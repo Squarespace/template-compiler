@@ -1,0 +1,228 @@
+package com.squarespace.template;
+
+import java.util.List;
+
+import com.squarespace.template.Instructions.AlternatesWithInst;
+import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.EndInst;
+import com.squarespace.template.Instructions.FormatterInst;
+import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.LiteralInst;
+import com.squarespace.template.Instructions.MetaInst;
+import com.squarespace.template.Instructions.PredicateInst;
+import com.squarespace.template.Instructions.RepeatedInst;
+import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.Instructions.SectionInst;
+import com.squarespace.template.Instructions.TextInst;
+import com.squarespace.template.Instructions.VariableInst;
+
+
+/**
+ * Given an instruction, (recursively) emits the canonical representation.
+ */
+public class ReprEmitter {
+
+  public static String get(Instruction inst, boolean recurse) {
+    StringBuilder buf = new StringBuilder();
+    inst.repr(buf, recurse);
+    return buf.toString();
+  }
+  
+  public static void emit(AlternatesWithInst inst, StringBuilder buf, boolean recurse) {
+    buf.append("{.alternates with}");
+    if (recurse) {
+      emitBlock(inst, buf, recurse);
+    }
+  }
+  
+  public static void emit(CommentInst inst, StringBuilder buf) {
+    buf.append("{#");
+    if (inst.isMultiLine()) {
+      buf.append('#');
+    }
+    StringView view = inst.getView();
+    buf.append(view.data(), view.start(), view.end());
+    if (inst.isMultiLine()) {
+      buf.append("##");
+    }
+    buf.append('}');
+  }
+  
+  public static void emit(EndInst inst, StringBuilder buf) {
+    buf.append("{.end}");
+  }
+
+  public static void emit(Arguments args, StringBuilder buf) {
+    if (args == null || args.isEmpty()) {
+      return;
+    }
+    char delimiter = args.getDelimiter();
+    for (String arg : args.getArgs()) {
+      buf.append(delimiter);
+      buf.append(arg);
+    }
+  }
+  
+  public static void emit(FormatterInst inst, StringBuilder buf) {
+    buf.append('{');
+    emitNames(inst.getVariable(), buf);
+    buf.append('|');
+    buf.append(inst.getFormatter().getIdentifier());
+    emit(inst.getArguments(), buf);
+//    List<String> arguments = inst.getArguments();
+//    if (arguments != null) {
+//      for (String arg : arguments) {
+//        buf.append(' ');
+//        buf.append(arg);
+//      }
+//    }
+    buf.append('}');
+  }
+
+  public static void emit(IfInst inst, StringBuilder buf, boolean recurse) {
+    buf.append("{.if ");
+    List<String[]> variables = inst.getVariables();
+    List<Operator> operators = inst.getOperators();
+    // There is always at least one variable.
+    emitNames(variables.get(0), buf);
+    for (int i = 1; i < variables.size(); i++) {
+      Operator op = operators.get(i - 1);
+      if (op == Operator.LOGICAL_AND) {
+        buf.append(" && ");
+      } else {
+        buf.append(" || ");
+      }
+      emitNames(variables.get(i), buf);
+    }
+    buf.append('}');
+  }
+  
+  public static void emit(LiteralInst inst, StringBuilder buf) {
+    buf.append("{.").append(inst.getName()).append('}');
+  }
+
+  public static void emit(MetaInst inst, StringBuilder buf) {
+    buf.append("{.");
+    if (inst.isLeft()) {
+      buf.append("meta-left");
+    } else {
+      buf.append("meta-right");
+    }
+    buf.append('}');
+  }
+  
+  public static void emit(PredicateInst inst, StringBuilder buf, boolean recurse) {
+    Predicate predicate = inst.getPredicate();
+    buf.append("{.");
+    if (inst.getType() == InstructionType.PREDICATE) {
+      buf.append(predicate.getIdentifier());
+    } else {
+      buf.append("or");
+      if (predicate != null) {
+        buf.append(' ').append(predicate.getIdentifier());
+      }
+    }
+    emit(inst.getArguments(), buf);
+//    if (args != null) {
+//      for (String arg : args) {
+//        buf.append(' ');
+//        buf.append(arg);
+//      }
+//    }
+    buf.append('}');
+
+    if (recurse) {
+      emitBlock(inst, buf, recurse);
+    }
+  }
+  
+  public static void emit(RepeatedInst inst, StringBuilder buf, boolean recurse) {
+    buf.append("{.repeated section ");
+    emitNames(inst.getVariable(), buf);
+    buf.append('}');
+    if (recurse) {
+      // Special case of a block, since we want the "alternates with" block to 
+      // be emitted between the consequent and alternative.
+      emitBlock(inst.getConsequent(), buf, recurse);
+      AlternatesWithInst a2 = inst.getAlternatesWith();
+      if (a2 != null) {
+        a2.repr(buf, recurse);
+      }
+      Instruction alt = inst.getAlternative();
+      if (alt != null) {
+        alt.repr(buf, recurse);
+      }
+    }
+  }
+  
+  public static void emit(RootInst inst, StringBuilder buf, boolean recurse) {
+    // A little silly, since the root has no representation, but must 
+    // implement the interface to maintain consistency.
+    if (recurse) {
+      emitBlock(inst.getConsequent(), buf, recurse);
+    }
+  }
+  
+  public static void emit(SectionInst inst, StringBuilder buf, boolean recurse) {
+    buf.append("{.section ");
+    emitNames(inst.getVariable(), buf);
+    buf.append('}');
+    if (recurse) {
+      emitBlock(inst.getConsequent(), buf, recurse);
+      Instruction alt = inst.getAlternative();
+      if (alt != null) {
+        alt.repr(buf, recurse);
+      }
+    }
+  }
+
+  public static void emit(TextInst inst, StringBuilder buf) {
+    StringView view = inst.getView();
+    buf.append(view.data(), view.start(), view.end());
+  }
+  
+  public static void emit(VariableInst inst, StringBuilder buf) {
+    buf.append('{');
+    emitNames(inst.getVariable(), buf);
+    buf.append('}');
+  }
+  
+  /**
+   * 
+   */
+  private static void emitBlock(BlockInstruction inst, StringBuilder buf, boolean recurse) {
+    emitBlock(inst.getConsequent(), buf, recurse);
+    Instruction alt = inst.getAlternative();
+    if (alt != null) {
+      alt.repr(buf, recurse);
+    }
+  }
+  
+  /**
+   * Helper to generate representations for lists of instructions.
+   */
+  private static void emitBlock(Block block, StringBuilder buf, boolean recurse) {
+    List<Instruction> instructions = block.getInstructions();
+    if (instructions == null) {
+      return;
+    }
+    for (Instruction inst : instructions) {
+      inst.repr(buf, recurse);
+    }
+  }
+  
+  private static void emitNames(String[] names, StringBuilder buf) {
+    if (names == null) {
+      buf.append("@");
+      return;
+    }
+    for (int i = 0; i < names.length; i++) {
+      if (i > 0) {
+        buf.append('.');
+      }
+      buf.append(names[i]);
+    }
+  }
+  
+  
+}
