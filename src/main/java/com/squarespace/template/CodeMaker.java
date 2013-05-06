@@ -9,6 +9,7 @@ import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.NewlineInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -80,12 +81,20 @@ public class CodeMaker {
   }
 
   /**
-   * Yes, "ifn" represents an IF instruction, since "if" cannot be a method name.
+   * Yeah, "ifn" represents an IF instruction, since "if" cannot be a method name.
    */
-  public IfInst ifn(List<String> vars, List<Operator> ops) {
+  public IfInst ifexpn(List<String> vars, List<Operator> ops) {
     return new IfInst(vars, ops);
   }
 
+  public IfPredicateInst ifpred(Predicate predicate) {
+    return ifpred(predicate, Constants.EMPTY_ARGUMENTS);
+  }
+  
+  public IfPredicateInst ifpred(Predicate predicate, Arguments args) {
+    return new IfPredicateInst(predicate, args);
+  }
+  
   public List<Integer> intlist(Integer ... numbers) {
     return Arrays.<Integer>asList(numbers);
   }
@@ -169,6 +178,10 @@ public class CodeMaker {
   
   public List<String> strlist(String ... strings) {
     return Arrays.<String>asList(strings);
+  }
+  
+  public String[] strarray(String ... elements) {
+    return elements;
   }
   
   public TabInst tab() {

@@ -6,14 +6,14 @@ package com.squarespace.template;
  */
 public class CodeExecuteException extends CodeException {
 
-  private ErrorInfo<ExecuteErrorType> errorInfo;
+  private ErrorInfo errorInfo;
   
-  public CodeExecuteException(ErrorInfo<ExecuteErrorType> info) {
+  public CodeExecuteException(ErrorInfo info) {
     super(info.getMessage());
     this.errorInfo = info;
   }
 
-  public ErrorInfo<ExecuteErrorType> getErrorInfo() {
+  public ErrorInfo getErrorInfo() {
     return errorInfo;
   }
   

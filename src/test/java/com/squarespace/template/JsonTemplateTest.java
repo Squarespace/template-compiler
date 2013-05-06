@@ -8,6 +8,11 @@ import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.v6.utils.JSONUtils;
 
 
+/**
+ * 
+ * @author phensley
+ *
+ */
 public class JsonTemplateTest extends UnitTestBase {
 
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";
@@ -63,7 +68,7 @@ public class JsonTemplateTest extends UnitTestBase {
   @Test
   public void testRepeat() throws CodeException {
     String expected = "Hi, Joe! Hi, Bob! ";
-    RootInst root = builder().repeat("@").text("Hi, ").var("foo").text("! ").end().eof().code();
+    RootInst root = builder().repeated("@").text("Hi, ").var("foo").text("! ").end().eof().code();
     assertContext(execute("[{\"foo\": \"Joe\"},{\"foo\": \"Bob\"}]", root), expected);
   }
 
@@ -87,12 +92,12 @@ public class JsonTemplateTest extends UnitTestBase {
     String input = "{\"foo\":123}";
     Context ctx = new Context(JSONUtils.decode(input));
     CoreFormatters.JSON.apply(ctx, Constants.EMPTY_ARGUMENTS);
-    assertEquals(ctx.getBuffer().toString(), input);
+    assertEquals(ctx.buffer().toString(), input);
     
     input = "\"hello world\"";
     ctx = new Context(JSONUtils.decode(input));
     CoreFormatters.JSON.apply(ctx, Constants.EMPTY_ARGUMENTS);
-    assertEquals(ctx.getBuffer().toString(), input);
+    assertEquals(ctx.buffer().toString(), input);
   }
   
   @Test

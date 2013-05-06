@@ -5,15 +5,13 @@ import java.util.List;
 
 
 /**
- * A BlockInstruction is contains a Block of instructions and an alternative.
- * This groups together the common functionality for all instructions containing
- * blocks.
+ * A BlockInstruction contains a primary list of nested instructions, called the consequent,
+ * and a single alternative instruction.
  * 
- * For a conditional block (PredicateInst, IfInst) the consequent is executed
- * if the conditional is true, and the alternative instruction is executed
- * if the conditional is false.
+ * A conditional block (PredicateInst, IfInst) executes the consequent when the
+ * condition is true, and the alternative is executed when the condition is false. 
  * 
- * A RepeatedInst would execute its consequent multiple times.
+ * A RepeatedInst just executes its consequent multiple times.
  */
 abstract class BlockInstruction extends BaseInstruction {
 

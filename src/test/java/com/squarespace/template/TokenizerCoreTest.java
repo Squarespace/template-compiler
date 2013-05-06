@@ -147,20 +147,20 @@ public class TokenizerCoreTest extends UnitTestBase {
   @Test
   public void testIf() throws CodeSyntaxException {
     CodeMaker mk = maker();
-    assertResult("{.if a}", mk.ifn(mk.strlist("a"), mk.oplist()), mk.eof());
-    assertResult("{.if a||b}", mk.ifn(mk.strlist("a", "b"), mk.oplist(LOGICAL_OR)), mk.eof());
-    assertResult("{.if a.b && c.d}", mk.ifn(mk.strlist("a.b","c.d"), mk.oplist(LOGICAL_AND)), mk.eof());
-    assertResult("{.if a&&b||c}", mk.ifn(mk.strlist("a", "b", "c"), mk.oplist(LOGICAL_AND, LOGICAL_OR)), mk.eof());
+    assertResult("{.if a}", mk.ifexpn(mk.strlist("a"), mk.oplist()), mk.eof());
+    assertResult("{.if a||b}", mk.ifexpn(mk.strlist("a", "b"), mk.oplist(LOGICAL_OR)), mk.eof());
+    assertResult("{.if a.b && c.d}", mk.ifexpn(mk.strlist("a.b","c.d"), mk.oplist(LOGICAL_AND)), mk.eof());
+    assertResult("{.if a&&b||c}", mk.ifexpn(mk.strlist("a", "b", "c"), mk.oplist(LOGICAL_AND, LOGICAL_OR)), mk.eof());
 
     List<String> vars = mk.strlist("a", "b", "c", "d", "e");
     List<Operator> ops = mk.oplist(LOGICAL_OR, LOGICAL_OR, LOGICAL_OR, LOGICAL_OR);
-    assertResult("{.if a||b||c||d||e}", mk.ifn(vars, ops), mk.eof());
+    assertResult("{.if a||b||c||d||e}", mk.ifexpn(vars, ops), mk.eof());
     
     assertFailure("{.if}", WHITESPACE_EXPECTED);
     assertFailure("{.if }", IF_EMPTY);
     assertFailure("{.if a||b||c||d||e||}", IF_TOO_MANY_OPERATORS);
     assertFailure("{.if a||b||c||d||e||f}", IF_TOO_MANY_VARS);
-    assertFailure("{.if a?||b?}", IF_EXPECTED_VAROP);
+    assertFailure("{.if .qrs||.tuv}", IF_EXPECTED_VAROP);
   }
   
   @Test
@@ -243,8 +243,8 @@ public class TokenizerCoreTest extends UnitTestBase {
       if (VERBOSE) {
         System.out.println("assertFailure: " + e.getMessage());
       }
-      assertNotEquals(e.getErrorInfo(), null, "ErrorInfo is null");
-      assertEquals(e.getErrorInfo().getErrorType(), type, "error type doesn't match");
+      assertNotEquals(e.getError(), null, "ErrorInfo is null");
+      assertEquals(e.getError().getType(), type, "error type doesn't match");
       assertEquals(e.getMessage().indexOf(Constants.NULL_PLACEHOLDER), -1, "found null placeholder");
     }
   }

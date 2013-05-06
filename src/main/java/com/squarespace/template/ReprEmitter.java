@@ -7,6 +7,7 @@ import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.LiteralInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -25,6 +26,12 @@ public class ReprEmitter {
   public static String get(Instruction inst, boolean recurse) {
     StringBuilder buf = new StringBuilder();
     inst.repr(buf, recurse);
+    return buf.toString();
+  }
+  
+  public static String get(Arguments args, boolean includeDelimiter) {
+    StringBuilder buf = new StringBuilder();
+    emit(args, includeDelimiter, buf);
     return buf.toString();
   }
   
@@ -53,13 +60,20 @@ public class ReprEmitter {
   }
 
   public static void emit(Arguments args, StringBuilder buf) {
+    emit(args, true, buf);
+  }
+  
+  public static void emit(Arguments args, boolean includeDelimiter, StringBuilder buf) {
     if (args == null || args.isEmpty()) {
       return;
     }
     char delimiter = args.getDelimiter();
-    for (String arg : args.getArgs()) {
-      buf.append(delimiter);
-      buf.append(arg);
+    List<String> argList = args.getArgs();
+    for (int i = 0; i < argList.size(); i++) {
+      if (includeDelimiter || i > 0) {
+        buf.append(delimiter);
+      }
+      buf.append(argList.get(i));
     }
   }
   
@@ -69,13 +83,6 @@ public class ReprEmitter {
     buf.append('|');
     buf.append(inst.getFormatter().getIdentifier());
     emit(inst.getArguments(), buf);
-//    List<String> arguments = inst.getArguments();
-//    if (arguments != null) {
-//      for (String arg : arguments) {
-//        buf.append(' ');
-//        buf.append(arg);
-//      }
-//    }
     buf.append('}');
   }
 
@@ -83,6 +90,7 @@ public class ReprEmitter {
     buf.append("{.if ");
     List<String[]> variables = inst.getVariables();
     List<Operator> operators = inst.getOperators();
+    
     // There is always at least one variable.
     emitNames(variables.get(0), buf);
     for (int i = 1; i < variables.size(); i++) {
@@ -94,6 +102,14 @@ public class ReprEmitter {
       }
       emitNames(variables.get(i), buf);
     }
+    buf.append('}');
+  }
+  
+  public static void emit(IfPredicateInst inst, StringBuilder buf, boolean recurse) {
+    Predicate predicate = inst.getPredicate();
+    buf.append("{.if ");
+    buf.append(predicate.getIdentifier());
+    emit(inst.getArguments(), buf);
     buf.append('}');
   }
   
@@ -123,12 +139,6 @@ public class ReprEmitter {
       }
     }
     emit(inst.getArguments(), buf);
-//    if (args != null) {
-//      for (String arg : args) {
-//        buf.append(' ');
-//        buf.append(arg);
-//      }
-//    }
     buf.append('}');
 
     if (recurse) {
@@ -156,10 +166,8 @@ public class ReprEmitter {
   }
   
   public static void emit(RootInst inst, StringBuilder buf, boolean recurse) {
-    // A little silly, since the root has no representation, but must 
-    // implement the interface to maintain consistency.
     if (recurse) {
-      emitBlock(inst.getConsequent(), buf, recurse);
+      emitBlock(inst, buf, recurse);
     }
   }
   
@@ -168,11 +176,7 @@ public class ReprEmitter {
     emitNames(inst.getVariable(), buf);
     buf.append('}');
     if (recurse) {
-      emitBlock(inst.getConsequent(), buf, recurse);
-      Instruction alt = inst.getAlternative();
-      if (alt != null) {
-        alt.repr(buf, recurse);
-      }
+      emitBlock(inst, buf, recurse);
     }
   }
 
@@ -187,9 +191,6 @@ public class ReprEmitter {
     buf.append('}');
   }
   
-  /**
-   * 
-   */
   private static void emitBlock(BlockInstruction inst, StringBuilder buf, boolean recurse) {
     emitBlock(inst.getConsequent(), buf, recurse);
     Instruction alt = inst.getAlternative();
@@ -198,9 +199,6 @@ public class ReprEmitter {
     }
   }
   
-  /**
-   * Helper to generate representations for lists of instructions.
-   */
   private static void emitBlock(Block block, StringBuilder buf, boolean recurse) {
     List<Instruction> instructions = block.getInstructions();
     if (instructions == null) {

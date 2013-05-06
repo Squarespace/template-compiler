@@ -27,18 +27,10 @@ public abstract class SymbolTable<K, V> {
     this.inUse = true;
   }
   
-  /**
-   * Register all T fields found on each of the source classes.
-   */
-  public void register(Class<?> ... sources) {
-    for (Class<?> source : sources) {
-      registerClass(source);
-    }
+  public void register(Registry<K, V> source) {
+    registerClass(source);
   }
   
-  /**
-   * Retrieve the T instance by symbol.
-   */
   public V get(K symbol) {
     return table.get(symbol);
   }
@@ -64,11 +56,13 @@ public abstract class SymbolTable<K, V> {
   abstract void registerSymbol(Object impl);
 
   /**
-   * Use reflection to iterate over all static T fields on the class and
-   * register each using a callback.
+   * Use reflection to iterate over all static fields on the class and
+   * register each that matches our type reference.
    */
-  private void registerClass(Class<?> source) {
-    Field[] fields = source.getDeclaredFields();
+  private void registerClass(Registry<K, V> source) {
+    
+    // Scan for static instances
+    Field[] fields = source.getClass().getDeclaredFields();
     for (Field field : fields) {
       
       if (!java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
@@ -84,6 +78,9 @@ public abstract class SymbolTable<K, V> {
         }
       }
     }
+    
+    // Register dynamic instances
+    source.registerTo(this);
   }
   
 }

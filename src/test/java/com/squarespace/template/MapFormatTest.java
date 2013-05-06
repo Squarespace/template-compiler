@@ -9,12 +9,13 @@ import org.testng.annotations.Test;
 
 public class MapFormatTest {
 
+  
   @Test
   public void testStrings() {
-    Map<String, Object> map = mapmaker().put("last", "Evans").put("first", "Bill").get();
-    assertEquals(format("%(first)s %(last)s", map), "Bill Evans");
-    assertEquals(format("%(last)-10s", map), "Evans     ");
-    assertEquals(format("%(last)10s", map), "     Evans");
+    Map<String, Object> map = mapmaker().put("last", "Space").put("first", "Square").get();
+    assertEquals(format("%(first)s %(last)s", map), "Square Space");
+    assertEquals(format("%(last)-10s", map), "Space     ");
+    assertEquals(format("%(last)10s", map), "     Space");
   }
   
   @Test

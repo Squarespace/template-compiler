@@ -4,7 +4,6 @@ import static com.squarespace.template.InstructionType.ALTERNATES_WITH;
 import static com.squarespace.template.InstructionType.IF;
 import static com.squarespace.template.InstructionType.OR_PREDICATE;
 import static com.squarespace.template.InstructionType.PREDICATE;
-import static com.squarespace.template.InstructionType.REPEATED;
 import static com.squarespace.template.InstructionType.ROOT;
 import static com.squarespace.template.InstructionType.SECTION;
 import static com.squarespace.template.SyntaxErrorType.DEAD_CODE_BLOCK;
@@ -42,12 +41,15 @@ public class CodeMachine implements CodeSink {
 
   private RootInst root;
   
+  private BlockInstruction scope;
+  
   private Instruction current;
   
   private int instructionCount;
   
   public CodeMachine() {
     this.root = new RootInst();
+    this.scope = null;
     this.current = root;
     state = state_ROOT;
   }
@@ -88,7 +90,7 @@ public class CodeMachine implements CodeSink {
       switch (inst.getType()) {
   
         // These block instructions open a new scope, so they can occur in any state,
-        // We handle them here to shorten the switch bodies of the states.
+        // We handle them here to shorten the switch bodies of the individual states.
         case IF:
         case PREDICATE:
         case REPEATED:
@@ -110,6 +112,7 @@ public class CodeMachine implements CodeSink {
   private State push(Instruction inst) {
     addConsequent(inst);
     stack.push(current);
+    scope = (BlockInstruction) inst;
     current = inst;
     return stateFor(inst);
   }
@@ -121,6 +124,7 @@ public class CodeMachine implements CodeSink {
   private State pop() throws CodeSyntaxException {
     try {
       current = stack.pop();
+      scope = (BlockInstruction) current;
     } catch (Exception e) {
       throw new RuntimeException("Popped the ROOT instruction off the stack, which should never happen! "
           + "Possible bug in state machine.");
@@ -142,13 +146,21 @@ public class CodeMachine implements CodeSink {
     ((BlockInstruction)current).setAlternative(inst);
   }
 
-  private ErrorInfo<SyntaxErrorType> error(SyntaxErrorType code, Instruction inst) {
-    ErrorInfo<SyntaxErrorType> mk = new ErrorInfo<>(code);
-    mk.code(code);
-    mk.type(inst.getType());
-    mk.line(inst.getLineNumber());
-    mk.offset(inst.getCharOffset());
-    return mk;
+  /**
+   * Populate an ErrorInfo with basic state and return it to be augmented before
+   * raising an exception.
+   */
+  private ErrorInfo error(SyntaxErrorType code, Instruction inst) {
+    ErrorInfo info = new ErrorInfo(code);
+    info.code(code);
+    info.type(inst.getType());
+    info.line(inst.getLineNumber());
+    info.offset(inst.getCharOffset());
+    return info;
+  }
+  
+  private void fail(ErrorInfo info) throws CodeSyntaxException {
+    throw new CodeSyntaxException(info);
   }
   
   private String currentInfo() {
@@ -185,7 +197,7 @@ public class CodeMachine implements CodeSink {
         return state_SECTION;
         
       default:
-        throw new RuntimeException("machine fail: attempt to find state for non-block instruction " + type.getName());
+        throw new RuntimeException("machine fail: attempt to find state for non-block instruction " + type);
     }
   }
     
@@ -204,12 +216,24 @@ public class CodeMachine implements CodeSink {
       switch (type) {
 
         case EOF:
-          throw new CodeSyntaxException(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
 
         case ALTERNATES_WITH:
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(ALTERNATES_WITH));
+
         case OR_PREDICATE:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_IN_BLOCK, inst).data(ALTERNATES_WITH));
-        
+          // Special case where an OR_PREDICATE follows an ALTERNATES_WITH. We
+          // need to close off the ALTERNATES_WITH and open the OR_PREDICATE scope.
+          if (scope instanceof RepeatedInst) {
+            setAlternative(new EndInst());
+            ((RepeatedInst)scope).setAlternative(inst);
+            current = inst;
+            return state_OR_PREDICATE;
+          }
+          
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(ALTERNATES_WITH));
+          break;
+
         case END:
           setAlternative(inst);
           return pop();
@@ -234,10 +258,10 @@ public class CodeMachine implements CodeSink {
       switch (type) {
         
         case EOF:
-          throw new CodeSyntaxException(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
 
         case ALTERNATES_WITH:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_IN_BLOCK, inst).data(IF));
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(IF));
         
         case END:
           setAlternative(inst);
@@ -255,7 +279,7 @@ public class CodeMachine implements CodeSink {
       return this;
     }
   };
-
+  
   /**
    * PREDICATE state. A conditional block structure. It has a consequent block
    * which is executed when the branching condition is true, and one alternate which
@@ -269,10 +293,10 @@ public class CodeMachine implements CodeSink {
       switch (type) {
         
         case EOF:
-          throw new CodeSyntaxException(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
 
         case ALTERNATES_WITH:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_IN_BLOCK, inst).data(PREDICATE));
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(PREDICATE));
         
         case END:
           setAlternative(inst);
@@ -304,20 +328,20 @@ public class CodeMachine implements CodeSink {
       switch (type) {
         
         case EOF:
-          throw new CodeSyntaxException(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
 
         case ALTERNATES_WITH:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_IN_BLOCK, inst).data(OR_PREDICATE));
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(OR_PREDICATE));
           
         case END:
           setAlternative(inst);
           return pop();
           
         case OR_PREDICATE:
-          // Perform a check to ensure that we don't have any {.or} following a null predicate {.or}.
+          // Check to ensure that we don't have any {.or} following a null predicate {.or}.
           PredicateInst parent = ((PredicateInst)current);
           if (parent.getType() == OR_PREDICATE && parent.getPredicate() == null) {
-            throw new CodeSyntaxException(error(DEAD_CODE_BLOCK, inst));
+            fail(error(DEAD_CODE_BLOCK, inst));
           }
           setAlternative(inst);
           current = inst;
@@ -332,7 +356,7 @@ public class CodeMachine implements CodeSink {
   };
   
   /**
-   * REPEAT state. A block which iterates over an array of elements and executes
+   * REPEATED state. A block which iterates over an array of elements and executes
    * its consequent block for each element. Interleaves executing its optional 
    * ALTERNATES_WITH block.
    */
@@ -344,16 +368,16 @@ public class CodeMachine implements CodeSink {
       switch (type) {
 
         case EOF:
-          throw new CodeSyntaxException(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
 
         case OR_PREDICATE:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_IN_BLOCK, inst).data(REPEATED));
-
+          setAlternative(inst);
+          current = inst;
+          return state_OR_PREDICATE;
+                                
         case ALTERNATES_WITH:
           // Special block that lives only within the repeat instruction
-          RepeatedInst parent = (RepeatedInst)current;
-          parent.setAlternatesWith((AlternatesWithInst)inst);
-          parent.setAlternative(new EndInst());
+          ((RepeatedInst)current).setAlternatesWith((AlternatesWithInst)inst);
           current = inst;
           return state_ALTERNATES_WITH;
 
@@ -379,10 +403,10 @@ public class CodeMachine implements CodeSink {
       switch (type) {
 
         case EOF:
-          throw new CodeSyntaxException(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
           
         case ALTERNATES_WITH:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_IN_BLOCK, inst).data(SECTION));
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(SECTION));
         
         case OR_PREDICATE:
           setAlternative(inst);
@@ -418,11 +442,11 @@ public class CodeMachine implements CodeSink {
           return state_EOF;
 
         case END:
-          throw new CodeSyntaxException(error(MISMATCHED_END, inst));
+          fail(error(MISMATCHED_END, inst));
           
         case ALTERNATES_WITH:
         case OR_PREDICATE:
-          throw new CodeSyntaxException(error(NOT_ALLOWED_AT_ROOT, inst).data(ROOT));
+          fail(error(NOT_ALLOWED_AT_ROOT, inst).data(ROOT));
           
         default:
           addConsequent(inst);

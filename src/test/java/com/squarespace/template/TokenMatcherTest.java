@@ -7,10 +7,10 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 
-public class TokenerTest extends UnitTestBase {
+public class TokenMatcherTest extends UnitTestBase {
 
   @Test
-  public void testBasic() {
+  public void testUsage() {
     CodeMaker mk = maker();
     TokenMatcher tm = new TokenMatcher(".abc? d e f");
     assertTrue(tm.keyword());
@@ -21,11 +21,12 @@ public class TokenerTest extends UnitTestBase {
   }
   
   @Test
-  public void testFailures() {
+  public void testMisses() {
     CodeMaker mk = maker();
     TokenMatcher tm = new TokenMatcher(" .abc?");
     assertFalse(tm.keyword());
     assertEquals(tm.remainder(), mk.view(" .abc?"));
   }
+  
   
 }

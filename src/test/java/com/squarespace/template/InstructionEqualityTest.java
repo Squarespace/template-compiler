@@ -114,13 +114,13 @@ public class InstructionEqualityTest extends UnitTestBase {
   @Test
   public void testIfEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
-    IfInst i1 = mk.ifn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_OR));
-    IfInst i2 = mk.ifn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_OR));
+    IfInst i1 = mk.ifexpn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_OR));
+    IfInst i2 = mk.ifexpn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_OR));
     assertEquals(i1, i2);
     assertFalse(i1.equals(null));
-    assertNotEquals(i1, mk.ifn(mk.strlist("@"), mk.oplist()));
-    assertNotEquals(i1, mk.ifn(mk.strlist("bar", "foo"), mk.oplist(LOGICAL_OR)));
-    assertNotEquals(i1, mk.ifn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_AND)));
+    assertNotEquals(i1, mk.ifexpn(mk.strlist("@"), mk.oplist()));
+    assertNotEquals(i1, mk.ifexpn(mk.strlist("bar", "foo"), mk.oplist(LOGICAL_OR)));
+    assertNotEquals(i1, mk.ifexpn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_AND)));
     
     testBlockEquals(i1, i2);
   }

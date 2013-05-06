@@ -12,10 +12,13 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Arguments {
   
-  private char delimiter = ' ';
-  
   private List<String> args = Constants.EMPTY_LIST_OF_STRING;
 
+  private char delimiter = ' ';
+  
+  /** A place where a Predicate / Formatter can store data associated with the parsed args */
+  private Object opaque;
+  
   public Arguments() {
   }
   
@@ -23,13 +26,10 @@ public class Arguments {
     parse(raw);
   }
   
-  private void parse(StringView raw) {
-    if (raw.length() == 0) {
-      return;
-    }
-    delimiter = raw.charAt(0);
-    raw = raw.subview(1, raw.length());
-    args = Arrays.asList(StringUtils.split(raw.repr(), delimiter));
+  public String join() {
+    StringBuilder buf = new StringBuilder();
+    ReprEmitter.emit(this, false, buf);
+    return buf.toString();
   }
   
   public String first() {
@@ -54,6 +54,14 @@ public class Arguments {
   
   public List<String> getArgs() {
     return args;
+  }
+  
+  public void setOpaque(Object obj) {
+    this.opaque = obj;
+  }
+  
+  public Object getOpaque() {
+    return this.opaque;
   }
   
   // Helper methods to make assertions about the args.
@@ -82,6 +90,11 @@ public class Arguments {
   }
   
   @Override
+  public String toString() {
+    return ReprEmitter.get(this, false);
+  }
+  
+  @Override
   public boolean equals(Object obj) {
     if (obj instanceof Arguments) {
       Arguments other = (Arguments) obj;
@@ -90,4 +103,13 @@ public class Arguments {
     return false;
   }
 
+  private void parse(StringView raw) {
+    if (raw.length() == 0) {
+      return;
+    }
+    delimiter = raw.charAt(0);
+    raw = raw.subview(1, raw.length());
+    args = Arrays.asList(StringUtils.split(raw.repr(), delimiter));
+  }
+  
 }

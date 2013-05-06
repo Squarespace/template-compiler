@@ -1,7 +1,7 @@
 package com.squarespace.template;
 
 
-interface Formatter {
+public interface Formatter {
 
   public String getIdentifier();
   

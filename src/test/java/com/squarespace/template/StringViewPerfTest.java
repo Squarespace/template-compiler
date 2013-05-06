@@ -2,15 +2,13 @@ package com.squarespace.template;
 
 import java.util.Arrays;
 
-import org.testng.annotations.Test;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 
 
 /**
  * Test the speedup factor of StringView over String, with hashing considered.
  */
-public class PerformanceTest {
+public class StringViewPerfTest {
 
   static class StringNum {
     private String str;
@@ -72,27 +70,27 @@ public class PerformanceTest {
     return buf.toString();
   }
 
-  @Test
+// DISABLED: used for development only
+//  @Test
   public void testFaster() throws Exception {
-    Thread.sleep(1);  // let profiler attach to process.
     String data = "abcdefghijklmnopqrstuvwxyz";
-    
-    for (int i = 1; i < 6; i++) {
-      String raw = expand(data, i * 256);
+
+    int iters = 10_000;
+    for (int i = 1; i < 4; i++) {
+      String raw = expand(data, i * 1024);
       System.out.printf("length: %d\n", raw.length());
-      long strTime = runString(raw);
-      long viewTime = runView(raw);
+      long strTime = runString(raw, iters);
+      long viewTime = runView(raw, iters);
       System.out.printf("   str: %d\n", strTime);
       System.out.printf("  view: %d\n", viewTime);
       System.out.printf("factor: %.2f\n\n", (strTime / (double)viewTime));
     }
   }
   
-  private long runString(String data) {
+  private long runString(String data, int iters) {
     int len = data.length();
     StringTable strTable = new StringTable();
     strTable.registerSymbol(new StringNum(data, 1));
-    int iters = 50_000;
     long[] times = new long[5];
 
     for (int p = 0; p < 5; p++) {
@@ -113,13 +111,12 @@ public class PerformanceTest {
     return elapsed / 3;
   }
   
-  private long runView(String data) {
+  private long runView(String data, int iters) {
     int len = data.length();
     StringView view = new StringView(data);
     StringViewTable viewTable = new StringViewTable();
     viewTable.registerSymbol(new StringViewNum(view, 1));
 
-    int iters = 50_000;
     long[] times = new long[5];
     
     for (int p = 0; p < 5; p++) {

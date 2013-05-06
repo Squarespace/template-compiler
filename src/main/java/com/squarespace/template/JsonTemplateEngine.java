@@ -70,5 +70,12 @@ public class JsonTemplateEngine {
     tokenizer.consume();
     return new CompiledTemplate(machine);
   }
+  
+  public CodeList tokenize(String template) throws CodeSyntaxException {
+    CodeList sink = new CodeList();
+    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
+    tokenizer.consume();
+    return sink;
+  }
 
 }

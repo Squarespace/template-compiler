@@ -2,6 +2,7 @@ package com.squarespace.template;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class Context {
   
   private ArrayDeque<Frame> stack = new ArrayDeque<>();
 
-  private Frame frame;
+  private Frame currentFrame;
   
   /** 
    * Reference to the currently-executing instruction. All instruction execution
@@ -47,7 +48,7 @@ public class Context {
   }
 
   public Context(JsonNode node, StringBuilder buf) {
-    this.frame = new Frame(node);
+    this.currentFrame = new Frame(node);
     this.buf = buf;
   }
   
@@ -95,12 +96,12 @@ public class Context {
     }
   }
   
-  public ErrorInfo<ExecuteErrorType> error(ExecuteErrorType code) {
-    ErrorInfo<ExecuteErrorType> mk = new ErrorInfo<>(code);
-    mk.code(code);
-    mk.line(currentInstruction.getLineNumber());
-    mk.offset(currentInstruction.getCharOffset());
-    return mk;
+  public ErrorInfo error(ExecuteErrorType code) {
+    ErrorInfo info = new ErrorInfo(code);
+    info.code(code);
+    info.line(currentInstruction.getLineNumber());
+    info.offset(currentInstruction.getCharOffset());
+    return info;
   }
   
   /**
@@ -152,37 +153,37 @@ public class Context {
     buf.append(cs, start, end);
   }
   
-  public StringBuilder getBuffer() {
+  public StringBuilder buffer() {
     return buf;
   }
   
   public JsonNode node() {
-    return frame.node;
+    return currentFrame.node;
   }
 
   /**
    * Use this to find the index position in the current frame.
    */
   public int currentIndex() {
-    return frame.currentIndex;
+    return currentFrame.currentIndex;
   }
   
   /**
    * Use this to find the index position of the parent frame.
    */
   public int parentIndex() {
-    return frame.parentIndex;
+    return currentFrame.parentIndex;
   }
   
   public boolean hasNext() {
-    return frame.currentIndex < frame.node.size();
+    return currentFrame.currentIndex < currentFrame.node.size();
   }
   
   /**
    * Increment the array element pointer for the current frame.
    */
   public void increment() {
-    frame.currentIndex++;
+    currentFrame.currentIndex++;
   }
 
   /**
@@ -196,32 +197,57 @@ public class Context {
     // XXX: need to support searching up the stack until it resolves.
     // XXX: use stack.iterator() to resolve starting node
 
-    JsonNode node = resolve(names, frame.node);
-    stack.push(frame);
-    frame = new Frame(node);
+    JsonNode node = resolve(names);
+    stack.push(currentFrame);
+    currentFrame = new Frame(node);
   }
 
   /**
    * Pushes the next element from the current array node onto the stack.
    */
   public void pushNext() {
-    int parentIndex = frame.currentIndex;
-    JsonNode node = frame.node.path(frame.currentIndex);
-    frame.currentIndex++;
-    stack.push(frame);
-    frame = new Frame(node, parentIndex);
+    int parentIndex = currentFrame.currentIndex;
+    JsonNode node = currentFrame.node.path(currentFrame.currentIndex);
+    currentFrame.currentIndex++;
+    stack.push(currentFrame);
+    currentFrame = new Frame(node, parentIndex);
+  }
+  
+  public int findIndex() {
+    Iterator<Frame> iter = stack.iterator();
+    while (iter.hasNext()) {
+      Frame temp = iter.next();
+      if (temp.currentIndex != -1) {
+        return temp.currentIndex;
+      }
+    }
+    return -1;
   }
 
   /**
-   * Dig out the JSON node referenced by the list of names. 
-   * If names == null, return the starting node.
+   * Lookup the JSON node referenced by the list of names. 
    */
-  public JsonNode resolve(String[] names, JsonNode node) {
+  public JsonNode resolve(String[] names) {
     if (names == null) {
-      return node;
+      return currentFrame.node;
     }
-    for (String name : names) {
-      node = node.path(name);
+    // Starting at the current frame, walk up the stack looking for the first
+    // object node which contains names[0].
+    JsonNode node = currentFrame.node;
+    node = node.path(names[0]);
+    if (node.isMissingNode()) {
+      // Search up the stack..
+      Iterator<Frame> iter = stack.iterator();
+      while (iter.hasNext()) {
+        node = iter.next().node.path(names[0]);
+        if (!node.isMissingNode()) {
+          break;
+        }
+      }
+    }
+      
+    for (int i = 1; i < names.length; i++) {
+      node = node.path(names[i]);
     }
     return node;
   }
@@ -230,7 +256,7 @@ public class Context {
    * Pop the stack unconditionally.
    */
   public void pop() {
-    frame = stack.pop();
+    currentFrame = stack.pop();
   }
   
   /**
@@ -240,7 +266,7 @@ public class Context {
     if (names == null) {
       return;
     }
-    frame = stack.pop();
+    currentFrame = stack.pop();
   }
 
   static class Frame {

@@ -1,19 +1,20 @@
 package com.squarespace.template;
 
 
+
 /**
  * Represents any error that occurs during compilation of a raw template string.
  */
 public class CodeSyntaxException extends CodeException {
 
-  private ErrorInfo<SyntaxErrorType> errorInfo;
+  private ErrorInfo errorInfo;
   
-  public CodeSyntaxException(ErrorInfo<SyntaxErrorType> info) {
+  public CodeSyntaxException(ErrorInfo info) {
     super(info.getMessage());
-    errorInfo = info;
+    this.errorInfo = info;
   }
-  
-  public ErrorInfo<SyntaxErrorType> getErrorInfo() {
+
+  public ErrorInfo getError() {
     return errorInfo;
   }
   

@@ -11,8 +11,8 @@ public enum ExecuteErrorType implements ErrorType {
   APPLY_PARTIAL_MISSING
   ("Attempt to apply partial '%(name)s' which could not be found."),
   
-  TEST_ERROR
-  ("Test error %(name)s."),
+  DEFAULT_ERROR
+  ("Default error %(name)s: %(data)s"),
 
   ;
   

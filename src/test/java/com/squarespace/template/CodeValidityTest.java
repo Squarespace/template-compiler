@@ -1,7 +1,6 @@
 package com.squarespace.template;
 
 import static com.squarespace.template.CorePredicates.PLURAL;
-import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.SyntaxErrorType.DEAD_CODE_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_BLOCK;
@@ -13,7 +12,6 @@ import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 /**
@@ -35,7 +33,7 @@ public class CodeValidityTest extends UnitTestBase {
     
     // AND TESTS
     
-    CodeBuilder builder = builder().ifn(mk.strlist("a", "b"), mk.oplist(Operator.LOGICAL_AND));
+    CodeBuilder builder = builder().ifexpn(mk.strlist("a", "b"), mk.oplist(Operator.LOGICAL_AND));
     RootInst root = builder.text("A").or().text("B").end().eof().code();
     
     assertContext(execute("{\"a\": 1, \"b\": 3.14159}", root), "A");
@@ -47,7 +45,7 @@ public class CodeValidityTest extends UnitTestBase {
     
     // OR TESTS
 
-    builder = builder().ifn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
+    builder = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
     root = builder.text("A").or().text("B").end().eof().code();
     
     assertContext(execute("{\"a\": true}", root), "A");
@@ -73,18 +71,28 @@ public class CodeValidityTest extends UnitTestBase {
   @Test
   public void testRepeat() throws CodeException {
     String jsonData = "{\"foo\": [0, 0, 0]}";
-    RootInst root = builder().repeat("foo").text("1").var("@").alternatesWith().text("-").end().eof().code();
+    RootInst root = builder().repeated("foo").text("1").var("@").alternatesWith().text("-").end().eof().code();
     assertContext(execute(jsonData, root), "10-10-10");
     
-    root = builder().repeat("bar").text("1").end().eof().code();
+    root = builder().repeated("bar").text("1").end().eof().code();
     assertContext(execute("{}", root), "");
+  }
+  
+  @Test
+  public void testRepeatOr() throws CodeException {
+    String jsonData = "{\"a\": [0, 0, 0]}";
+    RootInst root1 = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().code();
+    assertContext(execute(jsonData, root1), "0-0-0");
+
+    jsonData = "{\"b\": [0, 0, 0]}";
+    assertContext(execute(jsonData, root1), "X");
   }
   
   @Test
   public void testRepeatIndex() throws CodeException {
     String jsonData = "{\"foo\": [\"A\", \"B\", \"C\"]}";
     CodeBuilder cb = builder();
-    cb.repeat("foo").var("@").var("@index").alternatesWith().text(".").end().eof();
+    cb.repeated("foo").var("@").var("@index").alternatesWith().text(".").end().eof();
     RootInst root = cb.code();
     assertContext(execute(jsonData, root), "A0.B1.C2");
   }
@@ -119,7 +127,6 @@ public class CodeValidityTest extends UnitTestBase {
     RootInst root = builder().var("foo").var("bar").eof().code();
     assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
   }
-  
 
   @Test
   public void testInvalid() {
@@ -127,7 +134,7 @@ public class CodeValidityTest extends UnitTestBase {
       builder().or(CorePredicates.SINGULAR);
       fail("Invalid syntax passed as OK");
     } catch (CodeSyntaxException e) {
-      assertEquals(e.getErrorInfo().getErrorType(), NOT_ALLOWED_AT_ROOT);
+      assertEquals(e.getError().getType(), NOT_ALLOWED_AT_ROOT);
     }
   }
   
@@ -140,44 +147,10 @@ public class CodeValidityTest extends UnitTestBase {
   }
   
   @Test
-  public void testApplyPartial() throws CodeException {
-    String partials = "{\"block.item\": \"this {@} value\"}";
-    String input = "{\"foo\": 123}";
-    
-    CodeMaker mk = maker();
-    CodeBuilder cb = builder().text("hi ");
-    cb.formatter("foo", CoreFormatters.APPLY, mk.args(" block.item"));
-    RootInst root = cb.text("!").eof().code();
-
-    // TODO: better interface for context with partials
-    
-    Context ctx = new Context(JSONUtils.decode(input));
-    ctx.setCompiler(compiler());
-    ctx.setPartials(JSONUtils.decode(partials));
-    ctx.execute(root);
-    assertContext(ctx, "hi this 123 value!");
-  }
-  
-  @Test
-  public void testPartialError() throws CodeException {
-    String template = "{@|apply block}";
-    String partials = "{\"block\": \"{.section foo}{@}\"}";
-    String input = "{\"foo\": 123}";
-    Instruction inst = compiler().compile(template).getCode();
-    Context ctx = new Context(JSONUtils.decode(input));
-    ctx.setCompiler(compiler());
-    ctx.setPartials(JSONUtils.decode(partials));
-    try {
-      ctx.execute(inst);
-    } catch (CodeExecuteException e) {
-      assertEquals(e.getErrorInfo().getErrorType(), APPLY_PARTIAL_SYNTAX);
-    }
-  }
-  
-  @Test
   public void testDeadCode() {
     CodeMaker mk = maker();
     assertInvalid(DEAD_CODE_BLOCK, mk.predicate(PLURAL), mk.text("A"), mk.or(), mk.text("B"), mk.or());
+    assertInvalid(DEAD_CODE_BLOCK, mk.repeated("@"), mk.text("A"), mk.alternates(), mk.or(), mk.or());
   }
   
   /**
@@ -190,7 +163,8 @@ public class CodeValidityTest extends UnitTestBase {
     assertInvalid(EOF_IN_BLOCK, mk.section("@"), mk.section("a"), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.repeated("@"), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.repeated("@"), mk.repeated("b"), mk.eof());
-    assertInvalid(EOF_IN_BLOCK, mk.ifn(mk.strlist("a","b"), mk.oplist(LOGICAL_AND)), mk.eof());
+    assertInvalid(EOF_IN_BLOCK, mk.ifexpn(mk.strlist("a","b"), mk.oplist(LOGICAL_AND)), mk.eof());
+    assertInvalid(EOF_IN_BLOCK, mk.ifpred(PLURAL), mk.or(), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.predicate(PLURAL), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.section("@"), mk.or(), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.section("a"), mk.or(PLURAL), mk.eof());
@@ -202,8 +176,7 @@ public class CodeValidityTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.or());
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.alternates());
-    assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("@"), mk.or());
-    assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("a"), mk.alternates(), mk.or());
+    assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("@"), mk.or(), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.section("a"), mk.or(), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.predicate(PLURAL), mk.alternates());
   }
@@ -216,7 +189,7 @@ public class CodeValidityTest extends UnitTestBase {
       fail(type + " should have raised a syntax exception");
     } catch (CodeSyntaxException e) {
       // Exception means success.
-      assertEquals(e.getErrorInfo().getErrorType(), type);
+      assertEquals(e.getError().getType(), type);
     }
   }
   

@@ -23,10 +23,12 @@ package com.squarespace.template;
  *   buf.append(s2.getData(), s2.start(), s2.end());
  *   
  * Speeds things up by about 20-30%, depending on sequence length, and for the JSONT 
- * engine greatly reduces the creation of intermediate char[].
+ * engine greatly reduces the creation of intermediate String/char[] objects, thus
+ * reducing pressure on the garbage collector.
  */
 public class StringView implements CharSequence {
 
+  
   private String str;
   
   private int start;
@@ -106,13 +108,10 @@ public class StringView implements CharSequence {
     return true;
   }
 
-//  /**
-//   * Hash function from older JDK. Newer JDK uses an access-restricted version
-//   * of Murmur3. Too bad StringView doesn't have fast, direct access to the String's
-//   * internal char[], but charAt() is just about as fast.
-//   * 
-//   * The value 31 is a small prime, which is equivalent to (h << 5) - h.
-//   */
+  /**
+   * A modified hash function from older JDK. The initial value is a large prime.
+   * The value 31 is a small prime.
+   */
   @Override
   public int hashCode() {
     if (hashVal == 0) {
@@ -127,24 +126,7 @@ public class StringView implements CharSequence {
     }
     return hashVal;
   }
-  
-  /**
-   * FNV-1a hash code.
-   */
-//  @Override
-  public int hashCode_FNV() {
-    if (hashVal == 0) {
-      int h = 0;
-      for (int i = start; i < end; i++) {
-        h = (h ^ str.charAt(i)) * 0x01000193;
-      }
-      if (h == 0) {
-        h |= 1;
-      }
-      hashVal = h;
-    }
-    return hashVal;
-  }
+
   
   @Override
   public int length() {

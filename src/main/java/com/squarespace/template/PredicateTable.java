@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
  */
 public class PredicateTable extends SymbolTable<StringView, Predicate> {
 
-  private static final int NUM_BUCKETS = 64;
+  private static final int NUM_BUCKETS = 128;
   
   private static final TypeReference<Predicate> TYPE_REF = new TypeReference<Predicate>() { };
   

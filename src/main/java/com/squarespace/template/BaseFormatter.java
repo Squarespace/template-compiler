@@ -23,7 +23,12 @@ public abstract class BaseFormatter implements Formatter {
     return requiresArgs;
   }
   
+  public void fail(ErrorInfo info) throws CodeExecuteException {
+    throw new CodeExecuteException(info);
+  }
+  
   public void validateArgs(Arguments args) throws ArgumentsException {
+    // NOOP
   }
 
   public void apply(Context ctx, Arguments args) throws CodeExecuteException {

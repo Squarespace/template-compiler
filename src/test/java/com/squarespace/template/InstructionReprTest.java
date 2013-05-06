@@ -62,13 +62,13 @@ public class InstructionReprTest extends UnitTestBase {
   @Test
   public void testIfRepr() {
     CodeMaker mk = maker();
-    IfInst i1 = mk.ifn(mk.strlist("a"), null);
+    IfInst i1 = mk.ifexpn(mk.strlist("a"), null);
     assertEquals(i1.repr(), "{.if a}");
-    IfInst i2 = mk.ifn(mk.strlist("a", "b"), mk.oplist(LOGICAL_OR));
+    IfInst i2 = mk.ifexpn(mk.strlist("a", "b"), mk.oplist(LOGICAL_OR));
     assertEquals(i2.repr(), "{.if a || b}");
-    IfInst i3 = mk.ifn(mk.strlist("a", "b", "c"), mk.oplist(LOGICAL_AND, LOGICAL_AND));
+    IfInst i3 = mk.ifexpn(mk.strlist("a", "b", "c"), mk.oplist(LOGICAL_AND, LOGICAL_AND));
     assertEquals(i3.repr(), "{.if a && b && c}");
-    IfInst i4 = mk.ifn(mk.strlist("a.b", "c.d", "e.f"), mk.oplist(LOGICAL_OR, LOGICAL_AND));
+    IfInst i4 = mk.ifexpn(mk.strlist("a.b", "c.d", "e.f"), mk.oplist(LOGICAL_OR, LOGICAL_AND));
     assertEquals(i4.repr(), "{.if a.b || c.d && e.f}");
   }
   

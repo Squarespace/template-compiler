@@ -19,6 +19,7 @@ public class PatternsTest {
     isFormatter("pluralize");
     isFormatter("foo-bar");
 
+    notFormatter(" foo");
     notFormatter(".bar");
     notFormatter("-foo");
     notFormatter("2foo");
@@ -33,11 +34,12 @@ public class PatternsTest {
     isKeyword(".section");
     isKeyword(".plural?");
     isKeyword(".foo-Bar?");
+    isKeyword(".foo_");
     
+    notKeyword(" .foo");
     notKeyword("foo.bar");
     notKeyword(".foo-bar!");
     notKeyword(".123foo");
-    notKeyword(".foo_");
   }
   
   @Test
@@ -47,6 +49,7 @@ public class PatternsTest {
     isVariable("@");
     isVariable("@index");
     
+    notVariable(" foo");
     notVariable(".foo");
     notVariable("-foo.bar");
     notVariable("12foo");

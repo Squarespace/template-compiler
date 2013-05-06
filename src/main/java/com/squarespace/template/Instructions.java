@@ -86,7 +86,7 @@ public class Instructions {
     public boolean equals(Object obj) {
       if (obj instanceof CommentInst) {
         CommentInst other = (CommentInst) obj;
-        return multiLine == other.multiLine && equals(view, other.view);
+        return multiLine == other.multiLine && view.equals(other.view);
       }
       return false;
     }
@@ -183,7 +183,7 @@ public class Instructions {
         return false;
       }
       FormatterInst other = (FormatterInst) obj;
-      return Arrays.equals(variable, other.variable) && (impl == other.impl) && equals(args, other.args);
+      return Arrays.equals(variable, other.variable) && (impl.equals(other.impl)) && args.equals(other.args);
     }
     
     @Override
@@ -233,20 +233,7 @@ public class Instructions {
     public List<Operator> getOperators() {
       return operators;
     }
-    
-    private boolean isTruthy(JsonNode node) {
-      if (node.isTextual()) {
-        return node.asText() != "";
-      }
-      if (node.isNumber() || node.isBoolean()) {
-        return node.asLong() != 0;
-      }
-      if (node.isMissingNode() || node.isNull()) {
-        return false;
-      }
-      return node.size() != 0;
-    }
-    
+
     @Override 
     public boolean equals(Object obj) {
       if (!(obj instanceof IfInst)) {
@@ -254,7 +241,7 @@ public class Instructions {
       }
       IfInst other = (IfInst) obj;
       return variableListEquals(variables, other.variables)
-          && equals(operators, other.operators)
+          && operators.equals(other.operators)
           && blockEquals(other);
     }
     
@@ -266,11 +253,11 @@ public class Instructions {
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
       // Set initial boolean using truth value of first var.
-      boolean result = isTruthy(ctx.resolve(variables.get(0), ctx.node()));
+      boolean result = GeneralUtils.isTruthy(ctx.resolve(variables.get(0)));
       for (int i = 1; i < variables.size(); i++) {
         String[] var = variables.get(i);
         Operator op = operators.get(i-1);
-        boolean value = isTruthy(ctx.resolve(var, ctx.node()));
+        boolean value = GeneralUtils.isTruthy(ctx.resolve(var));
         result = (op == Operator.LOGICAL_OR) ? (result || value) : (result && value);
         if (op == Operator.LOGICAL_OR) {
           if (result) {
@@ -294,6 +281,66 @@ public class Instructions {
       ReprEmitter.emit(this, buf, recurse);
     }
     
+  }
+  
+  /**
+   * Represents a conditional which tests a predicate.
+   * 
+   * NOTE: I'm not sure why this form of if expression was added to the language,
+   * since it is redundant with a normal predicate call:
+   * 
+   *  {.if foo?}  does the same thing as  {.foo?}
+   *  
+   * I've implemented it to preserve compatibility with the JavaScript JSONT
+   * code, but it can be removed.
+   */
+  static class IfPredicateInst extends BlockInstruction {
+    
+    private Predicate predicate;
+
+    private Arguments arguments;
+    
+    public IfPredicateInst(Predicate predicate, Arguments arguments) {
+      super(CONSEQUENT_BLOCK_LEN);
+      this.predicate = predicate;
+      this.arguments = arguments;
+    }
+
+    public Predicate getPredicate() {
+      return predicate;
+    }
+    
+    public Arguments getArguments() {
+      return arguments;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof IfPredicateInst) {
+        IfPredicateInst other = (IfPredicateInst) obj;
+        return predicate.equals(other.predicate);
+      }
+      return false;
+    }
+    
+    @Override
+    public InstructionType getType() {
+      return InstructionType.IF;
+    }
+    
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      if (predicate.apply(ctx, arguments)) {
+        ctx.execute(consequent.getInstructions());
+      } else {
+        ctx.execute(alternative);
+      }
+    }
+    
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf, recurse);
+    }
   }
 
   /**
@@ -432,7 +479,7 @@ public class Instructions {
       if (impl != other.impl) {
         return false;
       }
-      return equals(args, other.args) && blockEquals(other);
+      return args.equals(other.args) && blockEquals(other);
     }
     
     @Override
@@ -672,7 +719,7 @@ public class Instructions {
     
     @Override
     public boolean equals(Object obj) {
-      return (obj instanceof TextInst) && equals(view, ((TextInst)obj).view);
+      return (obj instanceof TextInst) && view.equals(((TextInst)obj).view);
     }
     
     @Override
@@ -699,8 +746,13 @@ public class Instructions {
 
     private String[] variable;
     
+    private boolean isIndex = false;
+    
     public VariableInst(String name) {
       this.variable = splitName(name);
+      if (name.equals("@index")) {
+        isIndex = true;
+      }
     }
     
     public String[] getVariable() {
@@ -719,10 +771,10 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) {
-      if (variable != null && variable.length == 1 && variable[0].equals("@index")) {
+      if (isIndex) {
         ctx.append(Integer.toString(ctx.parentIndex()));
       } else {
-        JsonNode node = ctx.resolve(variable, ctx.node());
+        JsonNode node = ctx.resolve(variable);
         ctx.append(node.asText());
       }
     }

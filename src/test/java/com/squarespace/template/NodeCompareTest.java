@@ -22,8 +22,8 @@ public class NodeCompareTest extends TesterBase {
   private static final FormatterTable formatterTable = new FormatterTable();
   
   static {
-    predicateTable.register(CorePredicates.class);
-    formatterTable.register(CoreFormatters.class);
+    predicateTable.register(new CorePredicates());
+    formatterTable.register(new CoreFormatters());
   }
   
   @Inject
@@ -51,6 +51,16 @@ public class NodeCompareTest extends TesterBase {
   }
 
   @Test
+  public void testCompare() throws Exception {
+    String tmpl = "{.repeated section a}{b}{@index}{.end}";
+    String json = "{\"a\": [1,2,3], \"b\": \"A\"}";
+    
+    System.out.println(runNode(tmpl, json));
+    System.out.println(runParo(tmpl, json));
+  }
+  
+  // DISABLED: development test to compare output
+//  @Test
   public void testEquals() throws Exception {
     String template = "START {foo.bar}\n{.section foo}{bar}\n{.end}\n {.repeated section list}A{@}{.end} END-";
     String jsonData = "{\"foo\": {\"bar\": 123}, \"list\": [1, 2, \"a\", 4, 5]}";
@@ -70,7 +80,7 @@ public class NodeCompareTest extends TesterBase {
     JsonTemplateEngine compiler = compiler();
     CompiledTemplate script = compiler.compile(template);
     Context ctx = compiler.execute(script.getCode(), JSONUtils.decode(jsonData));
-    return ctx.getBuffer().toString();
+    return ctx.buffer().toString();
   }
  
   public JsonTemplateEngine compiler() {

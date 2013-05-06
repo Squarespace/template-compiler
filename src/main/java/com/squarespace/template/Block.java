@@ -23,8 +23,8 @@ class Block {
     if (obj == null || !(obj instanceof Block)) {
       return false;
     }
-    List<Instruction> other = ((Block)obj).instructions;
-    return (instructions == null) ? (other == null) : instructions.equals(other);
+    Block other = (Block) obj;
+    return (instructions == null) ? (other.instructions == null) : instructions.equals(other.instructions);
   }
   
   public void add(Instruction ... instrs) {

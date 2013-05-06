@@ -4,8 +4,12 @@ package com.squarespace.template;
  * Provides a class to capture state about the error, prior to constructing the 
  * exception itself. Lets us pass this object around to various places if necessary
  * before wrapping it in a CodeSyntaxException.
+ * 
+ * The methods are named for the small set of keys used to do pattern substitution
+ * in the error messages.  The methods allow more compact code, allow call
+ * chaining, and to reduce typos when specifying key names, e.g. info.put("ofset", ...)
  */
-public class ErrorInfo<T extends ErrorType> {
+public class ErrorInfo {
 
   private static final String CODE = "code";
 
@@ -21,55 +25,64 @@ public class ErrorInfo<T extends ErrorType> {
   
   private static final String LIMIT = "limit";
 
-  private T errorType;
+  private ErrorType type;
+  
+  private String repr;
   
   private MapBuilder<String, Object> builder = new MapBuilder<>();
   
-  public ErrorInfo(T type) {
-    this.errorType = type;
+  public ErrorInfo(ErrorType type) {
+    this.type = type;
   }
 
-  public ErrorInfo<T> code(Object code) {
+  public ErrorInfo code(Object code) {
     builder.put(CODE, code);
     return this;
   }
 
-  public ErrorInfo<T> line(int line) {
+  public ErrorInfo line(int line) {
     builder.put(LINE, line);
     return this;
   }
   
-  public ErrorInfo<T> offset(int offset) {
+  public ErrorInfo offset(int offset) {
     builder.put(OFFSET, offset);
     return this;
   }
 
-  public ErrorInfo<T> type(Object type) {
+  public ErrorInfo type(Object type) {
     builder.put(TYPE, type);
     return this;
   }
   
-  public ErrorInfo<T> data(Object data) {
+  public ErrorInfo data(Object data) {
     builder.put(DATA, data);
     return this;
   }
 
-  public ErrorInfo<T> name(Object name) {
+  public ErrorInfo name(Object name) {
     builder.put(NAME, name);
     return this;
   }
   
-  public ErrorInfo<T> limit(Object limit) {
+  public ErrorInfo limit(Object limit) {
     builder.put(LIMIT, limit);
     return this;
   }
 
-  public T getErrorType() {
-    return errorType;
+  public MapBuilder<String, Object> getBuilder() {
+    return builder;
+  }
+  
+  public ErrorType getType() {
+    return type;
   }
 
   public String getMessage() {
-    return errorType.format(builder.get());
+    if (repr == null) {
+      repr = type.format(builder.get());
+    }
+    return repr;
   }
   
 }

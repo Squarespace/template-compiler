@@ -110,7 +110,7 @@ public class TokenMatcher {
   public int pointer() {
     return pointer;
   }
-
+  
   /**
    * Index of the end of the input range.
    */

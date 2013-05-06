@@ -21,13 +21,13 @@ public class Patterns {
   
   public static final String _ABC09UH = "[a-zA-Z0-9_-]";
   
-  public static final String _WORD = _ABC + "(" + _ABC09UH + "*" + _ABC09 + ")*";
+//  public static final String _WORD = _ABC + "(" + _ABC09UH + "*" + _ABC09 + ")*";
   
-  public static final String _DOTWORD = _WORD + "(\\." + _WORD + ")*";
+  public static final String _WORD = _ABC + _ABC09UH + "*+";
+  
+  public static final String _DOTWORD = _WORD + "(\\." + _WORD + ")*+";
 
   // Compiled regular expressions
-  
-  public static final Pattern OLD_ARGUMENTS = Pattern.compile("\\s*[^\\s]+(\\s+[^\\s]+)*");
   
   public static final Pattern ARGUMENTS = Pattern.compile("[^}]+");
   
@@ -43,6 +43,8 @@ public class Patterns {
    *    .main-image?
    */
   public static final Pattern KEYWORD = Pattern.compile("\\." + _WORD + "\\??");
+
+  public static final Pattern ONESPACE = Pattern.compile("\\s");
 
   /**
    * Predicates can appear as instructions or part of an OR instruction. We need this

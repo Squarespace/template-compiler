@@ -5,7 +5,6 @@ import java.util.Arrays;
 import javax.inject.Inject;
 
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.google.inject.Module;
 import com.ibm.icu.text.NumberFormat;
@@ -49,7 +48,8 @@ public class NodeJsSpeedTest extends TesterBase {
     }
     return buf.toString();
   }
-  
+
+// DISABLED: used for development only
 //  @Test
   public void testSpeed() throws Exception {
     String data = "START {foo.bar} {.section foo}{bar}{.end} {.repeated section list}A{@}{.end} END-";

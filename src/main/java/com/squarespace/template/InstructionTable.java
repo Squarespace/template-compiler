@@ -7,8 +7,6 @@ package com.squarespace.template;
  */
 public class InstructionTable {
   
-  private static final boolean DEBUG = true;
-
   private static final int HASHMAP_BUCKETS = 32;
   
   private static final StringViewMap<StringView, InstructionType> table = new StringViewMap<>(HASHMAP_BUCKETS);

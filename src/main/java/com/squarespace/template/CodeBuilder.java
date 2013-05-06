@@ -83,8 +83,18 @@ public class CodeBuilder {
     return this;
   }
   
-  public CodeBuilder ifn(List<String> variables, List<Operator> operators) throws CodeSyntaxException {
-    machine.accept(maker.ifn(variables, operators));
+  public CodeBuilder ifexpn(List<String> variables, List<Operator> operators) throws CodeSyntaxException {
+    machine.accept(maker.ifexpn(variables, operators));
+    return this;
+  }
+  
+  public CodeBuilder ifpred(Predicate predicate) throws CodeSyntaxException {
+    machine.accept(maker.ifpred(predicate));
+    return this;
+  }
+  
+  public CodeBuilder ifpred(Predicate predicate, Arguments args) throws CodeSyntaxException {
+    machine.accept(maker.ifpred(predicate, args));
     return this;
   }
   
@@ -118,7 +128,7 @@ public class CodeBuilder {
     return this;
   }
   
-  public CodeBuilder repeat(String name) throws CodeSyntaxException {
+  public CodeBuilder repeated(String name) throws CodeSyntaxException {
     machine.accept(maker.repeated(name));
     return this;
   }

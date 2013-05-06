@@ -2,6 +2,7 @@ package com.squarespace.template;
 
 import static org.testng.Assert.assertEquals;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
 import com.squarespace.v6.utils.JSONUtils;
 
@@ -17,11 +18,13 @@ class UnitTestBase {
   private static final FormatterTable formatterTable = new FormatterTable();
   
   static {
-    predicateTable.register(CorePredicates.class);
-    predicateTable.register(UnitTestPlugins.class);
+    predicateTable.register(new CorePredicates());
+    predicateTable.register(new MediaPredicates());
+    predicateTable.register(new UnitTestPredicates());
 
-    formatterTable.register(CoreFormatters.class);
-    formatterTable.register(UnitTestPlugins.class);
+    formatterTable.register(new CoreFormatters());
+    formatterTable.register(new MediaFormatters());
+    formatterTable.register(new UnitTestFormatters());
 
     // Used to tune the symbol table sizes.
     if (DEBUG) {
@@ -49,6 +52,14 @@ class UnitTestBase {
     return new CodeBuilder();
   }
   
+  public Context context(String raw) {
+    return new Context(json(raw));
+  }
+  
+  public JsonNode json(String raw) {
+    return JSONUtils.decode(raw);
+  }
+  
   public CodeMachine machine() {
     return new CodeMachine();
   }
@@ -56,7 +67,15 @@ class UnitTestBase {
   public CodeMaker maker() {
     return maker;
   }
+  
+  public Formatter formatter(String name) {
+    return formatterTable.get(new StringView(name));
+  }
 
+  public Predicate predicate(String name) {
+    return predicateTable.get(new StringView(name));
+  }
+  
   public CodeList collector() {
     return new CodeList();
   }
@@ -74,7 +93,7 @@ class UnitTestBase {
   }
 
   public String eval(Context ctx) {
-    return ctx.getBuffer().toString();
+    return ctx.buffer().toString();
   }
   
   public String commas(long num) {
@@ -100,7 +119,7 @@ class UnitTestBase {
    * Grab the buffer from the context and assert that it equals the expected value.
    */
   public void assertContext(Context ctx, String expected) {
-    String result = ctx.getBuffer().toString();
+    String result = ctx.buffer().toString();
     assertEquals(result, expected);
   }
 }

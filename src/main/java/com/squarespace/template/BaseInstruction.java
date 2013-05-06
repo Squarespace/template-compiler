@@ -1,7 +1,5 @@
 package com.squarespace.template;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,31 +49,12 @@ public abstract class BaseInstruction implements Instruction {
     return name.equals("@") ? null : StringUtils.split(name, '.');
   }
   
-  /**
-   * 
-   */
   public String repr() {
     StringBuilder buf = new StringBuilder();
     repr(buf, true);
     return buf.toString();
   }
   
-  protected boolean equals(Object v1, Object v2) {
-    return (v1 == null) ? (v2 == null) : v1.equals(v2);
-  }
-  
-  protected void repr(List<Instruction> instructions, StringBuilder buf, boolean recurse) {
-    for (Instruction inst : instructions) {
-      inst.repr(buf, recurse);
-    }
-  }
-  
-  protected void tree(List<Instruction> instructions, StringBuilder buf, int depth) {
-    for (Instruction inst : instructions) {
-      inst.tree(buf, depth);
-    }
-  }
-
   /**
    * Generate a tree representation of this instruction and its children.
    */

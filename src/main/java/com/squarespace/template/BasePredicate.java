@@ -12,17 +12,6 @@ public abstract class BasePredicate implements Predicate {
     this.requiresArgs = requiresArgs;
   }
 
-  /**
-   * Allows the Predicate implementation to parse and syntax check its arguments
-   * using the raw StringView passed in by the Tokenizer.  No state is maintained,
-   * this just performs the conversion. By default it returns an empty list.
-   * 
-   * NOTE: if arguments == null, it means the predicate was followed by zero or 
-   * more whitespace characters, e.g. no arguments were provided.
-   */
-  public void validateArgs(Arguments args) throws ArgumentsException {
-  }
-  
   public String getIdentifier() {
     return identifier;
   }
@@ -31,9 +20,8 @@ public abstract class BasePredicate implements Predicate {
     return requiresArgs;
   }
   
-  @Override
-  public String toString() {
-    return identifier;
+  public void validateArgs(Arguments args) throws ArgumentsException {
+    // NOOP
   }
   
   /**
@@ -43,5 +31,10 @@ public abstract class BasePredicate implements Predicate {
   public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
     return true;
   }
-  
+
+  @Override
+  public String toString() {
+    return identifier;
+  }
+
 }

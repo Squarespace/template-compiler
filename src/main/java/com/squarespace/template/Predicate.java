@@ -9,8 +9,6 @@ public interface Predicate {
   
   public void validateArgs(Arguments args) throws ArgumentsException;
   
-//  public List<String> convertArgs(StringView arguments) throws CodeSyntaxException;
-  
   public boolean apply(Context ctx, Arguments args) throws CodeExecuteException;
 
 }

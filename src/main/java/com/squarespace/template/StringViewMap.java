@@ -10,6 +10,13 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
     super(numBuckets);
   }
   
+  /**
+   * Dump the structure of the map to debug and tune the layout. I'd prefer to switch to a
+   * compiled DFA-based replacement, which will eliminate need for a HashMap and calling
+   * hashCode() on StringViews -- it will match incrementally, char-by-char.  At this 
+   * point I couldn't justify the additional dev, but may once work on the LESS compiler 
+   * starts.
+   */
   @SuppressWarnings("unchecked")
   public void dump() throws Exception {
 
