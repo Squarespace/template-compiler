@@ -1,6 +1,8 @@
 package com.squarespace.template;
 
+import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
@@ -122,4 +124,34 @@ class UnitTestBase {
     String result = ctx.buffer().toString();
     assertEquals(result, expected);
   }
+  
+  
+  public String format(Formatter impl, String json) throws CodeException {
+    return format(impl, EMPTY_ARGUMENTS, json);
+  }
+  
+  public String format(Formatter impl, Arguments args, String json) throws CodeException {
+    Context ctx = new Context(JSONUtils.decode(json));
+    impl.validateArgs(args);
+    impl.apply(ctx, args);
+    return eval(ctx);
+  }
+  
+  public void assertFormatter(Formatter impl, String json, String expected) throws CodeException {
+    assertEquals(format(impl, EMPTY_ARGUMENTS, json), expected);
+  }
+  
+  public void assertFormatter(Formatter impl, Arguments args, String json, String expected) throws CodeException {
+    assertEquals(format(impl, args, json), expected);
+  }
+
+  public void assertInvalidArgs(Formatter impl, Arguments args) {
+    try {
+      impl.validateArgs(args);
+      fail("Expected " + args + " to raise exception");
+    } catch (ArgumentsException e) {
+      // Expected
+    }
+  }
+
 }

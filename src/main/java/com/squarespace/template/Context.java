@@ -1,5 +1,7 @@
 package com.squarespace.template;
 
+import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
+
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,7 +82,14 @@ public class Context {
       return;
     }
     currentInstruction = instruction;
-    instruction.invoke(this);
+    try {
+      instruction.invoke(this);
+    } catch (CodeExecuteException e) {
+      throw e;
+    } catch (Exception e) {
+      ErrorInfo info = error(GENERAL_ERROR).name(instruction.getType()).data(e.getMessage());
+      throw new CodeExecuteException(info);
+    }
   }
   
   /**
@@ -219,11 +228,18 @@ public class Context {
     }
     return -1;
   }
+  
+  public JsonNode resolve(String name) {
+    return currentFrame.node.path(name);
+  }
 
   /**
    * Lookup the JSON node referenced by the list of names. 
    */
   public JsonNode resolve(String[] names) {
+    
+    // TODO: @index, return JsonNode for consistency
+    
     if (names == null) {
       return currentFrame.node;
     }

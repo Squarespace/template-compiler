@@ -1,5 +1,8 @@
 package com.squarespace.template;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,6 +10,45 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class SocialFormatters extends BaseRegistry<Formatter> {
 
+  private static final Pattern TWITTER_LINKS_REGEX = Pattern.compile(
+      "(\\b(https?|ftp|file):\\/\\/[-A-Z0-9+&@#\\/%?=~_|!:,.;]*[-A-Z0-9+&@#\\/%=~_|])", Pattern.CASE_INSENSITIVE
+      );
+  
+  private static final String TWITTER_LINKS_REPLACE =
+      "<a target=\"new\" href=\"$1\">$1</a>";
+  
+  private static final Pattern TWITTER_TWEETS_REGEX = Pattern.compile(
+      "(^| )@([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE
+      );
+  
+  private static final String TWITTER_TWEETS_REPLACE = 
+      "$1<a target=\"new\" href=\"http://www.twitter.com/$2/\">@$2</a>";
+  
+  private static final Pattern TWITTER_HASHTAG_REGEX = Pattern.compile(
+      "(^| )#([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE
+      );
+  
+  
+  public static final Formatter ACTIVATE_TWITTER_LINKS = new BaseFormatter("activate-twitter-links", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      String text = ctx.node().asText();
+      text = TWITTER_LINKS_REGEX.matcher(text).replaceAll(TWITTER_LINKS_REPLACE);
+      text = TWITTER_TWEETS_REGEX.matcher(text).replaceAll(TWITTER_TWEETS_REPLACE);
+      Matcher matcher = TWITTER_HASHTAG_REGEX.matcher(text);
+
+      // Hate using StringBuffer, but see Sun bug 5066679
+      StringBuffer buf = new StringBuffer();
+      while (matcher.find()) {
+        matcher.appendReplacement(buf, "<a target=\"new\" href=\"http://www.twitter.com/search/" +
+            GeneralUtils.urlEncode(matcher.group(2)) + "\">" + matcher.group(2) + "</a>");
+      }
+      matcher.appendTail(buf);
+      ctx.append(buf.toString());
+    }
+  };
+  
+  
   public static final Formatter COMMENTS = new BaseFormatter("comments", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -61,6 +103,24 @@ public class SocialFormatters extends BaseRegistry<Formatter> {
       addCommentCount(item, ctx.buffer());
     }
   };
+  
+  private static final String CALENDAR_DATE_FORMAT = "%Y%m%dT%H%M%SZ";
+  
+  public static final Formatter GOOGLE_CALENDAR_URL = new BaseFormatter("google-calendar-url", false) {
+    
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      JsonNode node = ctx.node();
+      long start = node.path("startDate").asLong();
+      long end = node.path("endDate").asLong();
+      ctx.append("http://www.google.com/calendar/event?action=TEMPLATE&ext=");
+      ctx.append(node.path("title").asText());
+      ctx.append("&dates=");
+      FormatterDateUtils.formatDate(CALENDAR_DATE_FORMAT, start, "UTC", ctx.buffer());
+      ctx.append("/");
+      FormatterDateUtils.formatDate(CALENDAR_DATE_FORMAT, end, "UTC", ctx.buffer());
+    }
+  };
 
   public static final Formatter LIKE_BUTTON = new BaseFormatter("like-button", false) {
     @Override
@@ -104,21 +164,12 @@ public class SocialFormatters extends BaseRegistry<Formatter> {
         String[] parts = StringUtils.split(profileUrl, '/');
         userName = parts[parts.length - 1];
       }
-      // IN PROGRESS...
+      ctx.append("<script>Y.use('squarespace-follow-buttons', function(Y) { ");
+      ctx.append("Y.on('domready', function() { Y.Squarespace.FollowButtonUtils.renderAll(); }); });");
+      ctx.append("</script><div class=\"squarespace-follow-button\"");
+      ctx.append(userName);
+      ctx.append("\"></div>");
     }
   };
-  
-  /*
-  
-      'twitter-follow-button': function(connectedAccount) {
-      // If the connected account is old and doesn't have a userName set,
-      // try to use the end of their profileUrl. This should be https://twitter.com/RyanCGee
-      // for example.
-      var userName = connectedAccount.userName || connectedAccount.profileUrl.split('/').pop();
-
-      return "<script>Y.use('squarespace-follow-buttons', function(Y) { Y.on('domready', function() { Y.Squarespace.FollowButtonUtils.renderAll(); }); });</script><div class=\"squarespace-follow-button\" data-username=\"" + userName + "\"></div>";
-    },
-  
-  */
 
 }

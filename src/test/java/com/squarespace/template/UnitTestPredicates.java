@@ -19,7 +19,7 @@ public class UnitTestPredicates extends BaseRegistry<Predicate> {
   public static Predicate EXECUTE_ERROR = new BasePredicate("execute-error", false) {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      throw new CodeExecuteException(ctx.error(ExecuteErrorType.DEFAULT_ERROR).name("ABCXYZ"));
+      throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
   };
   

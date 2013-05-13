@@ -1,6 +1,5 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
 import static com.squarespace.template.CoreFormatters.ENCODE_SPACE;
 import static com.squarespace.template.CoreFormatters.HTML;
 import static com.squarespace.template.CoreFormatters.HTMLATTR;
@@ -31,6 +30,15 @@ import com.squarespace.v6.utils.JSONUtils;
 
 public class CoreFormattersTest extends UnitTestBase {
 
+  @Test
+  public void testAbsUrl() throws CodeException {
+    String template = "{a|AbsUrl}";
+    String json = "{\"base-url\": \"http://foobar.com/foo\", \"a\": \"abc\"}";
+    Instruction code = compiler().compile(template).getCode();
+    String result = eval(compiler().execute(code, JSONUtils.decode(json)));
+    assertEquals(result, "http://foobar.com/foo/abc");
+  }
+  
   @Test
   public void testApplyPartial() throws CodeException {
     String partials = "{\"block.item\": \"this {@} value\"}";
@@ -254,33 +262,5 @@ public class CoreFormattersTest extends UnitTestBase {
     website.put("timeZone", timezone.getID());
     node.put("website", website);
     return node.toString();
-  }
-  
-  private String format(Formatter impl, String json) throws CodeException {
-    return format(impl, EMPTY_ARGUMENTS, json);
-  }
-  
-  private String format(Formatter impl, Arguments args, String json) throws CodeException {
-    Context ctx = new Context(JSONUtils.decode(json));
-    impl.validateArgs(args);
-    impl.apply(ctx, args);
-    return eval(ctx);
-  }
-  
-  private void assertFormatter(Formatter impl, String json, String expected) throws CodeException {
-    assertEquals(format(impl, EMPTY_ARGUMENTS, json), expected);
-  }
-  
-  private void assertFormatter(Formatter impl, Arguments args, String json, String expected) throws CodeException {
-    assertEquals(format(impl, args, json), expected);
-  }
-
-  private void assertInvalidArgs(Formatter impl, Arguments args) {
-    try {
-      impl.validateArgs(args);
-      fail("Expected " + args + " to raise exception");
-    } catch (ArgumentsException e) {
-      // Expected
-    }
   }
 }

@@ -2,13 +2,15 @@ package com.squarespace.template;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
-import static com.squarespace.template.ExecuteErrorType.DEFAULT_ERROR;
-import static com.squarespace.template.Patterns.WHITESPACE;
+import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
+import static com.squarespace.template.FormatterUtils.slugify;
+import static com.squarespace.template.GeneralUtils.isTruthy;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.List;
 
 import org.joda.time.DateTimeZone;
 
@@ -21,6 +23,17 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
+  
+  public static Formatter ABSURL = new BaseFormatter("AbsUrl", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      String baseUrl = ctx.resolve(new String[] { "base-url" }).asText();
+      String value = ctx.node().asText();
+      ctx.buffer().append(baseUrl).append('/').append(value);
+    }
+  };
+  
+  
   /**
    * APPLY - This will compile and execute a "partial template", caching it in the
    * context for possible later use.
@@ -138,6 +151,98 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
   
+  /*
+   
+      'item-classes': function(value, context) {
+
+      if (context.hash) { // sign its handlebars
+        context = this;
+      }
+
+      var classes = ['hentry'];
+
+      var promotedBlockType = TemplateContextUtils.get(context, 'promotedBlockType');
+      if (!!promotedBlockType) {
+        classes.push('promoted');
+        classes.push(FORMATTERS['slugify']('promoted-block-' + promotedBlockType));
+      }
+
+      var categories = TemplateContextUtils.get(context, 'categories');
+      if (!!categories) {
+        for (var i = 0; i < categories.length; i++) {
+          classes.push(FORMATTERS['slugify']('category-' + categories[i]));
+        }
+      }
+
+      var tags = TemplateContextUtils.get(context, 'tags');
+      if (!!tags) {
+        for (var j = 0; j < tags.length; j++) {
+          classes.push(FORMATTERS['slugify']('tag-' + tags[j]));
+        }
+      }
+
+      var author = TemplateContextUtils.get(context, 'author');
+      if (!!author && !!author.displayName) {
+        classes.push(FORMATTERS['slugify']('author-' + author.displayName));
+      }
+
+      classes.push('post-type-' + TemplateContextUtils.get(context, 'recordTypeLabel'));
+
+      classes.push('article-index-' + TemplateContextUtils.get(context, '@index'));
+
+      if (TemplateContextUtils.get(context, 'starred')) {
+        classes.push('featured');
+      }
+
+      // product classes
+      if (value.recordType === Y.Squarespace.ContentConstants.STORE_ITEM) {
+
+        if (Y.Squarespace.Commerce.onSale(value)) {
+          classes.push('on-sale');
+        }
+
+        if (value.payWhatYouWant) {
+          classes.push('pay-what-you-want');
+        }
+      }
+
+      return classes.join(' ');
+    },
+   
+   */
+  
+  public static Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      List<String> classes = Arrays.asList("hentry");
+      JsonNode node = ctx.resolve("promotedBlockType");
+      if (isTruthy(node)) {
+        classes.add("promoted");
+        classes.add("promoted-block-" + slugify(node.asText()));
+      }
+      node = ctx.resolve("tags");
+      if (isTruthy(node)) {
+        int size = node.size();
+        for (int i = 0; i < size; i++) {
+          classes.add("category-" + slugify(node.get(i).asText()));
+        }
+      }
+      node = ctx.resolve("author");
+      JsonNode displayName = node.path("displayName");
+      if (isTruthy(node) && isTruthy(displayName)) {
+        classes.add("author-" + slugify(displayName.asText()));
+      }
+      node = ctx.resolve("recordTypeLabel");
+      classes.add(node.asText());
+      // TODO:  fixme
+      node = ctx.resolve("@index");
+      classes.add("article-index-" + node.asInt());
+      
+      // TODO: implement
+    }
+  };
+  
+  
   /**
    * JSON - Output a text representation of the node.
    */
@@ -160,7 +265,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         // version of JSONT, but it seems quite error-prone to me.
         ctx.append(result.replace("</script>", "</scr\"+\"ipt>"));
       } catch (IOException e) {
-        fail(ctx.error(DEFAULT_ERROR).data(e.getMessage()));
+        fail(ctx.error(GENERAL_ERROR).data(e.getMessage()));
       }
     }
   };
@@ -236,14 +341,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    */
   public static Formatter SLUGIFY = new BaseFormatter("slugify", false) {
     
-    private final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
-    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String result = ctx.node().asText();
-      result = SLUG_KILLCHARS.matcher(result).replaceAll("");
-      result = WHITESPACE.matcher(result).replaceAll("-");
-      ctx.append(result.toLowerCase());
+      ctx.append(FormatterUtils.slugify(result));
     }
   };
   

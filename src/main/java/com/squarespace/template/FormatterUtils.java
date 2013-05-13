@@ -1,10 +1,22 @@
 package com.squarespace.template;
 
+import static com.squarespace.template.Patterns.WHITESPACE;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 
 public class FormatterUtils {
+  
+  private static final Pattern REMOVE_TAGS = Pattern.compile("<(?:.|\n)*?>");
 
+  private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
+
+  
   public static void escapeHtml(String str, StringBuilder buf) {
     for (int i = 0; i < str.length(); i++) {
       char ch = str.charAt(i);
@@ -44,6 +56,24 @@ public class FormatterUtils {
           buf.append(ch);
       }
     }
+  }
+  
+  public static String formatMoney(double cents, Locale locale) {
+    boolean isWhole = (cents == Math.round(cents));
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+    String pattern = isWhole ? "#,###.00" : "#,###.##";
+    DecimalFormat format = new DecimalFormat(pattern, symbols);
+    return format.format(cents);
+  }
+
+  public static String removeTags(String str) {
+    return REMOVE_TAGS.matcher(str).replaceAll("");
+  }
+  
+  public static String slugify(String value) {
+    value = SLUG_KILLCHARS.matcher(value).replaceAll("");
+    value = WHITESPACE.matcher(value).replaceAll("-");
+    return value.toLowerCase();
   }
   
   public static void truncate(String value, int maxLen, String ellipses, StringBuilder buf) {

@@ -19,7 +19,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
   public static Formatter EXECUTE_ERROR = new BaseFormatter("execute-error", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      throw new CodeExecuteException(ctx.error(ExecuteErrorType.DEFAULT_ERROR).name("ABCXYZ"));
+      throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
   };
   
