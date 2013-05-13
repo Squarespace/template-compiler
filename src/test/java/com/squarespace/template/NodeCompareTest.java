@@ -59,7 +59,7 @@ public class NodeCompareTest extends TesterBase {
     System.out.println(runParo(tmpl, json));
   }
   
-  // DISABLED: development test to compare output
+  // DISABLED: development test to compare output. will expand later.
 //  @Test
   public void testEquals() throws Exception {
     String template = "START {foo.bar}\n{.section foo}{bar}\n{.end}\n {.repeated section list}A{@}{.end} END-";

@@ -193,10 +193,6 @@ public class Context {
     if (names == null) {
       return;
     }
-    
-    // XXX: need to support searching up the stack until it resolves.
-    // XXX: use stack.iterator() to resolve starting node
-
     JsonNode node = resolve(names);
     stack.push(currentFrame);
     currentFrame = new Frame(node);
@@ -234,6 +230,7 @@ public class Context {
     // Starting at the current frame, walk up the stack looking for the first
     // object node which contains names[0].
     JsonNode node = currentFrame.node;
+
     node = node.path(names[0]);
     if (node.isMissingNode()) {
       // Search up the stack..

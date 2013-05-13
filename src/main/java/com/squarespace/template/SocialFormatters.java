@@ -104,7 +104,7 @@ public class SocialFormatters extends BaseRegistry<Formatter> {
         String[] parts = StringUtils.split(profileUrl, '/');
         userName = parts[parts.length - 1];
       }
-      // TODO: continue
+      // IN PROGRESS...
     }
   };
   

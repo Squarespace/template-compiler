@@ -37,6 +37,8 @@ public class MediaFormatters extends BaseRegistry<Formatter> {
       if (!temp.isMissingNode()) {
 //        focalPoint = temp.path("x").asText() + 
       }
+      
+      // IN PROGRESS......
     }
   };
   

@@ -34,10 +34,14 @@ public class MediaPredicates extends BaseRegistry<Predicate> {
   
   static final Predicate MAIN_IMAGE = new BasePredicate("main-image?", false) {
     
+    // TODO: implement
+    
   };
   
   static final Predicate VIDEO = new BasePredicate("video?", false) {
-    
+
+    // TODO: implement
+
   };
   
   private static final String[] GALLERY_DESIGN_SELECT = new String[] { 

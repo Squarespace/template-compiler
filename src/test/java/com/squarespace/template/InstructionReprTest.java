@@ -12,6 +12,7 @@ import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
@@ -70,6 +71,17 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(i3.repr(), "{.if a && b && c}");
     IfInst i4 = mk.ifexpn(mk.strlist("a.b", "c.d", "e.f"), mk.oplist(LOGICAL_OR, LOGICAL_AND));
     assertEquals(i4.repr(), "{.if a.b || c.d && e.f}");
+  }
+  
+  @Test
+  public void testIfPredicate() {
+    CodeMaker mk = maker();
+    IfPredicateInst i1 = mk.ifpred(CorePredicates.PLURAL);
+    assertEquals(i1.repr(), "{.if plural?}");
+    i1 = mk.ifpred(UnitTestPredicates.REQUIRED_ARGS, mk.args(" 1 2 3"));
+    assertEquals(i1.repr(), "{.if required-args? 1 2 3}");
+    i1 = mk.ifpred(UnitTestPredicates.INVALID_ARGS, mk.args("/abc/def/ghi"));
+    assertEquals(i1.repr(), "{.if invalid-args?/abc/def/ghi}");
   }
   
   @Test

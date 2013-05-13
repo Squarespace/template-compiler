@@ -116,9 +116,6 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{a.b.c|slugify}", mk.formatter("a.b.c", CoreFormatters.SLUGIFY), mk.eof());
     assertResult("{foo|pluralize a1 a2}", mk.formatter("foo", CoreFormatters.PLURALIZE, args1), mk.eof());
 
-    // Not sure why upstream allow formatter args to butt against the formatter name -- it
-    // looks unreadable to me. If I had my way there'd be mandatory whitespace separating the two.
-    // Only reason this works is the argument starts with a non-formatter character.
     Arguments args2 = mk.args("/b/c");
     assertResult("{a|pluralize/b/c}", mk.formatter("a", CoreFormatters.PLURALIZE, args2), mk.eof());
   }

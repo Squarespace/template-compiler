@@ -1,6 +1,9 @@
 package com.squarespace.template;
 
 
+/**
+ * Implementations to test the Formatter interface.
+ */
 public class UnitTestFormatters extends BaseRegistry<Formatter> {
 
   public static Formatter INVALID_ARGS = new BaseFormatter("invalid-args", false) {

@@ -10,10 +10,8 @@ import com.squarespace.v6.utils.JSONUtils;
 
 /**
  * 
- * @author phensley
- *
  */
-public class JsonTemplateTest extends UnitTestBase {
+public class CodeExecuteTest extends UnitTestBase {
 
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";
   
@@ -72,14 +70,13 @@ public class JsonTemplateTest extends UnitTestBase {
     assertContext(execute("[{\"foo\": \"Joe\"},{\"foo\": \"Bob\"}]", root), expected);
   }
 
-// Currently unsupported.
-//  @Test
-//  public void testRepeatOr() throws CodeSyntaxException {
-//    RootInst root = builder().repeat("foo").text("A").variable("@").or().text("B").end().getRoot();
-//    assertEquals(repr(root), "{.repeat section foo}A{@}{.or}B{.end}");
-//    assertContext(execute("\"foo\": [1, 2, 3]}", root), "A1A2A3");
-//    assertContext(execute("{}", root), "B");
-//  }
+  @Test
+  public void testRepeatOr() throws CodeException {
+    RootInst root = builder().repeated("foo").text("A").var("@").or().text("B").end().eof().code();
+    assertEquals(repr(root), "{.repeated section foo}A{@}{.or}B{.end}");
+    assertContext(execute("{\"foo\": [1, 2, 3]}", root), "A1A2A3");
+    assertContext(execute("{}", root), "B");
+  }
 
   @Test
   public void testVariable() throws CodeException {
