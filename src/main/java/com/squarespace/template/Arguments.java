@@ -56,10 +56,19 @@ public class Arguments {
     return args;
   }
   
+  /**
+   * Associates an opaque object with the Arguments instance so it can be 
+   * retrieved later.  Typically, you'll convert your arguments in the parsing
+   * phase, in order to report errors early.  Then your plugin can fetch the
+   * already-converted arguments during the execute phase.
+   */
   public void setOpaque(Object obj) {
     this.opaque = obj;
   }
   
+  /**
+   * @see #setOpaque(Object)
+   */
   public Object getOpaque() {
     return this.opaque;
   }

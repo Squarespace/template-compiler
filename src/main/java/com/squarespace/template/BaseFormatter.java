@@ -2,42 +2,22 @@ package com.squarespace.template;
 
 
 /**
- * Common base class for Formatters.
+ * Default base class for Formatters.
  */
-public abstract class BaseFormatter implements Formatter {
+public abstract class BaseFormatter extends Plugin implements Formatter {
 
-  private String identifier;
-  
-  private boolean requiresArgs;
-  
   public BaseFormatter(String identifier, boolean requiresArgs) {
-    this.identifier = identifier;
-    this.requiresArgs = requiresArgs;
+    super(identifier, requiresArgs);
   }
   
-  public String getIdentifier() {
-    return identifier;
-  }
-  
-  public boolean requiresArgs() {
-    return requiresArgs;
-  }
-  
-  public void fail(ErrorInfo info) throws CodeExecuteException {
-    throw new CodeExecuteException(info);
-  }
-  
-  public void validateArgs(Arguments args) throws ArgumentsException {
-    // NOOP
-  }
-
+  /**
+   * Applies the Formatter to the context, using the given arguments which have
+   * been validated and optionally converted by validateArgs(). Formatters append
+   * output to the Context.
+   */
   public void apply(Context ctx, Arguments args) throws CodeExecuteException {
     // NOOP
   }
 
-  @Override
-  public String toString() {
-    return identifier;
-  }
 
 }
