@@ -14,10 +14,6 @@ import com.squarespace.v6.utils.JSONUtils;
 
 public class GeneralUtils {
 
-  public static final JsonNode EMPTY_OBJECT = JSONUtils.createObjectNode();
-
-  public static final JsonNode MISSING_NODE = EMPTY_OBJECT.path("");
-
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
   
   public static JsonNode getFirstMatchingNode(JsonNode parent, String ... keys) {
@@ -27,7 +23,7 @@ public class GeneralUtils {
         return node;
       }
     }
-    return MISSING_NODE;
+    return Constants.MISSING_NODE;
   }
   
   public static String jsonPretty(JsonNode node) throws IOException {

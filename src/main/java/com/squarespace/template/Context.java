@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 
 
 /**
@@ -169,19 +170,21 @@ public class Context {
   public JsonNode node() {
     return currentFrame.node;
   }
+  
+  public boolean initIteration() {
+    JsonNode node = node();
+    if (!node.isArray()) {
+      return false;
+    }
+    currentFrame.currentIndex = 0;
+    return true;
+  }
 
   /**
    * Use this to find the index position in the current frame.
    */
   public int currentIndex() {
     return currentFrame.currentIndex;
-  }
-  
-  /**
-   * Use this to find the index position of the parent frame.
-   */
-  public int parentIndex() {
-    return currentFrame.parentIndex;
   }
   
   public boolean hasNext() {
@@ -211,48 +214,29 @@ public class Context {
    * Pushes the next element from the current array node onto the stack.
    */
   public void pushNext() {
-    int parentIndex = currentFrame.currentIndex;
     JsonNode node = currentFrame.node.path(currentFrame.currentIndex);
-    currentFrame.currentIndex++;
     stack.push(currentFrame);
-    currentFrame = new Frame(node, parentIndex);
-  }
-  
-  public int findIndex() {
-    Iterator<Frame> iter = stack.iterator();
-    while (iter.hasNext()) {
-      Frame temp = iter.next();
-      if (temp.currentIndex != -1) {
-        return temp.currentIndex;
-      }
-    }
-    return -1;
+    currentFrame = new Frame(node);
   }
   
   public JsonNode resolve(String name) {
-    return currentFrame.node.path(name);
+    return resolve(name, currentFrame);
   }
 
   /**
    * Lookup the JSON node referenced by the list of names. 
    */
   public JsonNode resolve(String[] names) {
-    
-    // TODO: @index, return JsonNode for consistency
-    
     if (names == null) {
       return currentFrame.node;
     }
     // Starting at the current frame, walk up the stack looking for the first
     // object node which contains names[0].
-    JsonNode node = currentFrame.node;
-
-    node = node.path(names[0]);
+    JsonNode node = resolve(names[0], currentFrame);
     if (node.isMissingNode()) {
-      // Search up the stack..
       Iterator<Frame> iter = stack.iterator();
       while (iter.hasNext()) {
-        node = iter.next().node.path(names[0]);
+        node = resolve(names[0], iter.next());
         if (!node.isMissingNode()) {
           break;
         }
@@ -263,6 +247,18 @@ public class Context {
       node = node.path(names[i]);
     }
     return node;
+  }
+
+  private JsonNode resolve(String name, Frame frame) {
+    // Special internal variable @index points to the array index for a 
+    // given stack frame.
+    if (name.equals("@index")) {
+      if (frame.currentIndex != -1) {
+        return new IntNode(frame.currentIndex);
+      }
+      return Constants.MISSING_NODE;
+    }
+    return frame.node.path(name);
   }
 
   /**
@@ -288,16 +284,9 @@ public class Context {
     
     int currentIndex;
     
-    int parentIndex;
-    
     public Frame(JsonNode node) {
-      this(node, 0);
-    }
-    
-    public Frame(JsonNode node, int parentIndex) {
       this.node = node;
-      this.currentIndex = 0;
-      this.parentIndex = parentIndex;
+      this.currentIndex = -1;
     }
     
   }

@@ -3,6 +3,9 @@ package com.squarespace.template;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+
 
 public class Constants {
 
@@ -16,4 +19,6 @@ public class Constants {
 
   public static final String[] TIMEZONE_KEY = new String[] { "website", "timeZone" };
 
+  public static final JsonNode MISSING_NODE = MissingNode.getInstance();
+  
 }

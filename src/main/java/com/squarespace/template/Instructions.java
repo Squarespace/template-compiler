@@ -563,18 +563,20 @@ public class Instructions {
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.push(variable);
-      if (!ctx.node().isMissingNode()) {
+      if (ctx.initIteration()) {
+        // We have an array node and can now iterate.
         while (ctx.hasNext()) {
           int index = ctx.currentIndex();
+          // Push the array element onto the stack to be processed by the consequent.
           ctx.pushNext();
-
-          // Execute this action between each execution of the consequent
           if (index > 0) {
             ctx.execute(alternatesWith);
           }
-          
           ctx.execute(consequent.getInstructions());
           ctx.pop();
+          
+          // Point to next array element.
+          ctx.increment();
         }
       } else {
         alternative.invoke(ctx);
@@ -746,13 +748,8 @@ public class Instructions {
 
     private String[] variable;
     
-    private boolean isIndex = false;
-    
     public VariableInst(String name) {
       this.variable = splitName(name);
-      if (name.equals("@index")) {
-        isIndex = true;
-      }
     }
     
     public String[] getVariable() {
@@ -771,12 +768,8 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) {
-      if (isIndex) {
-        ctx.append(Integer.toString(ctx.parentIndex()));
-      } else {
-        JsonNode node = ctx.resolve(variable);
-        ctx.append(node.asText());
-      }
+      JsonNode node = ctx.resolve(variable);
+      ctx.append(node.asText());
     }
 
     @Override
