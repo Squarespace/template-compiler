@@ -179,6 +179,13 @@ public class CoreFormattersTest extends UnitTestBase {
   }
   
   @Test
+  public void testOutput() throws CodeException {
+    CodeMaker mk = maker();
+    Arguments args = mk.args(":1:2:3");
+    assertFormatter(CoreFormatters.OUTPUT, args, "{}", "1 2 3");
+  }
+  
+  @Test
   public void testPluralize() throws CodeException {
     CodeMaker mk = maker();
     

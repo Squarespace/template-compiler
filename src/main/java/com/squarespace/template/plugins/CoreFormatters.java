@@ -9,7 +9,9 @@ import static com.squarespace.template.plugins.PluginUtils.slugify;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,7 +27,6 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
-import com.squarespace.v6.utils.enums.ProductType;
 import com.squarespace.v6.utils.enums.RecordType;
 
 
@@ -202,38 +203,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
       node = value.path("recordType");
       if (RecordType.STORE_ITEM.value().equals(node.asInt())) {
-        if (onSale(value)) {
+        if (CommerceUtils.isOnSale(value)) {
           buf.append(" on-sale");
         }
         if (isTruthy(value.path("payWhatYouWant"))) {
           buf.append(" pay-what-you-want");
         }
       }
-    }
-    
-    private boolean onSale(JsonNode item) {
-      boolean onSale = false;
-      ProductType type = ProductType.valueOf(item.path("productType").asInt());
-      switch (type) {
-        case PHYSICAL:
-          JsonNode variants = item.path("variants");
-          for (int i = 0; i < variants.size(); i++) {
-            JsonNode variant = variants.get(i);
-            if (isTruthy(variant.path("onSale"))) {
-              onSale = true;
-              break;
-            }
-          }
-          break;
-          
-        case DIGITAL:
-          onSale = isTruthy(item.path("payWhatYouWant")) ? false : isTruthy(item.path("onSale"));
-          break;
-          
-        default:
-          break;
-      }
-      return onSale;
     }
     
   };
@@ -274,6 +250,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
 
+  
+  public static Formatter OUTPUT = new BaseFormatter("output", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      List<String> values = args.getArgs();
+      ctx.append(StringUtils.join(values.toArray(), ' '));
+    }
+  };
   
   static class PluralizeArgs {
     String singular = "";
