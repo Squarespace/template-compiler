@@ -1,5 +1,6 @@
 package com.squarespace.template;
 
+
 /**
  * A class implementing this interface is used as a way of bundling together related
  * implementations of a particular type of symbol.  Any static fields of type V defined

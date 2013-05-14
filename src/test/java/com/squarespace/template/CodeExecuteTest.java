@@ -5,6 +5,8 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CorePredicates;
 import com.squarespace.v6.utils.JSONUtils;
 
 

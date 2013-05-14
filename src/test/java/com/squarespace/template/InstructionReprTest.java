@@ -1,8 +1,8 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.CorePredicates.COLLECTION_TYPE_NAME_EQUALS;
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
+import static com.squarespace.template.plugins.CorePredicates.COLLECTION_TYPE_NAME_EQUALS;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -18,6 +18,8 @@ import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.Instructions.SectionInst;
 import com.squarespace.template.Instructions.TextInst;
+import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CorePredicates;
 
 
 /**

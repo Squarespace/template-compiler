@@ -9,6 +9,8 @@ import org.testng.annotations.Test;
 import com.google.inject.Module;
 import com.squarespace.test.CommonsTestModules;
 import com.squarespace.test.TesterBase;
+import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CorePredicates;
 import com.squarespace.v6.utils.JSONUtils;
 import com.squarespace.v6.utils.template.NodeJsContext;
 import com.squarespace.v6.utils.template.NodeJsService;

@@ -43,7 +43,7 @@ public abstract class SymbolTable<K, V> {
     }
   }
 
-  void put(K key, V value) {
+  protected void put(K key, V value) {
     if (inUse) {
       throw new RuntimeException("Attempt to add a symbol after table in use.");
     }
@@ -53,7 +53,7 @@ public abstract class SymbolTable<K, V> {
   /**
    * Callback to cast the object, retrieve the key and store it in the table.
    */
-  abstract void registerSymbol(Object impl);
+  public abstract void registerSymbol(Object impl);
 
   /**
    * Use reflection to iterate over all static fields on the class and
@@ -71,6 +71,7 @@ public abstract class SymbolTable<K, V> {
       
       Class<?> type = field.getType();
       if (type.equals(ref.getType())) {
+        field.setAccessible(true);
         try {
           registerSymbol(field.get(source));
         } catch (IllegalAccessException e) {

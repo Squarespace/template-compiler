@@ -1,6 +1,7 @@
 package com.squarespace.template;
 
 
+
 public abstract class BaseRegistry<T> implements Registry<StringView, T> {
 
   @Override

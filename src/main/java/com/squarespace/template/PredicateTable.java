@@ -25,7 +25,7 @@ public class PredicateTable extends SymbolTable<StringView, Predicate> {
    * Callback to cast the Predicate and store it in the table.
    */
   @Override
-  void registerSymbol(Object impl) {
+  public void registerSymbol(Object impl) {
     Predicate predicate = (Predicate) impl;
     put(new StringView(predicate.getIdentifier()), predicate);
   }

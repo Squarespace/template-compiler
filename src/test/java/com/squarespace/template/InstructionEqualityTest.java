@@ -1,9 +1,9 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.CorePredicates.PLURAL;
-import static com.squarespace.template.CorePredicates.SINGULAR;
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
+import static com.squarespace.template.plugins.CorePredicates.PLURAL;
+import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
@@ -25,6 +25,7 @@ import com.squarespace.template.Instructions.SectionInst;
 import com.squarespace.template.Instructions.SpaceInst;
 import com.squarespace.template.Instructions.TextInst;
 import com.squarespace.template.Instructions.VariableInst;
+import com.squarespace.template.plugins.CoreFormatters;
 
 
 public class InstructionEqualityTest extends UnitTestBase {

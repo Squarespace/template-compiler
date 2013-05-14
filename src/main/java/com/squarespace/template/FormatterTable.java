@@ -25,7 +25,7 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
    * Callback to cast the Formatter and store it in the table.
    */
   @Override
-  void registerSymbol(Object impl) {
+  public void registerSymbol(Object impl) {
     Formatter formatter = (Formatter) impl;
     put(new StringView(formatter.getIdentifier()), formatter);
   }

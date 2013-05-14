@@ -1,4 +1,12 @@
-package com.squarespace.template;
+package com.squarespace.template.plugins;
+
+import com.squarespace.template.Arguments;
+import com.squarespace.template.ArgumentsException;
+import com.squarespace.template.BasePredicate;
+import com.squarespace.template.BaseRegistry;
+import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.Context;
+import com.squarespace.template.Predicate;
 
 
 /**

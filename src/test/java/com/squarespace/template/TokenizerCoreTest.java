@@ -1,7 +1,5 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.CorePredicates.PLURAL;
-import static com.squarespace.template.CorePredicates.SINGULAR;
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_COMMENT;
@@ -23,6 +21,8 @@ import static com.squarespace.template.SyntaxErrorType.PREDICATE_NEEDS_ARGS;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
 import static com.squarespace.template.SyntaxErrorType.VARIABLE_EXPECTED;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
+import static com.squarespace.template.plugins.CorePredicates.PLURAL;
+import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.fail;
@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.testng.annotations.Test;
+
+import com.squarespace.template.plugins.CoreFormatters;
 
 
 /**

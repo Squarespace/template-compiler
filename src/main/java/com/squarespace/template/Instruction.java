@@ -1,7 +1,7 @@
 package com.squarespace.template;
 
 
-interface Instruction {
+public interface Instruction {
 
   public InstructionType getType();
 

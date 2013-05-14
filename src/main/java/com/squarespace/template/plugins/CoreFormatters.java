@@ -1,4 +1,4 @@
-package com.squarespace.template;
+package com.squarespace.template.plugins;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
@@ -15,6 +15,20 @@ import java.util.List;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.squarespace.template.Arguments;
+import com.squarespace.template.ArgumentsException;
+import com.squarespace.template.BaseFormatter;
+import com.squarespace.template.BaseRegistry;
+import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.CodeSyntaxException;
+import com.squarespace.template.Constants;
+import com.squarespace.template.Context;
+import com.squarespace.template.Formatter;
+import com.squarespace.template.FormatterDateUtils;
+import com.squarespace.template.FormatterUtils;
+import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.Instruction;
+import com.squarespace.template.Patterns;
 
 
 /**

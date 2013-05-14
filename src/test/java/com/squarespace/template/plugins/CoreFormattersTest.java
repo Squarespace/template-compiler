@@ -1,19 +1,19 @@
-package com.squarespace.template;
+package com.squarespace.template.plugins;
 
-import static com.squarespace.template.CoreFormatters.ENCODE_SPACE;
-import static com.squarespace.template.CoreFormatters.HTML;
-import static com.squarespace.template.CoreFormatters.HTMLATTR;
-import static com.squarespace.template.CoreFormatters.HTMLTAG;
-import static com.squarespace.template.CoreFormatters.JSON;
-import static com.squarespace.template.CoreFormatters.JSON_PRETTY;
-import static com.squarespace.template.CoreFormatters.PLURALIZE;
-import static com.squarespace.template.CoreFormatters.RAW;
-import static com.squarespace.template.CoreFormatters.SLUGIFY;
-import static com.squarespace.template.CoreFormatters.TIMESINCE;
-import static com.squarespace.template.CoreFormatters.TRUNCATE;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
+import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
+import static com.squarespace.template.plugins.CoreFormatters.HTML;
+import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
+import static com.squarespace.template.plugins.CoreFormatters.HTMLTAG;
+import static com.squarespace.template.plugins.CoreFormatters.JSON;
+import static com.squarespace.template.plugins.CoreFormatters.JSON_PRETTY;
+import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
+import static com.squarespace.template.plugins.CoreFormatters.RAW;
+import static com.squarespace.template.plugins.CoreFormatters.SLUGIFY;
+import static com.squarespace.template.plugins.CoreFormatters.TIMESINCE;
+import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -24,7 +24,15 @@ import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.Arguments;
+import com.squarespace.template.CodeBuilder;
+import com.squarespace.template.CodeException;
+import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.CodeMaker;
+import com.squarespace.template.Context;
+import com.squarespace.template.Formatter;
+import com.squarespace.template.Instruction;
+import com.squarespace.template.UnitTestBase;
 import com.squarespace.v6.utils.JSONUtils;
 
 
@@ -47,7 +55,7 @@ public class CoreFormattersTest extends UnitTestBase {
     CodeMaker mk = maker();
     CodeBuilder cb = builder().text("hi ");
     cb.formatter("foo", CoreFormatters.APPLY, mk.args(" block.item"));
-    RootInst root = cb.text("!").eof().code();
+    Instruction root = cb.text("!").eof().code();
 
     Context ctx = new Context(JSONUtils.decode(input));
     ctx.setCompiler(compiler());

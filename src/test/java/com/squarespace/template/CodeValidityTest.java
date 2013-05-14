@@ -1,17 +1,18 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.CorePredicates.PLURAL;
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.SyntaxErrorType.DEAD_CODE_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_AT_ROOT;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
+import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.plugins.CorePredicates;
 
 
 /**

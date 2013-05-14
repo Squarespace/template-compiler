@@ -6,12 +6,16 @@ import static org.testng.Assert.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
+import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CorePredicates;
+import com.squarespace.template.plugins.MediaFormatters;
+import com.squarespace.template.plugins.MediaPredicates;
 import com.squarespace.v6.utils.JSONUtils;
 
 /**
  * Methods to simplify writing tests against the JSON template package.
  */
-class UnitTestBase {
+public class UnitTestBase {
 
   private static final boolean DEBUG = false;
   

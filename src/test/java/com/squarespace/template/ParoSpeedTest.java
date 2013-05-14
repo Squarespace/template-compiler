@@ -12,6 +12,10 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Instructions.TextInst;
+import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CorePredicates;
+import com.squarespace.template.plugins.MediaFormatters;
+import com.squarespace.template.plugins.MediaPredicates;
 import com.squarespace.v6.utils.JSONUtils;
 
 

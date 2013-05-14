@@ -45,7 +45,7 @@ public class StringViewPerfTest {
       super(new TypeReference<Integer>(){}, 64);
     }
     @Override
-    void registerSymbol(Object impl) {
+    public void registerSymbol(Object impl) {
       StringNum num = (StringNum) impl;
       put(num.getString(), num.getNum());
     }
@@ -56,7 +56,7 @@ public class StringViewPerfTest {
       super(new TypeReference<Integer>(){}, 64);
     }
     @Override
-    void registerSymbol(Object impl) {
+    public void registerSymbol(Object impl) {
       StringViewNum num = (StringViewNum) impl;
       put(num.getStringView(), num.getNum());
     }
