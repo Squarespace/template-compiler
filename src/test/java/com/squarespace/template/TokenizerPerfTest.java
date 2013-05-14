@@ -55,10 +55,13 @@ public class TokenizerPerfTest extends UnitTestBase {
     JsonTemplateEngine compiler = compiler();
     String result = null;
     int iters = 20;
-    double[] times = new double[iters];
+    double[] compTimes = new double[iters];
+    double[] execTimes = new double[iters];
+    int instructionCount = 0;
     for (int i = 0; i < iters; i++) {
       long start = System.nanoTime();
       CompiledTemplate script = compiler.compile(data);
+      instructionCount = script.getMachine().getInstructionCount();
       long compileTime = System.nanoTime() - start;
       
       start = System.nanoTime();
@@ -66,18 +69,24 @@ public class TokenizerPerfTest extends UnitTestBase {
       result = ctx.buffer().toString();
       long executeTime = System.nanoTime() - start;
       
-      times[i] = (compileTime + executeTime) / NANOSECONDS;
+      compTimes[i] = compileTime / NANOSECONDS;
+      execTimes[i] = executeTime / NANOSECONDS;
     }
     System.out.printf("input        %s chars\n", commas(data.length()));
     System.out.printf("output       %s chars\n",  commas(result.length()));
+    System.out.printf("instructions %d\n", instructionCount);
     
-    Arrays.sort(times);
-    System.out.printf("execute times (ms):\n\n");
-    System.out.printf("   %10.2f  lo\n            ...\n", times[0]);
+    Arrays.sort(compTimes);
+    Arrays.sort(execTimes);
+    System.out.printf("compile + execute = total (ms):\n\n");
+    System.out.printf("   %8.2f + %8.2f = %8.2f  lo\n            ...\n", compTimes[0], execTimes[0],
+        (compTimes[0] + execTimes[0]));
     for (int i = 8; i < 13; i++) {
-      System.out.printf("   %10.2f  %d\n", times[i], i);
+      double total = compTimes[i] + execTimes[i];
+      System.out.printf("   %8.2f + %8.2f = %8.2f  %d\n", compTimes[i], execTimes[i], total, i);
     }
-    System.out.printf("            ...\n   %10.2f  hi\n", times[iters-1]);
+    System.out.printf("            ...\n   %8.2f + %8.2f = %8.2f  hi\n", compTimes[iters-1], execTimes[iters-1],
+        (compTimes[iters-1] + execTimes[iters-1]));
     System.out.println("\n---------------------------------------");
     
   }
