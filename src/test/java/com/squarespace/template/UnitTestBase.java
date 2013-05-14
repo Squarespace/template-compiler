@@ -6,10 +6,13 @@ import static org.testng.Assert.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
+import com.squarespace.template.plugins.CommerceFormatters;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 import com.squarespace.template.plugins.MediaFormatters;
 import com.squarespace.template.plugins.MediaPredicates;
+import com.squarespace.template.plugins.SocialFormatters;
+import com.squarespace.template.plugins.SocialPredicates;
 import com.squarespace.v6.utils.JSONUtils;
 
 /**
@@ -26,10 +29,13 @@ public class UnitTestBase {
   static {
     predicateTable.register(new CorePredicates());
     predicateTable.register(new MediaPredicates());
+    predicateTable.register(new SocialPredicates());
     predicateTable.register(new UnitTestPredicates());
 
+    formatterTable.register(new CommerceFormatters());
     formatterTable.register(new CoreFormatters());
     formatterTable.register(new MediaFormatters());
+    formatterTable.register(new SocialFormatters());
     formatterTable.register(new UnitTestFormatters());
 
     // Used to tune the symbol table sizes.

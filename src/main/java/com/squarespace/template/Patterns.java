@@ -62,6 +62,8 @@ public class Patterns {
   
   public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
+  public static final Pattern WHITESPACE_NBSP = Pattern.compile("[\\s\u200b\u00a0]+");
+  
   // Required word following REPEATED instruction, e.g. {.repeated section foo.bar}
   public static final Pattern WORD_SECTION = Pattern.compile("section");
 
