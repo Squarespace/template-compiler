@@ -195,7 +195,7 @@ public class Instructions {
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.push(variable);
       impl.apply(ctx, args);
-      ctx.pop(variable);
+      ctx.pop();
     }
     
     @Override
@@ -581,7 +581,7 @@ public class Instructions {
       } else {
         alternative.invoke(ctx);
       }
-      ctx.pop(variable);
+      ctx.pop();
     }
 
     @Override
@@ -666,7 +666,7 @@ public class Instructions {
       } else {
         ctx.execute(alternative);
       }
-      ctx.pop(variable);
+      ctx.pop();
     }
     
     @Override

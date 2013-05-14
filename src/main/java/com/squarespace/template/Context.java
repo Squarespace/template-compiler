@@ -202,9 +202,6 @@ public class Context {
    * Push the node referenced by names onto the stack. If names == null do nothing.
    */
   public void push(String[] names) {
-    if (names == null) {
-      return;
-    }
     JsonNode node = resolve(names);
     stack.push(currentFrame);
     currentFrame = new Frame(node);
@@ -268,16 +265,6 @@ public class Context {
     currentFrame = stack.pop();
   }
   
-  /**
-   * Pop the stack if names != null.
-   */
-  public void pop(String[] names) {
-    if (names == null) {
-      return;
-    }
-    currentFrame = stack.pop();
-  }
-
   static class Frame {
     
     JsonNode node;
