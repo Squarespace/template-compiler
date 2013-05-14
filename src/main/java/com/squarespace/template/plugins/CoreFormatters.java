@@ -3,8 +3,8 @@ package com.squarespace.template.plugins;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
-import static com.squarespace.template.FormatterUtils.slugify;
 import static com.squarespace.template.GeneralUtils.isTruthy;
+import static com.squarespace.template.plugins.PluginUtils.slugify;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -24,8 +24,6 @@ import com.squarespace.template.CodeSyntaxException;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
-import com.squarespace.template.FormatterDateUtils;
-import com.squarespace.template.FormatterUtils;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
@@ -129,7 +127,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       } else {
         tzName = tzNode.asText();
       }
-      FormatterDateUtils.formatDate((String)args.getOpaque(), instant, tzName, ctx.buffer());
+      PluginDateUtils.formatDate((String)args.getOpaque(), instant, tzName, ctx.buffer());
     }
   };
   
@@ -145,7 +143,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTML = new BaseFormatter("html", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      FormatterUtils.escapeHtml(ctx.node().asText(), ctx.buffer());
+      PluginUtils.escapeHtml(ctx.node().asText(), ctx.buffer());
     }
   };
   
@@ -153,7 +151,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      FormatterUtils.escapeHtmlTag(ctx.node().asText(), ctx.buffer());
+      PluginUtils.escapeHtmlTag(ctx.node().asText(), ctx.buffer());
     }
   };
   
@@ -161,7 +159,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      FormatterUtils.escapeHtmlTag(ctx.node().asText(), ctx.buffer());
+      PluginUtils.escapeHtmlTag(ctx.node().asText(), ctx.buffer());
     }
   };
   
@@ -358,7 +356,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String result = ctx.node().asText();
-      ctx.append(FormatterUtils.slugify(result));
+      ctx.append(PluginUtils.slugify(result));
     }
   };
   
@@ -383,7 +381,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       } else {
         long value = node.asLong();
         ctx.append("<span class=\"timesince\" data-date=\"" + value + "\">");
-        FormatterDateUtils.humanizeDate(value, false, ctx.buffer());
+        PluginDateUtils.humanizeDate(value, false, ctx.buffer());
         ctx.append("</span>");
       }
     }
@@ -416,7 +414,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       TruncateArgs obj = (TruncateArgs)args.getOpaque();
       String value = ctx.node().asText();
-      FormatterUtils.truncate(value, obj.maxLen, obj.ellipses, ctx.buffer());
+      PluginUtils.truncate(value, obj.maxLen, obj.ellipses, ctx.buffer());
     }
   };
   

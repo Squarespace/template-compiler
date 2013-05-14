@@ -1,6 +1,6 @@
-package com.squarespace.template;
+package com.squarespace.template.plugins;
 
-import static com.squarespace.template.FormatterUtils.leftPad;
+import static com.squarespace.template.plugins.PluginUtils.leftPad;
 
 import java.util.TimeZone;
 
@@ -10,7 +10,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
 
-public class FormatterDateUtils {
+public class PluginDateUtils {
 
   static enum DatePartType {
     YEAR("year"),

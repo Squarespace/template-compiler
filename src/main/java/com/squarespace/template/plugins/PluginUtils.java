@@ -1,4 +1,4 @@
-package com.squarespace.template;
+package com.squarespace.template.plugins;
 
 import static com.squarespace.template.Patterns.WHITESPACE;
 
@@ -8,9 +8,10 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.squarespace.template.GeneralUtils;
 
 
-public class FormatterUtils {
+public class PluginUtils {
   
   private static final Pattern REMOVE_TAGS = Pattern.compile("<(?:.|\n)*?>");
 
