@@ -9,8 +9,6 @@ import static com.squarespace.template.plugins.PluginUtils.slugify;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.List;
 
 import org.joda.time.DateTimeZone;
 
@@ -27,6 +25,8 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
+import com.squarespace.v6.utils.enums.ProductType;
+import com.squarespace.v6.utils.enums.RecordType;
 
 
 /**
@@ -163,95 +163,79 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
   
-  /*
-   
-      'item-classes': function(value, context) {
-
-      if (context.hash) { // sign its handlebars
-        context = this;
-      }
-
-      var classes = ['hentry'];
-
-      var promotedBlockType = TemplateContextUtils.get(context, 'promotedBlockType');
-      if (!!promotedBlockType) {
-        classes.push('promoted');
-        classes.push(FORMATTERS['slugify']('promoted-block-' + promotedBlockType));
-      }
-
-      var categories = TemplateContextUtils.get(context, 'categories');
-      if (!!categories) {
-        for (var i = 0; i < categories.length; i++) {
-          classes.push(FORMATTERS['slugify']('category-' + categories[i]));
-        }
-      }
-
-      var tags = TemplateContextUtils.get(context, 'tags');
-      if (!!tags) {
-        for (var j = 0; j < tags.length; j++) {
-          classes.push(FORMATTERS['slugify']('tag-' + tags[j]));
-        }
-      }
-
-      var author = TemplateContextUtils.get(context, 'author');
-      if (!!author && !!author.displayName) {
-        classes.push(FORMATTERS['slugify']('author-' + author.displayName));
-      }
-
-      classes.push('post-type-' + TemplateContextUtils.get(context, 'recordTypeLabel'));
-
-      classes.push('article-index-' + TemplateContextUtils.get(context, '@index'));
-
-      if (TemplateContextUtils.get(context, 'starred')) {
-        classes.push('featured');
-      }
-
-      // product classes
-      if (value.recordType === Y.Squarespace.ContentConstants.STORE_ITEM) {
-
-        if (Y.Squarespace.Commerce.onSale(value)) {
-          classes.push('on-sale');
-        }
-
-        if (value.payWhatYouWant) {
-          classes.push('pay-what-you-want');
-        }
-      }
-
-      return classes.join(' ');
-    },
-   
-   */
-  
   public static Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      List<String> classes = Arrays.asList("hentry");
+      JsonNode value = ctx.node();
+      
+      StringBuilder buf = ctx.buffer();
+      buf.append("hentry");
+      
       JsonNode node = ctx.resolve("promotedBlockType");
       if (isTruthy(node)) {
-        classes.add("promoted");
-        classes.add("promoted-block-" + slugify(node.asText()));
+        buf.append(" promoted promoted-block-" + slugify(node.asText()));
       }
+      
       node = ctx.resolve("tags");
       if (isTruthy(node)) {
         int size = node.size();
         for (int i = 0; i < size; i++) {
-          classes.add("category-" + slugify(node.get(i).asText()));
+          buf.append(" category-" + slugify(node.get(i).asText()));
         }
       }
+      
       node = ctx.resolve("author");
       JsonNode displayName = node.path("displayName");
       if (isTruthy(node) && isTruthy(displayName)) {
-        classes.add("author-" + slugify(displayName.asText()));
+        ctx.append(" author-" + slugify(displayName.asText()));
       }
       node = ctx.resolve("recordTypeLabel");
-      classes.add(node.asText());
-      // TODO:  fixme
-      node = ctx.resolve("@index");
-      classes.add("article-index-" + node.asInt());
+      buf.append(' ').append(node.asText());
       
-      // TODO: implement
+      node = ctx.resolve("@index");
+      buf.append(" article-index-" + node.asInt());
+      
+      node = ctx.resolve("starred");
+      if (isTruthy(node)) {
+        buf.append( "featured");
+      }
+
+      node = value.path("recordType");
+      if (RecordType.STORE_ITEM.value().equals(node.asInt())) {
+        if (onSale(value)) {
+          buf.append(" on-sale");
+        }
+        if (isTruthy(value.path("payWhatYouWant"))) {
+          buf.append(" pay-what-you-want");
+        }
+      }
     }
+    
+    private boolean onSale(JsonNode item) {
+      boolean onSale = false;
+      ProductType type = ProductType.valueOf(item.path("productType").asInt());
+      switch (type) {
+        case PHYSICAL:
+          JsonNode variants = item.path("variants");
+          for (int i = 0; i < variants.size(); i++) {
+            JsonNode variant = variants.get(i);
+            if (isTruthy(variant.path("onSale"))) {
+              onSale = true;
+              break;
+            }
+          }
+          break;
+          
+        case DIGITAL:
+          onSale = isTruthy(item.path("payWhatYouWant")) ? false : isTruthy(item.path("onSale"));
+          break;
+          
+        default:
+          break;
+      }
+      return onSale;
+    }
+    
   };
   
   
