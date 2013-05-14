@@ -239,6 +239,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  public static Formatter ITER = new BaseFormatter("iter", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      ctx.append(ctx.resolve("@index").asText());
+    }
+  };
+  
+  
   /**
    * JSON - Output a text representation of the node.
    */
@@ -306,6 +314,15 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
 
+  
+  public static Formatter ROUND = new BaseFormatter("round", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      long value = Math.round(ctx.node().asDouble());
+      ctx.buffer().append(value);
+    }
+  };
+  
   
   public static Formatter SAFE = new BaseFormatter("safe", false) {
     @Override
