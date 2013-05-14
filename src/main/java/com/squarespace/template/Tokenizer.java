@@ -447,20 +447,22 @@ public class Tokenizer {
     if (matcher.arguments()) {
       rawArgs = matcher.consume();
     }
-    
-    Arguments args = Constants.EMPTY_ARGUMENTS;
+
+    Arguments args = null;
     if (rawArgs == null) {
       if (formatter.requiresArgs()) {
         fail(error(FORMATTER_NEEDS_ARGS).data(formatter));
       }
+      args = new Arguments();
     } else {
-      try {
-        args = new Arguments(rawArgs);
-        formatter.validateArgs(args);
-      } catch (ArgumentsException e) {
-        String identifier = formatter.getIdentifier();
-        fail(error(FORMATTER_ARGS_INVALID).name(identifier).data(e.getMessage()));
-      }
+      args = new Arguments(rawArgs);
+    }
+    
+    try {
+      formatter.validateArgs(args);
+    } catch (ArgumentsException e) {
+      String identifier = formatter.getIdentifier();
+      fail(error(FORMATTER_ARGS_INVALID).name(identifier).data(e.getMessage()));
     }
 
     return maker.formatter(variable.repr(), formatter, args);

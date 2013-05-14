@@ -71,6 +71,13 @@ public class CorePredicates extends BaseRegistry<Predicate> {
     }
   };
   
+  public static final Predicate FOLDER = new BasePredicate("folder?", false) {
+    @Override
+    public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
+      return isTruthy(ctx.node().path("collection").path("folder"));
+    }
+  };
+  
   public static final Predicate PASSTHROUGH = new BasePredicate("passthrough?", false) {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {

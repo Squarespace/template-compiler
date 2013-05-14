@@ -56,7 +56,7 @@ public class UnitTestBase {
    */
   private CodeMaker maker = new CodeMaker();
   
-  public JsonTemplateEngine compiler() {
+  public static JsonTemplateEngine compiler() {
     return new JsonTemplateEngine(formatterTable, predicateTable);
   }
   

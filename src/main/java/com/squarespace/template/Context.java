@@ -88,6 +88,7 @@ public class Context {
     } catch (CodeExecuteException e) {
       throw e;
     } catch (Exception e) {
+      // TODO: expand this, and embed the real exception into the one we're throwing.
       ErrorInfo info = error(GENERAL_ERROR).name(instruction.getType()).data(e.getMessage());
       throw new CodeExecuteException(info);
     }

@@ -113,7 +113,7 @@ public class Arguments {
   }
 
   private void parse(StringView raw) {
-    if (raw.length() == 0) {
+    if (raw == null || raw.length() == 0) {
       return;
     }
     delimiter = raw.charAt(0);
