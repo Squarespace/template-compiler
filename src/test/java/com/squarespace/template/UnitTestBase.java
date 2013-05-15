@@ -7,6 +7,8 @@ import static org.testng.Assert.fail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
 import com.squarespace.template.plugins.CommerceFormatters;
+import com.squarespace.template.plugins.CommercePredicates;
+import com.squarespace.template.plugins.ContentPredicates;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 import com.squarespace.template.plugins.MediaFormatters;
@@ -27,6 +29,8 @@ public class UnitTestBase {
   private static final FormatterTable formatterTable = new FormatterTable();
   
   static {
+    predicateTable.register(new CommercePredicates());
+    predicateTable.register(new ContentPredicates());
     predicateTable.register(new CorePredicates());
     predicateTable.register(new MediaPredicates());
     predicateTable.register(new SocialPredicates());

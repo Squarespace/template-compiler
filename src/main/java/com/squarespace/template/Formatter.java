@@ -1,6 +1,14 @@
 package com.squarespace.template;
 
 
+/**
+ * A Formatter is a function that examines a value and emits a string. Formatters
+ * can have zero or more arguments.
+ * 
+ * NOTE: Formatter instances must be stateless and thread-safe, e.g. they
+ * should only ever access read-only, thread-safe shared data.  The only exception
+ * to this rule are the Context and Arguments that are passed in.
+ */
 public interface Formatter {
 
   public String getIdentifier();

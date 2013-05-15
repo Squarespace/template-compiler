@@ -1,6 +1,6 @@
 package com.squarespace.template;
 
-import java.util.Arrays;
+import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -71,7 +71,7 @@ public class StringViewPerfTest {
   }
 
 // DISABLED: used for development only
-//  @Test
+  @Test
   public void testFaster() throws Exception {
     String data = "abcdefghijklmnopqrstuvwxyz";
 
@@ -91,19 +91,20 @@ public class StringViewPerfTest {
     int len = data.length();
     StringTable strTable = new StringTable();
     strTable.registerSymbol(new StringNum(data, 1));
-    long[] times = new long[5];
+    int loops = 5;
+    NanoTimer timer = new NanoTimer(loops);
 
-    for (int p = 0; p < 5; p++) {
-      long start = System.currentTimeMillis();
+    for (int p = 0; p < loops; p++) {
+      timer.start();
       for (int i = 0; i < iters; i++) {
         String s = data.substring(2 + (i % 15), len - (i % 50));
         if (strTable.get(s) != null) {
           throw new RuntimeException("bug!");
         }
       }
-      times[p] = System.currentTimeMillis() - start;
+      timer.stop();
     }
-    Arrays.sort(times);
+    long[] times = timer.getResults(true);
     long elapsed = 0;
     for (int p = 1; p < 4; p++) {
       elapsed += times[p];
@@ -117,19 +118,20 @@ public class StringViewPerfTest {
     StringViewTable viewTable = new StringViewTable();
     viewTable.registerSymbol(new StringViewNum(view, 1));
 
-    long[] times = new long[5];
+    int loops = 5;
+    NanoTimer timer = new NanoTimer(loops);
     
     for (int p = 0; p < 5; p++) {
-      long start = System.currentTimeMillis();
+      timer.start();
       for (int i = 0; i < iters; i++) {
         StringView s = new StringView(data, 2 + (i % 15), len - (i % 50));
         if (viewTable.get(s) != null) {
           throw new RuntimeException("bug!");
         }
       }
-      times[p] = System.currentTimeMillis() - start;
+      timer.stop();
     }
-    Arrays.sort(times);
+    long[] times = timer.getResults(true);
     long elapsed = 0;
     for (int p = 1; p < 4; p++) {
       elapsed += times[p];

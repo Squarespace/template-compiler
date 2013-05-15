@@ -34,8 +34,9 @@ public class Patterns {
   public static final Pattern FORMATTER = Pattern.compile(_WORD);
   
   /**
-   *  Matches instructions and predicates in their instruction form.
+   *  Matches instructions as well as predicates in their dot-prefixed form.
    *  Examples:
+   *  
    *    .section
    *    .plural?
    *    .main-image?

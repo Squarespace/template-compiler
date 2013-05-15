@@ -106,6 +106,20 @@ public class PluginDateUtils {
     YYYYMMDD
   }
   
+  public static boolean sameDay(long instant1, long instant2, String tzName) {
+    DateTimeZone zone = null;
+    try {
+      zone = DateTimeZone.forID(tzName);
+    } catch (IllegalArgumentException e) {
+      zone = DateTimeZone.getDefault();
+    }
+    DateTime date1 = new DateTime(instant1, zone);
+    DateTime date2 = new DateTime(instant2, zone);
+    return (date1.year().get() == date2.year().get()) &&
+        (date1.monthOfYear().get() == date2.monthOfYear().get()) &&
+        (date1.dayOfMonth().get() == date2.dayOfMonth().get());
+  }
+  
   /**
    * Takes a strftime()-compatible format string and outputs the properly formatted date.
    */

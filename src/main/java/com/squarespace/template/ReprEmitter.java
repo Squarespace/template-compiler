@@ -70,6 +70,8 @@ public class ReprEmitter {
     char delimiter = args.getDelimiter();
     List<String> argList = args.getArgs();
     for (int i = 0; i < argList.size(); i++) {
+      // In some cases we want to get the arguments' representation without the prefixed
+      // delimiter. When rendering the template representation we want the prefix.
       if (includeDelimiter || i > 0) {
         buf.append(delimiter);
       }

@@ -30,10 +30,6 @@ import com.squarespace.template.Patterns;
 import com.squarespace.v6.utils.enums.RecordType;
 
 
-/**
- * A formatter is a function that examines a value and emits a string. Formatters
- * can have zero or more arguments.
- */
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
   
