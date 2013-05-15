@@ -65,10 +65,19 @@ public class JsonTemplateEngine {
    * compile a template once and execute it multiple times.
    */
   public CompiledTemplate compile(String template) throws CodeSyntaxException {
-    CodeMachine machine = new CodeMachine();
+    final CodeMachine machine = new CodeMachine();
     Tokenizer tokenizer = new Tokenizer(template, machine, formatterTable, predicateTable);
     tokenizer.consume();
-    return new CompiledTemplate(machine);
+    return new CompiledTemplate() {
+      @Override
+      public Instruction getCode() {
+        return machine.getCode();
+      }
+      @Override
+      public CodeMachine getMachine() {
+        return machine;
+      }
+    };
   }
   
   public CodeList tokenize(String template) throws CodeSyntaxException {

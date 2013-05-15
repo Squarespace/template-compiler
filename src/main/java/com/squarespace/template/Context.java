@@ -252,7 +252,8 @@ public class Context {
     // given stack frame.
     if (name.equals("@index")) {
       if (frame.currentIndex != -1) {
-        return new IntNode(frame.currentIndex);
+        // @index is 1-based
+        return new IntNode(frame.currentIndex + 1);
       }
       return Constants.MISSING_NODE;
     }

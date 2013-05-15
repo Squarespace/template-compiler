@@ -1,20 +1,10 @@
 package com.squarespace.template;
 
 
-public class CompiledTemplate {
+public interface CompiledTemplate {
 
-  private final CodeMachine machine;
+  public CodeMachine getMachine();
   
-  CompiledTemplate(CodeMachine machine) {
-    this.machine = machine;
-  }
-  
-  public CodeMachine getMachine() {
-    return machine;
-  }
-  
-  public Instruction getCode() {
-    return machine.getCode();
-  }
+  public Instruction getCode();
   
 }

@@ -21,8 +21,6 @@ public class Patterns {
   
   public static final String _ABC09UH = "[a-zA-Z0-9_-]";
   
-//  public static final String _WORD = _ABC + "(" + _ABC09UH + "*" + _ABC09 + ")*";
-  
   public static final String _WORD = _ABC + _ABC09UH + "*+";
   
   public static final String _DOTWORD = _WORD + "(\\." + _WORD + ")*+";

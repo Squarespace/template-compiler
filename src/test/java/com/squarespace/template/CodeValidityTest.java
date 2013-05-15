@@ -95,7 +95,8 @@ public class CodeValidityTest extends UnitTestBase {
     CodeBuilder cb = builder();
     cb.repeated("foo").var("@").var("@index").alternatesWith().text(".").end().eof();
     RootInst root = cb.code();
-    assertContext(execute(jsonData, root), "A0.B1.C2");
+    // @index is 1-based
+    assertContext(execute(jsonData, root), "A1.B2.C3");
   }
 
   @Test

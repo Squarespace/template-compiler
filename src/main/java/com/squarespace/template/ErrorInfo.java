@@ -27,8 +27,6 @@ public class ErrorInfo {
 
   private ErrorType type;
   
-  private String repr;
-  
   private MapBuilder<String, Object> builder = new MapBuilder<>();
   
   public ErrorInfo(ErrorType type) {
@@ -79,10 +77,7 @@ public class ErrorInfo {
   }
 
   public String getMessage() {
-    if (repr == null) {
-      repr = type.format(builder.get());
-    }
-    return repr;
+    return type.format(builder.get());
   }
   
 }

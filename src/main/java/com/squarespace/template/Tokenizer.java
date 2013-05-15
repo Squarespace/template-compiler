@@ -609,4 +609,5 @@ public class Tokenizer {
     public State transition() throws CodeSyntaxException;
     
   }
+  
 }
