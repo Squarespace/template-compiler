@@ -579,7 +579,7 @@ public class Instructions {
           ctx.increment();
         }
       } else {
-        alternative.invoke(ctx);
+        ctx.execute(alternative);
       }
       ctx.pop();
     }

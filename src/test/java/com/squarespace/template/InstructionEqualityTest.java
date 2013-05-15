@@ -16,6 +16,7 @@ import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.LiteralInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -124,6 +125,18 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(i1, mk.ifexpn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_AND)));
     
     testBlockEquals(i1, i2);
+  }
+  
+  @Test
+  public void testIfPredicateEquals() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    IfPredicateInst i1 = mk.ifpred(PLURAL);
+    IfPredicateInst i2 = mk.ifpred(PLURAL);
+    assertEquals(i1, i2);
+    IfPredicateInst i3 = mk.ifpred(SINGULAR);
+    assertFalse(i1.equals(null));
+    assertNotEquals(i1, i3);
+    assertNotEquals(i1, mk.ifexpn(mk.strlist("@"), mk.oplist()));
   }
   
   @Test

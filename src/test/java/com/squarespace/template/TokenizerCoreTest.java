@@ -96,6 +96,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{##\n##{}##\n##}", mk.mcomment("\n##{}##\n"), mk.eof());
     assertResult("{#######}", mk.mcomment("###"), mk.eof());
     
+    assertFailure("{## foo ", EOF_IN_COMMENT);
     assertFailure("{## foo }", EOF_IN_COMMENT);
   }
   

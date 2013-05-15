@@ -6,6 +6,7 @@ import static com.squarespace.template.SyntaxErrorType.EOF_IN_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_AT_ROOT;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
+import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -23,9 +24,9 @@ import com.squarespace.template.plugins.CorePredicates;
 public class CodeValidityTest extends UnitTestBase {
 
   @Test
-  public void testBasic() throws CodeException  {
-    RootInst root = builder().text("foo").text("bar").eof().code();
-    assertContext(execute("{}", root), "foobar");
+  public void testComments() throws CodeException {
+    RootInst root = builder().comment("foo").mcomment("bar\nbaz").eof().code();
+    assertContext(execute("{}", root), "");
   }
 
   @Test
@@ -63,52 +64,16 @@ public class CodeValidityTest extends UnitTestBase {
   }
 
   @Test
-  public void testPredicateInvalid() throws CodeException {
-    CodeMaker mk = maker();
-    assertInvalid(DEAD_CODE_BLOCK, mk.predicate(PLURAL), mk.text("A"), mk.or(), mk.text("B"), mk.or());
-    assertInvalid(EOF_IN_BLOCK, mk.predicate(PLURAL), mk.eof());
-  }
-  
-  @Test
-  public void testRepeat() throws CodeException {
-    String jsonData = "{\"foo\": [0, 0, 0]}";
-    RootInst root = builder().repeated("foo").text("1").var("@").alternatesWith().text("-").end().eof().code();
-    assertContext(execute(jsonData, root), "10-10-10");
-    
-    root = builder().repeated("bar").text("1").end().eof().code();
-    assertContext(execute("{}", root), "");
-  }
-  
-  @Test
-  public void testRepeatOr() throws CodeException {
-    String jsonData = "{\"a\": [0, 0, 0]}";
-    RootInst root1 = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().code();
-    assertContext(execute(jsonData, root1), "0-0-0");
-
-    jsonData = "{\"b\": [0, 0, 0]}";
-    assertContext(execute(jsonData, root1), "X");
-  }
-  
-  @Test
-  public void testRepeatIndex() throws CodeException {
-    String jsonData = "{\"foo\": [\"A\", \"B\", \"C\"]}";
+  public void testIfPredicate() throws CodeException {
     CodeBuilder cb = builder();
-    cb.repeated("foo").var("@").var("@index").alternatesWith().text(".").end().eof();
-    RootInst root = cb.code();
-    // @index is 1-based
-    assertContext(execute(jsonData, root), "A1.B2.C3");
+    RootInst root = cb.ifpred(PLURAL).text("A").or(SINGULAR).text("B").or().text("C").end().eof().code();
+    assertContext(execute("5", root), "A");
+    assertContext(execute("1", root), "B");
+    assertContext(execute("0", root), "C");
   }
-
+  
   @Test
-  public void testSection() throws CodeException {
-    RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().code();
-    assertContext(execute("{\"foo\": 1}", root), "");
-    assertContext(execute("{}", root), "B");
-    assertContext(execute("{\"foo\": {\"bar\": 1}}", root), "1");
-  }
-
-  @Test
-  public void testPluralSingular() throws CodeException {
+  public void testPredicate() throws CodeException {
     CodeBuilder cb = builder().section("@").predicate(CorePredicates.PLURAL).text("A");
     cb.or(CorePredicates.SINGULAR).text("B");
     cb.or().text("C").end(); // end or
@@ -125,27 +90,68 @@ public class CodeValidityTest extends UnitTestBase {
   }
 
   @Test
-  public void testVariables() throws CodeException {
-    RootInst root = builder().var("foo").var("bar").eof().code();
-    assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
-  }
-
-  @Test
-  public void testInvalid() {
-    try {
-      builder().or(CorePredicates.SINGULAR);
-      fail("Invalid syntax passed as OK");
-    } catch (CodeSyntaxException e) {
-      assertEquals(e.getError().getType(), NOT_ALLOWED_AT_ROOT);
-    }
+  public void testPredicateInvalid() throws CodeException {
+    CodeMaker mk = maker();
+    assertInvalid(DEAD_CODE_BLOCK, mk.predicate(PLURAL), mk.text("A"), mk.or(), mk.text("B"), mk.or());
+    assertInvalid(EOF_IN_BLOCK, mk.predicate(PLURAL), mk.eof());
   }
   
   @Test
-  public void testChaining() throws CodeException {
-    CodeBuilder cb = new CodeBuilder();
-    cb.section("@").var("@").end().eof();
+  public void testRepeated() throws CodeException {
+    String jsonData = "{\"foo\": [0, 0, 0]}";
+    RootInst root = builder().repeated("foo").text("1").var("@").alternatesWith().text("-").end().eof().code();
+    assertContext(execute(jsonData, root), "10-10-10");
     
-    assertContext(execute("1", cb.code()), "1");
+    root = builder().repeated("bar").text("1").end().eof().code();
+    assertContext(execute("{}", root), "");
+  }
+  
+  @Test
+  public void testRepeatedOr() throws CodeException {
+    String jsonData = "{\"a\": [0, 0, 0]}";
+    RootInst root1 = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().code();
+    assertContext(execute(jsonData, root1), "0-0-0");
+
+    jsonData = "{\"b\": [0, 0, 0]}";
+    assertContext(execute(jsonData, root1), "X");
+  }
+  
+  @Test
+  public void testRepeatedIndex() throws CodeException {
+    String jsonData = "{\"foo\": [\"A\", \"B\", \"C\"]}";
+    CodeBuilder cb = builder();
+    cb.repeated("foo").var("@").var("@index").alternatesWith().text(".").end().eof();
+    RootInst root = cb.code();
+    // @index is 1-based
+    assertContext(execute(jsonData, root), "A1.B2.C3");
+    
+    jsonData = "{\"a\": [\"x\", \"y\"]}";
+    cb = builder();
+    cb.repeated("a").var("@").section("@").var("@").var("@index").end().alternatesWith().text(".").end().eof();
+    assertContext(execute(jsonData, cb.code()), "xx1.yy2");
+  }
+
+  @Test
+  public void testSection() throws CodeException {
+    RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().code();
+    assertContext(execute("{\"foo\": 1}", root), "");
+    assertContext(execute("{}", root), "B");
+    assertContext(execute("{\"foo\": {\"bar\": 1}}", root), "1");
+  }
+  
+  @Test
+  public void testText() throws CodeException  {
+    RootInst root = builder().text("foo").text("bar").eof().code();
+    assertContext(execute("{}", root), "foobar");
+    
+    root = builder().eof().code();
+    assertContext(execute("{}", root), "");
+  }
+
+  @Test
+  public void testVariables() throws CodeException {
+    RootInst root = builder().var("foo").var("bar").eof().code();
+    assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
   }
   
   @Test
@@ -155,9 +161,6 @@ public class CodeValidityTest extends UnitTestBase {
     assertInvalid(DEAD_CODE_BLOCK, mk.repeated("@"), mk.text("A"), mk.alternates(), mk.or(), mk.or());
   }
   
-  /**
-   * Feed EOF to the machine at an unexpected time.
-   */
   @Test
   public void testEOFInBlock() {
     CodeMaker mk = maker();
@@ -177,10 +180,13 @@ public class CodeValidityTest extends UnitTestBase {
   public void testUnexpectedInstructions() {
     CodeMaker mk = maker();
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.or());
+    assertInvalid(NOT_ALLOWED_AT_ROOT, mk.or(SINGULAR));
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.alternates());
+    
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("@"), mk.or(), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.section("a"), mk.or(), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.predicate(PLURAL), mk.alternates());
+    assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("@"), mk.alternates(), mk.alternates());
   }
   
   private void assertInvalid(SyntaxErrorType type, Instruction... instructions) {
