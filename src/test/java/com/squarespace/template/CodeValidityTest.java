@@ -35,8 +35,8 @@ public class CodeValidityTest extends UnitTestBase {
     
     // AND TESTS
     
-    CodeBuilder builder = builder().ifexpn(mk.strlist("a", "b"), mk.oplist(Operator.LOGICAL_AND));
-    RootInst root = builder.text("A").or().text("B").end().eof().code();
+    CodeBuilder cb = builder().ifexpn(mk.strlist("a", "b"), mk.oplist(Operator.LOGICAL_AND));
+    RootInst root = cb.text("A").or().text("B").end().eof().code();
     
     assertContext(execute("{\"a\": 1, \"b\": 3.14159}", root), "A");
     assertContext(execute("{\"a\": true, \"b\": \"Bill\"}", root), "A");
@@ -47,8 +47,8 @@ public class CodeValidityTest extends UnitTestBase {
     
     // OR TESTS
 
-    builder = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
-    root = builder.text("A").or().text("B").end().eof().code();
+    cb = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
+    root = cb.text("A").or().text("B").end().eof().code();
     
     assertContext(execute("{\"a\": true}", root), "A");
     assertContext(execute("{\"b\": \"Bill\"}", root), "A");
@@ -109,11 +109,11 @@ public class CodeValidityTest extends UnitTestBase {
   @Test
   public void testRepeatedOr() throws CodeException {
     String jsonData = "{\"a\": [0, 0, 0]}";
-    RootInst root1 = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().code();
-    assertContext(execute(jsonData, root1), "0-0-0");
+    RootInst root = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().code();
+    assertContext(execute(jsonData, root), "0-0-0");
 
     jsonData = "{\"b\": [0, 0, 0]}";
-    assertContext(execute(jsonData, root1), "X");
+    assertContext(execute(jsonData, root), "X");
   }
   
   @Test
@@ -131,6 +131,21 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute(jsonData, cb.code()), "xx1.yy2");
   }
 
+  @Test
+  public void testRepeatedNesting() throws CodeException {
+    String json = "{\"a\": [1,2], \"b\": \"A\", \"c\": \"-\"}";
+    CodeBuilder cb = builder();
+    cb.repeated("a").var("b").repeated("a").var("@").var("c").var("@index").end().text(".").end().eof();
+    assertContext(execute(json, cb.code()), "A1-12-2.A1-12-2.");
+
+    json = "{\"a\": [\"x\",\"y\"], \"b\": [55,66,77]}";
+    cb = builder();
+    cb.repeated("a").var("@").var("@index").text("-");
+    cb.repeated("b").var("@").var("@index").alternatesWith().text(".").end();
+    cb.end().eof();
+    assertContext(execute(json, cb.code()), "x1-551.662.773y2-551.662.773");
+  }
+  
   @Test
   public void testSection() throws CodeException {
     RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().code();
