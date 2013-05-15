@@ -25,6 +25,8 @@ public class ErrorInfo {
   
   private static final String LIMIT = "limit";
 
+  private static final String REPR = "repr";
+  
   private ErrorType type;
   
   private MapBuilder<String, Object> builder = new MapBuilder<>();
@@ -68,6 +70,11 @@ public class ErrorInfo {
     return this;
   }
 
+  public ErrorInfo repr(String repr) {
+    builder.put(REPR, repr);
+    return this;
+  }
+  
   public MapBuilder<String, Object> getBuilder() {
     return builder;
   }

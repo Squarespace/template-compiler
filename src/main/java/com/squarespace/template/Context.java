@@ -1,6 +1,6 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
+import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -88,9 +88,9 @@ public class Context {
     } catch (CodeExecuteException e) {
       throw e;
     } catch (Exception e) {
-      // TODO: expand this, and embed the real exception into the one we're throwing.
-      ErrorInfo info = error(GENERAL_ERROR).name(instruction.getType()).data(e.getMessage());
-      throw new CodeExecuteException(info);
+      String repr = ReprEmitter.get(instruction, false);
+      ErrorInfo info = error(UNEXPECTED_ERROR).name(e.getClass().getSimpleName()).data(e.getMessage()).repr(repr);
+      throw new CodeExecuteException(info, e);
     }
   }
   
@@ -102,8 +102,7 @@ public class Context {
       return;
     }
     for (Instruction inst : instructions) {
-      currentInstruction = inst;
-      inst.invoke(this);
+      execute(inst);
     }
   }
   

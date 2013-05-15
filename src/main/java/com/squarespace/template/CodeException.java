@@ -6,8 +6,12 @@ package com.squarespace.template;
  */
 public class CodeException extends Exception {
 
-  public CodeException(String temp) {
-    super(temp);
+  public CodeException(String message) {
+    super(message);
+  }
+  
+  public CodeException(String message, Throwable cause) {
+    super(message, cause);
   }
   
 }

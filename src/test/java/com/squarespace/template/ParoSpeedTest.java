@@ -49,7 +49,7 @@ public class ParoSpeedTest extends UnitTestBase {
       
       JsonNode jsonNode = JSONUtils.decode(json);
       JsonNode partialsNode = JSONUtils.decode(partials);
-      String error = null;
+      Exception error = null;
       System.out.println("tokenize/compile/execute: " + template.length() + " chars");
       try {
         CompiledTemplate script = PARO.compile(template);
@@ -65,11 +65,13 @@ public class ParoSpeedTest extends UnitTestBase {
         try {
           runParo(template, jsonNode, partialsNode);
         } catch (Exception e) {
-          error = e.getMessage();
+          error = e;
         }
       }
       elapsed = System.nanoTime() - now;
-      if (error != null) System.out.println("error: " + error);
+      if (error != null) {
+        error.printStackTrace();
+      }
       System.out.printf("elapsed: %6.2f ms per iter\n\n", (elapsed / NANOS_PER_MS / (double)iters));
       
     }

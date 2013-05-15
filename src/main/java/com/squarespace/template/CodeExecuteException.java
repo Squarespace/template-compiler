@@ -12,6 +12,11 @@ public class CodeExecuteException extends CodeException {
     super(info.getMessage());
     this.errorInfo = info;
   }
+  
+  public CodeExecuteException(ErrorInfo info, Throwable cause) {
+    super(info.getMessage(), cause);
+    this.errorInfo = info;
+  }
 
   public ErrorInfo getErrorInfo() {
     return errorInfo;
