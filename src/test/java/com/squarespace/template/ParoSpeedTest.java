@@ -12,29 +12,13 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Instructions.TextInst;
-import com.squarespace.template.plugins.CoreFormatters;
-import com.squarespace.template.plugins.CorePredicates;
-import com.squarespace.template.plugins.MediaFormatters;
-import com.squarespace.template.plugins.MediaPredicates;
 import com.squarespace.v6.utils.JSONUtils;
 
 
 public class ParoSpeedTest extends UnitTestBase {
 
-  private static final PredicateTable predicateTable = new PredicateTable();
+  private static final JsonTemplateEngine PARO = compiler();
   
-  private static final FormatterTable formatterTable = new FormatterTable();
-  
-  static {
-    predicateTable.register(new CorePredicates());
-    predicateTable.register(new MediaPredicates());
-    
-    formatterTable.register(new CoreFormatters());
-    formatterTable.register(new MediaFormatters());
-  }
-
-  private static final JsonTemplateEngine PARO = new JsonTemplateEngine(formatterTable, predicateTable);
-
   @Test
   public void testSpeed() throws Exception {
     double NANOS_PER_MS = 1_000_000.0;
