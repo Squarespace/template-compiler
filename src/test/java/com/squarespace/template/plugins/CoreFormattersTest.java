@@ -55,7 +55,7 @@ public class CoreFormattersTest extends UnitTestBase {
     CodeMaker mk = maker();
     CodeBuilder cb = builder().text("hi ");
     cb.formatter("foo", CoreFormatters.APPLY, mk.args(" block.item"));
-    Instruction root = cb.text("!").eof().code();
+    Instruction root = cb.text("!").eof().build();
 
     Context ctx = new Context(JSONUtils.decode(input));
     ctx.setCompiler(compiler());

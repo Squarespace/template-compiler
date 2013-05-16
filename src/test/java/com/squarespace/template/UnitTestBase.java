@@ -4,6 +4,13 @@ import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.apache.commons.io.IOUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
 import com.squarespace.template.plugins.CommerceFormatters;
@@ -126,7 +133,7 @@ public class UnitTestBase {
   public Context execute(String jsonData, Instruction ... instructions) throws CodeExecuteException {
     Context ctx = new Context(JSONUtils.decode(jsonData));
     for (Instruction inst : instructions) {
-      inst.invoke(ctx);
+      ctx.execute(inst);
     }
     return ctx;
   }
@@ -168,4 +175,9 @@ public class UnitTestBase {
     }
   }
 
+  public static String readFile(Path path) throws IOException {
+    try (InputStream input = Files.newInputStream(path)) {
+      return IOUtils.toString(input);
+    }
+  }
 }

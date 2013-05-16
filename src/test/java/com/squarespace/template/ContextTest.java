@@ -17,7 +17,7 @@ public class ContextTest extends UnitTestBase {
     assertEquals(ctx.node(), json("{\"b\": [1,2,3]}"));
 
     String json = "{\"a\": {\"c\": 1}, \"b\": 2}";
-    RootInst root = builder().section("a").var("b").var("c").end().eof().code();
+    RootInst root = builder().section("a").var("b").var("c").end().eof().build();
     assertContext(execute(json, root), "21");
   }
   

@@ -173,11 +173,19 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         buf.append(" promoted promoted-block-" + slugify(node.asText()));
       }
       
+      node = ctx.resolve("categories");
+      if (isTruthy(node)) {
+        int size = node.size();
+        for (int i = 0; i < size; i++) {
+          buf.append(" category-" + slugify(node.path(i).asText()));
+        }
+      }
+      
       node = ctx.resolve("tags");
       if (isTruthy(node)) {
         int size = node.size();
         for (int i = 0; i < size; i++) {
-          buf.append(" category-" + slugify(node.get(i).asText()));
+          buf.append(" tag-" + slugify(node.path(i).asText()));
         }
       }
       
@@ -187,14 +195,16 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         ctx.append(" author-" + slugify(displayName.asText()));
       }
       node = ctx.resolve("recordTypeLabel");
-      buf.append(' ').append(node.asText());
+      buf.append(" post-type-").append(node.asText());
       
       node = ctx.resolve("@index");
-      buf.append(" article-index-" + node.asInt());
+      if (!node.isMissingNode()) {
+        buf.append(" article-index-" + node.asInt());
+      }
       
       node = ctx.resolve("starred");
       if (isTruthy(node)) {
-        buf.append( "featured");
+        buf.append( " featured");
       }
 
       node = value.path("recordType");

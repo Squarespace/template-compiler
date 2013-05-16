@@ -18,7 +18,7 @@ public class CodeBuilder {
   public CodeBuilder() {
   }
   
-  public RootInst code() throws CodeSyntaxException {
+  public RootInst build() throws CodeSyntaxException {
     machine.validate();
     return machine.getCode();
   }

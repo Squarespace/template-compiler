@@ -10,6 +10,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 
 /**
@@ -23,6 +25,8 @@ import com.fasterxml.jackson.databind.node.IntNode;
  */
 public class Context {
 
+  private static final JsonNode DEFAULT_UNDEFINED = NullNode.getInstance();
+  
   private static final String META_LEFT = "{";
   
   private static final String META_RIGHT = "}";
@@ -30,6 +34,8 @@ public class Context {
   private ArrayDeque<Frame> stack = new ArrayDeque<>();
 
   private Frame currentFrame;
+
+  private JsonNode undefined = DEFAULT_UNDEFINED;
   
   /** 
    * Reference to the currently-executing instruction. All instruction execution
@@ -217,7 +223,7 @@ public class Context {
   }
   
   public JsonNode resolve(String name) {
-    return resolve(name, currentFrame);
+    return lookupStack(name);
   }
 
   /**
@@ -227,25 +233,38 @@ public class Context {
     if (names == null) {
       return currentFrame.node;
     }
-    // Starting at the current frame, walk up the stack looking for the first
-    // object node which contains names[0].
-    JsonNode node = resolve(names[0], currentFrame);
-    if (node.isMissingNode()) {
-      Iterator<Frame> iter = stack.iterator();
-      while (iter.hasNext()) {
-        node = resolve(names[0], iter.next());
-        if (!node.isMissingNode()) {
-          break;
-        }
-      }
-    }
-      
+
+    // Find the starting point.
+    JsonNode node = lookupStack(names[0]);
     for (int i = 1; i < names.length; i++) {
+      if (node.isMissingNode()) {
+        return undefined;
+      }
+      if (node.isNull()) {
+        return new TextNode("[JSONT: Can't resolve '" + ReprEmitter.get(names) + "'.]");
+      }
       node = node.path(names[i]);
     }
     return node;
   }
 
+  private JsonNode lookupStack(String name) {
+    // Starting at the current frame, walk up the stack looking for the first
+    // object node which contains name.
+    JsonNode node = resolve(name, currentFrame);
+    if (!node.isMissingNode()) {
+      return node;
+    }
+    Iterator<Frame> iter = stack.iterator();
+    while (iter.hasNext()) {
+      node = resolve(name, iter.next());
+      if (!node.isMissingNode()) {
+        return node;
+      }
+    }
+    return undefined;
+  }
+  
   private JsonNode resolve(String name, Frame frame) {
     // Special internal variable @index points to the array index for a 
     // given stack frame.

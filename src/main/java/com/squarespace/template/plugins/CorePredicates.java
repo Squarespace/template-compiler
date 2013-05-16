@@ -117,7 +117,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode pass = ctx.node().path("passthrough");
       String sourceUrl = ctx.node().path("sourceUrl").asText();
-      return !pass.isMissingNode() && !sourceUrl.equals("");
+      return isTruthy(pass) && !sourceUrl.equals("");
     }
   };
   

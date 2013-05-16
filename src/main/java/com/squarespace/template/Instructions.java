@@ -1,10 +1,15 @@
 package com.squarespace.template;
 
+import static com.squarespace.template.GeneralUtils.isTruthy;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BigIntegerNode;
+import com.fasterxml.jackson.databind.node.DecimalNode;
 
 
 /**
@@ -661,7 +666,12 @@ public class Instructions {
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.push(variable);
-      if (!ctx.node().isMissingNode()) {
+      JsonNode node = ctx.node();
+      boolean execute = isTruthy(node);
+      if (node.isArray() && node.size() == 0) {
+        execute = false;
+      }
+      if (execute) {
         ctx.execute(consequent.getInstructions());
       } else {
         ctx.execute(alternative);
@@ -768,8 +778,47 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) {
+      StringBuilder buf = ctx.buffer();
       JsonNode node = ctx.resolve(variable);
-      ctx.append(node.asText());
+      if (node.isNumber()) {
+        // Formatting of numbers depending on type
+        switch (node.numberType()) {
+          case BIG_INTEGER:
+            buf.append(((BigIntegerNode)node).bigIntegerValue().toString());
+            break;
+            
+          case BIG_DECIMAL:
+            BigDecimal bigVal = ((DecimalNode)node).decimalValue();
+            String bigString = bigVal.toString();
+            BigDecimal bigCopy = new BigDecimal(bigString);
+            bigCopy.setScale(1, BigDecimal.ROUND_HALF_UP);
+            if (bigCopy.compareTo(bigCopy) == 0) {
+              buf.append(bigCopy.toString());
+            } else {
+              buf.append(bigString);
+            }
+            break;
+            
+          case INT:
+          case LONG:
+            buf.append(node.asLong());
+            break;
+            
+          case FLOAT:
+          case DOUBLE:
+            // If no decimal part, output as integer (to match JavaScript output)
+            double val = node.asDouble();
+            if (val == Math.round(val)) {
+              buf.append((long)val);
+            } else {
+              buf.append(val);
+            }
+            break;
+        }
+        
+      } else if (!node.isNull() && !node.isMissingNode()){
+        ctx.append(node.asText());
+      }
     }
 
     @Override

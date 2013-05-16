@@ -25,7 +25,7 @@ public class CodeValidityTest extends UnitTestBase {
 
   @Test
   public void testComments() throws CodeException {
-    RootInst root = builder().comment("foo").mcomment("bar\nbaz").eof().code();
+    RootInst root = builder().comment("foo").mcomment("bar\nbaz").eof().build();
     assertContext(execute("{}", root), "");
   }
 
@@ -36,7 +36,7 @@ public class CodeValidityTest extends UnitTestBase {
     // AND TESTS
     
     CodeBuilder cb = builder().ifexpn(mk.strlist("a", "b"), mk.oplist(Operator.LOGICAL_AND));
-    RootInst root = cb.text("A").or().text("B").end().eof().code();
+    RootInst root = cb.text("A").or().text("B").end().eof().build();
     
     assertContext(execute("{\"a\": 1, \"b\": 3.14159}", root), "A");
     assertContext(execute("{\"a\": true, \"b\": \"Bill\"}", root), "A");
@@ -48,7 +48,7 @@ public class CodeValidityTest extends UnitTestBase {
     // OR TESTS
 
     cb = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
-    root = cb.text("A").or().text("B").end().eof().code();
+    root = cb.text("A").or().text("B").end().eof().build();
     
     assertContext(execute("{\"a\": true}", root), "A");
     assertContext(execute("{\"b\": \"Bill\"}", root), "A");
@@ -66,7 +66,7 @@ public class CodeValidityTest extends UnitTestBase {
   @Test
   public void testIfPredicate() throws CodeException {
     CodeBuilder cb = builder();
-    RootInst root = cb.ifpred(PLURAL).text("A").or(SINGULAR).text("B").or().text("C").end().eof().code();
+    RootInst root = cb.ifpred(PLURAL).text("A").or(SINGULAR).text("B").or().text("C").end().eof().build();
     assertContext(execute("5", root), "A");
     assertContext(execute("1", root), "B");
     assertContext(execute("0", root), "C");
@@ -79,7 +79,7 @@ public class CodeValidityTest extends UnitTestBase {
     cb.or().text("C").end(); // end or
     cb.end(); // section
     
-    RootInst root = cb.eof().code();
+    RootInst root = cb.eof().build();
     assertEquals(repr(root), "{.section @}{.plural?}A{.or singular?}B{.or}C{.end}{.end}");
     
     assertContext(execute("174", root), "A");
@@ -99,17 +99,17 @@ public class CodeValidityTest extends UnitTestBase {
   @Test
   public void testRepeated() throws CodeException {
     String jsonData = "{\"foo\": [0, 0, 0]}";
-    RootInst root = builder().repeated("foo").text("1").var("@").alternatesWith().text("-").end().eof().code();
+    RootInst root = builder().repeated("foo").text("1").var("@").alternatesWith().text("-").end().eof().build();
     assertContext(execute(jsonData, root), "10-10-10");
     
-    root = builder().repeated("bar").text("1").end().eof().code();
+    root = builder().repeated("bar").text("1").end().eof().build();
     assertContext(execute("{}", root), "");
   }
   
   @Test
   public void testRepeatedOr() throws CodeException {
     String jsonData = "{\"a\": [0, 0, 0]}";
-    RootInst root = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().code();
+    RootInst root = builder().repeated("a").var("@").alternatesWith().text("-").or().text("X").end().eof().build();
     assertContext(execute(jsonData, root), "0-0-0");
 
     jsonData = "{\"b\": [0, 0, 0]}";
@@ -121,14 +121,14 @@ public class CodeValidityTest extends UnitTestBase {
     String jsonData = "{\"foo\": [\"A\", \"B\", \"C\"]}";
     CodeBuilder cb = builder();
     cb.repeated("foo").var("@").var("@index").alternatesWith().text(".").end().eof();
-    RootInst root = cb.code();
+    RootInst root = cb.build();
     // @index is 1-based
     assertContext(execute(jsonData, root), "A1.B2.C3");
     
     jsonData = "{\"a\": [\"x\", \"y\"]}";
     cb = builder();
     cb.repeated("a").var("@").section("@").var("@").var("@index").end().alternatesWith().text(".").end().eof();
-    assertContext(execute(jsonData, cb.code()), "xx1.yy2");
+    assertContext(execute(jsonData, cb.build()), "xx1.yy2");
   }
 
   @Test
@@ -136,19 +136,19 @@ public class CodeValidityTest extends UnitTestBase {
     String json = "{\"a\": [1,2], \"b\": \"A\", \"c\": \"-\"}";
     CodeBuilder cb = builder();
     cb.repeated("a").var("b").repeated("a").var("@").var("c").var("@index").end().text(".").end().eof();
-    assertContext(execute(json, cb.code()), "A1-12-2.A1-12-2.");
+    assertContext(execute(json, cb.build()), "A1-12-2.A1-12-2.");
 
     json = "{\"a\": [\"x\",\"y\"], \"b\": [55,66,77]}";
     cb = builder();
     cb.repeated("a").var("@").var("@index").text("-");
     cb.repeated("b").var("@").var("@index").alternatesWith().text(".").end();
     cb.end().eof();
-    assertContext(execute(json, cb.code()), "x1-551.662.773y2-551.662.773");
+    assertContext(execute(json, cb.build()), "x1-551.662.773y2-551.662.773");
   }
   
   @Test
   public void testSection() throws CodeException {
-    RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().code();
+    RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().build();
     assertContext(execute("{\"foo\": 1}", root), "");
     assertContext(execute("{}", root), "B");
     assertContext(execute("{\"foo\": {\"bar\": 1}}", root), "1");
@@ -156,16 +156,16 @@ public class CodeValidityTest extends UnitTestBase {
   
   @Test
   public void testText() throws CodeException  {
-    RootInst root = builder().text("foo").text("bar").eof().code();
+    RootInst root = builder().text("foo").text("bar").eof().build();
     assertContext(execute("{}", root), "foobar");
     
-    root = builder().eof().code();
+    root = builder().eof().build();
     assertContext(execute("{}", root), "");
   }
 
   @Test
   public void testVariables() throws CodeException {
-    RootInst root = builder().var("foo").var("bar").eof().code();
+    RootInst root = builder().var("foo").var("bar").eof().build();
     assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
   }
   
@@ -208,7 +208,7 @@ public class CodeValidityTest extends UnitTestBase {
     try {
       CodeBuilder cb = builder();
       cb.accept(instructions);
-      cb.code();
+      cb.build();
       fail(type + " should have raised a syntax exception");
     } catch (CodeSyntaxException e) {
       // Exception means success.

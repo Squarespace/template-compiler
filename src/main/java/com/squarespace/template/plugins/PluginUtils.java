@@ -104,7 +104,7 @@ public class PluginUtils {
     buf.append(value);
   }
   
-  public static void makeSocialButton(JsonNode website, JsonNode item, String style, StringBuilder buf) {
+  public static void makeSocialButton(JsonNode website, JsonNode item, boolean inline, StringBuilder buf) {
     JsonNode options = website.path("shareButtonOptions");
     if (website.isMissingNode() || options.isMissingNode() || options.size() == 0) {
       return;
@@ -118,9 +118,16 @@ public class PluginUtils {
       node = item.path("mainImage").path("assetUrl");
       assetUrl = node.asText();
     }
-    
+    String style = (inline) ? "inline-style" : "button-style";
     buf.append("<script>Y.use('squarespace-social-buttons');");
-    buf.append("</script><div class=\"squarespace-social-buttons ");
+    buf.append("</script>");
+    if (inline) {
+      buf.append("<span ");
+    
+    } else {
+      buf.append("<div ");
+    }
+    buf.append("class=\"squarespace-social-buttons ");
     buf.append(style);
     buf.append("\" data-system-data-id=\"");
     buf.append(imageId);
@@ -132,7 +139,12 @@ public class PluginUtils {
     buf.append(item.path("fullUrl").asText());
     buf.append("\" data-title=\"");
     escapeHtmlTag(item.path("title").asText(), buf);
-    buf.append("\"></div>");
+    buf.append("\">");
+    if (inline) {
+      buf.append("</span>");
+    } else {
+      buf.append("</div>");
+    }
   }
 
 }

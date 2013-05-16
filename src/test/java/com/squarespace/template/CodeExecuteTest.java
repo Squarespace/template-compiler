@@ -24,7 +24,7 @@ public class CodeExecuteTest extends UnitTestBase {
     builder.or(CorePredicates.SINGULAR).text("B");
     builder.or().text("C").end();
     
-    RootInst root = builder.eof().code();
+    RootInst root = builder.eof().build();
     assertEquals(repr(root), "{.plural?}A{.or singular?}B{.or}C{.end}");
     assertContext(execute("5", root), "A");
     assertContext(execute("1", root), "B");
@@ -37,7 +37,7 @@ public class CodeExecuteTest extends UnitTestBase {
     CodeBuilder builder = builder();
     builder.section("foo.bar").var("baz").end();
 
-    RootInst root = builder.eof().code();
+    RootInst root = builder.eof().build();
     String jsonData = "{\"foo\": {\"bar\": {\"baz\": 123}}}";
     assertEquals(repr(root), "{.section foo.bar}{baz}{.end}");
     assertContext(execute(jsonData, root), "123");
@@ -47,7 +47,7 @@ public class CodeExecuteTest extends UnitTestBase {
   public void testSectionMissing() throws CodeException {
     CodeBuilder builder = builder();
     builder.section("foo").text("A").or().text("B").end();
-    RootInst root = builder.eof().code();
+    RootInst root = builder.eof().build();
     assertContext(execute("{\"foo\": 123}", root), "A");
     assertContext(execute("{}", root), "B");
   }
@@ -55,26 +55,26 @@ public class CodeExecuteTest extends UnitTestBase {
   @Test
   public void testText() throws CodeException {
     String expected = "defjkl";
-    RootInst root = builder().text(ALPHAS, 3, 6).text(ALPHAS, 9, 12).eof().code();
+    RootInst root = builder().text(ALPHAS, 3, 6).text(ALPHAS, 9, 12).eof().build();
     assertContext(execute("{}", root), expected);
   }
   
   @Test
   public void testLiterals() throws CodeException {
-    RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().code();
+    RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().build();
     assertContext(execute("{}", root), "{ \t\n}");
   }
   
   @Test
   public void testRepeat() throws CodeException {
     String expected = "Hi, Joe! Hi, Bob! ";
-    RootInst root = builder().repeated("@").text("Hi, ").var("foo").text("! ").end().eof().code();
+    RootInst root = builder().repeated("@").text("Hi, ").var("foo").text("! ").end().eof().build();
     assertContext(execute("[{\"foo\": \"Joe\"},{\"foo\": \"Bob\"}]", root), expected);
   }
 
   @Test
   public void testRepeatOr() throws CodeException {
-    RootInst root = builder().repeated("foo").text("A").var("@").or().text("B").end().eof().code();
+    RootInst root = builder().repeated("foo").text("A").var("@").or().text("B").end().eof().build();
     assertEquals(repr(root), "{.repeated section foo}A{@}{.or}B{.end}");
     assertContext(execute("{\"foo\": [1, 2, 3]}", root), "A1A2A3");
     assertContext(execute("{}", root), "B");
@@ -82,7 +82,7 @@ public class CodeExecuteTest extends UnitTestBase {
 
   @Test
   public void testVariable() throws CodeException {
-    RootInst root = builder().var("foo.bar").eof().code();
+    RootInst root = builder().var("foo.bar").eof().build();
     assertContext(execute("{\"foo\": {\"bar\": 123}}", root), "123");
   }
   
@@ -101,7 +101,7 @@ public class CodeExecuteTest extends UnitTestBase {
   
   @Test
   public void testFormatterInstruction() throws CodeException {
-    RootInst root = builder().formatter("foo", CoreFormatters.JSON).eof().code();
+    RootInst root = builder().formatter("foo", CoreFormatters.JSON).eof().build();
     assertContext(execute("{\"foo\": 123}", root), "123");
   }
   

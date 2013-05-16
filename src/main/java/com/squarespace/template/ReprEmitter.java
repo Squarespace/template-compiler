@@ -35,6 +35,12 @@ public class ReprEmitter {
     return buf.toString();
   }
   
+  public static String get(String[] names) {
+    StringBuilder buf = new StringBuilder();
+    emitNames(names, buf);
+    return buf.toString();
+  }
+  
   public static void emit(AlternatesWithInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.alternates with}");
     if (recurse) {
@@ -192,7 +198,20 @@ public class ReprEmitter {
     emitNames(inst.getVariable(), buf);
     buf.append('}');
   }
-  
+
+  public static void emitNames(String[] names, StringBuilder buf) {
+    if (names == null) {
+      buf.append("@");
+      return;
+    }
+    for (int i = 0; i < names.length; i++) {
+      if (i > 0) {
+        buf.append('.');
+      }
+      buf.append(names[i]);
+    }
+  }
+
   private static void emitBlock(BlockInstruction inst, StringBuilder buf, boolean recurse) {
     emitBlock(inst.getConsequent(), buf, recurse);
     Instruction alt = inst.getAlternative();
@@ -211,18 +230,6 @@ public class ReprEmitter {
     }
   }
   
-  private static void emitNames(String[] names, StringBuilder buf) {
-    if (names == null) {
-      buf.append("@");
-      return;
-    }
-    for (int i = 0; i < names.length; i++) {
-      if (i > 0) {
-        buf.append('.');
-      }
-      buf.append(names[i]);
-    }
-  }
   
   
 }

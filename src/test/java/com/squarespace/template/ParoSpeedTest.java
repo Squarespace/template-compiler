@@ -1,13 +1,12 @@
 package com.squarespace.template;
 
-import java.io.IOException;
-import java.io.InputStream;
+import static com.squarespace.template.UnitTestBase.readFile;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,9 +14,9 @@ import com.squarespace.template.Instructions.TextInst;
 import com.squarespace.v6.utils.JSONUtils;
 
 
-public class ParoSpeedTest extends UnitTestBase {
+public class ParoSpeedTest {
 
-  private static final JsonTemplateEngine PARO = compiler();
+  private static final JsonTemplateEngine PARO = UnitTestBase.compiler();
   
   @Test
   public void testSpeed() throws Exception {
@@ -28,9 +27,9 @@ public class ParoSpeedTest extends UnitTestBase {
     for (Path path : ds) {
       Path name = path.getFileName();
       String[] jsonPath = name.toString().split("\\.");
-      String template = read(path);
-      String json = read(root.resolve(jsonPath[0] + ".json"));
-      String partials = read(root.resolve(jsonPath[0] + "-partials.json"));
+      String template = readFile(path);
+      String json = readFile(root.resolve(jsonPath[0] + ".json"));
+      String partials = readFile(root.resolve(jsonPath[0] + "-partials.json"));
   
       long now;
       long elapsed;
@@ -73,10 +72,9 @@ public class ParoSpeedTest extends UnitTestBase {
         error.printStackTrace();
       }
       System.out.printf("elapsed: %6.2f ms per iter\n\n", (elapsed / NANOS_PER_MS / (double)iters));
-      
     }
   }
-
+  
   private String runParo(String template, JsonNode json, JsonNode partials) throws Exception {
     CompiledTemplate script = PARO.compile(template);
     Context ctx = PARO.executeWithPartials(script.getCode(), json, partials);
@@ -93,9 +91,4 @@ public class ParoSpeedTest extends UnitTestBase {
     return chars;
   }
   
-  private String read(Path path) throws IOException {
-    try (InputStream input = Files.newInputStream(path)) {
-      return IOUtils.toString(input);
-    }
-  }
 }
