@@ -93,9 +93,9 @@ public class NodeCompareTest extends TesterBase {
     DirectoryStream<Path> ds = Files.newDirectoryStream(root, "*.html");
     for (Path path : ds) {
       Path name = path.getFileName();
-      if (!name.toString().equals("jirick-demo_215.html")) {
-        continue;
-      }
+//      if (!name.toString().equals("wells-demo_121.html")) {
+//        continue;
+//      }
       String[] jsonPath = name.toString().split("\\.");
       String template = UnitTestBase.readFile(path);
       String json = UnitTestBase.readFile(root.resolve(jsonPath[0] + ".json"));

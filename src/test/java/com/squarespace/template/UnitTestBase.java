@@ -15,11 +15,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
 import com.squarespace.template.plugins.CommerceFormatters;
 import com.squarespace.template.plugins.CommercePredicates;
+import com.squarespace.template.plugins.ContentFormatters;
 import com.squarespace.template.plugins.ContentPredicates;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
-import com.squarespace.template.plugins.MediaFormatters;
-import com.squarespace.template.plugins.MediaPredicates;
 import com.squarespace.template.plugins.SocialFormatters;
 import com.squarespace.template.plugins.SocialPredicates;
 import com.squarespace.v6.utils.JSONUtils;
@@ -39,13 +38,12 @@ public class UnitTestBase {
     predicateTable.register(new CommercePredicates());
     predicateTable.register(new ContentPredicates());
     predicateTable.register(new CorePredicates());
-    predicateTable.register(new MediaPredicates());
     predicateTable.register(new SocialPredicates());
     predicateTable.register(new UnitTestPredicates());
 
     formatterTable.register(new CommerceFormatters());
+    formatterTable.register(new ContentFormatters());
     formatterTable.register(new CoreFormatters());
-    formatterTable.register(new MediaFormatters());
     formatterTable.register(new SocialFormatters());
     formatterTable.register(new UnitTestFormatters());
 
