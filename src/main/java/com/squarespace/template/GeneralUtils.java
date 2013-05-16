@@ -56,4 +56,12 @@ public class GeneralUtils {
     return node.size() != 0;
   }
   
+  public static String ifString(JsonNode node, String defaultString) {
+    return isTruthy(node) ? node.asText() : defaultString;
+  }
+  
+  public static double ifDouble(JsonNode node, double defaultValue) {
+    return isTruthy(node) ? node.asDouble() : defaultValue;
+  }
+  
 }
