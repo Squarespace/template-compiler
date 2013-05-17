@@ -3,6 +3,7 @@ package com.squarespace.template.plugins;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
+import static com.squarespace.template.GeneralUtils.eatNull;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.plugins.PluginUtils.slugify;
 
@@ -318,7 +319,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
-      if (GeneralUtils.isTruthy(node)) {
+      if (isTruthy(node)) {
         ctx.append(node.asText().replaceAll("<.*?>", ""));
       }
     }
@@ -328,7 +329,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter SMARTYPANTS = new BaseFormatter("smartypants", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String str = ctx.node().asText();
+      String str = eatNull(ctx.node());
       str = str.replaceAll("(^|[-\u2014\\s(\\[\"])'", "$1\u2018");
       str = str.replace("'", "\u2019");
       str = str.replaceAll("(^|[-\u2014/\\[(\u2018\\s])\"", "$1\u201c");
@@ -346,7 +347,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String result = ctx.node().asText();
+      String result = eatNull(ctx.node());
       ctx.append(PluginUtils.slugify(result));
     }
   };
@@ -355,10 +356,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter STR = new BaseFormatter("str", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode node = ctx.node();
-      if (!(node.isMissingNode() || node.isNull())) {
-        ctx.append(node.asText());
-      }
+      ctx.append(eatNull(ctx.node()));
     }
   };
   

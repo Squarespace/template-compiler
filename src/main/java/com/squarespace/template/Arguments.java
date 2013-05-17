@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Parses arguments for Formatter instances. Associates an argument delimiter with
- * the list of arguments, and lets Formatters make quick assertions to ensure the
- * correct number of arguments were passed in.
+ * Parses arguments for Formatter/Predicate instances. It associates an argument delimiter with
+ * the list of arguments, and lets plugins make simple assertions to ensure the correct number
+ * of arguments were passed in.
  */
 public class Arguments {
   
@@ -57,10 +57,9 @@ public class Arguments {
   }
   
   /**
-   * Associates an opaque object with the Arguments instance so it can be 
-   * retrieved later.  Typically, you'll convert your arguments in the parsing
-   * phase, in order to report errors early.  Then your plugin can fetch the
-   * already-converted arguments during the execute phase.
+   * Associates an opaque object with the Arguments instance so it can be retrieved later.
+   * Typically, you'll convert your arguments in the parsing phase, in order to report errors
+   * early.  Then your plugin can fetch the already-converted arguments during the execute phase.
    */
   public void setOpaque(Object obj) {
     this.opaque = obj;

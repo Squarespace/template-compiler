@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * A CodeSink that collects instructions in a list.
+ */
 public class CodeList implements CodeSink {
 
   private static final Instruction[] EMPTY_INSTRUCTION_ARRAY = new Instruction[0];

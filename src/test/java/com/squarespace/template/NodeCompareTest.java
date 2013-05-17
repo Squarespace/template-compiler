@@ -93,7 +93,7 @@ public class NodeCompareTest extends TesterBase {
     DirectoryStream<Path> ds = Files.newDirectoryStream(root, "*.html");
     for (Path path : ds) {
       Path name = path.getFileName();
-//      if (!name.toString().equals("adirondack-demo_14.html")) {
+//      if (!name.toString().equals("adirondack-demo_84.html")) {
 //        continue;
 //      }
       String[] jsonPath = name.toString().split("\\.");
@@ -181,7 +181,7 @@ public class NodeCompareTest extends TesterBase {
     str = SPACELINE.matcher(str).replaceAll(" \n");
     str = LINESPACE.matcher(str).replaceAll("\n ");
     str = NEWLINES.matcher(str).replaceAll("\n");
-    str = SPACES.matcher(str).replaceAll("  ");
+    str = SPACES.matcher(str).replaceAll(" ");
 //    str = HTMLCOMMENTS.matcher(str).replaceAll("");
     return str;
   }
@@ -206,7 +206,7 @@ public class NodeCompareTest extends TesterBase {
     CompiledTemplate script = compiler.compile(template);
     JsonNode jsonNode = JSONUtils.decode(json);
     JsonNode partialsNode = JSONUtils.decode(partials);
-    Context ctx = compiler.executeWithPartials(script.getCode(), jsonNode, partialsNode);
+    Context ctx = compiler.execute(script.getCode(), jsonNode, partialsNode);
     return ctx.buffer().toString();
   }
  

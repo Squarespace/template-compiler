@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public abstract class SymbolTable<K, V> {
 
   private StringViewMap<K, V> table;
-  
+
   private TypeReference<V> ref;
   
   private boolean inUse = false;
@@ -34,7 +34,7 @@ public abstract class SymbolTable<K, V> {
   public V get(K symbol) {
     return table.get(symbol);
   }
-
+  
   public void dump() {
     try {
       table.dump();

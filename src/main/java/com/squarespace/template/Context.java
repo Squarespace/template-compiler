@@ -214,6 +214,26 @@ public class Context {
   }
 
   /**
+   * SECTION scope does not look up the stack.
+   */
+  public void pushSection(String[] names) {
+    JsonNode node;
+    if (names == null) {
+      node = currentFrame.node;
+    } else {
+      node = resolve(names[0], currentFrame);
+      for (int i = 1; i < names.length; i++) {
+        if (node.isMissingNode()) {
+          break;
+        }
+        node = node.path(names[i]);
+      }
+    }
+    stack.push(currentFrame);
+    currentFrame = new Frame(node);
+  }
+  
+  /**
    * Pushes the next element from the current array node onto the stack.
    */
   public void pushNext() {

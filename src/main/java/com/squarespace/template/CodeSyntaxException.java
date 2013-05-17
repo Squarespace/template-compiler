@@ -3,7 +3,7 @@ package com.squarespace.template;
 
 
 /**
- * Represents any error that occurs during compilation of a raw template string.
+ * Represents any error that occurs during compilation of a template.
  */
 public class CodeSyntaxException extends CodeException {
 

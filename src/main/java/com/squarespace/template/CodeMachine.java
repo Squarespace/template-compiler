@@ -83,7 +83,7 @@ public class CodeMachine implements CodeSink {
   
   /**
    * Accept one or more instructions and either push them onto the stack or allow
-   * the current state to process each one, conditionally transitioning to a new state.
+   * the current state to process each one, and conditionally transitions to a new state.
    */
   public void accept(Instruction ... instructions) throws CodeSyntaxException {
     for (Instruction inst : instructions) {
@@ -393,7 +393,7 @@ public class CodeMachine implements CodeSink {
   };
   
   /**
-   * Represents opening a section scope.
+   * SECTION state. Represents opening a section scope.
    */
   private State state_SECTION = new State() {
     
@@ -427,9 +427,10 @@ public class CodeMachine implements CodeSink {
   };
   
   /**
-   * The outermost state in the machine. Used to ensure that all opened
-   * scopes are properly closed, and only valid instructions exist at the
-   * top level of the template.
+   * ROOT state. The outermost state in the machine. Used to ensure that all opened
+   * scopes are properly closed, and only valid instructions exist at the top level
+   * of the template.  It is also the instruction that is returned after a successful
+   * compile, as the start of execution.
    */
   private State state_ROOT = new State() {
 
@@ -459,7 +460,8 @@ public class CodeMachine implements CodeSink {
   
   /**
    * Final state of the machine. Once reached the machine will accept no
-   * additional instructions.
+   * additional instructions -- doing so will raise an error.  EOF should be the 
+   * last thing a parser feeds to the state machine.
    */
   private State state_EOF = new State() {
 

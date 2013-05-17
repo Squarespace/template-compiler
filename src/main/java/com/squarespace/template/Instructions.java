@@ -567,7 +567,7 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      ctx.push(variable);
+      ctx.pushSection(variable);
       if (ctx.initIteration()) {
         // We have an array node and can now iterate.
         while (ctx.hasNext()) {
@@ -665,7 +665,7 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      ctx.push(variable);
+      ctx.pushSection(variable);
       JsonNode node = ctx.node();
       boolean execute = isTruthy(node);
       if (node.isArray() && node.size() == 0) {

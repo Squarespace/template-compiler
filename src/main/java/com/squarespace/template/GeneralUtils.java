@@ -64,4 +64,7 @@ public class GeneralUtils {
     return isTruthy(node) ? node.asDouble() : defaultValue;
   }
   
+  public static String eatNull(JsonNode node) {
+    return node.isNull() ? "" : node.asText();
+  }
 }

@@ -6,7 +6,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,6 +26,7 @@ public class ParoSpeedTest {
   public void testSpeed() throws Exception {
     double NANOS_PER_MS = 1_000_000.0;
     Thread.sleep(1);
+    CodeStats stats = new CodeStats();
     Path root = Paths.get("/Users/phensley/jsont_testcases");
     DirectoryStream<Path> ds = Files.newDirectoryStream(root, "*.html");
     for (Path path : ds) {
@@ -33,7 +38,7 @@ public class ParoSpeedTest {
   
       long now;
       long elapsed;
-      int iters = 1000;
+      int iters = 1;
 
       System.out.println("FILE: " + name);
       System.out.print("decode json: " + json.length() + " chars");
@@ -51,6 +56,7 @@ public class ParoSpeedTest {
       Exception error = null;
       System.out.println("tokenize/compile/execute: " + template.length() + " chars");
       try {
+        PARO.tokenize(template, stats);
         CompiledTemplate script = PARO.compile(template);
         System.out.println("instruction count: " + script.getMachine().getInstructionCount());
         int textChars = countTextChars(template);
@@ -59,10 +65,11 @@ public class ParoSpeedTest {
         System.out.printf("template overhead: %.1f %%\n", (count * 100.0 / (float)template.length()));
       } catch (CodeSyntaxException e) {
       }
+      String result = "";
       now = System.nanoTime();
       for (int i = 0; i < iters; i++) {
         try {
-          runParo(template, jsonNode, partialsNode);
+          result = runParo(template, jsonNode, partialsNode);
         } catch (Exception e) {
           error = e;
         }
@@ -72,12 +79,60 @@ public class ParoSpeedTest {
         error.printStackTrace();
       }
       System.out.printf("elapsed: %6.2f ms per iter\n\n", (elapsed / NANOS_PER_MS / (double)iters));
+      System.out.printf("result length: %d\n", result.length());
+      result = result.substring(0, Math.min(256, result.length()));
+      System.out.printf("result: %s\n", StringEscapeUtils.escapeJava(result));
     }
+    showReport(stats);
+  }
+
+  private void showReport(CodeStats stats) {
+    System.out.println("==========================================");
+    System.out.println("INSTRUCTIONS:");
+    for (Map.Entry<InstructionType, Integer> entry : stats.getInstructionCounts().entrySet()) {
+      System.out.printf("%30s: %8d\n", entry.getKey().name(), entry.getValue());
+    }
+    System.out.println();
+    System.out.println("FORMATTERS:");
+    for (Map.Entry<String, Integer> entry : stats.getFormatterCounts().entrySet()) {
+      System.out.printf("%30s: %8d\n", entry.getKey(), entry.getValue());
+    }
+    
+    System.out.println();
+    System.out.println("Not executed:");
+    String[] formatters = UnitTestBase.formatterTable().getSymbols();
+    Arrays.sort(formatters);
+    for (String name : formatters) {
+      if (!stats.getFormatterCounts().containsKey(name)) {
+        System.out.printf("  %s\n", name);
+      }
+    }
+
+    System.out.println();
+    System.out.println("PREDICATES:");
+    for (Map.Entry<String, Integer> entry : stats.getPredicateCounts().entrySet()) {
+      if (entry == null || entry.getKey() == null) {
+        System.out.println("NULL entry");
+        continue;
+      }
+      System.out.printf("%30s: %8d\n", entry.getKey(), entry.getValue());
+    }
+    
+    System.out.println();
+    System.out.println("Not executed:");
+    String[] predicates = UnitTestBase.predicateTable().getSymbols();
+    Arrays.sort(predicates);
+    for (String name : predicates) {
+      if (!stats.getPredicateCounts().containsKey(name)) {
+        System.out.printf("  %s\n", name);
+      }
+    }
+    
   }
   
   private String runParo(String template, JsonNode json, JsonNode partials) throws Exception {
     CompiledTemplate script = PARO.compile(template);
-    Context ctx = PARO.executeWithPartials(script.getCode(), json, partials);
+    Context ctx = PARO.execute(script.getCode(), json, partials);
     return ctx.buffer().toString();
   }
 

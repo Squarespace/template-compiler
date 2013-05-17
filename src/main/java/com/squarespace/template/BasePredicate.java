@@ -15,7 +15,7 @@ public abstract class BasePredicate extends Plugin implements Predicate {
    * been validated and optionally converted by validateArgs(). Predicates do 
    * nothing but return a boolean value -- they do not append output to the Context.
    * 
-   * TODO: restrict Predicates from appending output to Context?
+   * TODO: actively prevent Predicates from appending output to Context?
    */
   public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
     return true;

@@ -13,6 +13,8 @@ public class Constants {
   
   public static final List<String> EMPTY_LIST_OF_STRING = new ArrayList<>(0);
   
+  public static final String[] EMPTY_ARRAY_OF_STRING = new String[] { };
+  
   public static final Arguments EMPTY_ARGUMENTS = new Arguments();
 
   public static final String NULL_PLACEHOLDER = "???";

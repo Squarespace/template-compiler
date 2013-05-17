@@ -73,6 +73,14 @@ public class UnitTestBase {
     return new CodeBuilder();
   }
   
+  public static PredicateTable predicateTable() {
+    return predicateTable;
+  }
+  
+  public static FormatterTable formatterTable() {
+    return formatterTable;
+  }
+  
   public Context context(String raw) {
     return new Context(json(raw));
   }

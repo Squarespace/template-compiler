@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 
 /**
- * Reusable class to compile and execute templates. 
+ * JSON-Template compiler and execution engine.
  */
 public class JsonTemplateEngine {
 
@@ -32,7 +32,7 @@ public class JsonTemplateEngine {
   }
 
   /**
-   * Execute the instruction against the JSON node, appending the output to buf.
+   * Execute the instruction against the JSON node, appending the output to buffer.
    */
   public Context execute(Instruction instruction, JsonNode json, StringBuilder buf) throws CodeExecuteException {
     return executeWithPartials(instruction, json, null, buf);
@@ -41,14 +41,14 @@ public class JsonTemplateEngine {
   /**
    * Execute the instruction against the given JSON node, using the partial template map.
    */
-  public Context executeWithPartials(Instruction instruction, JsonNode json, JsonNode partials)
+  public Context execute(Instruction instruction, JsonNode json, JsonNode partials)
       throws CodeExecuteException {
     return executeWithPartials(instruction, json, partials, new StringBuilder());
   }
 
   /**
    * Execute the instruction against the JSON node, using the partial template map, and append
-   * the output to buf.
+   * the output to buffer.
    */
   public Context executeWithPartials(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf)
       throws CodeExecuteException {
@@ -61,7 +61,7 @@ public class JsonTemplateEngine {
   }
 
   /**
-   * Compile the template and return the root instruction. Useful if you want to
+   * Compile the template and return a wrapper containing the instructions. Useful if you want to
    * compile a template once and execute it multiple times.
    */
   public CompiledTemplate compile(String template) throws CodeSyntaxException {
@@ -80,6 +80,11 @@ public class JsonTemplateEngine {
     };
   }
   
+  /**
+   * Tokenize the template and return the list of instructions.  The list is not built into a
+   * tree -- its simply an ordered list of parsed instruction instances.  If you render these in order
+   * you'll get back the original template source.
+   */
   public CodeList tokenize(String template) throws CodeSyntaxException {
     CodeList sink = new CodeList();
     Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
@@ -87,4 +92,11 @@ public class JsonTemplateEngine {
     return sink;
   }
 
+  /**
+   * Tokenize the template and feed all parsed instructions to the sink.
+   */
+  public void tokenize(String template, CodeSink sink) throws CodeSyntaxException {
+    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
+    tokenizer.consume();
+  }
 }
