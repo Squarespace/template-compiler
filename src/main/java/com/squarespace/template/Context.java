@@ -131,7 +131,8 @@ public class Context {
   /**
    * Returns the root instruction for a compiled partial, assuming the partial exists
    * in the partials map. Compiled partials are cached for reuse within the same
-   * context.
+   * context, since a partial may be applied multiple times within a template, or 
+   * inside a loop.
    */
   public Instruction getPartial(String name) throws CodeSyntaxException {
     if (rawPartials == null) {
@@ -159,14 +160,6 @@ public class Context {
       compiledPartials.put(name, inst);
     }
     return inst;
-  }
-  
-  public void append(CharSequence cs) {
-    buf.append(cs);
-  }
-  
-  public void append(CharSequence cs, int start, int end) {
-    buf.append(cs, start, end);
   }
   
   public StringBuilder buffer() {
@@ -205,16 +198,15 @@ public class Context {
   }
 
   /**
-   * Push the node referenced by names onto the stack. If names == null do nothing.
+   * Push the node referenced by names onto the stack.
    */
   public void push(String[] names) {
-    JsonNode node = resolve(names);
-    stack.push(currentFrame);
-    currentFrame = new Frame(node);
+    push(resolve(names));
   }
 
   /**
-   * SECTION scope does not look up the stack.
+   * SECTION/REPEATED scope does not look up the stack.  It only resolves
+   * names against the current frame's node downward.
    */
   public void pushSection(String[] names) {
     JsonNode node;
@@ -229,8 +221,7 @@ public class Context {
         node = node.path(names[i]);
       }
     }
-    stack.push(currentFrame);
-    currentFrame = new Frame(node);
+    push(node);
   }
   
   /**
@@ -241,8 +232,7 @@ public class Context {
     if (node.isNull()) {
       node = undefined;
     }
-    stack.push(currentFrame);
-    currentFrame = new Frame(node);
+    push(node);
   }
   
   public JsonNode resolve(String name) {
@@ -271,9 +261,17 @@ public class Context {
     return node;
   }
 
+  private void push(JsonNode node) {
+    stack.push(currentFrame);
+    currentFrame = new Frame(node);
+  }
+
+  /**
+   * Starting at the current frame, walk up the stack looking for the first
+   * object node which contains 'name' and return that. If none match, return
+   * undefined.
+   */
   private JsonNode lookupStack(String name) {
-    // Starting at the current frame, walk up the stack looking for the first
-    // object node which contains name.
     JsonNode node = resolve(name, currentFrame);
     if (!node.isMissingNode()) {
       return node;
@@ -288,6 +286,9 @@ public class Context {
     return undefined;
   }
   
+  /**
+   * Obtain the value for 'name' from the given stack frame's node.
+   */
   private JsonNode resolve(String name, Frame frame) {
     // Special internal variable @index points to the array index for a 
     // given stack frame.
@@ -302,7 +303,7 @@ public class Context {
   }
 
   /**
-   * Pop the stack unconditionally.
+   * Pop a frame off the stack.
    */
   public void pop() {
     currentFrame = stack.pop();

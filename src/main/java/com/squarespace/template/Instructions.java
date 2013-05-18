@@ -377,7 +377,7 @@ public class Instructions {
     
     @Override
     public void invoke(Context ctx) {
-      ctx.append(value);
+      ctx.buffer().append(value);
     }
 
     @Override
@@ -416,7 +416,7 @@ public class Instructions {
     
     @Override
     public void invoke(Context ctx) {
-      ctx.append(isLeft ? ctx.getMetaLeft() : ctx.getMetaRight());
+      ctx.buffer().append(isLeft ? ctx.getMetaLeft() : ctx.getMetaRight());
     }
     
     @Override
@@ -504,7 +504,6 @@ public class Instructions {
           ctx.execute(alternative);
         }
       } else {
-        
         // Without a predicate we always execute the consequents. This represents 
         // the "else" in an if / else chain.
         ctx.execute(consequent.getInstructions());
@@ -574,6 +573,8 @@ public class Instructions {
           int index = ctx.currentIndex();
           // Push the array element onto the stack to be processed by the consequent.
           ctx.pushNext();
+          
+          // In between each pass, execute the alternatesWith block.
           if (index > 0) {
             ctx.execute(alternatesWith);
           }
@@ -667,7 +668,7 @@ public class Instructions {
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.pushSection(variable);
       JsonNode node = ctx.node();
-      boolean execute = isTruthy(node);
+      boolean execute = !node.isMissingNode();
       if (node.isArray() && node.size() == 0) {
         execute = false;
       }
@@ -741,7 +742,7 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) {
-      ctx.append(view.data(), view.start(), view.end());
+      ctx.buffer().append(view.data(), view.start(), view.end());
     }
     
     @Override
@@ -817,7 +818,7 @@ public class Instructions {
         }
         
       } else if (!node.isNull() && !node.isMissingNode()){
-        ctx.append(node.asText());
+        ctx.buffer().append(node.asText());
       }
     }
 

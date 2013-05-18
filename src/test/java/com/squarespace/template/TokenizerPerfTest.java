@@ -35,15 +35,15 @@ public class TokenizerPerfTest extends UnitTestBase {
     }
   }
   
-  @Test
-  public void testStatic() throws Exception {
-    String template = read("/Users/phensley/jsont_testcases/adirondack-demo_35.html");
-    String json = read("/Users/phensley/jsont_testcases/adirondack-demo_35.json");
-    for (int i = 2; i < 10; i++) {
-      template += template;
-      run(template, json);
-    }
-  }
+//  @Test
+//  public void testStatic() throws Exception {
+//    String template = read("/Users/phensley/jsont_testcases/adirondack-demo_35.html");
+//    String json = read("/Users/phensley/jsont_testcases/adirondack-demo_35.json");
+//    for (int i = 2; i < 10; i++) {
+//      template += template;
+//      run(template, json);
+//    }
+//  }
   
   private String read(String path) throws IOException {
     try (InputStream input = Files.newInputStream(Paths.get(path))) {

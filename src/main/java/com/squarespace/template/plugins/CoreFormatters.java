@@ -84,7 +84,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       if (node.isArray() || node.isObject()) {
         res = node.size();
       }
-      ctx.append(Integer.toString(res));
+      ctx.buffer().append(res);
     }
   };
   
@@ -103,7 +103,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       if (index < 0) {
         index += count;
       }
-      ctx.append(args.get(index));
+      ctx.buffer().append(args.get(index));
     };
   };
 
@@ -133,7 +133,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.append(Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;"));
+      ctx.buffer().append(Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;"));
     }
   };
   
@@ -193,7 +193,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       node = ctx.resolve("author");
       JsonNode displayName = node.path("displayName");
       if (isTruthy(node) && isTruthy(displayName)) {
-        ctx.append(" author-" + slugify(displayName.asText()));
+        buf.append(" author-" + slugify(displayName.asText()));
       }
       node = ctx.resolve("recordTypeLabel");
       buf.append(" post-type-").append(node.asText());
@@ -225,7 +225,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter ITER = new BaseFormatter("iter", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.append(ctx.resolve("@index").asText());
+      ctx.buffer().append(ctx.resolve("@index").asText());
     }
   };
   
@@ -238,7 +238,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       // NOTE: this is </script> replacement is copied verbatim from the JavaScript
       // version of JSONT, but it seems quite error-prone to me.
-      ctx.append(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
+      ctx.buffer().append(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
     }
   };
 
@@ -250,7 +250,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         String result = GeneralUtils.jsonPretty(ctx.node());
         // NOTE: this is </script> replacement is copied verbatim from the JavaScript
         // version of JSONT, but it seems quite error-prone to me.
-        ctx.append(result.replace("</script>", "</scr\"+\"ipt>"));
+        ctx.buffer().append(result.replace("</script>", "</scr\"+\"ipt>"));
       } catch (IOException e) {
         fail(ctx.error(GENERAL_ERROR).data(e.getMessage()));
       }
@@ -262,7 +262,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       List<String> values = args.getArgs();
-      ctx.append(StringUtils.join(values.toArray(), ' '));
+      ctx.buffer().append(StringUtils.join(values.toArray(), ' '));
     }
   };
   
@@ -293,7 +293,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       PluralizeArgs realArgs = (PluralizeArgs) args.getOpaque();
       CharSequence result = (ctx.node().asLong() > 1) ? realArgs.plural : realArgs.singular;
-      ctx.append(result);
+      ctx.buffer().append(result);
     }
   };
   
@@ -301,7 +301,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter RAW = new BaseFormatter("raw", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.append(ctx.node().toString());
+      ctx.buffer().append(ctx.node().toString());
     }
   };
 
@@ -320,7 +320,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
       if (isTruthy(node)) {
-        ctx.append(node.asText().replaceAll("<.*?>", ""));
+        ctx.buffer().append(node.asText().replaceAll("<.*?>", ""));
       }
     }
   };
@@ -335,7 +335,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       str = str.replaceAll("(^|[-\u2014/\\[(\u2018\\s])\"", "$1\u201c");
       str = str.replace("\"", "\u201d");
       str = str.replace("--", "\u2014");
-      ctx.append(str);
+      ctx.buffer().append(str);
     }
   };
 
@@ -348,7 +348,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String result = eatNull(ctx.node());
-      ctx.append(PluginUtils.slugify(result));
+      ctx.buffer().append(PluginUtils.slugify(result));
     }
   };
   
@@ -356,7 +356,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter STR = new BaseFormatter("str", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.append(eatNull(ctx.node()));
+      ctx.buffer().append(eatNull(ctx.node()));
     }
   };
   
@@ -364,14 +364,15 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter TIMESINCE = new BaseFormatter("timesince", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      StringBuilder buf = ctx.buffer();
       JsonNode node = ctx.node();
       if (!node.isNumber()) {
-        ctx.append("Invalid date.");
+        buf.append("Invalid date.");
       } else {
         long value = node.asLong();
-        ctx.append("<span class=\"timesince\" data-date=\"" + value + "\">");
-        PluginDateUtils.humanizeDate(value, false, ctx.buffer());
-        ctx.append("</span>");
+        buf.append("<span class=\"timesince\" data-date=\"" + value + "\">");
+        PluginDateUtils.humanizeDate(value, false, buf);
+        buf.append("</span>");
       }
     }
   };
@@ -413,7 +414,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String value = ctx.node().asText();
       try {
-        ctx.append(URLEncoder.encode(value, "UTF-8"));
+        ctx.buffer().append(URLEncoder.encode(value, "UTF-8"));
       } catch (UnsupportedEncodingException e) {
         // Shouldn't happen
       }

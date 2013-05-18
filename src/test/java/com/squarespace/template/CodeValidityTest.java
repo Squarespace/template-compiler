@@ -131,20 +131,22 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute(jsonData, cb.build()), "xx1.yy2");
   }
 
-  @Test
-  public void testRepeatedNesting() throws CodeException {
-    String json = "{\"a\": [1,2], \"b\": \"A\", \"c\": \"-\"}";
-    CodeBuilder cb = builder();
-    cb.repeated("a").var("b").repeated("a").var("@").var("c").var("@index").end().text(".").end().eof();
-    assertContext(execute(json, cb.build()), "A1-12-2.A1-12-2.");
-
-    json = "{\"a\": [\"x\",\"y\"], \"b\": [55,66,77]}";
-    cb = builder();
-    cb.repeated("a").var("@").var("@index").text("-");
-    cb.repeated("b").var("@").var("@index").alternatesWith().text(".").end();
-    cb.end().eof();
-    assertContext(execute(json, cb.build()), "x1-551.662.773y2-551.662.773");
-  }
+// DISABLED: these tests are invalid since REPEATED instructions do not resolve
+// variables up the stack. - phensley
+//  @Test
+//  public void testRepeatedNesting() throws CodeException {
+//    String json = "{\"a\": [1,2], \"b\": \"A\", \"c\": \"-\"}";
+//    CodeBuilder cb = builder();
+//    cb.repeated("a").var("b").repeated("a").var("@").var("c").var("@index").end().text(".").end().eof();
+//    assertContext(execute(json, cb.build()), "A1-12-2.A1-12-2.");
+//
+//    json = "{\"a\": [\"x\",\"y\"], \"b\": [55,66,77]}";
+//    cb = builder();
+//    cb.repeated("a").var("@").var("@index").text("-");
+//    cb.repeated("b").var("@").var("@index").alternatesWith().text(".").end();
+//    cb.end().eof();
+//    assertContext(execute(json, cb.build()), "x1-551.662.773y2-551.662.773");
+//  }
   
   @Test
   public void testSection() throws CodeException {
