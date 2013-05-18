@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
  */
 public class Context {
 
-  private static final JsonNode DEFAULT_UNDEFINED = NullNode.getInstance();
+  private static final JsonNode DEFAULT_UNDEFINED = MissingNode.getInstance();
   
   private static final String META_LEFT = "{";
   
@@ -238,6 +238,9 @@ public class Context {
    */
   public void pushNext() {
     JsonNode node = currentFrame.node.path(currentFrame.currentIndex);
+    if (node.isNull()) {
+      node = undefined;
+    }
     stack.push(currentFrame);
     currentFrame = new Frame(node);
   }

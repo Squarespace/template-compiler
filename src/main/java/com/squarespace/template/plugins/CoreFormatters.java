@@ -141,7 +141,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTML = new BaseFormatter("html", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      PluginUtils.escapeHtml(ctx.node().asText(), ctx.buffer());
+      PluginUtils.escapeHtml(eatNull(ctx.node()), ctx.buffer());
     }
   };
   
@@ -149,7 +149,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      PluginUtils.escapeHtmlTag(ctx.node().asText(), ctx.buffer());
+      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), ctx.buffer());
     }
   };
   
@@ -157,7 +157,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      PluginUtils.escapeHtmlTag(ctx.node().asText(), ctx.buffer());
+      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), ctx.buffer());
     }
   };
   

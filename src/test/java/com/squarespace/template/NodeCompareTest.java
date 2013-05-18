@@ -93,7 +93,7 @@ public class NodeCompareTest extends TesterBase {
     DirectoryStream<Path> ds = Files.newDirectoryStream(root, "*.html");
     for (Path path : ds) {
       Path name = path.getFileName();
-//      if (!name.toString().equals("adirondack-demo_84.html")) {
+//      if (!name.toString().equals("adirondack-demo_190.html")) {
 //        continue;
 //      }
       String[] jsonPath = name.toString().split("\\.");
@@ -124,6 +124,9 @@ public class NodeCompareTest extends TesterBase {
   private boolean differs(String nodeRes, String paroRes) {
     nodeRes = normalize(nodeRes);
     paroRes = normalize(paroRes);
+//    System.out.println("NODE: " + compress(nodeRes));
+//    System.out.println("PARO: " + compress(paroRes));
+//    System.out.println("EQUALS: " + compress(nodeRes).equals(compress(paroRes)));
     if (compress(nodeRes).equals(compress(paroRes))) {
       return false;
     }

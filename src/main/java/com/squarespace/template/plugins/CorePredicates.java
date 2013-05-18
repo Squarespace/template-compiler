@@ -64,12 +64,10 @@ public class CorePredicates extends BaseRegistry<Predicate> {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode excerpt = ctx.node().path("excerpt");
+      JsonNode html = excerpt.path("html");
       String text = "";
-      if (!excerpt.isMissingNode()) {
-        JsonNode html = excerpt.path("html");
-        if (!html.isMissingNode()) {
-          text = html.asText();
-        }
+      if (!html.isMissingNode()) {
+        text = html.asText();
       } else {
         text = excerpt.asText();
       }
