@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 public class TokenizerPositionTest extends UnitTestBase {
   
-  private static final boolean VERBOSE = false;
+  private static final boolean VERBOSE = true;
   
   /**
    * Sanity-checking all the line and column offsets. All line and character offsets
@@ -69,6 +69,11 @@ public class TokenizerPositionTest extends UnitTestBase {
     str = "{.section a}{b}{.end}\n{.repeated section b}{@}{.end}";
     assertLines(parse(str), mk.intlist(1, 1, 1, 1, 2, 2, 2, 2));
     assertOffsets(parse(str), mk.intlist(1, 13, 16, 22, 1, 22, 25, 31));
+
+    // TEXT SECTION END EOF
+    str = " {.section a}{.end}";
+    assertLines(parse(str), mk.intlist(1, 1, 1, 1));
+    assertOffsets(parse(str), mk.intlist(1, 2, 14, 20));
   }
   
   @Test

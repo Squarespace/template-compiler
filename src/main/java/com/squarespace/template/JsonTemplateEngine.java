@@ -88,15 +88,24 @@ public class JsonTemplateEngine {
    * you'll get back the original template source.
    */
   public List<ErrorInfo> validate(String template) throws CodeSyntaxException {
-    CodeSink sink = new CodeSink() {
-      @Override
-      public void accept(Instruction... instructions) throws CodeSyntaxException {
-      }
-    };
+    CodeList sink = new CodeList();
     Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
     tokenizer.setValidate();
     tokenizer.consume();
-    return tokenizer.getErrors();
+    List<ErrorInfo> errors = tokenizer.getErrors();
+
+    // Since we may have parsed a lot of valid instructions, pass the result to a code machine
+    // to see if it'll throw an additional error.
+    // TODO: add explicit validation to CodeMachine
+    CodeMachine machine = new CodeMachine();
+    try {
+      for (Instruction inst : sink.getInstructions()) {
+        machine.accept(inst);
+      }
+    } catch (CodeSyntaxException e) {
+      errors.add(e.getErrorInfo());
+    }
+    return errors;
   }
 
   public CodeList tokenize(String template) throws CodeSyntaxException {

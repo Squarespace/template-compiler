@@ -563,7 +563,6 @@ public class Tokenizer {
             break;
             
           case META_LEFT_CHAR:
-
             instLine = lineCounter;
             instOffset = index - lineIndex;
 
