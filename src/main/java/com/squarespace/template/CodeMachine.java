@@ -13,7 +13,9 @@ import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_AT_ROOT;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.EndInst;
@@ -41,6 +43,10 @@ public class CodeMachine implements CodeSink {
 
   private RootInst root;
   
+  private List<ErrorInfo> errors;
+  
+  private boolean validate = false;
+  
   private BlockInstruction scope;
   
   private Instruction current;
@@ -59,6 +65,14 @@ public class CodeMachine implements CodeSink {
    */
   public RootInst getCode() {
     return root;
+  }
+  
+  public List<ErrorInfo> getErrors() {
+    return (errors != null) ? errors : new ArrayList<ErrorInfo>(0);
+  }
+  
+  public void setValidate() {
+    this.validate = true;
   }
   
   /**
@@ -160,7 +174,14 @@ public class CodeMachine implements CodeSink {
   }
   
   private void fail(ErrorInfo info) throws CodeSyntaxException {
-    throw new CodeSyntaxException(info);
+    if (validate) {
+      if (errors == null) {
+        errors = new ArrayList<>(4);
+      }
+      errors.add(info);
+    } else {
+      throw new CodeSyntaxException(info);
+    }
   }
   
   private String currentInfo() {
@@ -217,9 +238,11 @@ public class CodeMachine implements CodeSink {
 
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          return state_EOF;
 
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(ALTERNATES_WITH));
+          break;
 
         case OR_PREDICATE:
           // Special case where an OR_PREDICATE follows an ALTERNATES_WITH. We
@@ -259,9 +282,11 @@ public class CodeMachine implements CodeSink {
         
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
-
+          return state_EOF;
+          
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(IF));
+          break;
         
         case END:
           setAlternative(inst);
@@ -294,10 +319,12 @@ public class CodeMachine implements CodeSink {
         
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          return state_EOF;
 
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(PREDICATE));
-        
+          break;
+          
         case END:
           setAlternative(inst);
           return pop();
@@ -329,9 +356,11 @@ public class CodeMachine implements CodeSink {
         
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          return state_EOF;
 
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(OR_PREDICATE));
+          break;
           
         case END:
           setAlternative(inst);
@@ -342,6 +371,7 @@ public class CodeMachine implements CodeSink {
           PredicateInst parent = ((PredicateInst)current);
           if (parent.getType() == OR_PREDICATE && parent.getPredicate() == null) {
             fail(error(DEAD_CODE_BLOCK, inst));
+            break;
           }
           setAlternative(inst);
           current = inst;
@@ -369,6 +399,7 @@ public class CodeMachine implements CodeSink {
 
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          return state_EOF;
 
         case OR_PREDICATE:
           setAlternative(inst);
@@ -404,9 +435,11 @@ public class CodeMachine implements CodeSink {
 
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          return state_EOF;
           
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(SECTION));
+          break;
         
         case OR_PREDICATE:
           setAlternative(inst);
@@ -445,10 +478,12 @@ public class CodeMachine implements CodeSink {
 
         case END:
           fail(error(MISMATCHED_END, inst));
+          break;
           
         case ALTERNATES_WITH:
         case OR_PREDICATE:
           fail(error(NOT_ALLOWED_AT_ROOT, inst).data(ROOT));
+          break;
           
         default:
           addConsequent(inst);

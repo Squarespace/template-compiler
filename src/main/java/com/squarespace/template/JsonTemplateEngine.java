@@ -87,7 +87,7 @@ public class JsonTemplateEngine {
    * tree -- its simply an ordered list of parsed instruction instances.  If you render these in order
    * you'll get back the original template source.
    */
-  public List<ErrorInfo> validate(String template) throws CodeSyntaxException {
+  public List<ErrorInfo> validate(String template) throws CodeException {
     CodeList sink = new CodeList();
     Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
     tokenizer.setValidate();
@@ -96,15 +96,12 @@ public class JsonTemplateEngine {
 
     // Since we may have parsed a lot of valid instructions, pass the result to a code machine
     // to see if it'll throw an additional error.
-    // TODO: add explicit validation to CodeMachine
     CodeMachine machine = new CodeMachine();
-    try {
-      for (Instruction inst : sink.getInstructions()) {
-        machine.accept(inst);
-      }
-    } catch (CodeSyntaxException e) {
-      errors.add(e.getErrorInfo());
+    machine.setValidate();
+    for (Instruction inst : sink.getInstructions()) {
+      machine.accept(inst);
     }
+    errors.addAll(machine.getErrors());
     return errors;
   }
 

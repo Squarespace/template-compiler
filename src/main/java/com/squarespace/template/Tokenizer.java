@@ -112,7 +112,7 @@ public class Tokenizer {
   }
   
   public List<ErrorInfo> getErrors() {
-    return errors;
+    return (errors != null) ? errors : new ArrayList<ErrorInfo>(0);
   }
   
   private char getc(int index) {
