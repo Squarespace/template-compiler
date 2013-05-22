@@ -1,5 +1,8 @@
 package com.squarespace.template;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Mapping of fixed instruction identifiers.  Instructions which have variant
@@ -11,22 +14,35 @@ public class InstructionTable {
   
   private static final StringViewMap<StringView, InstructionType> table = new StringViewMap<>(HASHMAP_BUCKETS);
   
+  private static final List<String> symbolList = new ArrayList<>();
+  
   static void add(String str, InstructionType type) {
+    add(str, type, true);
+  } 
+  
+  static void add(String str, InstructionType type, boolean isSymbol) {
     table.put(new StringView(str), type);
+    if (isSymbol) {
+      symbolList.add(str);
+    }
   }
   
   static {
-    add(".alternates", InstructionType.ALTERNATES_WITH);
+    add(".alternates", InstructionType.ALTERNATES_WITH, false);
     add(".end", InstructionType.END);
     add(".if", InstructionType.IF);
     add(".meta-left", InstructionType.META_LEFT);
     add(".meta-right", InstructionType.META_RIGHT);
     add(".newline", InstructionType.NEWLINE);
     add(".or", InstructionType.OR_PREDICATE);
-    add(".repeated", InstructionType.REPEATED);
+    add(".repeated", InstructionType.REPEATED, false);
     add(".section", InstructionType.SECTION);
     add(".space", InstructionType.SPACE);
     add(".tab", InstructionType.TAB);
+    
+    // Special-case for instructions containing whitespace (yeah).
+    symbolList.add(".alternates with");
+    symbolList.add(".repeated section");
   }
   
   public static void dump() {
@@ -44,4 +60,8 @@ public class InstructionTable {
     return table.get(symbol);
   }
   
+  public static String[] getSymbols() {
+    return symbolList.toArray(Constants.EMPTY_ARRAY_OF_STRING);
+  }
+
 }

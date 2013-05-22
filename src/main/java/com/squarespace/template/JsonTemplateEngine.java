@@ -14,6 +14,8 @@ public class JsonTemplateEngine {
   
   private final PredicateTable predicateTable;
 
+  private final MetaData metaData;
+  
   /**
   * Since the FormatterTable and PredicateTable classes are extensible with custom
   * instances, this class accepts them as constructor arguments.  Just initialize an
@@ -24,6 +26,11 @@ public class JsonTemplateEngine {
     this.predicateTable = predicateTable;
     formatterTable.setInUse();
     predicateTable.setInUse();
+    this.metaData = new MetaData(formatterTable, predicateTable);
+  }
+  
+  public MetaData getMetaData() {
+    return this.metaData;
   }
   
   /**
@@ -82,33 +89,53 @@ public class JsonTemplateEngine {
     };
   }
   
+  public ValidatedTemplate validate(String template) throws CodeException {
+    final CodeList sink = new CodeList();
+    final CodeStats stats = new CodeStats();
+
+    // Validate the template at the syntax level.
+    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
+    tokenizer.setValidate();
+    tokenizer.consume();
+    final List<ErrorInfo> errors = tokenizer.getErrors();
+
+    // Pass the parsed instructions to the CodeMachine for structural validation, and
+    // collect some stats.
+    CodeMachine machine = new CodeMachine();
+    machine.setValidate();
+    for (Instruction inst : sink.getInstructions()) {
+      machine.accept(inst);
+      stats.accept(inst);
+    }
+    errors.addAll(machine.getErrors());
+    
+    // Return all of the validation objects for the template.
+    return new ValidatedTemplate() {
+      @Override
+      public CodeList getCode() {
+        return sink;
+      }
+      @Override
+      public List<ErrorInfo> getErrors() {
+        return errors;
+      }
+      @Override
+      public CodeStats getStats() {
+        return stats;
+      }
+    };
+  }
+
   /**
    * Tokenize the template and return the list of instructions.  The list is not built into a
    * tree -- its simply an ordered list of parsed instruction instances.  If you render these in order
    * you'll get back the original template source.
    */
-  public List<ErrorInfo> validate(String template) throws CodeException {
-    CodeList sink = new CodeList();
-    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
-    tokenizer.setValidate();
-    tokenizer.consume();
-    List<ErrorInfo> errors = tokenizer.getErrors();
-
-    // Since we may have parsed a lot of valid instructions, pass the result to a code machine
-    // to see if it'll throw an additional error.
-    CodeMachine machine = new CodeMachine();
-    machine.setValidate();
-    for (Instruction inst : sink.getInstructions()) {
-      machine.accept(inst);
-    }
-    errors.addAll(machine.getErrors());
-    return errors;
-  }
-
   public CodeList tokenize(String template) throws CodeSyntaxException {
     return tokenize(template, false);
   }
   
+  // TODO: remove this method, refactor tests to use ValidatedTemplate.
   public CodeList tokenize(String template, boolean validate) throws CodeSyntaxException {
     CodeList sink = new CodeList();
     Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
