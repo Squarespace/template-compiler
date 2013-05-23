@@ -144,18 +144,27 @@ public class Tokenizer {
   }
 
   private ErrorInfo error(SyntaxErrorType code) {
-    return error(code, 0);
+    return error(code, 0, false);
+  }
+  
+  private ErrorInfo error(SyntaxErrorType code, boolean textLoc) {
+    return error(code, 0, textLoc);
   }
 
   /**
    * Include an offset to nudge the error message character offset right to the position of the
    * error.
    */
-  private ErrorInfo error(SyntaxErrorType code, int offset) {
+  private ErrorInfo error(SyntaxErrorType code, int offset, boolean textLoc) {
     ErrorInfo info = new ErrorInfo(code);
     info.code(code);
-    info.line(instLine + 1);
-    info.offset(instOffset + 1 + offset);
+    if (textLoc) {
+      info.line(textLine + 1);
+      info.offset(textOffset + 1);
+    } else {
+      info.line(instLine + 1);
+      info.offset(instOffset + 1 + offset);
+    }
     return info;
   }
   
@@ -493,13 +502,13 @@ public class Tokenizer {
     // We have a formatter to parse.
     matcher.consume();
     if (!matcher.formatter()) {
-      fail(error(FORMATTER_INVALID, matcher.pointer() - start).name(matcher.remainder()));
+      fail(error(FORMATTER_INVALID, matcher.pointer() - start, false).name(matcher.remainder()));
       return emitInvalid();
     }
     StringView name = matcher.consume();
     Formatter formatter = formatterTable.get(name);
     if (formatter == null) {
-      fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start).name(name));
+      fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(name));
       return emitInvalid();
     }
     
@@ -627,7 +636,9 @@ public class Tokenizer {
         switch (ch) {
 
           case EOF_CHAR:
-            fail(error(SyntaxErrorType.EOF_IN_COMMENT));
+            emitInstruction(maker.mcomment(raw, start, index));
+            fail(error(SyntaxErrorType.EOF_IN_COMMENT, true));
+            return state_EOF;
           
           case NEWLINE_CHAR:
             lineCounter++;
