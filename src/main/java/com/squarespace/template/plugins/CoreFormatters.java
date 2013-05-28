@@ -292,7 +292,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       PluralizeArgs realArgs = (PluralizeArgs) args.getOpaque();
-      CharSequence result = (ctx.node().asLong() > 1) ? realArgs.plural : realArgs.singular;
+      CharSequence result = (ctx.node().asLong() == 1) ? realArgs.singular : realArgs.plural;
       ctx.buffer().append(result);
     }
   };

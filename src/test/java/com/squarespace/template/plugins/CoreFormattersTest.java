@@ -190,19 +190,19 @@ public class CoreFormattersTest extends UnitTestBase {
     CodeMaker mk = maker();
     
     Arguments args = mk.args("");
-    assertFormatter(PLURALIZE, "0", "");
+    assertFormatter(PLURALIZE, "0", "s");
     assertFormatter(PLURALIZE, "1", "");
     assertFormatter(PLURALIZE, "2", "s");
     assertFormatter(PLURALIZE, "3.1415", "s");
 
     args = mk.args(" A");
-    assertFormatter(PLURALIZE, args, "0", "");
+    assertFormatter(PLURALIZE, args, "0", "A");
     assertFormatter(PLURALIZE, args, "1", "");
     assertFormatter(PLURALIZE, args, "2", "A");
     assertFormatter(PLURALIZE, args, "100", "A");
     
     args = mk.args("/A/B");
-    assertFormatter(PLURALIZE, args, "0", "A");
+    assertFormatter(PLURALIZE, args, "0", "B");
     assertFormatter(PLURALIZE, args, "1", "A");
     assertFormatter(PLURALIZE, args, "2", "B");
     assertFormatter(PLURALIZE, args, "100", "B");
