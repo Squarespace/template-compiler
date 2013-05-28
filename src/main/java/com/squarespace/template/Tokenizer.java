@@ -290,10 +290,12 @@ public class Tokenizer {
           }
           Predicate predicate = resolvePredicate(matcher.consume());
           if (predicate == null) {
+            // Error was emitted by resolvePredicate()
             return emitInvalid();
           }
           Arguments args = parsePredicateArguments(predicate);
           if (args == null) {
+            // Error was emitted by parsePredicateArguments()
             return emitInvalid();
           }
           PredicateInst inst = maker.predicate(predicate, args);

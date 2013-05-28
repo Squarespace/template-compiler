@@ -23,16 +23,28 @@ import com.squarespace.template.plugins.CorePredicates;
  */
 public class CodeValidityTest extends UnitTestBase {
 
+  /**
+   * Sort of confusing to add sections to ALTERNATES_WITH block, since we're always pointing to the
+   * next element in the array when that block is executed. Typical uses of ALTERNATES_WITH just output
+   * static text, but nesting things inside those blocks is possible.
+   */
   @Test
   public void testAlternatesWith() throws CodeException {
     RootInst root = builder().repeated("a").alternatesWith().section("b").var("@").end().end().eof().build();
-    // Sort of confusing to add sections to ALTERNATES_WITH block, since we're always pointing to the
-    // next element in the array when that block is executed.
-    assertContext(execute("{\"a\": [{\"b\": 1}, {\"b\": 2}, {\"b\": 3}]}", root), "23");
+    String json = "{\"a\": [{\"b\": 1}, {\"b\": 2}, {\"b\": 3}, {\"b\": 4}]}";
+    assertContext(execute(json, root), "234");
   }
   
   @Test
-  public void testAlterantesWithOr() throws CodeException {
+  public void testAlternatesWithSectionOr() throws CodeException {
+    CodeBuilder cb = builder().repeated("a").alternatesWith().section("@").var("@").end();
+    RootInst root = cb.or().text("x").end().eof().build();
+    assertContext(execute("{\"a\": [1,2,3]}", root), "23");
+    assertContext(execute("{}", root), "x");
+  }
+  
+  @Test
+  public void testAlternatesWithOr() throws CodeException {
     RootInst root = builder().repeated("a").text("A").alternatesWith().text("-").or().text("B").end().eof().build();
     assertContext(execute("{\"a\": [1,2,3]}", root), "A-A-A");
     assertContext(execute("{}", root), "B");

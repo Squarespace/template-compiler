@@ -47,15 +47,12 @@ public class CodeMachine implements CodeSink {
   
   private boolean validate = false;
   
-  private BlockInstruction scope;
-  
   private Instruction current;
   
   private int instructionCount;
   
   public CodeMachine() {
     this.root = new RootInst();
-    this.scope = null;
     this.current = root;
     state = state_ROOT;
   }
@@ -125,12 +122,19 @@ public class CodeMachine implements CodeSink {
    */
   private State push(Instruction inst) {
     addConsequent(inst);
+    return push_(inst);
+  }
+
+  /**
+   * Just modify the instruction stack. Exists to support special block instructions
+   * like ALTERNATES_WITH. 
+   */
+  private State push_(Instruction inst) {
     stack.push(current);
-    scope = (BlockInstruction) inst;
     current = inst;
     return stateFor(inst);
   }
-
+  
   /**
    * Pop a block instruction off the stack.  The stack should never return null,
    * and this is enforced by the state machine.
@@ -138,7 +142,6 @@ public class CodeMachine implements CodeSink {
   private State pop() throws CodeSyntaxException {
     try {
       current = stack.pop();
-      scope = (BlockInstruction) current;
     } catch (Exception e) {
       throw new RuntimeException("Popped the ROOT instruction off the stack, which should never happen! "
           + "Possible bug in state machine.");
@@ -245,19 +248,20 @@ public class CodeMachine implements CodeSink {
           break;
 
         case OR_PREDICATE:
-          // Special case where an OR_PREDICATE follows an ALTERNATES_WITH. We
-          // need to close off the ALTERNATES_WITH and open the OR_PREDICATE scope.
-          if (scope instanceof RepeatedInst) {
-            setAlternative(new EndInst());
-            ((RepeatedInst)scope).setAlternative(inst);
-            current = inst;
-            return state_OR_PREDICATE;
-          }
-          
-          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(ALTERNATES_WITH));
-          break;
+          // Special case where an OR_PREDICATE follows an ALTERNATES_WITH.
+          //
+          // We need to close off the ALTERNATES_WITH block, add the OR_PREDICATE to
+          // the REPEATED as its alternate branch, and switch into the OR_PREDICATE scope.
+          setAlternative(new EndInst());
+          pop();
+          setAlternative(inst);
+          current = inst;
+          return state_OR_PREDICATE;
 
         case END:
+          // Special case, since an END following an ALTERNATES_WITH actually closes
+          // the parent REPEATED instruction.  We need to pop twice.
+          pop();
           setAlternative(inst);
           return pop();
 
@@ -367,7 +371,7 @@ public class CodeMachine implements CodeSink {
           return pop();
           
         case OR_PREDICATE:
-          // Check to ensure that we don't have any {.or} following a null predicate {.or}.
+          // Check to ensure that we don't have an {.or} following an {.or} with a null predicate.
           PredicateInst parent = ((PredicateInst)current);
           if (parent.getType() == OR_PREDICATE && parent.getPredicate() == null) {
             fail(error(DEAD_CODE_BLOCK, inst));
@@ -409,8 +413,7 @@ public class CodeMachine implements CodeSink {
         case ALTERNATES_WITH:
           // Special block that lives only within the repeat instruction
           ((RepeatedInst)current).setAlternatesWith((AlternatesWithInst)inst);
-          current = inst;
-          return state_ALTERNATES_WITH;
+          return push_(inst);
 
         case END:
           setAlternative(inst);
