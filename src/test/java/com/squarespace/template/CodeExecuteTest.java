@@ -5,13 +5,11 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
-import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 /**
- * 
+ * Executing pieces of code and verifying output.
  */
 public class CodeExecuteTest extends UnitTestBase {
 
@@ -35,9 +33,8 @@ public class CodeExecuteTest extends UnitTestBase {
   @Test
   public void testSection() throws CodeException {
     CodeBuilder builder = builder();
-    builder.section("foo.bar").var("baz").end();
+    RootInst root = builder.section("foo.bar").var("baz").end().eof().build();
 
-    RootInst root = builder.eof().build();
     String jsonData = "{\"foo\": {\"bar\": {\"baz\": 123}}}";
     assertEquals(repr(root), "{.section foo.bar}{baz}{.end}");
     assertContext(execute(jsonData, root), "123");
@@ -50,6 +47,8 @@ public class CodeExecuteTest extends UnitTestBase {
     RootInst root = builder.eof().build();
     assertContext(execute("{\"foo\": 123}", root), "A");
     assertContext(execute("{}", root), "B");
+    assertContext(execute("{\"foo\": null}", root), "B");
+    assertContext(execute("{\"foo\": []}", root), "B");
   }
 
   @Test
@@ -84,25 +83,11 @@ public class CodeExecuteTest extends UnitTestBase {
   public void testVariable() throws CodeException {
     RootInst root = builder().var("foo.bar").eof().build();
     assertContext(execute("{\"foo\": {\"bar\": 123}}", root), "123");
-  }
-  
-  @Test
-  public void testJsonFormatter() throws CodeException {
-    String input = "{\"foo\":123}";
-    Context ctx = new Context(JSONUtils.decode(input));
-    CoreFormatters.JSON.apply(ctx, Constants.EMPTY_ARGUMENTS);
-    assertEquals(ctx.buffer().toString(), input);
     
-    input = "\"hello world\"";
-    ctx = new Context(JSONUtils.decode(input));
-    CoreFormatters.JSON.apply(ctx, Constants.EMPTY_ARGUMENTS);
-    assertEquals(ctx.buffer().toString(), input);
-  }
-  
-  @Test
-  public void testFormatterInstruction() throws CodeException {
-    RootInst root = builder().formatter("foo", CoreFormatters.JSON).eof().build();
-    assertContext(execute("{\"foo\": 123}", root), "123");
+    root = builder().var("@").eof().build();
+    assertContext(execute("3.14159", root), "3.14159");
+    assertContext(execute("123.000", root), "123.0");
+    assertContext(execute("null", root), "");
   }
   
 }

@@ -23,6 +23,10 @@ public class BlockTest extends UnitTestBase {
     b4.add(maker.text("foo"));
     Assert.assertNotEquals(b1, b4);
     Assert.assertNotEquals(b3, b4);
+
+    Assert.assertFalse(b1.equals(null));
+    Assert.assertFalse(b1.equals("foo"));
   }
+  
   
 }

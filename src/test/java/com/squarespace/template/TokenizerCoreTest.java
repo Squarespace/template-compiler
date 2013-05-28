@@ -41,7 +41,7 @@ import com.squarespace.template.plugins.CoreFormatters;
  */
 public class TokenizerCoreTest extends UnitTestBase {
 
-  private static final boolean VERBOSE = true;
+  private static final boolean VERBOSE = false;
   
   @Test
   public void testEdgeCases() throws CodeSyntaxException {

@@ -28,5 +28,12 @@ public class TokenMatcherTest extends UnitTestBase {
     assertEquals(tm.remainder(), mk.view(" .abc?"));
   }
   
+  @Test
+  public void testRange() {
+    TokenMatcher tm = new TokenMatcher(".abc?");
+    assertTrue(tm.keyword());
+    assertEquals(tm.matchStart(), 0);
+    assertEquals(tm.matchEnd(), 5);
+  }
   
 }

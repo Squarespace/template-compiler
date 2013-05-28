@@ -176,6 +176,10 @@ public class ReprEmitter {
   public static void emit(RootInst inst, StringBuilder buf, boolean recurse) {
     if (recurse) {
       emitBlock(inst, buf, recurse);
+      Instruction alt = inst.getAlternative();
+      if (alt != null) {
+        alt.repr(buf, recurse);
+      }
     }
   }
   

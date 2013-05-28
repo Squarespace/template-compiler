@@ -59,7 +59,7 @@ public abstract class BaseInstruction implements Instruction {
    * Generate a tree representation of this instruction and its children.
    */
   public void tree(StringBuilder buf, int depth) {
-    throw new UnsupportedOperationException("tree() not yet implemented");
+    TreeEmitter.emit(this, depth, buf);
   }
 
   public void invoke(Context ctx) throws CodeExecuteException {

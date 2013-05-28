@@ -7,9 +7,16 @@ package com.squarespace.template;
 public abstract class BasePredicate extends Plugin implements Predicate {
 
   public BasePredicate(String identifier, boolean requiresArgs) {
-    super(identifier, requiresArgs);
+    super(validateIdentifier(identifier), requiresArgs);
   }
 
+  private static String validateIdentifier(String identifier) {
+    if (!identifier.endsWith("?")) {
+      throw new IllegalArgumentException("All predicates must end with '?'");
+    }
+    return identifier;
+  }
+  
   /**
    * Applies the Predicate to the context, using the given arguments which have
    * been validated and optionally converted by validateArgs(). Predicates do 

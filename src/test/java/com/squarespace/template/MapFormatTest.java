@@ -9,6 +9,11 @@ import org.testng.annotations.Test;
 
 public class MapFormatTest {
 
+  @Test
+  public void testBasics() {
+    MapFormat format = new MapFormat("%(first)s %(age)d", "???");
+    assertEquals(format.getFormat(), "%s %d");
+  }
   
   @Test
   public void testStrings() {

@@ -24,6 +24,21 @@ import com.squarespace.template.plugins.CorePredicates;
 public class CodeValidityTest extends UnitTestBase {
 
   @Test
+  public void testAlternatesWith() throws CodeException {
+    RootInst root = builder().repeated("a").alternatesWith().section("b").var("@").end().end().eof().build();
+    // Sort of confusing to add sections to ALTERNATES_WITH block, since we're always pointing to the
+    // next element in the array when that block is executed.
+    assertContext(execute("{\"a\": [{\"b\": 1}, {\"b\": 2}, {\"b\": 3}]}", root), "23");
+  }
+  
+  @Test
+  public void testAlterantesWithOr() throws CodeException {
+    RootInst root = builder().repeated("a").text("A").alternatesWith().text("-").or().text("B").end().eof().build();
+    assertContext(execute("{\"a\": [1,2,3]}", root), "A-A-A");
+    assertContext(execute("{}", root), "B");
+  }
+  
+  @Test
   public void testComments() throws CodeException {
     RootInst root = builder().comment("foo").mcomment("bar\nbaz").eof().build();
     assertContext(execute("{}", root), "");
@@ -86,7 +101,9 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("174.35", root), "A");
     assertContext(execute("1", root), "B");
     assertContext(execute("1.0", root), "B");
-    assertContext(execute("0", root), "C");
+    
+    // zero is false-y, so entire section is skipped
+    assertContext(execute("0", root), "");
   }
 
   @Test
@@ -131,23 +148,6 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute(jsonData, cb.build()), "xx1.yy2");
   }
 
-// DISABLED: these tests are invalid since REPEATED instructions do not resolve
-// variables up the stack. - phensley
-//  @Test
-//  public void testRepeatedNesting() throws CodeException {
-//    String json = "{\"a\": [1,2], \"b\": \"A\", \"c\": \"-\"}";
-//    CodeBuilder cb = builder();
-//    cb.repeated("a").var("b").repeated("a").var("@").var("c").var("@index").end().text(".").end().eof();
-//    assertContext(execute(json, cb.build()), "A1-12-2.A1-12-2.");
-//
-//    json = "{\"a\": [\"x\",\"y\"], \"b\": [55,66,77]}";
-//    cb = builder();
-//    cb.repeated("a").var("@").var("@index").text("-");
-//    cb.repeated("b").var("@").var("@index").alternatesWith().text(".").end();
-//    cb.end().eof();
-//    assertContext(execute(json, cb.build()), "x1-551.662.773y2-551.662.773");
-//  }
-  
   @Test
   public void testSection() throws CodeException {
     RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().build();

@@ -440,6 +440,7 @@ public class CodeMachine implements CodeSink {
       switch (type) {
 
         case EOF:
+          setAlternative(inst);
           return state_EOF;
 
         case END:

@@ -102,6 +102,12 @@ public class InstructionReprTest extends UnitTestBase {
   }
   
   @Test
+  public void testNames() {
+    assertEquals(ReprEmitter.get(new String[] { "foo", "bar" }), "foo.bar");
+    assertEquals(ReprEmitter.get(null), "@");
+  }
+  
+  @Test
   public void testPredicateRepr() {
     CodeMaker mk = maker();
     PredicateInst p1 = mk.predicate(CorePredicates.PLURAL);

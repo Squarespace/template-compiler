@@ -1,6 +1,7 @@
 package com.squarespace.template;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 
 import org.testng.annotations.Test;
@@ -33,6 +34,10 @@ public class StringViewTest {
     StringView v4 = v3.subview(1, 2); 
     assertEquals(v4.start(), 2);
     assertEquals(v4.end(), 3);
+    assertEquals(v4.repr(), "c");
+    
+    // call multiple times, since repr is cached
+    assertEquals(v4.repr(), "c");
     assertEquals(v4.repr(), "c");
   }
 
@@ -86,6 +91,9 @@ public class StringViewTest {
     assertEquals(v1, v2);
     StringView v3 = new StringView(s1, 9, 12);
     assertNotEquals(v1, v3);
+    
+    assertFalse(v1.equals(null));
+    assertFalse(v1.equals("abc"));
   }
   
 }

@@ -1,7 +1,5 @@
 package com.squarespace.template;
 
-import static com.squarespace.template.GeneralUtils.isTruthy;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -571,6 +569,7 @@ public class Instructions {
         // We have an array node and can now iterate.
         while (ctx.hasNext()) {
           int index = ctx.currentIndex();
+
           // Push the array element onto the stack to be processed by the consequent.
           ctx.pushNext();
           
@@ -578,6 +577,7 @@ public class Instructions {
           if (index > 0) {
             ctx.execute(alternatesWith);
           }
+          
           ctx.execute(consequent.getInstructions());
           ctx.pop();
           
@@ -668,11 +668,7 @@ public class Instructions {
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.pushSection(variable);
       JsonNode node = ctx.node();
-      boolean execute = !node.isMissingNode();
-      if (node.isArray() && node.size() == 0) {
-        execute = false;
-      }
-      if (execute) {
+      if (GeneralUtils.isTruthy(node)) {
         ctx.execute(consequent.getInstructions());
       } else {
         ctx.execute(alternative);
@@ -809,11 +805,7 @@ public class Instructions {
           case DOUBLE:
             // If no decimal part, output as integer (to match JavaScript output)
             double val = node.asDouble();
-            if (val == Math.round(val)) {
-              buf.append((long)val);
-            } else {
-              buf.append(val);
-            }
+            buf.append(Double.toString(val));
             break;
         }
         
