@@ -1,5 +1,11 @@
 package com.squarespace.template;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.v6.utils.JSONUtils;
+
 /**
  * Provides a class to capture state about the error, prior to constructing the 
  * exception itself. Lets us pass this object around to various places if necessary
@@ -29,12 +35,19 @@ public class ErrorInfo {
   
   private ErrorType type;
   
+  private ErrorLevel level;
+  
   private MapBuilder<String, Object> builder = new MapBuilder<>();
   
   public ErrorInfo(ErrorType type) {
-    this.type = type;
+    this(type, ErrorLevel.ERROR);
   }
 
+  public ErrorInfo(ErrorType type, ErrorLevel level) {
+    this.type = type;
+    this.level = level;
+  }
+  
   public ErrorInfo code(Object code) {
     builder.put(CODE, code);
     return this;
@@ -82,9 +95,28 @@ public class ErrorInfo {
   public ErrorType getType() {
     return type;
   }
+  
+  public ErrorLevel getLevel() {
+    return level;
+  }
 
   public String getMessage() {
-    return type.format(builder.get());
+    Map<String, Object> params = builder.get();
+    return type.prefix(params) + ": " + type.message(params);
+  }
+  
+  public JsonNode toJson() {
+    Map<String, Object> map = builder.get();
+    ObjectNode obj = JSONUtils.createObjectNode();
+    obj.put("level", level.toString());
+    Integer line = (Integer)map.get(LINE);
+    obj.put("line", (line == null) ? 0 : line);
+    Integer offset = (Integer)map.get(OFFSET);
+    obj.put("offset", (offset == null) ? 0 : offset);
+    obj.put("type", type.toString());
+    obj.put("prefix", type.prefix(map));
+    obj.put("message", type.message(map));
+    return obj;
   }
   
 }

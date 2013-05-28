@@ -10,6 +10,9 @@ public class TokenMatcher {
 
   private String raw;
   
+  /** Start as set by region() */
+  private int start = -1;
+  
   /** Start of the most recent match. */
   private int matchStart = -1;
   
@@ -60,6 +63,7 @@ public class TokenMatcher {
    * Set the region of the potential matches.
    */
   public TokenMatcher region(int start, int end) {
+    this.start = start;
     this.pointer = start;
     this.end = end;
     return this;
@@ -109,6 +113,10 @@ public class TokenMatcher {
    */
   public int pointer() {
     return pointer;
+  }
+  
+  public int start() {
+    return start;
   }
   
   /**

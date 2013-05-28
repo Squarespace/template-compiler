@@ -1,5 +1,7 @@
 package com.squarespace.template;
 
+import static com.squarespace.template.Constants.NULL_PLACEHOLDER;
+
 import java.util.Map;
 
 
@@ -19,16 +21,23 @@ public enum ExecuteErrorType implements ErrorType {
   
   ;
   
-  private static final String PREFIX = "RuntimeError %(code)s at line %(line)s character %(offset)s: ";
+  private static final String PREFIX = "RuntimeError %(code)s at line %(line)s character %(offset)s";
+
+  private MapFormat prefixFormat;
   
-  private MapFormat mapFormat;
+  private MapFormat messageFormat;
   
-  private ExecuteErrorType(String rawFormat) {
-    this.mapFormat = new MapFormat(PREFIX + rawFormat, Constants.NULL_PLACEHOLDER);
+  private ExecuteErrorType(String messageFormat) {
+    this.prefixFormat = new MapFormat(PREFIX, NULL_PLACEHOLDER);
+    this.messageFormat = new MapFormat(messageFormat, NULL_PLACEHOLDER);
   }
   
-  public String format(Map<String, Object> params) {
-    return mapFormat.apply(params);
+  public String prefix(Map<String, Object> params) {
+    return this.prefixFormat.apply(params);
+  }
+  
+  public String message(Map<String, Object> params) {
+    return messageFormat.apply(params);
   }
 
 }

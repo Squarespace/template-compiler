@@ -243,8 +243,8 @@ public class TokenizerCoreTest extends UnitTestBase {
       if (VERBOSE) {
         System.out.println("assertFailure: " + e.getMessage());
       }
-      assertNotEquals(e.getError(), null, "ErrorInfo is null");
-      assertEquals(e.getError().getType(), type, "error type doesn't match");
+      assertNotEquals(e.getErrorInfo(), null, "ErrorInfo is null");
+      assertEquals(e.getErrorInfo().getType(), type, "error type doesn't match");
       assertEquals(e.getMessage().indexOf(Constants.NULL_PLACEHOLDER), -1, "found null placeholder");
     }
   }

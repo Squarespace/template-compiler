@@ -1,5 +1,7 @@
 package com.squarespace.template;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 
@@ -85,9 +87,28 @@ public class JsonTemplateEngine {
    * tree -- its simply an ordered list of parsed instruction instances.  If you render these in order
    * you'll get back the original template source.
    */
+  public List<ErrorInfo> validate(String template) throws CodeSyntaxException {
+    CodeSink sink = new CodeSink() {
+      @Override
+      public void accept(Instruction... instructions) throws CodeSyntaxException {
+      }
+    };
+    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
+    tokenizer.setValidate();
+    tokenizer.consume();
+    return tokenizer.getErrors();
+  }
+
   public CodeList tokenize(String template) throws CodeSyntaxException {
+    return tokenize(template, false);
+  }
+  
+  public CodeList tokenize(String template, boolean validate) throws CodeSyntaxException {
     CodeList sink = new CodeList();
     Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
+    if (validate) {
+      tokenizer.setValidate();
+    }
     tokenizer.consume();
     return sink;
   }

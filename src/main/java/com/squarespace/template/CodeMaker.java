@@ -122,7 +122,11 @@ public class CodeMaker {
   }
 
   public PredicateInst or(Predicate impl) {
-    PredicateInst inst = predicate(impl);
+    return or(impl, Constants.EMPTY_ARGUMENTS);
+  }
+  
+  public PredicateInst or(Predicate impl, Arguments args) {
+    PredicateInst inst = predicate(impl, args);
     inst.setOr();
     return inst;
   }

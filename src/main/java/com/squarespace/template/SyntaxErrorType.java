@@ -89,16 +89,23 @@ public enum SyntaxErrorType implements ErrorType {
 
   ;
   
-  private static final String PREFIX = "SyntaxError %(code)s at line %(line)s character %(offset)s: ";
+  private static final String PREFIX = "SyntaxError %(code)s at line %(line)s character %(offset)s";
 
-  private MapFormat mapFormat;
+  private MapFormat prefixFormat;
+  
+  private MapFormat messageFormat;
   
   private SyntaxErrorType(String rawFormat) {
-    this.mapFormat = new MapFormat(PREFIX + rawFormat, NULL_PLACEHOLDER);
+    this.prefixFormat = new MapFormat(PREFIX, NULL_PLACEHOLDER);
+    this.messageFormat = new MapFormat(rawFormat, NULL_PLACEHOLDER);
   }
   
-  public String format(Map<String, Object> params) {
-    return mapFormat.apply(params);
+  public String prefix(Map<String, Object> params) {
+    return prefixFormat.apply(params);
+  }
+
+  public String message(Map<String, Object> params) {
+    return messageFormat.apply(params);
   }
  
 }

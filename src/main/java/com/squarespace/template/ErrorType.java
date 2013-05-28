@@ -5,6 +5,8 @@ import java.util.Map;
 
 public interface ErrorType {
 
-  public String format(Map<String, Object> params);
+  public String prefix(Map<String, Object> params);
+  
+  public String message(Map<String, Object> params);
 
 }

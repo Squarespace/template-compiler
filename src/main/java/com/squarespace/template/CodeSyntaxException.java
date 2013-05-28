@@ -14,7 +14,7 @@ public class CodeSyntaxException extends CodeException {
     this.errorInfo = info;
   }
 
-  public ErrorInfo getError() {
+  public ErrorInfo getErrorInfo() {
     return errorInfo;
   }
   

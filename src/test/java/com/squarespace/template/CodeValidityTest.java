@@ -170,7 +170,7 @@ public class CodeValidityTest extends UnitTestBase {
     RootInst root = builder().var("foo").var("bar").eof().build();
     assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
   }
-  
+
   @Test
   public void testDeadCode() {
     CodeMaker mk = maker();
@@ -214,7 +214,7 @@ public class CodeValidityTest extends UnitTestBase {
       fail(type + " should have raised a syntax exception");
     } catch (CodeSyntaxException e) {
       // Exception means success.
-      assertEquals(e.getError().getType(), type);
+      assertEquals(e.getErrorInfo().getType(), type);
     }
   }
   

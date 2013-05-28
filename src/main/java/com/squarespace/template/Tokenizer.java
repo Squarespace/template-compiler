@@ -62,6 +62,10 @@ public class Tokenizer {
 
   private State state;
 
+  private List<ErrorInfo> errors = new ArrayList<>(4);
+  
+  boolean validate = false;
+  
   private int textLine;
   
   private int textOffset;
@@ -92,10 +96,23 @@ public class Tokenizer {
     this.state = state_INITIAL;
   }
   
-  public void consume() throws CodeSyntaxException {
+  public boolean consume() throws CodeSyntaxException {
     do {
       state = state.transition();
     } while (state != state_EOF);
+    return errors.size() == 0;
+  }
+
+  /**
+   * Puts the Tokenizer in a mode where it collects a list of errors, rather than
+   * throwing an exception on the first parse error.
+   */
+  public void setValidate() {
+    this.validate = true;
+  }
+  
+  public List<ErrorInfo> getErrors() {
+    return errors;
   }
   
   private char getc(int index) {
@@ -109,6 +126,11 @@ public class Tokenizer {
     inst.setLineNumber(instLine + 1);
     inst.setCharOffset(instOffset + 1);
     sink.accept(inst);
+  }
+  
+  private boolean emitInvalid() throws CodeSyntaxException {
+    sink.accept(maker.text(new StringView(raw, matcher.start()-1, matcher.end()+1)));
+    return true;
   }
   
   /**
@@ -138,7 +160,10 @@ public class Tokenizer {
   }
   
   private void fail(ErrorInfo info) throws CodeSyntaxException {
-    throw new CodeSyntaxException(info);
+    if (!validate) {
+      throw new CodeSyntaxException(info);
+    }
+    errors.add(info);
   }
   
   /**
@@ -157,7 +182,7 @@ public class Tokenizer {
    * 
    * Package-private to facilitate unit testing.
    */
-  boolean matchMeta(int start, int end) throws CodeSyntaxException {
+  private boolean matchMeta(int start, int end) throws CodeSyntaxException {
     if (!(start < end)) {
       throw new RuntimeException("Start position should always be less than end. Bug in tokenizer.");
     }
@@ -172,39 +197,33 @@ public class Tokenizer {
     
     // Start token matching everything between '{' and '}'
     matcher.region(innerStart, innerEnd);
-    
-    Instruction inst = parseKeyword();
-    if (inst != null) {
-      emitInstruction(inst);
-      return true;
-    }
-    
-    inst = parseVariable();
-    if (inst != null) {
-      emitInstruction(inst);
-      return true;
-    }
-    return false;
+
+    return parseKeyword() || parseVariable() || false;
   }
 
   /**
    * Attempt to parse the range into a keyword instruction.
    */
-  private Instruction parseKeyword() throws CodeSyntaxException {
+  private boolean parseKeyword() throws CodeSyntaxException {
     if (!matcher.keyword()) {
-      return null;
+      return false;
     }
     
     StringView keyword = matcher.consume();
     if (keyword.lastChar() == '?') {
       Predicate predicate = resolvePredicate(keyword.subview(1, keyword.length()));
-      Arguments args = parsePredicate(predicate);
-      return maker.predicate(predicate, args);
+      Arguments args = parsePredicateArguments(predicate);
+      if (args == null) {
+        return emitInvalid();
+      }
+      emitInstruction(maker.predicate(predicate, args));
+      return true;
     }
     
     InstructionType type = InstructionTable.get(keyword);
     if (type == null) {
       fail(error(INVALID_INSTRUCTION).data(keyword));
+      return emitInvalid();
     }
     return parseInstruction(type, matcher.pointer(), matcher.end());
   }
@@ -212,7 +231,7 @@ public class Tokenizer {
   /**
    * We've found the start of an instruction. Parse the rest of the range.
    */
-  private Instruction parseInstruction(InstructionType type, int start, int end) throws CodeSyntaxException {
+  private boolean parseInstruction(InstructionType type, int start, int end) throws CodeSyntaxException {
 
     switch (type) {
 
@@ -220,16 +239,20 @@ public class Tokenizer {
         // Look for SPACE "WITH" EOF
         if (!matcher.space()) {
           fail(error(SyntaxErrorType.WHITESPACE_EXPECTED).data(matcher.remainder()));
+          return emitInvalid();
         }
         matcher.consume();
         if (!matcher.wordWith()) {
           fail(error(MISSING_WITH_KEYWORD).data(matcher.remainder()));
+          return emitInvalid();
         }
         matcher.consume();
         if (!matcher.finished()) {
           fail(error(EXTRA_CHARS).type(type).data(matcher.remainder()));
+          return emitInvalid();
         }
-        return maker.alternates();
+        emitInstruction(maker.alternates());
+        return true;
         
       case END:
       case META_LEFT:
@@ -240,8 +263,10 @@ public class Tokenizer {
         // Nothing should follow these instructions.
         if (!matcher.finished()) {
           fail(error(EXTRA_CHARS).type(type).data(matcher.remainder()));
+          return emitInvalid();
         }
-        return maker.simple(type);
+        emitInstruction(maker.simple(type));
+        return true;
 
       case IF:
         return parseIfExpression();
@@ -252,18 +277,28 @@ public class Tokenizer {
 
           if (!matcher.predicate()) {
             fail(error(OR_EXPECTED_PREDICATE).type(type).data(matcher.remainder()));
+            return emitInvalid();
           }
           Predicate predicate = resolvePredicate(matcher.consume());
-          Arguments args = parsePredicate(predicate);
+          if (predicate == null) {
+            return emitInvalid();
+          }
+          Arguments args = parsePredicateArguments(predicate);
+          if (args == null) {
+            return emitInvalid();
+          }
           PredicateInst inst = maker.predicate(predicate, args);
           inst.setOr();
-          return inst;
+          emitInstruction(inst);
+          return true;
 
         }
         if (!matcher.finished()) {
           fail(error(EXTRA_CHARS).type(type).data(matcher.remainder()));
+          return emitInvalid();
         }
-        return maker.or();
+        emitInstruction(maker.or());
+        return true;
         
       case REPEATED:
       case SECTION:
@@ -281,6 +316,8 @@ public class Tokenizer {
     Predicate predicate = predicateTable.get(keyword);
     if (predicate == null) {
       fail(error(PREDICATE_UNKNOWN).data(keyword.repr()));
+      // Emit a dummy predicate with this name.
+      return new BasePredicate(keyword.repr(), false) { };
     }
     return predicate;
   }
@@ -288,25 +325,29 @@ public class Tokenizer {
   /**
    * After we've resolved a predicate implementation, parse its optional arguments.
    */
-  private Arguments parsePredicate(Predicate predicate) throws CodeSyntaxException {
+  private Arguments parsePredicateArguments(Predicate predicate) throws CodeSyntaxException {
     StringView rawArgs = null;
     if (matcher.arguments()) {
       rawArgs = matcher.consume();
     }
 
-    Arguments args = Constants.EMPTY_ARGUMENTS;
+    Arguments args = null;
     if (rawArgs == null) {
+      args = new Arguments();
       if (predicate.requiresArgs()) {
         fail(error(PREDICATE_NEEDS_ARGS).data(predicate));
+        return null;
       }
     } else {
-      try {
-        args = new Arguments(rawArgs);
-        predicate.validateArgs(args);
-      } catch (ArgumentsException e) {
-        String identifier = predicate.getIdentifier();
-        fail(error(PREDICATE_ARGS_INVALID).name(identifier).data(e.getMessage()));
-      }
+      args = new Arguments(rawArgs);
+    }
+    
+    try {
+      predicate.validateArgs(args);
+    } catch (ArgumentsException e) {
+      String identifier = predicate.getIdentifier();
+      fail(error(PREDICATE_ARGS_INVALID).name(identifier).data(e.getMessage()));
+      return null;
     }
     return args;
   }
@@ -318,17 +359,22 @@ public class Tokenizer {
    * can mix OR with AND if you want, but there is no operator precedence or parenthesis so the
    * result may not be what was expected.
    */
-  private Instruction parseIfExpression() throws CodeSyntaxException {
+  private boolean parseIfExpression() throws CodeSyntaxException {
     if (!matcher.whitespace()) {
       fail(error(WHITESPACE_EXPECTED).data(matcher.remainder()));
+      return emitInvalid();
     }
     matcher.consume();
     
     // First, check if this is a predicate expression. If so, parse it.
     if (matcher.predicate()) {
       Predicate predicate = resolvePredicate(matcher.consume());
-      Arguments args = parsePredicate(predicate);
-      return maker.ifpred(predicate, args);
+      Arguments args = parsePredicateArguments(predicate);
+      if (args == null) {
+        return emitInvalid();
+      }
+      emitInstruction(maker.ifpred(predicate, args));
+      return true;
     }
     
     // Otherwise, this is an expression involving variable tests and operators.
@@ -344,6 +390,7 @@ public class Tokenizer {
       
       if (count == IF_VARIABLE_LIMIT) {
         fail(error(IF_TOO_MANY_VARS).limit(IF_VARIABLE_LIMIT));
+        return emitInvalid();
       }
       count++;
 
@@ -360,15 +407,19 @@ public class Tokenizer {
     
     if (!matcher.finished()) {
       fail(error(IF_EXPECTED_VAROP).data(matcher.remainder()));
+      return emitInvalid();
     }
     if (vars.size() == 0) {
       fail(error(IF_EMPTY));
+      return emitInvalid();
     }
     if (vars.size() != (ops.size() + 1)) {
       fail(error(IF_TOO_MANY_OPERATORS));
+      return emitInvalid();
     }
     
-    return maker.ifexpn(vars, ops);
+    emitInstruction(maker.ifexpn(vars, ops));
+    return true;
   }
   
   /**
@@ -378,7 +429,7 @@ public class Tokenizer {
    *   ".repeated section" VARIABLE
    * 
    */
-  private Instruction parseSection(InstructionType type) throws CodeSyntaxException {
+  private boolean parseSection(InstructionType type) throws CodeSyntaxException {
     if (!matcher.whitespace()) {
       fail(error(WHITESPACE_EXPECTED).data(matcher.remainder()));
     }
@@ -387,26 +438,32 @@ public class Tokenizer {
     if (type == InstructionType.REPEATED) {
       if (!matcher.wordSection()) {
         fail(error(MISSING_SECTION_KEYWORD).data(matcher.remainder()));
+        return emitInvalid();
       }
       matcher.consume();
       if (!matcher.whitespace()) {
         fail(error(WHITESPACE_EXPECTED).data(matcher.remainder()));
+        return emitInvalid();
       }
       matcher.consume();
     }
     
     if (!matcher.variable()) {
       fail(error(VARIABLE_EXPECTED).data(matcher.remainder()));
+      return emitInvalid();
     }
     StringView variable = matcher.consume();
     if (!matcher.finished()) {
       fail(error(EXTRA_CHARS).type(type).data(matcher.remainder()));
+      return emitInvalid();
     }
 
     if (type == InstructionType.REPEATED) {
-      return maker.repeated(variable.repr());
+      emitInstruction(maker.repeated(variable.repr()));
+    } else {
+      emitInstruction(maker.section(variable.repr()));
     }
-    return maker.section(variable.repr());
+    return true;
   }
 
   /**
@@ -417,9 +474,9 @@ public class Tokenizer {
    * 3) FormatterInst, if variable name plus a valid piped formatter with optional arguments.
    * 4) throws error
    */
-  private Instruction parseVariable() throws CodeSyntaxException {
+  private boolean parseVariable() throws CodeSyntaxException {
     if (!matcher.variable()) {
-      return null;
+      return false;
     }
     int start = matcher.matchStart();
     StringView variable = matcher.consume();
@@ -427,20 +484,23 @@ public class Tokenizer {
     // Variable with no formatter applied.
     if (!matcher.pipe()) {
       if (!matcher.finished()) {
-        return null;
+        return false;
       }
-      return maker.var(variable.repr());
+      emitInstruction(maker.var(variable.repr()));
+      return true;
     }
 
     // We have a formatter to parse.
     matcher.consume();
     if (!matcher.formatter()) {
       fail(error(FORMATTER_INVALID, matcher.pointer() - start).name(matcher.remainder()));
+      return emitInvalid();
     }
     StringView name = matcher.consume();
     Formatter formatter = formatterTable.get(name);
     if (formatter == null) {
       fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start).name(name));
+      return emitInvalid();
     }
     
     StringView rawArgs = null;
@@ -452,6 +512,7 @@ public class Tokenizer {
     if (rawArgs == null) {
       if (formatter.requiresArgs()) {
         fail(error(FORMATTER_NEEDS_ARGS).data(formatter));
+        return emitInvalid();
       }
       args = new Arguments();
     } else {
@@ -463,9 +524,11 @@ public class Tokenizer {
     } catch (ArgumentsException e) {
       String identifier = formatter.getIdentifier();
       fail(error(FORMATTER_ARGS_INVALID).name(identifier).data(e.getMessage()));
+      return emitInvalid();
     }
 
-    return maker.formatter(variable.repr(), formatter, args);
+    emitInstruction(maker.formatter(variable.repr(), formatter, args));
+    return true;
   }
   
   /**
