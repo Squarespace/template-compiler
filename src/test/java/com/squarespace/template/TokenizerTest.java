@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 
 public class TokenizerTest extends UnitTestBase {
 
-  private static final boolean VERBOSE = true;
+  private static final boolean VERBOSE = false;
   
   @Test
   public void testAlternatesWith() throws CodeSyntaxException {

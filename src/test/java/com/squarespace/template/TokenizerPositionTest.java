@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 public class TokenizerPositionTest extends UnitTestBase {
   
-  private static final boolean VERBOSE = true;
+  private static final boolean VERBOSE = false;
   
   /**
    * Sanity-checking all the line and column offsets. All line and character offsets
