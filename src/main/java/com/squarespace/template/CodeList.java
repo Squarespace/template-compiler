@@ -27,4 +27,8 @@ public class CodeList implements CodeSink {
     }
   }
   
+  @Override
+  public void complete() {
+  }
+  
 }

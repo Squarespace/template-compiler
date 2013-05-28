@@ -59,6 +59,11 @@ public class CodeStats implements CodeSink {
     }
   }
   
+  @Override
+  public void complete() {
+    
+  }
+  
   public int getTotalInstructions() {
     return totalInstructions;
   }

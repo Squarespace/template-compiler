@@ -100,6 +100,7 @@ public class Tokenizer {
     do {
       state = state.transition();
     } while (state != state_EOF);
+    sink.complete();
     return errors.size() == 0;
   }
 
@@ -241,7 +242,6 @@ public class Tokenizer {
    * We've found the start of an instruction. Parse the rest of the range.
    */
   private boolean parseInstruction(InstructionType type, int start, int end) throws CodeSyntaxException {
-
     switch (type) {
 
       case ALTERNATES_WITH:
@@ -289,10 +289,6 @@ public class Tokenizer {
             return emitInvalid();
           }
           Predicate predicate = resolvePredicate(matcher.consume());
-          if (predicate == null) {
-            // Error was emitted by resolvePredicate()
-            return emitInvalid();
-          }
           Arguments args = parsePredicateArguments(predicate);
           if (args == null) {
             // Error was emitted by parsePredicateArguments()
@@ -443,6 +439,7 @@ public class Tokenizer {
   private boolean parseSection(InstructionType type) throws CodeSyntaxException {
     if (!matcher.whitespace()) {
       fail(error(WHITESPACE_EXPECTED).data(matcher.remainder()));
+      return emitInvalid();
     }
     matcher.consume();
     

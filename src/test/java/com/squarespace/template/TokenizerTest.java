@@ -1,0 +1,126 @@
+package com.squarespace.template;
+
+import static com.squarespace.template.SyntaxErrorType.EOF_IN_COMMENT;
+import static com.squarespace.template.SyntaxErrorType.EXTRA_CHARS;
+import static com.squarespace.template.SyntaxErrorType.FORMATTER_ARGS_INVALID;
+import static com.squarespace.template.SyntaxErrorType.FORMATTER_INVALID;
+import static com.squarespace.template.SyntaxErrorType.FORMATTER_NEEDS_ARGS;
+import static com.squarespace.template.SyntaxErrorType.FORMATTER_UNKNOWN;
+import static com.squarespace.template.SyntaxErrorType.IF_EMPTY;
+import static com.squarespace.template.SyntaxErrorType.IF_EXPECTED_VAROP;
+import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_OPERATORS;
+import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
+import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
+import static com.squarespace.template.SyntaxErrorType.MISSING_WITH_KEYWORD;
+import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
+import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
+import static com.squarespace.template.SyntaxErrorType.PREDICATE_NEEDS_ARGS;
+import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
+import static com.squarespace.template.SyntaxErrorType.VARIABLE_EXPECTED;
+import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
+import static org.testng.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.testng.annotations.Test;
+
+
+public class TokenizerTest extends UnitTestBase {
+
+  private static final boolean VERBOSE = true;
+  
+  @Test
+  public void testAlternatesWith() throws CodeSyntaxException {
+    assertErrors("{.alternates}", WHITESPACE_EXPECTED);
+    assertErrors("{.alternates x}", MISSING_WITH_KEYWORD);
+    assertErrors("{.alternates with }", EXTRA_CHARS);
+  }
+  
+  @Test
+  public void testComments() throws CodeSyntaxException {
+    assertErrors("{## foo #", EOF_IN_COMMENT);
+  }
+  
+  @Test
+  public void testIfExpression() throws CodeSyntaxException {
+
+    // Boolean expressions
+    
+    assertErrors("{.i}", INVALID_INSTRUCTION);
+    assertErrors("{.if}", WHITESPACE_EXPECTED);
+    assertErrors("{.if }", IF_EMPTY);
+    assertErrors("{.if ?}", IF_EXPECTED_VAROP);
+    assertErrors("{.if a ||}", IF_TOO_MANY_OPERATORS);
+    assertErrors("{.if a || b ||}", IF_TOO_MANY_OPERATORS);
+    assertErrors("{.if a b}", IF_EXPECTED_VAROP);
+    assertErrors("{.if a || b || c || d || e || f}", SyntaxErrorType.IF_TOO_MANY_VARS);
+    assertErrors("{.if a .}", IF_EXPECTED_VAROP);
+    
+    // Predicates
+    assertErrors("{.if foo?}", PREDICATE_UNKNOWN);
+  }
+  
+  @Test
+  public void testOrPredicate() throws CodeSyntaxException {
+    assertErrors("{.or.}", EXTRA_CHARS);
+    assertErrors("{.or }", OR_EXPECTED_PREDICATE);
+    assertErrors("{.or .}", OR_EXPECTED_PREDICATE);
+    assertErrors("{.or foo?}", PREDICATE_UNKNOWN);
+    assertErrors("{.or required-args?}", PREDICATE_NEEDS_ARGS);
+    assertErrors("{.or invalid-args?}", PREDICATE_ARGS_INVALID);
+  }
+  
+  @Test
+  public void testRepeated() throws CodeSyntaxException {
+    assertErrors("{.repeated}", WHITESPACE_EXPECTED);
+    assertErrors("{.repeated.}", WHITESPACE_EXPECTED);
+    assertErrors("{.repeated sekshun}", MISSING_SECTION_KEYWORD);
+    assertErrors("{.repeated section}", WHITESPACE_EXPECTED);
+    assertErrors("{.repeated section.}", WHITESPACE_EXPECTED);
+    assertErrors("{.repeated section a }", EXTRA_CHARS);
+  }
+  
+  @Test
+  public void testSection() throws CodeSyntaxException {
+    assertErrors("{.section}", WHITESPACE_EXPECTED);
+    assertErrors("{.section.}", WHITESPACE_EXPECTED);
+    assertErrors("{.section ?}", VARIABLE_EXPECTED);
+    assertErrors("{.section a }", EXTRA_CHARS);
+  }
+  
+  @Test
+  public void testTerminal() throws CodeSyntaxException {
+    assertErrors("{.endx}", INVALID_INSTRUCTION);
+    assertErrors("{.end }", EXTRA_CHARS);
+    assertErrors("{.end end}", EXTRA_CHARS);
+  }
+  
+  @Test
+  public void testVariables() throws CodeSyntaxException {
+    assertErrors("{a|?}", FORMATTER_INVALID);
+    assertErrors("{a|foo}", FORMATTER_UNKNOWN);
+    assertErrors("{a|required-args}", FORMATTER_NEEDS_ARGS);
+    assertErrors("{a|invalid-args}", FORMATTER_ARGS_INVALID);
+  }
+  
+  private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
+    List<ErrorInfo> errors = validate(template);
+    List<ErrorType> actual = new ArrayList<>();
+    for (ErrorInfo error : errors) {
+      actual.add(error.getType());
+    }
+    if (VERBOSE) {
+      System.out.println(actual);
+    }
+    assertEquals(actual.toArray(), expected);
+  }
+  
+  private List<ErrorInfo> validate(String template) throws CodeSyntaxException {
+    Tokenizer tokenizer = tokenizer(template);
+    tokenizer.setValidate();
+    tokenizer.consume();
+    return tokenizer.getErrors();
+  }
+ 
+}

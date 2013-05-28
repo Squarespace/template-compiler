@@ -19,7 +19,7 @@ public class CodeBuilder {
   }
   
   public RootInst build() throws CodeSyntaxException {
-    machine.validate();
+    machine.complete();
     return machine.getCode();
   }
   

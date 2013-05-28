@@ -16,6 +16,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.EndInst;
@@ -65,6 +66,8 @@ public class CodeMachine implements CodeSink {
   }
   
   public List<ErrorInfo> getErrors() {
+    // Always return a new instance of an empty list, since the caller may append 
+    // further errors to it.
     return (errors != null) ? errors : new ArrayList<ErrorInfo>(0);
   }
   
@@ -73,11 +76,15 @@ public class CodeMachine implements CodeSink {
   }
   
   /**
-   * Once the assembly is complete, verify that we're back at the root node,
-   * e.g. all opened scopes have been properly closed. If not, we throw an
-   * error to indicate the template is badly formed.
+   * Once the assembly is complete, verify that we're back at the root node, e.g. all opened
+   * scopes have been properly closed. If not, there may be a bug in the state machine. 
+   * This is a sanity check to ensure that the state machine always reaches the final, 
+   * expected state.
    */
-  public void validate() throws CodeSyntaxException {
+  public void complete() {
+    // These should never happen when the machine is driven by the tokenizer, since it always
+    // (or should always) feed EOF as the final instruction.  The individual states should handle
+    // EOF and raise the appropriate error, if any.
     if (current != root) {
       throw new RuntimeException("Unclosed " + currentInfo() + ": perhaps an EOF was not fed to the machine?"
           + " If not, this represents a bug in the state machine.");
@@ -106,7 +113,7 @@ public class CodeMachine implements CodeSink {
         case PREDICATE:
         case REPEATED:
         case SECTION:
-          state = push(inst);
+          state = pushConsequent(inst);
           break;
           
         default:
@@ -120,16 +127,16 @@ public class CodeMachine implements CodeSink {
   /**
    * Push a block instruction onto the stack.
    */
-  private State push(Instruction inst) {
+  private State pushConsequent(Instruction inst) {
     addConsequent(inst);
-    return push_(inst);
+    return push(inst);
   }
 
   /**
    * Just modify the instruction stack. Exists to support special block instructions
    * like ALTERNATES_WITH. 
    */
-  private State push_(Instruction inst) {
+  private State push(Instruction inst) {
     stack.push(current);
     current = inst;
     return stateFor(inst);
@@ -142,7 +149,7 @@ public class CodeMachine implements CodeSink {
   private State pop() throws CodeSyntaxException {
     try {
       current = stack.pop();
-    } catch (Exception e) {
+    } catch (NoSuchElementException e) {
       throw new RuntimeException("Popped the ROOT instruction off the stack, which should never happen! "
           + "Possible bug in state machine.");
     }
@@ -209,8 +216,6 @@ public class CodeMachine implements CodeSink {
         return state_ALTERNATES_WITH;
       case IF:
         return state_IF;
-      case OR_PREDICATE:
-        return state_OR_PREDICATE;
       case PREDICATE:
         return state_PREDICATE;
       case REPEATED:
@@ -413,7 +418,7 @@ public class CodeMachine implements CodeSink {
         case ALTERNATES_WITH:
           // Special block that lives only within the repeat instruction
           ((RepeatedInst)current).setAlternatesWith((AlternatesWithInst)inst);
-          return push_(inst);
+          return push(inst);
 
         case END:
           setAlternative(inst);

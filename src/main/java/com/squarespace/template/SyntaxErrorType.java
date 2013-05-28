@@ -78,9 +78,6 @@ public enum SyntaxErrorType implements ErrorType {
   PREDICATE_UNKNOWN
   ("Predicate '%(data)s' is unknown."),
 
-  PREDICATE_INVALID_ARGS
-  ("Predicate %(predicate)s invoked with invalid arguments."),
-
   VARIABLE_EXPECTED
   ("Variable expected, found '%(data)s'"),
 
