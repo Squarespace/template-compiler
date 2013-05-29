@@ -12,6 +12,9 @@ import org.joda.time.Duration;
 
 public class PluginDateUtils {
 
+  private PluginDateUtils() {
+  }
+  
   static enum DatePartType {
     YEAR("year"),
     MONTH("month"),

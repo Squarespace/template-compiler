@@ -803,7 +803,6 @@ public class Instructions {
             
           case FLOAT:
           case DOUBLE:
-            // If no decimal part, output as integer (to match JavaScript output)
             double val = node.asDouble();
             buf.append(Double.toString(val));
             break;

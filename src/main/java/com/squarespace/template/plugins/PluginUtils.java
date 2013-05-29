@@ -17,6 +17,9 @@ public class PluginUtils {
 
   private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
 
+  private PluginUtils() {
+  }
+  
   public static void escapeHtml(String str, StringBuilder buf) {
     for (int i = 0; i < str.length(); i++) {
       char ch = str.charAt(i);

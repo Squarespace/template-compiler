@@ -16,6 +16,9 @@ public class GeneralUtils {
 
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
   
+  private GeneralUtils() {
+  }
+  
   public static JsonNode getFirstMatchingNode(JsonNode parent, String ... keys) {
     for (String key : keys) {
       JsonNode node = parent.path(key);
