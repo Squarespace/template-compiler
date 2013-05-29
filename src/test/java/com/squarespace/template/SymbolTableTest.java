@@ -40,6 +40,17 @@ public class SymbolTableTest {
     Assert.assertEquals(symbols, expected);
   }
   
+  @Test
+  public void testDuplicateSymbols() {
+    PredicateTable table = new PredicateTable(8);
+    table.register(new UnitTestPredicates());
+    try {
+      table.register(new UnitTestPredicates());
+      Assert.fail("Expected error on registering duplicate symbol");
+    } catch (RuntimeException e) {
+      // Expected.
+    }
+  }
   
   static class Name {
     

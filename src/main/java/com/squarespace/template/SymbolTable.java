@@ -47,6 +47,10 @@ public abstract class SymbolTable<K, V> {
     if (inUse) {
       throw new RuntimeException("Attempt to add a symbol after table in use.");
     }
+    // Prevent registering duplicate symbols.
+    if (table.get(key) != null) {
+      throw new RuntimeException("A symbol named '" + key + "' is already registered!");
+    }
     table.put(key, value);
   }
 
