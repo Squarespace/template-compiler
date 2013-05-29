@@ -17,20 +17,26 @@ public class CodeExecuteTest extends UnitTestBase {
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";
   
   @Test
-  public void testPlural() throws CodeException {
+  public void testLiterals() throws CodeException {
+    RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().build();
+    assertContext(execute("{}", root), "{ \t\n}");
+  }
+  
+  @Test
+  public void testPredicates() throws CodeException {
     CodeBuilder builder = builder();
     builder.predicate(CorePredicates.PLURAL).text("A");
     builder.or(CorePredicates.SINGULAR).text("B");
     builder.or().text("C").end();
     
-    RootInst root = builder.eof().build();
+    Instruction root = builder.eof().build();
     assertEquals(repr(root), "{.plural?}A{.or singular?}B{.or}C{.end}");
     assertContext(execute("5", root), "A");
     assertContext(execute("1", root), "B");
     assertContext(execute("0", root), "C");
     assertContext(execute("-3.1415926", root), "C");
   }
-
+  
   @Test
   public void testSection() throws CodeException {
     CodeBuilder builder = builder();
@@ -57,12 +63,6 @@ public class CodeExecuteTest extends UnitTestBase {
     String expected = "defjkl";
     RootInst root = builder().text(ALPHAS, 3, 6).text(ALPHAS, 9, 12).eof().build();
     assertContext(execute("{}", root), expected);
-  }
-  
-  @Test
-  public void testLiterals() throws CodeException {
-    RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().build();
-    assertContext(execute("{}", root), "{ \t\n}");
   }
   
   @Test

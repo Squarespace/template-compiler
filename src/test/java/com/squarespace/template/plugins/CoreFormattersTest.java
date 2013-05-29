@@ -269,7 +269,7 @@ public class CoreFormattersTest extends UnitTestBase {
   }
   
   
-  private String getDateTestJson(long timestamp, String tzId) {
+  protected static String getDateTestJson(long timestamp, String tzId) {
     DateTimeZone timezone = DateTimeZone.forID(tzId);
     ObjectNode node = JSONUtils.createObjectNode();
     node.put("time", timestamp);

@@ -32,6 +32,10 @@ public class CodeMaker {
     return new AlternatesWithInst();
   }
   
+  public Arguments args() {
+    return new Arguments();
+  }
+  
   public Arguments args(String args) {
     return new Arguments(view(args));
   }
