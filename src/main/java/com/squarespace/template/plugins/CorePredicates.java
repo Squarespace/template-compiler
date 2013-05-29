@@ -15,7 +15,6 @@ import com.squarespace.template.Context;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
 import com.squarespace.v6.utils.enums.CollectionType;
-import com.squarespace.v6.utils.enums.RecordType;
 
 
 public class CorePredicates extends BaseRegistry<Predicate> {
@@ -81,18 +80,6 @@ public class CorePredicates extends BaseRegistry<Predicate> {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       return isTruthy(ctx.node().path("externalLink"));
-    }
-  };
-  
-  public static final Predicate EVENT = new BasePredicate("event?", false) {
-    @Override
-    public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode node = ctx.node().path("recordType");
-      if (!node.isMissingNode()) {
-        RecordType type = RecordType.valueOf(node.asInt());
-        return RecordType.EVENT.equals(type);
-      }
-      return false;
     }
   };
   
