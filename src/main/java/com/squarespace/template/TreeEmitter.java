@@ -5,6 +5,10 @@ import java.util.List;
 import com.squarespace.template.Instructions.RepeatedInst;
 
 
+/**
+ * Emits a string representation of an instruction tree, for debugging
+ * purposes.
+ */
 public class TreeEmitter {
 
   public static String get(Instruction inst) {

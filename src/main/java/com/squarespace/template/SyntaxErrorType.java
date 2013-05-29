@@ -6,7 +6,8 @@ import java.util.Map;
 
 
 /**
- * Captures all syntax errors raised during template parsing.
+ * Definitions of all syntax errors that can be raised during template parsing,
+ * assembling.
  */
 public enum SyntaxErrorType implements ErrorType {
 

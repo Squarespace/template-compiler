@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * Generic symbol table to map string symbols to instances of a given
- * class. Uses reflection to discover and instances by container class,
+ * class. Uses reflection to discover and register instances by container class,
  * since they are numerous.
  */
 public abstract class SymbolTable<K, V> {

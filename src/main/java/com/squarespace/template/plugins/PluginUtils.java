@@ -127,7 +127,6 @@ public class PluginUtils {
     buf.append("</script>");
     if (inline) {
       buf.append("<span ");
-    
     } else {
       buf.append("<div ");
     }

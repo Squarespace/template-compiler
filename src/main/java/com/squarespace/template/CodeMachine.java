@@ -55,7 +55,7 @@ public class CodeMachine implements CodeSink {
   public CodeMachine() {
     this.root = new RootInst();
     this.current = root;
-    state = state_ROOT;
+    this.state = state_ROOT;
   }
 
   /**
@@ -186,6 +186,10 @@ public class CodeMachine implements CodeSink {
     return info;
   }
   
+  /**
+   * In validation mode this adds an error to the errors list. Otherwise it will raise
+   * an exception that wraps the error.
+   */
   private void fail(ErrorInfo info) throws CodeSyntaxException {
     if (validate) {
       errors.add(info);
@@ -194,6 +198,9 @@ public class CodeMachine implements CodeSink {
     }
   }
   
+  /**
+   * Returns a string describing (in English) the offset to the current instruction.
+   */
   private String currentInfo() {
     StringBuilder buf = new StringBuilder();
     current.repr(buf, false);
@@ -235,7 +242,7 @@ public class CodeMachine implements CodeSink {
   
   /**
    * ALTERNATES_WITH state. Special block which is executed between each pass over the
-   * consequent block for a REPEAT instruction.
+   * consequent block for a REPEATED instruction.
    */
   private State state_ALTERNATES_WITH = new State() {
     
