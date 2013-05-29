@@ -19,7 +19,7 @@ public abstract class SymbolTable<K, V> {
   private boolean inUse = false;
   
   public SymbolTable(TypeReference<V> ref, int numBuckets) {
-    table = new StringViewMap<K, V>(numBuckets);
+    table = new StringViewMap<>(numBuckets);
     this.ref = ref;
   }
 
