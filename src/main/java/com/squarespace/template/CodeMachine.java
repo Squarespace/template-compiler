@@ -73,8 +73,11 @@ public class CodeMachine implements CodeSink {
   
   public void setValidate() {
     this.validate = true;
+    if (this.errors == null) {
+      this.errors = new ArrayList<>(4);
+    }
   }
-  
+
   /**
    * Once the assembly is complete, verify that we're back at the root node, e.g. all opened
    * scopes have been properly closed. If not, there may be a bug in the state machine. 
@@ -185,9 +188,6 @@ public class CodeMachine implements CodeSink {
   
   private void fail(ErrorInfo info) throws CodeSyntaxException {
     if (validate) {
-      if (errors == null) {
-        errors = new ArrayList<>(4);
-      }
       errors.add(info);
     } else {
       throw new CodeSyntaxException(info);

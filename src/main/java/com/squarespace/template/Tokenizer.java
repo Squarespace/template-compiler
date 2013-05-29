@@ -62,7 +62,7 @@ public class Tokenizer {
 
   private State state;
 
-  private List<ErrorInfo> errors = new ArrayList<>(4);
+  private List<ErrorInfo> errors;
   
   boolean validate = false;
   
@@ -101,7 +101,7 @@ public class Tokenizer {
       state = state.transition();
     } while (state != state_EOF);
     sink.complete();
-    return errors.size() == 0;
+    return (validate) ? errors.size() == 0 : true;
   }
 
   /**
@@ -110,10 +110,16 @@ public class Tokenizer {
    */
   public void setValidate() {
     this.validate = true;
+    if (this.errors == null) {
+      this.errors = new ArrayList<>(4);
+    }
   }
   
   public List<ErrorInfo> getErrors() {
-    return (errors != null) ? errors : new ArrayList<ErrorInfo>(0);
+    if (errors == null) {
+      errors = new ArrayList<ErrorInfo>(0);
+    }
+    return errors;
   }
   
   private char getc(int index) {

@@ -20,13 +20,18 @@ import static com.squarespace.template.SyntaxErrorType.VARIABLE_EXPECTED;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
 import static org.testng.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.testng.annotations.Test;
 
 
-public class TokenizerTest extends UnitTestBase {
+/**
+ * Tests the Tokenizer's validation mode, where it continues parsing after
+ * encountering an error.  When hooked to a CodeMachine more errors would
+ * be reported, but these tests only verify errors raised by the Tokenizer
+ * class.
+ */
+public class TokenizerValidationTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;
   
@@ -39,7 +44,7 @@ public class TokenizerTest extends UnitTestBase {
   
   @Test
   public void testComments() throws CodeSyntaxException {
-    assertErrors("{## foo #", EOF_IN_COMMENT);
+    assertErrors("{##\nfoo #", EOF_IN_COMMENT);
   }
   
   @Test
@@ -106,10 +111,7 @@ public class TokenizerTest extends UnitTestBase {
   
   private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
     List<ErrorInfo> errors = validate(template);
-    List<ErrorType> actual = new ArrayList<>();
-    for (ErrorInfo error : errors) {
-      actual.add(error.getType());
-    }
+    List<ErrorType> actual = errorTypes(errors);
     if (VERBOSE) {
       System.out.println(actual);
     }

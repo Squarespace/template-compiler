@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -131,6 +133,14 @@ public class UnitTestBase {
   
   public String commas(double num) {
     return NumberFormat.getInstance().format(num);
+  }
+  
+  public List<ErrorType> errorTypes(List<ErrorInfo> errors) {
+    List<ErrorType> actual = new ArrayList<>(errors.size());
+    for (ErrorInfo error : errors) {
+      actual.add(error.getType());
+    }
+    return actual;
   }
   
   /**

@@ -6,7 +6,6 @@ import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.testng.annotations.Test;
@@ -41,7 +40,7 @@ public class CodeMachineTest extends UnitTestBase {
   
   
   @Test
-  public void testCodeMachineErrors() throws CodeException {
+  public void testCodeMachineValidation() throws CodeException {
     assertErrors("{.if a}", EOF_IN_BLOCK);
     assertErrors("{.if a}{.alternates with}", NOT_ALLOWED_IN_BLOCK, EOF_IN_BLOCK);
     assertErrors("{.if a}{.alternates with}{.end}", NOT_ALLOWED_IN_BLOCK);
@@ -66,10 +65,7 @@ public class CodeMachineTest extends UnitTestBase {
   
   private void assertErrors(String template, ErrorType ... expected) throws CodeException {
     List<ErrorInfo> errors = validate(template);
-    List<ErrorType> actual = new ArrayList<>();
-    for (ErrorInfo error : errors) {
-      actual.add(error.getType());
-    }
+    List<ErrorType> actual = errorTypes(errors);
     assertEquals(actual.toArray(), expected);
   }
   

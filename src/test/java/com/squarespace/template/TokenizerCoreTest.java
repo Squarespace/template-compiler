@@ -60,7 +60,6 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     assertResult("{#", mk.text("{#"), mk.eof());
     
-    
     // Variable references without formatters must have zero trailing chars, including whitespace.
     // This lets us better handle passing through Javascript in the template, for example:
     // <script>function foo(){bar+=1;}</script>

@@ -89,7 +89,7 @@ public class JsonTemplateEngine {
     };
   }
   
-  public ValidatedTemplate validate(String template) throws CodeException {
+  public ValidatedTemplate validate(String template) throws CodeSyntaxException {
     final CodeList sink = new CodeList();
     final CodeStats stats = new CodeStats();
 
