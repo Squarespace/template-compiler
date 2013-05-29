@@ -39,6 +39,7 @@ import com.squarespace.template.plugins.CoreFormatters;
  * Tokenizer validation tests. Ensures that the parsed strings result in the correct
  * sequences of instructions, or that the expected error is raised.
  */
+@Test( groups={ "unit" })
 public class TokenizerCoreTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;

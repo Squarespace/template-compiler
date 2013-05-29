@@ -21,6 +21,7 @@ import com.squarespace.template.plugins.CorePredicates;
  * CodeBuilder, producing the expected result, and invalid sequences are rejected
  * and raise the expected error.
  */
+@Test( groups={ "unit" })
 public class CodeValidityTest extends UnitTestBase {
 
   /**

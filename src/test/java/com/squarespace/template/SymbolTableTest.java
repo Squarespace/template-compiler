@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 
+@Test( groups={ "unit" })
 public class SymbolTableTest {
   
   @Test

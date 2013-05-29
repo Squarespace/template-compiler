@@ -12,6 +12,7 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class CodeStatsTest extends UnitTestBase {
 
   @Test

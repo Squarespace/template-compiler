@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import com.squarespace.template.Instructions.RootInst;
 
 
+@Test( groups={ "unit" })
 public class ContextTest extends UnitTestBase {
 
   @Test

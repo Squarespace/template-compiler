@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.v6.utils.JSONUtils;
 
 
+@Test( groups={ "unit" })
 public class GeneralUtilsTest {
 
   @Test

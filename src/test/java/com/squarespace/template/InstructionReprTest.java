@@ -25,6 +25,7 @@ import com.squarespace.template.plugins.CorePredicates;
 /**
  * Validates the external representations of instructions.
  */
+@Test( groups={ "unit" })
 public class InstructionReprTest extends UnitTestBase {
 
   @Test

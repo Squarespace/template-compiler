@@ -7,6 +7,7 @@ import static org.testng.Assert.assertNotEquals;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class StringViewTest {
 
   @Test

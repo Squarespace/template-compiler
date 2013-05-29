@@ -11,6 +11,7 @@ import com.squarespace.template.plugins.CorePredicates;
 /**
  * Executing pieces of code and verifying output.
  */
+@Test( groups={ "unit" })
 public class CodeExecuteTest extends UnitTestBase {
 
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";

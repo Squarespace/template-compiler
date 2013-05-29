@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
+@Test( groups={ "unit" })
 public class ErrorInfoTest {
 
   static class DummyType implements ErrorType {

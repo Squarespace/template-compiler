@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
  * be reported, but these tests only verify errors raised by the Tokenizer
  * class.
  */
+@Test( groups={ "unit" })
 public class TokenizerValidationTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;

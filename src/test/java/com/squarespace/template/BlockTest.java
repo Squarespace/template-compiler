@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class BlockTest extends UnitTestBase {
 
   @Test

@@ -29,6 +29,7 @@ import com.squarespace.template.Instructions.VariableInst;
 import com.squarespace.template.plugins.CoreFormatters;
 
 
+@Test( groups={ "unit" })
 public class InstructionEqualityTest extends UnitTestBase {
 
   @Test

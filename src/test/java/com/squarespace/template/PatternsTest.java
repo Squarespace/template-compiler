@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 /**
  * Built-in pattern match tests, ensuring matched character ranges are fully checked.
  */
+@Test( groups={ "unit" })
 public class PatternsTest {
 
   @Test

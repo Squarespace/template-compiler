@@ -7,6 +7,7 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class MapFormatTest {
 
   @Test

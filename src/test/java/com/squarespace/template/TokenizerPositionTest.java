@@ -8,6 +8,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class TokenizerPositionTest extends UnitTestBase {
   
   private static final boolean VERBOSE = false;

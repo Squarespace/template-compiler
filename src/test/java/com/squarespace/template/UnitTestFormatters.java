@@ -1,6 +1,7 @@
 package com.squarespace.template;
 
 
+
 /**
  * Implementations to test the Formatter interface.
  */

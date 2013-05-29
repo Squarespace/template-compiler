@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 
 
+@Test( groups={ "unit" })
 public class PluginUtilsTest {
 
   @Test

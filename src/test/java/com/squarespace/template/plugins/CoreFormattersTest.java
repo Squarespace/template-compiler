@@ -36,6 +36,7 @@ import com.squarespace.template.UnitTestBase;
 import com.squarespace.v6.utils.JSONUtils;
 
 
+@Test( groups={ "unit" })
 public class CoreFormattersTest extends UnitTestBase {
 
   @Test

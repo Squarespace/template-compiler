@@ -11,6 +11,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class CodeMachineTest extends UnitTestBase {
 
   @Test

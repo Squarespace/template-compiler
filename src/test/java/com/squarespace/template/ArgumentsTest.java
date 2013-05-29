@@ -10,6 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class ArgumentsTest extends UnitTestBase {
 
   @Test

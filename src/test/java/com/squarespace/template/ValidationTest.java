@@ -16,6 +16,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 
+@Test( groups={ "unit" })
 public class ValidationTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;
