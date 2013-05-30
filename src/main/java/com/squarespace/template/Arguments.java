@@ -1,6 +1,7 @@
 package com.squarespace.template;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Arguments {
   
-  private List<String> args = Constants.EMPTY_LIST_OF_STRING;
+  private List<String> args = Collections.emptyList();
 
   private char delimiter = ' ';
   

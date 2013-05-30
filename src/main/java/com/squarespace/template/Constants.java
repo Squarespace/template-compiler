@@ -1,8 +1,5 @@
 package com.squarespace.template;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
@@ -10,8 +7,6 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 public class Constants {
 
   public static final StringView EMPTY_STRING_VIEW = new StringView("");
-  
-  public static final List<String> EMPTY_LIST_OF_STRING = new ArrayList<>(0);
   
   public static final String[] EMPTY_ARRAY_OF_STRING = new String[] { };
   
