@@ -89,6 +89,9 @@ public class JsonTemplateEngine {
     };
   }
   
+  /**
+   * Compiles the template in validation mode, capturing all errors.
+   */
   public ValidatedTemplate validate(String template) throws CodeSyntaxException {
     final CodeList sink = new CodeList();
     final CodeStats stats = new CodeStats();
@@ -126,31 +129,4 @@ public class JsonTemplateEngine {
     };
   }
 
-  /**
-   * Tokenize the template and return the list of instructions.  The list is not built into a
-   * tree -- its simply an ordered list of parsed instruction instances.  If you render these in order
-   * you'll get back the original template source.
-   */
-  public CodeList tokenize(String template) throws CodeSyntaxException {
-    return tokenize(template, false);
-  }
-  
-  // TODO: remove this method, refactor tests to use ValidatedTemplate.
-  public CodeList tokenize(String template, boolean validate) throws CodeSyntaxException {
-    CodeList sink = new CodeList();
-    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
-    if (validate) {
-      tokenizer.setValidate();
-    }
-    tokenizer.consume();
-    return sink;
-  }
-
-  /**
-   * Tokenize the template and feed all parsed instructions to the sink.
-   */
-  public void tokenize(String template, CodeSink sink) throws CodeSyntaxException {
-    Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
-    tokenizer.consume();
-  }
 }
