@@ -223,6 +223,8 @@ public class CodeMachine implements CodeSink {
         return state_ALTERNATES_WITH;
       case IF:
         return state_IF;
+      case OR_PREDICATE:
+        return state_OR_PREDICATE;
       case PREDICATE:
         return state_PREDICATE;
       case REPEATED:

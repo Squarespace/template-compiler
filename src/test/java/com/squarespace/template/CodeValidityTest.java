@@ -102,7 +102,7 @@ public class CodeValidityTest extends UnitTestBase {
   
   @Test
   public void testPredicate() throws CodeException {
-    CodeBuilder cb = builder().section("@").predicate(CorePredicates.PLURAL).text("A");
+    CodeBuilder cb = builder().section("@").predicate(PLURAL).text("A");
     cb.or(CorePredicates.SINGULAR).text("B");
     cb.or().text("C").end(); // end or
     cb.end(); // section
@@ -117,6 +117,15 @@ public class CodeValidityTest extends UnitTestBase {
     
     // zero is false-y, so entire section is skipped
     assertContext(execute("0", root), "");
+  }
+  
+  @Test
+  public void testOrWithSection() throws CodeException {
+    // This construction makes almost no sense but is possible in the language, 
+    // so adding it for coverage.
+    RootInst root = builder().section("@").or().predicate(PLURAL).or().text("A").var("@").end().end().eof().build();
+    assertEquals(repr(root), "{.section @}{.or}{.plural?}{.or}A{@}{.end}{.end}");
+    assertContext(execute("0", root), "A0");
   }
 
   @Test
