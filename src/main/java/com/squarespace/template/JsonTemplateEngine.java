@@ -1,5 +1,6 @@
 package com.squarespace.template;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -81,6 +82,35 @@ public class JsonTemplateEngine {
       @Override
       public Instruction getCode() {
         return machine.getCode();
+      }
+      @Override
+      public List<ErrorInfo> getErrors() {
+        return Collections.emptyList();
+      }
+      @Override
+      public CodeMachine getMachine() {
+        return machine;
+      }
+    };
+  }
+  
+  public CompiledTemplate compileSafe(String template) throws CodeSyntaxException {
+    final CodeMachine machine = new CodeMachine();
+    machine.setValidate();
+    Tokenizer tokenizer = new Tokenizer(template, machine, formatterTable, predicateTable);
+    tokenizer.setValidate();
+    tokenizer.consume();
+    final List<ErrorInfo> errors = tokenizer.getErrors();
+    errors.addAll(machine.getErrors());
+    
+    return new CompiledTemplate() {
+      @Override
+      public Instruction getCode() {
+        return machine.getCode();
+      }
+      @Override
+      public List<ErrorInfo> getErrors() {
+        return errors;
       }
       @Override
       public CodeMachine getMachine() {

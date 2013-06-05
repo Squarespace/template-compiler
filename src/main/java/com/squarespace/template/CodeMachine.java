@@ -85,6 +85,12 @@ public class CodeMachine implements CodeSink {
    * expected state.
    */
   public void complete() {
+    if (validate) {
+      // When errors occur in validation mode we will almost certainly see the machine in a bad state. 
+      // Any relevant errors will have already been captured, so just return.
+      return;
+    }
+    
     // These should never happen when the machine is driven by the tokenizer, since it always
     // (or should always) feed EOF as the final instruction.  The individual states should handle
     // EOF and raise the appropriate error, if any.
