@@ -12,6 +12,9 @@ public enum ExecuteErrorType implements ErrorType {
   
   APPLY_PARTIAL_MISSING
   ("Attempt to apply partial '%(name)s' which could not be found."),
+
+  COMPILE_PARTIAL_SYNTAX
+  ("Compiling partial '%(name)s' raised errors:"),
   
   GENERAL_ERROR
   ("Default error %(name)s: %(data)s"),

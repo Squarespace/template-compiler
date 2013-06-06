@@ -1,5 +1,6 @@
 package com.squarespace.template.plugins;
 
+import static com.squarespace.template.Constants.MISSING_NODE;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
@@ -27,6 +28,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.JsonTemplateEngine;
 import com.squarespace.template.Patterns;
 import com.squarespace.v6.utils.enums.RecordType;
 
@@ -71,7 +73,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       // Execute instruction starting with the current node, and appending to the parent
       // context's buffer.
-      ctx.getCompiler().execute(inst, ctx.node(), ctx.buffer());
+      StringBuilder buf = ctx.buffer();
+      JsonNode node = ctx.node();
+      JsonTemplateEngine compiler = ctx.getCompiler();
+      if (ctx.safeExecutionEnabled()) {
+        compiler.executeWithPartialsSafe(inst, node, MISSING_NODE, buf);
+      } else {
+        ctx.getCompiler().execute(inst, node, buf);
+      }
     }
   };
   

@@ -1,8 +1,12 @@
 package com.squarespace.template;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.v6.utils.JSONUtils;
 
@@ -39,6 +43,8 @@ public class ErrorInfo {
   
   private MapBuilder<String, Object> builder = new MapBuilder<>();
   
+  private List<ErrorInfo> children;
+  
   public ErrorInfo(ErrorType type) {
     this(type, ErrorLevel.ERROR);
   }
@@ -46,6 +52,14 @@ public class ErrorInfo {
   public ErrorInfo(ErrorType type, ErrorLevel level) {
     this.type = type;
     this.level = level;
+  }
+  
+  public ErrorInfo child(ErrorInfo child) {
+    if (children == null) {
+      children = new ArrayList<>();
+    }
+    children.add(child);
+    return this;
   }
   
   public ErrorInfo code(Object code) {
@@ -99,10 +113,33 @@ public class ErrorInfo {
   public ErrorLevel getLevel() {
     return level;
   }
+  
+  public List<ErrorInfo> getChildren() {
+    if (children == null) {
+      return Collections.emptyList();
+    }
+    return children;
+  }
 
   public String getMessage() {
+    return getMessage(false);
+  }
+  
+  public String getMessage( boolean withChildren) {
     Map<String, Object> params = builder.get();
-    return type.prefix(params) + ": " + type.message(params);
+    StringBuilder buf = new StringBuilder();
+    buf.append(type.prefix(params)).append(": ").append(type.message(params));
+
+    if (withChildren && children != null) {
+      buf.append(", causes follow: ");
+      for (int i = 0; i < children.size(); i++) {
+        if (i >= 1) {
+          buf.append(", ");
+        }
+        buf.append(children.get(i).getMessage());
+      }
+    }
+    return buf.toString();
   }
   
   public JsonNode toJson() {
@@ -116,6 +153,15 @@ public class ErrorInfo {
     obj.put("type", type.toString());
     obj.put("prefix", type.prefix(map));
     obj.put("message", type.message(map));
+
+    // Append any child errors that exist.
+    ArrayNode list = JSONUtils.createArrayNode();
+    obj.put("children", list);
+    if (children != null) {
+      for (ErrorInfo child : children) {
+        list.add(child.toJson());
+      }
+    }
     return obj;
   }
   

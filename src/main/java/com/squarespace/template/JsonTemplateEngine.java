@@ -56,6 +56,10 @@ public class JsonTemplateEngine {
     return executeWithPartials(instruction, json, partials, new StringBuilder());
   }
 
+  public Context executeSafe(Instruction instruction, JsonNode json, JsonNode partials) throws CodeExecuteException {
+    return executeWithPartialsSafe(instruction, json, partials, new StringBuilder());
+  }
+  
   /**
    * Execute the instruction against the JSON node, using the partial template map, and append
    * the output to buffer.
@@ -70,6 +74,17 @@ public class JsonTemplateEngine {
     return ctx;
   }
 
+  public Context executeWithPartialsSafe(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf) 
+      throws CodeExecuteException {
+
+    Context ctx = new Context(json, buf);
+    ctx.setCompiler(this);
+    ctx.setPartials(partials);
+    ctx.setSafeExecution();
+    instruction.invoke(ctx);
+    return ctx;
+  }
+  
   /**
    * Compile the template and return a wrapper containing the instructions. Useful if you want to
    * compile a template once and execute it multiple times.

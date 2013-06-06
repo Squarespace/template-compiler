@@ -3,6 +3,8 @@ package com.squarespace.template;
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +39,10 @@ public class Context {
 
   private JsonNode undefined = DEFAULT_UNDEFINED;
   
+  private boolean safeExecution = false;
+  
+  private List<ErrorInfo> errors;
+  
   /** 
    * Reference to the currently-executing instruction. All instruction execution
    * must pass control via the Context, for proper error handling.
@@ -59,6 +65,24 @@ public class Context {
   public Context(JsonNode node, StringBuilder buf) {
     this.currentFrame = new Frame(node);
     this.buf = buf;
+  }
+  
+  public boolean safeExecutionEnabled() {
+    return safeExecution;
+  }
+  
+  public List<ErrorInfo> getErrors() {
+    if (errors == null) {
+      return Collections.emptyList();
+    }
+    return errors;
+  }
+  
+  /**
+   * Set mode where no exceptions will be thrown; instead
+   */
+  public void setSafeExecution() {
+    this.safeExecution = true;
   }
   
   public CharSequence getMetaLeft() {
@@ -95,8 +119,14 @@ public class Context {
       throw e;
     } catch (Exception e) {
       String repr = ReprEmitter.get(instruction, false);
-      ErrorInfo info = error(UNEXPECTED_ERROR).name(e.getClass().getSimpleName()).data(e.getMessage()).repr(repr);
-      throw new CodeExecuteException(info, e);
+      ErrorInfo error = error(UNEXPECTED_ERROR).name(e.getClass().getSimpleName()).data(e.getMessage()).repr(repr);
+      
+      // In safe mode we don't raise exceptions; just append the error.
+      if (safeExecution) {
+        addError(error);
+      } else {
+        throw new CodeExecuteException(error, e);
+      }
     }
   }
   
@@ -153,7 +183,23 @@ public class Context {
       
       // Compile the partial.  This can throw a syntax exception, which the formatter
       // will catch and nest inside a runtime exception.
-      CompiledTemplate template = compiler.compile(partialNode.asText());
+      String source = partialNode.asText();
+      CompiledTemplate template = null;
+      if (safeExecution) {
+        template = compiler.compileSafe(source);
+        List<ErrorInfo> errors = template.getErrors();
+        if (!errors.isEmpty()) {
+          ErrorInfo parent = error(ExecuteErrorType.COMPILE_PARTIAL_SYNTAX).name(name);
+          for (ErrorInfo error : errors) {
+            parent.child(error);
+          }
+          addError(parent);
+        }
+
+      } else {
+        template = compiler.compile(source);
+      }
+      
       inst = template.getCode();
       
       // Cache the compiled template in case it is used more than once.
@@ -310,6 +356,13 @@ public class Context {
       return node.path((int) key);
     }
     return node.path((String) key);
+  }
+  
+  private void addError(ErrorInfo error) {
+    if (errors == null) {
+      errors = new ArrayList<>();
+    }
+    errors.add(error);
   }
   
   /**
