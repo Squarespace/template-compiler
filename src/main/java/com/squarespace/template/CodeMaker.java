@@ -184,8 +184,8 @@ public class CodeMaker {
     return new SpaceInst();
   }
   
-  public List<String> strlist(String ... strings) {
-    return Arrays.<String>asList(strings);
+  public List<String> strlist(String ... keys) {
+    return Arrays.<String>asList(keys);
   }
   
   public String[] strarray(String ... elements) {

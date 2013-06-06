@@ -41,7 +41,7 @@ abstract class BlockInstruction extends BaseInstruction {
     return alternative;
   }
   
-  protected boolean variableListEquals(List<String[]> t1, List<String[]> t2) {
+  protected boolean variableListEquals(List<Object[]> t1, List<Object[]> t2) {
     if (t1 == null) {
       return (t2 == null);
     }

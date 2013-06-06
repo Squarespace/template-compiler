@@ -156,20 +156,20 @@ public class Instructions {
    */
   static class FormatterInst extends BaseInstruction {
 
-    private String[] variable;
+    private Object[] keys;
 
     private Formatter impl;
     
     private Arguments args;
     
     public FormatterInst(String name, Formatter impl, Arguments args) {
-      this.variable = splitName(name);
+      this.keys = splitVariable(name);
       this.impl = impl;
       this.args = args;
     }
     
-    public String[] getVariable() {
-      return variable;
+    public Object[] getVariable() {
+      return keys;
     }
     
     public Formatter getFormatter() {
@@ -186,7 +186,7 @@ public class Instructions {
         return false;
       }
       FormatterInst other = (FormatterInst) obj;
-      return Arrays.equals(variable, other.variable) && (impl.equals(other.impl)) && args.equals(other.args);
+      return Arrays.equals(keys, other.keys) && (impl.equals(other.impl)) && args.equals(other.args);
     }
     
     @Override
@@ -196,7 +196,7 @@ public class Instructions {
     
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      ctx.push(variable);
+      ctx.push(keys);
       impl.apply(ctx, args);
       ctx.pop();
     }
@@ -216,20 +216,20 @@ public class Instructions {
     
     private static final List<Operator> EMPTY_OPS = Arrays.<Operator>asList();
     
-    private List<String[]> variables = new ArrayList<>(VARIABLE_LIST_LEN);
+    private List<Object[]> variables = new ArrayList<>(VARIABLE_LIST_LEN);
     
     private List<Operator> operators;
     
     public IfInst(List<String> vars, List<Operator> ops) {
       super(CONSEQUENT_BLOCK_LEN);
       for (String name : vars) {
-        String[] parts = splitName(name);
+        Object[] parts = splitVariable(name);
         variables.add(parts);
       }
       this.operators = (ops == null) ? EMPTY_OPS : ops;
     }
 
-    public List<String[]> getVariables() {
+    public List<Object[]> getVariables() {
       return variables;
     }
     
@@ -258,7 +258,7 @@ public class Instructions {
       // Set initial boolean using truth value of first var.
       boolean result = GeneralUtils.isTruthy(ctx.resolve(variables.get(0)));
       for (int i = 1; i < variables.size(); i++) {
-        String[] var = variables.get(i);
+        Object[] var = variables.get(i);
         Operator op = operators.get(i-1);
         boolean value = GeneralUtils.isTruthy(ctx.resolve(var));
         result = (op == Operator.LOGICAL_OR) ? (result || value) : (result && value);
@@ -521,16 +521,16 @@ public class Instructions {
    */
   static class RepeatedInst extends BlockInstruction {
 
-    private String[] variable;
+    private Object[] variable;
     
     private AlternatesWithInst alternatesWith;
     
     public RepeatedInst(String name) {
       super(CONSEQUENT_BLOCK_LEN);
-      this.variable = splitName(name);
+      this.variable = splitVariable(name);
     }
     
-    public String[] getVariable() {
+    public Object[] getVariable() {
       return variable;
     }
 
@@ -639,14 +639,14 @@ public class Instructions {
    */
   static class SectionInst extends BlockInstruction {
 
-    private String[] variable;
+    private Object[] variable;
     
     public SectionInst(String name) {
       super(CONSEQUENT_BLOCK_LEN);
-      this.variable = splitName(name);
+      this.variable = splitVariable(name);
     }
 
-    public String[] getVariable() {
+    public Object[] getVariable() {
       return variable;
     }
     
@@ -753,13 +753,13 @@ public class Instructions {
    */
   static class VariableInst extends BaseInstruction {
 
-    private String[] variable;
+    private Object[] variable;
     
     public VariableInst(String name) {
-      this.variable = splitName(name);
+      this.variable = splitVariable(name);
     }
     
-    public String[] getVariable() {
+    public Object[] getVariable() {
       return variable;
     }
     

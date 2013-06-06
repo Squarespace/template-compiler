@@ -39,12 +39,16 @@ public class CodeExecuteTest extends UnitTestBase {
   
   @Test
   public void testSection() throws CodeException {
-    CodeBuilder builder = builder();
-    RootInst root = builder.section("foo.bar").var("baz").end().eof().build();
+    RootInst root = builder().section("foo.bar").var("baz").end().eof().build();
 
-    String jsonData = "{\"foo\": {\"bar\": {\"baz\": 123}}}";
+    String json = "{\"foo\": {\"bar\": {\"baz\": 123}}}";
     assertEquals(repr(root), "{.section foo.bar}{baz}{.end}");
-    assertContext(execute(jsonData, root), "123");
+    assertContext(execute(json, root), "123");
+    
+    root = builder().section("foo.1").var("@").end().eof().build();
+    json = "{\"foo\": [\"a\", \"b\"]}";
+    assertEquals(repr(root), "{.section foo.1}{@}{.end}");
+    assertContext(execute(json, root), "b");
   }
 
   @Test
@@ -89,6 +93,9 @@ public class CodeExecuteTest extends UnitTestBase {
     assertContext(execute("3.14159", root), "3.14159");
     assertContext(execute("123.000", root), "123.0");
     assertContext(execute("null", root), "");
+    
+    root = builder().var("foo.2.bar").eof().build();
+    assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}]}", root), "hi");
   }
   
 }

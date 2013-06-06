@@ -49,12 +49,21 @@ public class PatternsTest {
     isVariable("foo.bar.baz");
     isVariable("@");
     isVariable("@index");
+    isVariable("0");
+    isVariable("1");
+    isVariable("12");
+    isVariable("0.name");
+    isVariable("0.1.2.name");
     
     notVariable(" foo");
     notVariable(".foo");
     notVariable("-foo.bar");
     notVariable("12foo");
     notVariable("@foo");
+    notVariable("0 .foo");
+    notVariable("0. foo");
+    notVariable(".0");
+    notVariable("0.");
   }
 
   private void isFormatter(String str) {

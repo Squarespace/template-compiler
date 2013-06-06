@@ -35,7 +35,7 @@ public class ReprEmitter {
     return buf.toString();
   }
   
-  public static String get(String[] names) {
+  public static String get(Object[] names) {
     StringBuilder buf = new StringBuilder();
     emitNames(names, buf);
     return buf.toString();
@@ -96,7 +96,7 @@ public class ReprEmitter {
 
   public static void emit(IfInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.if ");
-    List<String[]> variables = inst.getVariables();
+    List<Object[]> variables = inst.getVariables();
     List<Operator> operators = inst.getOperators();
     
     // There is always at least one variable.
@@ -203,7 +203,7 @@ public class ReprEmitter {
     buf.append('}');
   }
 
-  public static void emitNames(String[] names, StringBuilder buf) {
+  public static void emitNames(Object[] names, StringBuilder buf) {
     if (names == null) {
       buf.append("@");
       return;
@@ -212,7 +212,12 @@ public class ReprEmitter {
       if (i > 0) {
         buf.append('.');
       }
-      buf.append(names[i]);
+      Object name = names[i];
+      if (name instanceof Integer) {
+        buf.append((int) name);
+      } else {
+        buf.append((String) name);
+      }
     }
   }
 

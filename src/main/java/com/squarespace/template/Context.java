@@ -200,7 +200,7 @@ public class Context {
   /**
    * Push the node referenced by names onto the stack.
    */
-  public void push(String[] names) {
+  public void push(Object[] names) {
     push(resolve(names));
   }
 
@@ -208,7 +208,7 @@ public class Context {
    * SECTION/REPEATED scope does not look up the stack.  It only resolves
    * names against the current frame's node downward.
    */
-  public void pushSection(String[] names) {
+  public void pushSection(Object[] names) {
     JsonNode node;
     if (names == null) {
       node = currentFrame.node;
@@ -218,7 +218,7 @@ public class Context {
         if (node.isMissingNode()) {
           break;
         }
-        node = node.path(names[i]);
+        node = nodePath(node, names[i]);
       }
     }
     push(node);
@@ -235,14 +235,14 @@ public class Context {
     push(node);
   }
   
-  public JsonNode resolve(String name) {
+  public JsonNode resolve(Object name) {
     return lookupStack(name);
   }
 
   /**
    * Lookup the JSON node referenced by the list of names. 
    */
-  public JsonNode resolve(String[] names) {
+  public JsonNode resolve(Object[] names) {
     if (names == null) {
       return currentFrame.node;
     }
@@ -256,7 +256,7 @@ public class Context {
       if (node.isNull()) {
         return new TextNode("[JSONT: Can't resolve '" + ReprEmitter.get(names) + "'.]");
       }
-      node = node.path(names[i]);
+      node = nodePath(node, names[i]);
     }
     return node;
   }
@@ -271,7 +271,7 @@ public class Context {
    * object node which contains 'name' and return that. If none match, return
    * undefined.
    */
-  private JsonNode lookupStack(String name) {
+  private JsonNode lookupStack(Object name) {
     JsonNode node = resolve(name, currentFrame);
     if (!node.isMissingNode()) {
       return node;
@@ -289,7 +289,7 @@ public class Context {
   /**
    * Obtain the value for 'name' from the given stack frame's node.
    */
-  private JsonNode resolve(String name, Frame frame) {
+  private JsonNode resolve(Object name, Frame frame) {
     // Special internal variable @index points to the array index for a 
     // given stack frame.
     if (name.equals("@index")) {
@@ -299,9 +299,19 @@ public class Context {
       }
       return Constants.MISSING_NODE;
     }
-    return frame.node.path(name);
+    if (name instanceof Integer) {
+      return frame.node.path((int)name);
+    }
+    return nodePath(frame.node, name);
   }
 
+  private JsonNode nodePath(JsonNode node, Object key) {
+    if (key instanceof Integer) {
+      return node.path((int) key);
+    }
+    return node.path((String) key);
+  }
+  
   /**
    * Pop a frame off the stack.
    */

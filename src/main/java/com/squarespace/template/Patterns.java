@@ -23,7 +23,9 @@ public class Patterns {
   
   public static final String _WORD = _ABC + _ABC09UH + "*+";
   
-  public static final String _DOTWORD = _WORD + "(\\." + _WORD + ")*+";
+  public static final String _WORD_OR_DIGITS = "(" + _WORD + "|\\d+)";
+  
+  public static final String _DOTWORD = _WORD_OR_DIGITS + "(\\." + _WORD_OR_DIGITS + ")*+";
 
   // Compiled regular expressions
   

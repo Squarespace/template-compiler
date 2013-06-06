@@ -73,6 +73,14 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"a\": true, \"b\": false}", root), "B");
     assertContext(execute("{}", root), "B");
     
+    // Index into nested arrays.
+    cb = builder().ifexpn(mk.strlist("a.0.b", "a.1.b"), mk.oplist(Operator.LOGICAL_AND));
+    root = cb.text("A").or().text("B").end().eof().build();
+    assertContext(execute("{\"a\": [{\"b\": 1}, {\"b\": true}]}", root), "A");
+    assertContext(execute("{\"a\": [{\"b\": 3.14}, {\"b\": \"hi\"}]}", root), "A");
+    assertContext(execute("{\"a\": [{\"b\": null}, {\"b\": true}]}", root), "B");
+    assertContext(execute("{\"a\": [{\"b\": \"\"}, {\"b\": true}]}", root), "B");
+    
     // OR TESTS
 
     cb = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));

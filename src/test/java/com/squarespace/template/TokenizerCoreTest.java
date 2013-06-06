@@ -19,7 +19,6 @@ import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_NEEDS_ARGS;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
-import static com.squarespace.template.SyntaxErrorType.VARIABLE_EXPECTED;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
@@ -209,9 +208,9 @@ public class TokenizerCoreTest extends UnitTestBase {
   public void testSection() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{.section @}", mk.section("@"), mk.eof());
+    assertResult("{.section 1}", mk.section("1"), mk.eof());
     
     assertFailure("{.section}", WHITESPACE_EXPECTED);
-    assertFailure("{.section 1}", VARIABLE_EXPECTED);
   }
   
   @Test
@@ -223,11 +222,13 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     // Invalid instruction but parses as TEXT
     assertResult("{  .repeated section x}", mk.text("{  .repeated section x}"), mk.eof());
-    
+
+    // sections, et al, can index into arrays.
+    assertResult("{.repeated section 123}", mk.repeated("123"), mk.eof());
+
     assertFailure("{.repeated=}", WHITESPACE_EXPECTED);
     assertFailure("{.repeated = a}", MISSING_SECTION_KEYWORD);
     assertFailure("{.repeated section}", WHITESPACE_EXPECTED);
-    assertFailure("{.repeated section 123}", VARIABLE_EXPECTED);
     assertFailure("{.repeated section abc xyz}", EXTRA_CHARS);
   }
   

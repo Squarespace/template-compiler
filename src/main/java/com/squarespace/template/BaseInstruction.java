@@ -45,8 +45,18 @@ public abstract class BaseInstruction implements Instruction {
     return buf.toString();
   }
   
-  public static String[] splitName(String name) {
-    return name.equals("@") ? null : StringUtils.split(name, '.');
+  public static Object[] splitVariable(String name) {
+    String[] parts = name.equals("@") ? null : StringUtils.split(name, '.');
+    if (parts == null) {
+      return null;
+    }
+    
+    // Each segment of the key path can be either a String or an Integer.
+    Object[] keys = new Object[parts.length];
+    for (int i = 0; i < parts.length; i++) {
+      keys[i] = allDigits(parts[i]) ? Integer.parseInt(parts[i], 10) : parts[i];
+    }
+    return keys;
   }
   
   public String repr() {
@@ -71,5 +81,12 @@ public abstract class BaseInstruction implements Instruction {
    */
   public abstract void repr(StringBuilder buf, boolean recurse);
   
-  
+  private static boolean allDigits(String str) {
+    for (int i = 0; i < str.length(); i++) {
+      if (!Character.isDigit(str.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
