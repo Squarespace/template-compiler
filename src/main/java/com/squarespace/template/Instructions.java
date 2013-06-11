@@ -808,8 +808,17 @@ public class Instructions {
             break;
         }
         
+      } else if (node.isArray()) {
+        // Javascript Array.toString() will comma-delimit the elements.
+        for (int i = 0; i < node.size(); i++) {
+          if (i >= 1) {
+            buf.append(",");
+          }
+          buf.append(node.path(i).asText());
+        }
+        
       } else if (!node.isNull() && !node.isMissingNode()){
-        ctx.buffer().append(node.asText());
+        buf.append(node.asText());
       }
     }
 

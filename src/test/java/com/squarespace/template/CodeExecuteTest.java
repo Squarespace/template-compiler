@@ -96,6 +96,9 @@ public class CodeExecuteTest extends UnitTestBase {
     
     root = builder().var("foo.2.bar").eof().build();
     assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}]}", root), "hi");
+    
+    root = builder().var("foo").eof().build();
+    assertContext(execute("{\"foo\": [\"a\", \"b\", 123]}", root), "a,b,123");
   }
   
 }
