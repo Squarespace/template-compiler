@@ -65,9 +65,9 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       JsonNode excerpt = ctx.node().path("excerpt");
       JsonNode html = excerpt.path("html");
       String text = "";
-      if (!html.isMissingNode()) {
+      if (html.isTextual()) {
         text = html.asText();
-      } else {
+      } else if (excerpt.isTextual()) {
         text = excerpt.asText();
       }
       text = PluginUtils.removeTags(text);

@@ -584,10 +584,12 @@ public class Instructions {
           // Point to next array element.
           ctx.increment();
         }
+        ctx.pop();
+
       } else {
+        ctx.pop();
         ctx.execute(alternative);
       }
-      ctx.pop();
     }
 
     @Override
@@ -670,10 +672,11 @@ public class Instructions {
       JsonNode node = ctx.node();
       if (GeneralUtils.isTruthy(node)) {
         ctx.execute(consequent.getInstructions());
+        ctx.pop();
       } else {
+        ctx.pop();
         ctx.execute(alternative);
       }
-      ctx.pop();
     }
     
     @Override
