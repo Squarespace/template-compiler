@@ -81,6 +81,10 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"a\": [{\"b\": null}, {\"b\": true}]}", root), "B");
     assertContext(execute("{\"a\": [{\"b\": \"\"}, {\"b\": true}]}", root), "B");
     
+    root = builder().ifexpn(mk.strlist("a"), mk.oplist()).text("A").end().eof().build();
+    assertContext(execute("{\"a\": 1}", root), "A");
+    assertContext(execute("{}", root), "");
+    
     // OR TESTS
 
     cb = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
