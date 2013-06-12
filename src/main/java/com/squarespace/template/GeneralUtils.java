@@ -9,6 +9,7 @@ import org.apache.commons.io.output.StringBuilderWriter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.POJONode;
 import com.squarespace.v6.utils.JSONUtils;
 
 
@@ -55,6 +56,13 @@ public class GeneralUtils {
     }
     if (node.isMissingNode() || node.isNull()) {
       return false;
+    }
+    if (node.isPojo()) {
+      // TEMPORARY: shouldn't be necessary if we property convert to tree at top level.
+      // will fix - phensley
+      POJONode pojo = (POJONode) node;
+      node = JSONUtils.MAPPER.valueToTree(pojo.getPojo());
+      return isTruthy(node);
     }
     return node.size() != 0;
   }
