@@ -102,7 +102,39 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"c\": false}", root), "B");
     assertContext(execute("{\"c\": false, \"b\": 0}", root), "B");
   }
+  
+  @Test
+  public void testIfExpressionVars() throws CodeException {
+    CodeMaker mk = maker();
+    // Nested variables
+    CodeBuilder cb = builder().ifexpn(mk.strlist("a.b", "a.c"), mk.oplist(Operator.LOGICAL_OR));
+    Instruction root = cb.text("A").or().text("B").end().eof().build();
 
+    // True cases
+    assertContext(execute("{\"a\": {\"b\": 1}}", root), "A");
+    assertContext(execute("{\"a\": {\"b\": 0, \"c\": true}}", root), "A");
+    assertContext(execute("{\"a\": {\"c\": 1}}", root), "A");
+    
+    // False cases
+    assertContext(execute("{\"a\": {}}", root), "B");
+    assertContext(execute("{\"a\": {\"b\": 0}}", root), "B");
+    assertContext(execute("{\"a\": {\"b\": 0, \"c\": 0}}", root), "B");
+    assertContext(execute("{\"a\": {\"c\": 0}}", root), "B");
+  }
+
+  @Test
+  public void testIfExpressionScope() throws CodeException {
+    CodeMaker mk = maker();
+    Instruction root = builder().ifexpn(mk.strlist("a"), mk.oplist()).or().var("b").end().eof().build();
+    // True cases
+    assertContext(execute("{\"a\": 1}", root), "");
+    assertContext(execute("{\"a\": 1, \"b\": \"B\"}", root), "");
+
+    // False cases
+    assertContext(execute("{\"a\": 0}", root), "");
+    assertContext(execute("{\"a\": 0, \"b\": \"B\"}", root), "B");
+  }
+  
   @Test
   public void testIfPredicate() throws CodeException {
     CodeBuilder cb = builder();
@@ -183,11 +215,25 @@ public class CodeValidityTest extends UnitTestBase {
   }
 
   @Test
+  public void testRepeatedScope() throws CodeException {
+    RootInst root = builder().repeated("a").var("@index").or().var("b").end().eof().build();
+    assertContext(execute("{\"a\": [0, 0], \"b\": \"B\"}", root), "12");
+    assertContext(execute("{\"a\": null, \"b\": \"B\"}", root), "B");
+  }
+
+  @Test
   public void testSection() throws CodeException {
     RootInst root = builder().section("foo").var("bar").or().text("B").end().eof().build();
     assertContext(execute("{\"foo\": 1}", root), "");
     assertContext(execute("{}", root), "B");
     assertContext(execute("{\"foo\": {\"bar\": 1}}", root), "1");
+  }
+  
+  @Test
+  public void testSectionScope() throws CodeException {
+    RootInst root = builder().section("a").var("a").or().var("b").end().eof().build();
+    assertContext(execute("{\"a\": 1, \"b\": \"B\"}", root), "1");
+    assertContext(execute("{\"a\": 0, \"b\": \"B\"}", root), "B");
   }
   
   @Test
