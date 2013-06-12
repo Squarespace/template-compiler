@@ -171,7 +171,7 @@ public class UnitTestBase {
     Context ctx = new Context(JSONUtils.decode(json));
     impl.validateArgs(args);
     impl.apply(ctx, args);
-    return eval(ctx);
+    return ctx.node().asText();
   }
   
   public void assertFormatter(Formatter impl, String json, String expected) throws CodeException {

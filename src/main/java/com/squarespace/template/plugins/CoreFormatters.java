@@ -41,7 +41,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String baseUrl = ctx.resolve(new String[] { "base-url" }).asText();
       String value = ctx.node().asText();
-      ctx.buffer().append(baseUrl).append('/').append(value);
+      ctx.setNode(baseUrl + "/" + value);
     }
   };
   
@@ -73,7 +73,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       // Execute instruction starting with the current node, and appending to the parent
       // context's buffer.
-      StringBuilder buf = ctx.buffer();
+      StringBuilder buf = new StringBuilder();
       JsonNode node = ctx.node();
       JsonTemplateEngine compiler = ctx.getCompiler();
       if (ctx.safeExecutionEnabled()) {
@@ -81,6 +81,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       } else {
         ctx.getCompiler().execute(inst, node, buf);
       }
+      ctx.setNode(buf.toString());
     }
   };
   
@@ -93,7 +94,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       if (node.isArray() || node.isObject()) {
         res = node.size();
       }
-      ctx.buffer().append(res);
+      ctx.setNode(res);
     }
   };
   
@@ -112,7 +113,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       if (index < 0) {
         index += count;
       }
-      ctx.buffer().append(args.get(index));
+      ctx.setNode(args.get(index));
     };
   };
 
@@ -134,7 +135,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       } else {
         tzName = tzNode.asText();
       }
-      PluginDateUtils.formatDate((String)args.getOpaque(), instant, tzName, ctx.buffer());
+      StringBuilder buf = new StringBuilder();
+      PluginDateUtils.formatDate((String)args.getOpaque(), instant, tzName, buf);
+      ctx.setNode(buf.toString());
     }
   };
   
@@ -142,7 +145,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.buffer().append(Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;"));
+      String value = Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;");
+      ctx.setNode(value);
     }
   };
   
@@ -150,7 +154,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTML = new BaseFormatter("html", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      PluginUtils.escapeHtml(eatNull(ctx.node()), ctx.buffer());
+      StringBuilder buf = new StringBuilder();
+      PluginUtils.escapeHtml(eatNull(ctx.node()), buf);
+      ctx.setNode(buf.toString());
     }
   };
   
@@ -158,7 +164,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), ctx.buffer());
+      StringBuilder buf = new StringBuilder();
+      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
+      ctx.setNode(buf.toString());
     }
   };
   
@@ -166,7 +174,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), ctx.buffer());
+      StringBuilder buf = new StringBuilder();
+      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
+      ctx.setNode(buf.toString());
     }
   };
   
@@ -175,7 +185,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode value = ctx.node();
       
-      StringBuilder buf = ctx.buffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("hentry");
       
       JsonNode node = ctx.resolve("promotedBlockType");
@@ -226,6 +236,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
           buf.append(" pay-what-you-want");
         }
       }
+      
+      ctx.setNode(buf.toString());
     }
     
   };
@@ -234,7 +246,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter ITER = new BaseFormatter("iter", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.buffer().append(ctx.resolve("@index").asText());
+      ctx.setNode(ctx.resolve("@index").asText());
     }
   };
   
@@ -247,7 +259,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       // NOTE: this is </script> replacement is copied verbatim from the JavaScript
       // version of JSONT, but it seems quite error-prone to me.
-      ctx.buffer().append(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
+      ctx.setNode(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
     }
   };
 
@@ -259,7 +271,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         String result = GeneralUtils.jsonPretty(ctx.node());
         // NOTE: this is </script> replacement is copied verbatim from the JavaScript
         // version of JSONT, but it seems quite error-prone to me.
-        ctx.buffer().append(result.replace("</script>", "</scr\"+\"ipt>"));
+        ctx.setNode(result.replace("</script>", "</scr\"+\"ipt>"));
       } catch (IOException e) {
         fail(ctx.error(GENERAL_ERROR).data(e.getMessage()));
       }
@@ -271,7 +283,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       List<String> values = args.getArgs();
-      ctx.buffer().append(StringUtils.join(values.toArray(), ' '));
+      ctx.setNode(StringUtils.join(values.toArray(), ' '));
     }
   };
   
@@ -302,7 +314,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       PluralizeArgs realArgs = (PluralizeArgs) args.getOpaque();
       CharSequence result = (ctx.node().asLong() == 1) ? realArgs.singular : realArgs.plural;
-      ctx.buffer().append(result);
+      ctx.setNode(result.toString());
     }
   };
   
@@ -310,7 +322,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter RAW = new BaseFormatter("raw", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.buffer().append(ctx.node().toString());
+      ctx.setNode(ctx.node().toString());
     }
   };
 
@@ -319,7 +331,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       long value = Math.round(ctx.node().asDouble());
-      ctx.buffer().append(value);
+      ctx.setNode(value);
     }
   };
   
@@ -329,7 +341,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
       if (isTruthy(node)) {
-        ctx.buffer().append(node.asText().replaceAll("<.*?>", ""));
+        String value = node.asText().replaceAll("<.*?>", "");
+        ctx.setNode(value);
       }
     }
   };
@@ -344,7 +357,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       str = str.replaceAll("(^|[-\u2014/\\[(\u2018\\s])\"", "$1\u201c");
       str = str.replace("\"", "\u201d");
       str = str.replace("--", "\u2014");
-      ctx.buffer().append(str);
+      ctx.setNode(str);
     }
   };
 
@@ -357,7 +370,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String result = eatNull(ctx.node());
-      ctx.buffer().append(PluginUtils.slugify(result));
+      ctx.setNode(PluginUtils.slugify(result));
     }
   };
   
@@ -365,7 +378,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter STR = new BaseFormatter("str", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.buffer().append(eatNull(ctx.node()));
+      ctx.setNode(eatNull(ctx.node()));
     }
   };
   
@@ -373,7 +386,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static Formatter TIMESINCE = new BaseFormatter("timesince", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      StringBuilder buf = ctx.buffer();
+      StringBuilder buf = new StringBuilder();
       JsonNode node = ctx.node();
       if (!node.isNumber()) {
         buf.append("Invalid date.");
@@ -383,6 +396,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         PluginDateUtils.humanizeDate(value, false, buf);
         buf.append("</span>");
       }
+      ctx.setNode(buf.toString());
     }
   };
 
@@ -412,8 +426,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       TruncateArgs obj = (TruncateArgs)args.getOpaque();
-      String value = ctx.node().asText();
-      PluginUtils.truncate(value, obj.maxLen, obj.ellipses, ctx.buffer());
+      String value = PluginUtils.truncate(ctx.node().asText(), obj.maxLen, obj.ellipses);
+      ctx.setNode(value);
     }
   };
   
@@ -423,7 +437,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String value = ctx.node().asText();
       try {
-        ctx.buffer().append(URLEncoder.encode(value, "UTF-8"));
+        ctx.setNode(URLEncoder.encode(value, "UTF-8"));
       } catch (UnsupportedEncodingException e) {
         // Shouldn't happen
       }

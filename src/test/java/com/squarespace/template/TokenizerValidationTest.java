@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 @Test( groups={ "unit" })
 public class TokenizerValidationTest extends UnitTestBase {
 
-  private static final boolean VERBOSE = false;
+  private static final boolean VERBOSE = true;
   
   @Test
   public void testAlternatesWith() throws CodeSyntaxException {
@@ -110,10 +110,19 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{a|invalid-args}", FORMATTER_ARGS_INVALID);
   }
   
+  @Test
+  public void testVariableFormatters() throws CodeSyntaxException {
+    assertErrors("{a|safe|safe|required-args}", FORMATTER_NEEDS_ARGS);
+    assertErrors("{a|safe|safe|invalid-args}", FORMATTER_ARGS_INVALID);
+  }
+  
   private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
     if (VERBOSE) {
+      for (ErrorInfo error : errors) {
+        System.out.println(error.getMessage());
+      }
       System.out.println(actual);
     }
     assertEquals(actual.toArray(), expected);

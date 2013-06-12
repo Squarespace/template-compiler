@@ -1,13 +1,14 @@
 package com.squarespace.template;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
-import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.MetaInst;
@@ -75,13 +76,25 @@ public class CodeMaker {
   public EofInst eof() {
     return new EofInst();
   }
-  
-  public FormatterInst formatter(String name, Formatter formatter) {
-    return formatter(name, formatter, Constants.EMPTY_ARGUMENTS);
+
+  public FormatterCall fmt(Formatter formatter) {
+    return fmt(formatter, Constants.EMPTY_ARGUMENTS);
   }
   
-  public FormatterInst formatter(String name, Formatter formatter, Arguments args) {
-    return new FormatterInst(name, formatter, args);
+  public FormatterCall fmt(Formatter formatter, Arguments args) {
+    return new FormatterCall(formatter, args);
+  }
+  
+  public List<FormatterCall> formatters(Formatter ... formatters) {
+    List<FormatterCall> list = new ArrayList<>(formatters.length);
+    for (Formatter impl : formatters) {
+      list.add(new FormatterCall(impl, Constants.EMPTY_ARGUMENTS));
+    }
+    return list;
+  }
+
+  public List<FormatterCall> formatters(FormatterCall ... formatters) {
+    return Arrays.asList(formatters);
   }
 
   /**
@@ -209,7 +222,19 @@ public class CodeMaker {
   }
   
   public VariableInst var(String name) {
-    return new VariableInst(name);
+    return var(name, Collections.<FormatterCall>emptyList());
+  }
+  
+  public VariableInst var(String name, Formatter ... formatters) {
+    return new VariableInst(name, formatters(formatters));
+  }
+  
+  public VariableInst var(String name, FormatterCall ... formatters) {
+    return new VariableInst(name, Arrays.asList(formatters));
+  }
+  
+  public VariableInst var(String name, List<FormatterCall> formatters) {
+    return new VariableInst(name, formatters);
   }
 
   public StringView view(String str) {

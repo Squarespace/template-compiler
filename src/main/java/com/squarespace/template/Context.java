@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -214,6 +216,31 @@ public class Context {
   
   public JsonNode node() {
     return currentFrame.node;
+  }
+
+  /**
+   * Replace the node's value for the current stack frame.  This enables formatters to
+   * chain their output without requiring a change to their interface, e.g. return 
+   * value, extra method args, etc.
+   */
+  public void setNode(JsonNode node) {
+    this.currentFrame.node = node;
+  }
+  
+  public void setNode(String value) {
+    setNode(new TextNode(value));
+  }
+  
+  public void setNode(int value) {
+    setNode(new IntNode(value));
+  }
+  
+  public void setNode(long value) {
+    setNode(new LongNode(value));
+  }
+  
+  public void setNode(double value) {
+    setNode(new DoubleNode(value));
   }
   
   public boolean initIteration() {

@@ -7,7 +7,6 @@ public enum InstructionType {
   COMMENT,
   END,
   EOF,
-  FORMATTER,
   IF,
   META_LEFT,
   META_RIGHT,

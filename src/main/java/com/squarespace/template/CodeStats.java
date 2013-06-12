@@ -3,9 +3,9 @@ package com.squarespace.template;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.PredicateInst;
+import com.squarespace.template.Instructions.VariableInst;
 
 
 /**
@@ -49,8 +49,10 @@ public class CodeStats implements CodeSink {
           }
           break;
           
-        case FORMATTER:
-          formatterCounter.increment(((FormatterInst)inst).getFormatter().getIdentifier());
+        case VARIABLE:
+          for (FormatterCall formatter : ((VariableInst)inst).getFormatters()) {
+            formatterCounter.increment(formatter.getFormatter().getIdentifier());
+          }
           break;
           
         default:

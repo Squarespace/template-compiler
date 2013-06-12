@@ -29,7 +29,7 @@ public class Patterns {
 
   // Compiled regular expressions
   
-  public static final Pattern ARGUMENTS = Pattern.compile("[^}]+");
+  public static final Pattern ARGUMENTS = Pattern.compile("[^|}]+");
   
   public static final Pattern BOOLEAN_OP = Pattern.compile("&&|\\|\\|");
   

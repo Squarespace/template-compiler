@@ -5,14 +5,19 @@ import static com.squarespace.template.SyntaxErrorType.DEAD_CODE_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_AT_ROOT;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
+import static com.squarespace.template.plugins.CoreFormatters.SAFE;
+import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
+import java.util.List;
+
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
 
@@ -249,6 +254,21 @@ public class CodeValidityTest extends UnitTestBase {
   public void testVariables() throws CodeException {
     RootInst root = builder().var("foo").var("bar").eof().build();
     assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
+  }
+  
+  @Test
+  public void testVariableFormatters() throws CodeException {
+    RootInst root = builder().var("a", CoreFormatters.SAFE).eof().build();
+    assertContext(execute("{\"a\": \"x <> y\"}", root), "x  y");
+    
+    // Chain formatters together.
+    CodeMaker mk = maker();
+    Arguments args = mk.args(" 5");
+    TRUNCATE.validateArgs(args);
+    List<FormatterCall> formatters = mk.formatters(mk.fmt(SAFE), mk.fmt(TRUNCATE, args));
+    root = builder().var("a", formatters).eof().build();
+    System.out.println(root.repr());
+    assertContext(execute("{\"a\": \"x <> y <> z\"}", root), "x  y ...");
   }
 
   @Test

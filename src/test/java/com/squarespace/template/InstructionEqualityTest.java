@@ -14,7 +14,6 @@ import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
-import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.LiteralInst;
@@ -88,30 +87,6 @@ public class InstructionEqualityTest extends UnitTestBase {
     
     assertNotEquals(e1, mk.space());
     assertNotEquals(e1, mk.end());
-  }
-  
-  @Test
-  public void testFormatterEquals() throws CodeSyntaxException {
-    CodeMaker mk = maker();
-    FormatterInst f1 = mk.formatter("foo.bar", CoreFormatters.JSON);
-    assertEquals(f1, mk.formatter("foo.bar", CoreFormatters.JSON));
-    assertFalse(f1.equals(null));
-    assertNotEquals(f1, mk.formatter("@", CoreFormatters.JSON));
-    assertNotEquals(f1, mk.formatter("foo.bar", CoreFormatters.PLURALIZE));
-    assertNotEquals(f1, mk.formatter("bar.foo", CoreFormatters.JSON));
-    assertNotEquals(f1, mk.var("foo.bar"));
-    assertNotEquals(f1, mk.end());
-
-    // With arguments
-    Arguments args1 = mk.args(" a1 a2");
-    Arguments args2 = mk.args(" a2 a1");
-    FormatterInst f2 = mk.formatter("foo.bar", CoreFormatters.PLURALIZE, args1);
-    assertNotEquals(f1, f2);
-    assertEquals(f2, mk.formatter("foo.bar", CoreFormatters.PLURALIZE, args1));
-    assertNotEquals(f2, mk.formatter("foo.bar", CoreFormatters.PLURALIZE, args2));
-    
-    FormatterInst f3 = mk.formatter("a.b.c", CoreFormatters.SLUGIFY, args1);
-    assertEquals(f3, mk.formatter("a.b.c", CoreFormatters.SLUGIFY, args1));
   }
   
   @Test
@@ -262,6 +237,29 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(v1, mk.var("bar.foo"));
     assertNotEquals(v1, mk.comment("foo.bar"));
     assertNotEquals(v1, mk.end());
+    
+    v1 = mk.var("foo.bar", mk.formatters(CoreFormatters.JSON));
+    assertEquals(v1, mk.var("foo.bar", mk.formatters(CoreFormatters.JSON)));
+    assertFalse(v1.equals(null));
+    
+    assertNotEquals(v1, mk.var("@", CoreFormatters.JSON));
+    VariableInst x =  mk.var("foo.bar", CoreFormatters.PLURALIZE);
+    assertNotEquals(v1, x);
+    assertNotEquals(v1, mk.var("bar.foo", CoreFormatters.JSON));
+    assertNotEquals(v1, mk.var("foo.bar"));
+    assertNotEquals(v1, mk.end());
+
+    // With arguments
+    Arguments args1 = mk.args(" a1 a2");
+    Arguments args2 = mk.args(" a2 a1");
+    VariableInst v2 = mk.var("foo.bar", mk.formatters(mk.fmt(CoreFormatters.PLURALIZE, args1)));
+    assertNotEquals(v1, v2);
+    assertEquals(v2, mk.var("foo.bar", mk.fmt(CoreFormatters.PLURALIZE, args1)));
+    assertNotEquals(v2, mk.var("foo.bar", mk.fmt(CoreFormatters.PLURALIZE, args2)));
+    
+    VariableInst v3 = mk.var("a.b.c", mk.fmt(CoreFormatters.SLUGIFY, args1));
+    assertEquals(v3, mk.var("a.b.c", mk.fmt(CoreFormatters.SLUGIFY, args1)));
+
   }
   
   /**

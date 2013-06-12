@@ -118,12 +118,12 @@ public class TokenizerCoreTest extends UnitTestBase {
   public void testFormatter() throws CodeSyntaxException {
     CodeMaker mk = maker();
     Arguments args1 = mk.args(" a1 a2");
-    assertResult("{@|pluralize}", mk.formatter("@", CoreFormatters.PLURALIZE), mk.eof());
-    assertResult("{a.b.c|slugify}", mk.formatter("a.b.c", CoreFormatters.SLUGIFY), mk.eof());
-    assertResult("{foo|pluralize a1 a2}", mk.formatter("foo", CoreFormatters.PLURALIZE, args1), mk.eof());
+    assertResult("{@|pluralize}", mk.var("@", CoreFormatters.PLURALIZE), mk.eof());
+    assertResult("{a.b.c|slugify}", mk.var("a.b.c", CoreFormatters.SLUGIFY), mk.eof());
+    assertResult("{foo|pluralize a1 a2}", mk.var("foo", mk.fmt(CoreFormatters.PLURALIZE, args1)), mk.eof());
 
     Arguments args2 = mk.args("/b/c");
-    assertResult("{a|pluralize/b/c}", mk.formatter("a", CoreFormatters.PLURALIZE, args2), mk.eof());
+    assertResult("{a|pluralize/b/c}", mk.var("a", mk.fmt(CoreFormatters.PLURALIZE, args2)), mk.eof());
   }
   
   @Test

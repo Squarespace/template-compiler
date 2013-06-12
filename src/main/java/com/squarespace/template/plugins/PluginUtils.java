@@ -80,10 +80,9 @@ public class PluginUtils {
     return value.toLowerCase();
   }
   
-  public static void truncate(String value, int maxLen, String ellipses, StringBuilder buf) {
+  public static String truncate(String value, int maxLen, String ellipses) {
     if (value.length() <= maxLen) {
-      buf.append(value);
-      return;
+      return value;
     }
     
     int end = maxLen;
@@ -93,8 +92,7 @@ public class PluginUtils {
         break;
       }
     }
-    buf.append(value, 0, end);
-    buf.append(ellipses);
+    return value.substring(0, end) + ellipses;
   }
   
   /**

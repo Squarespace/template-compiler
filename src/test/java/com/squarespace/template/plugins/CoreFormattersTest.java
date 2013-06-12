@@ -3,6 +3,7 @@ package com.squarespace.template.plugins;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
+import static com.squarespace.template.plugins.CoreFormatters.APPLY;
 import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
 import static com.squarespace.template.plugins.CoreFormatters.HTML;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
@@ -55,7 +56,9 @@ public class CoreFormattersTest extends UnitTestBase {
     
     CodeMaker mk = maker();
     CodeBuilder cb = builder().text("hi ");
-    cb.formatter("foo", CoreFormatters.APPLY, mk.args(" block.item"));
+    Arguments args = mk.args(" block.item");
+    APPLY.validateArgs(args);
+    cb.var("foo", mk.fmt(APPLY, args));
     Instruction root = cb.text("!").eof().build();
 
     Context ctx = new Context(JSONUtils.decode(input));

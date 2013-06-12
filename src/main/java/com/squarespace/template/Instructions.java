@@ -3,6 +3,7 @@ package com.squarespace.template;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -147,63 +148,6 @@ public class Instructions {
     @Override
     public void repr(StringBuilder buf, boolean recurse) {
       // NO VISIBLE REPRESENTATION
-    }
-    
-  }
-  
-  /**
-   * Represents a filter applied to the value of a JSON node.
-   */
-  static class FormatterInst extends BaseInstruction {
-
-    private Object[] keys;
-
-    private Formatter impl;
-    
-    private Arguments args;
-    
-    public FormatterInst(String name, Formatter impl, Arguments args) {
-      this.keys = splitVariable(name);
-      this.impl = impl;
-      this.args = args;
-    }
-    
-    public Object[] getVariable() {
-      return keys;
-    }
-    
-    public Formatter getFormatter() {
-      return impl;
-    }
-
-    public Arguments getArguments() {
-      return args;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof FormatterInst)) {
-        return false;
-      }
-      FormatterInst other = (FormatterInst) obj;
-      return Arrays.equals(keys, other.keys) && (impl.equals(other.impl)) && args.equals(other.args);
-    }
-    
-    @Override
-    public InstructionType getType() {
-      return InstructionType.FORMATTER;
-    }
-    
-    @Override
-    public void invoke(Context ctx) throws CodeExecuteException {
-      ctx.push(keys);
-      impl.apply(ctx, args);
-      ctx.pop();
-    }
-    
-    @Override
-    public void repr(StringBuilder buf, boolean recurse) {
-      ReprEmitter.emit(this, buf);
     }
     
   }
@@ -748,27 +692,48 @@ public class Instructions {
     public void repr(StringBuilder buf, boolean recurse) {
       ReprEmitter.emit(this, buf);
     }
-
   }
   
   /**
-   * Represents the value of a JSON node.
+   * Represents the value of a JSON node, with an optional list of formatters,
+   * For example, "{name|foo|bar}" will do the following:
+   * 
+   * First the "foo" formatter will modify the current stack frame's node and
+   * replace it with a new value.  Then "bar" will do the same.  Once all the
+   * formatters have been applied, the switch statement at the end of the
+   * invoke() method will determine which representation to emit for the final
+   * value.
    */
   static class VariableInst extends BaseInstruction {
 
     private Object[] variable;
     
+    private List<FormatterCall> formatters;
+    
     public VariableInst(String name) {
+      this(name, Collections.<FormatterCall>emptyList());
+    }
+    
+    public VariableInst(String name, List<FormatterCall> formatters) {
       this.variable = splitVariable(name);
+      this.formatters = formatters;
     }
     
     public Object[] getVariable() {
       return variable;
     }
     
+    public List<FormatterCall> getFormatters() {
+      return formatters;
+    }
+    
     @Override
     public boolean equals(Object obj) {
-      return (obj instanceof VariableInst) && Arrays.equals(variable, ((VariableInst)obj).variable);
+      if (obj instanceof VariableInst) {
+        VariableInst other = (VariableInst) obj;
+        return Arrays.equals(variable, other.variable) && formatters.equals(other.formatters);
+      }
+      return false;
     }
     
     @Override
@@ -777,9 +742,18 @@ public class Instructions {
     }
 
     @Override
-    public void invoke(Context ctx) {
+    public void invoke(Context ctx) throws CodeExecuteException {
       StringBuilder buf = ctx.buffer();
-      JsonNode node = ctx.resolve(variable);
+      ctx.push(variable);
+      
+      // Apply any formatters.
+      for (FormatterCall formatter : formatters) {
+        Formatter impl = formatter.getFormatter();
+        impl.apply(ctx, formatter.getArguments());
+      }
+      
+      // Finally, output the result.
+      JsonNode node = ctx.node();
       if (node.isNumber()) {
         // Formatting of numbers depending on type
         switch (node.numberType()) {
@@ -823,6 +797,8 @@ public class Instructions {
       } else if (!node.isNull() && !node.isMissingNode()){
         buf.append(node.asText());
       }
+      
+      ctx.pop();
     }
 
     @Override

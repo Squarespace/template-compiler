@@ -481,12 +481,8 @@ public class Tokenizer {
   }
 
   /**
-   * Parses the characters between (start, end) and returns one of:
-   * 
-   * 1) null, if no match for a variable name found.
-   * 2) VariableInst, if variable name but no piped formatter found.
-   * 3) FormatterInst, if variable name plus a valid piped formatter with optional arguments.
-   * 4) throws error
+   * Parses a variable reference with an optional list of formatters.  Formatters can be
+   * chained, e.g. {name|foo|bar}.
    */
   private boolean parseVariable() throws CodeSyntaxException {
     if (!matcher.variable()) {
@@ -495,56 +491,65 @@ public class Tokenizer {
     int start = matcher.matchStart();
     StringView variable = matcher.consume();
     
-    // Variable with no formatter applied.
-    if (!matcher.pipe()) {
-      if (!matcher.finished()) {
-        return false;
-      }
-      emitInstruction(maker.var(variable.repr()));
-      return true;
-    }
-
-    // We have a formatter to parse.
-    matcher.consume();
-    if (!matcher.formatter()) {
-      fail(error(FORMATTER_INVALID, matcher.pointer() - start, false).name(matcher.remainder()));
-      return emitInvalid();
-    }
-    StringView name = matcher.consume();
-    Formatter formatter = formatterTable.get(name);
-    if (formatter == null) {
-      fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(name));
-      return emitInvalid();
-    }
-    
-    StringView rawArgs = null;
-    if (matcher.arguments()) {
-      rawArgs = matcher.consume();
-    }
-
-    Arguments args = null;
-    if (rawArgs == null) {
-      if (formatter.requiresArgs()) {
-        fail(error(FORMATTER_NEEDS_ARGS).data(formatter));
+    List<FormatterCall> formatters = null;
+    while (matcher.pipe()) {
+      
+      // We have one or more formatters plus optional arguments to parse.
+      matcher.consume();
+      
+      if (!matcher.formatter()) {
+        fail(error(FORMATTER_INVALID, matcher.pointer() - start, false).name(matcher.remainder()));
         return emitInvalid();
       }
-      args = new Arguments();
-    } else {
-      args = new Arguments(rawArgs);
-    }
-    
-    try {
-      formatter.validateArgs(args);
-    } catch (ArgumentsException e) {
-      String identifier = formatter.getIdentifier();
-      fail(error(FORMATTER_ARGS_INVALID).name(identifier).data(e.getMessage()));
-      return emitInvalid();
+      StringView name = matcher.consume();
+      Formatter formatter = formatterTable.get(name);
+      if (formatter == null) {
+        fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(matcher.remainder()));
+        return emitInvalid();
+      }
+      
+      StringView rawArgs = null;
+      if (matcher.arguments()) {
+        rawArgs = matcher.consume();
+      }
+      
+      Arguments args = null;
+      if (rawArgs == null) {
+        if (formatter.requiresArgs()) {
+          fail(error(FORMATTER_NEEDS_ARGS, matcher.matchStart() - start, false).data(formatter));
+          return emitInvalid();
+        }
+        args = new Arguments();
+      } else {
+        args = new Arguments(rawArgs);
+      }
+      
+      try {
+        formatter.validateArgs(args);
+      } catch (ArgumentsException e) {
+        String identifier = formatter.getIdentifier();
+        fail(error(FORMATTER_ARGS_INVALID, matcher.matchStart() - start, false).name(identifier).data(e.getMessage()));
+        return emitInvalid();
+      }
+      
+      if (formatters == null) {
+        formatters = new ArrayList<>(2);
+      }
+      formatters.add(new FormatterCall(formatter, args));
     }
 
-    emitInstruction(maker.formatter(variable.repr(), formatter, args));
+    if (!matcher.finished()) {
+      return false;
+    }
+    
+    if (formatters == null) {
+      emitInstruction(maker.var(variable.repr()));
+    } else {
+      emitInstruction(maker.var(variable.repr(), formatters));
+    }
     return true;
   }
-  
+
   /**
    * Initial state for the tokenizer machine, representing the outermost parse scope.
    * This machine is pretty simple as it only needs to track an alternating sequence

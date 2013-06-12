@@ -39,7 +39,6 @@ public class CodeMachineTest extends UnitTestBase {
     }
   }
   
-  
   @Test
   public void testCodeMachineValidation() throws CodeException {
     assertErrors("{.if a}", EOF_IN_BLOCK);

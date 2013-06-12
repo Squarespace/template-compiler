@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
-import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -18,6 +17,7 @@ import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.Instructions.SectionInst;
 import com.squarespace.template.Instructions.TextInst;
+import com.squarespace.template.Instructions.VariableInst;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -52,15 +52,6 @@ public class InstructionReprTest extends UnitTestBase {
     
     c1 = maker().mcomment("\nfoo\nbar\nbaz\n");
     assertEquals(c1.repr(), "{##\nfoo\nbar\nbaz\n##}");
-  }
-  
-  @Test
-  public void testFormatterRepr() {
-    CodeMaker mk = maker();
-    FormatterInst f1 = mk.formatter("a.b", CoreFormatters.JSON);
-    assertEquals(f1.repr(), "{a.b|json}");
-    f1 = mk.formatter("@", CoreFormatters.PLURALIZE, mk.args(" a1 a2"));
-    assertEquals(f1.repr(), "{@|pluralize a1 a2}");
   }
   
   @Test
@@ -204,5 +195,12 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(mk.var("@").repr(), "{@}");
     assertEquals(mk.var("@index").repr(), "{@index}");
     assertEquals(mk.var("a.b.c").repr(), "{a.b.c}");
+
+    VariableInst v1 = mk.var("a.b", CoreFormatters.JSON);
+    assertEquals(v1.repr(), "{a.b|json}");
+    v1 = mk.var("@", mk.fmt(CoreFormatters.PLURALIZE, mk.args(" a1 a2")));
+    assertEquals(v1.repr(), "{@|pluralize a1 a2}");
   }
+  
+
 }

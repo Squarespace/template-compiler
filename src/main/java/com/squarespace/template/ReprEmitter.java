@@ -5,7 +5,6 @@ import java.util.List;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
-import com.squarespace.template.Instructions.FormatterInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.LiteralInst;
@@ -84,7 +83,8 @@ public class ReprEmitter {
       buf.append(argList.get(i));
     }
   }
-  
+
+  /*
   public static void emit(FormatterInst inst, StringBuilder buf) {
     buf.append('{');
     emitNames(inst.getVariable(), buf);
@@ -93,6 +93,7 @@ public class ReprEmitter {
     emit(inst.getArguments(), buf);
     buf.append('}');
   }
+  */
 
   public static void emit(IfInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.if ");
@@ -200,9 +201,15 @@ public class ReprEmitter {
   public static void emit(VariableInst inst, StringBuilder buf) {
     buf.append('{');
     emitNames(inst.getVariable(), buf);
+    List<FormatterCall> formatters = inst.getFormatters();
+    for (FormatterCall formatter : formatters) {
+      buf.append('|');
+      buf.append(formatter.getFormatter().getIdentifier());
+      emit(formatter.getArguments(), buf);
+    }
     buf.append('}');
   }
-
+  
   public static void emitNames(Object[] names, StringBuilder buf) {
     if (names == null) {
       buf.append("@");
