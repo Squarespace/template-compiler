@@ -2,6 +2,9 @@ package com.squarespace.template;
 
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
+import static com.squarespace.template.plugins.CoreFormatters.JSON;
+import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
+import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static com.squarespace.template.plugins.CorePredicates.COLLECTION_TYPE_NAME_EQUALS;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
@@ -18,7 +21,6 @@ import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.Instructions.SectionInst;
 import com.squarespace.template.Instructions.TextInst;
 import com.squarespace.template.Instructions.VariableInst;
-import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
 
@@ -196,10 +198,13 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(mk.var("@index").repr(), "{@index}");
     assertEquals(mk.var("a.b.c").repr(), "{a.b.c}");
 
-    VariableInst v1 = mk.var("a.b", CoreFormatters.JSON);
+    VariableInst v1 = mk.var("a.b", JSON);
     assertEquals(v1.repr(), "{a.b|json}");
-    v1 = mk.var("@", mk.fmt(CoreFormatters.PLURALIZE, mk.args(" a1 a2")));
+    v1 = mk.var("@", mk.fmt(PLURALIZE, mk.args(" a1 a2")));
     assertEquals(v1.repr(), "{@|pluralize a1 a2}");
+    
+    v1 = mk.var("@", mk.formatters(mk.fmt(PLURALIZE, mk.args(" a1 a2")), mk.fmt(TRUNCATE, mk.args(" 34"))));
+    assertEquals(v1.repr(), "{@|pluralize a1 a2|truncate 34}");
   }
   
 

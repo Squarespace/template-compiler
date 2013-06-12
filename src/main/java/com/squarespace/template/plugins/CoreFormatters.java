@@ -36,6 +36,9 @@ import com.squarespace.v6.utils.enums.RecordType;
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
   
+  /**
+   * ABSURL - Create an absolute URL, using the "base-url" value.
+   */
   public static Formatter ABSURL = new BaseFormatter("AbsUrl", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -86,6 +89,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * COUNT - Returns a count of the number of members in an Array or Object.
+   */
   public static Formatter COUNT = new BaseFormatter("count", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -99,6 +105,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * CYCLE
+   */
   public static Formatter CYCLE = new BaseFormatter("cycle", true) {
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -118,6 +127,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
 
 
+  /**
+   * DATE - Format an epoch date using the site's timezone.
+   */
   public static Formatter DATE = new BaseFormatter("date", true) {
     
     @Override
@@ -142,6 +154,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * ENCODE_SPACE - Replace each space character with "&nbsp;".
+   */
   public static Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -151,6 +166,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * HTML - Escapes HTML characters & < > replacing them with the corresponding entity.
+   */
   public static Formatter HTML = new BaseFormatter("html", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -161,6 +179,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * HTMLTAG - Escapes HTML characters & < > " replacing them with the corresponding entity.
+   */
   public static Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -171,6 +192,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * HTMLATTR - Same as HTMLTAG.
+   */
   public static Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -180,6 +204,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
   
+  
+  /**
+   * ITEM_CLASSES
+   */
   public static Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -243,6 +271,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * ITER
+   */
   public static Formatter ITER = new BaseFormatter("iter", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -264,6 +295,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
 
   
+  /**
+   * JSON_PRETTY
+   */
   public static Formatter JSON_PRETTY = new BaseFormatter("json-pretty", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -279,6 +313,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
 
   
+  /**
+   * OUTPUT
+   */
   public static Formatter OUTPUT = new BaseFormatter("output", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -287,11 +324,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
   
+  
   static class PluralizeArgs {
     String singular = "";
     String plural = "s";
   }
-
+  
   /**
    * PLURALIZE - Emit a string based on the plurality of the node.
    */
@@ -319,6 +357,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * RAW
+   */
   public static Formatter RAW = new BaseFormatter("raw", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -327,6 +368,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
 
   
+  /**
+   * ROUND
+   */
   public static Formatter ROUND = new BaseFormatter("round", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -336,6 +380,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * SAFE
+   */
   public static Formatter SAFE = new BaseFormatter("safe", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -348,6 +395,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * SMARTYPANTS - Converts plain ASCII quote / apostrophe to corresponding Unicode curly characters.
+   */
   public static Formatter SMARTYPANTS = new BaseFormatter("smartypants", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -383,6 +433,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * TIMESINCE - Outputs a human-readable representation of (now - timestamp).
+   */
   public static Formatter TIMESINCE = new BaseFormatter("timesince", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -400,11 +453,15 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
 
+  
   static class TruncateArgs {
     int maxLen = 100;
     String ellipses = "...";
   }
   
+  /**
+   * TRUNCATE - Chop a string to a given length after the nearest space boundary.
+   */
   public static Formatter TRUNCATE = new BaseFormatter("truncate", false) {
     
     @Override
@@ -432,6 +489,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * URL_ENCODE - Encode characters which must be escaped in URLs. This
+   * will output a hex escape sequence, '/' to %2F, or ' ' to '+'.
+   */
   public static Formatter URL_ENCODE = new BaseFormatter("url-encode", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
