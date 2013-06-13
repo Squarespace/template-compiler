@@ -68,7 +68,7 @@ public class PluginUtils {
 
   public static String removeTags(String str) {
     StringBuilder buf = new StringBuilder();
-    boolean inTag = true;
+    boolean inTag = false;
     for (int i = 0; i < str.length(); i++) {
       char ch = str.charAt(i);
       switch (ch) {

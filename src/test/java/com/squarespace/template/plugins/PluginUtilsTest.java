@@ -10,6 +10,6 @@ public class PluginUtilsTest {
 
   @Test
   public void testRemoveTags() {
-    assertEquals(PluginUtils.removeTags("<\nhello < >world"), "world");
+    assertEquals(PluginUtils.removeTags("hi,<\nhello < >world"), "hi, world");
   }
 }
