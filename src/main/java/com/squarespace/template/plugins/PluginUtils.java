@@ -12,8 +12,6 @@ import com.squarespace.template.GeneralUtils;
 
 
 public class PluginUtils {
-  
-  private static final Pattern REMOVE_TAGS = Pattern.compile("<(?:.|\n)*?>");
 
   private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
 
@@ -69,7 +67,28 @@ public class PluginUtils {
   }
 
   public static String removeTags(String str) {
-    return REMOVE_TAGS.matcher(str).replaceAll("");
+    StringBuilder buf = new StringBuilder();
+    boolean inTag = true;
+    for (int i = 0; i < str.length(); i++) {
+      char ch = str.charAt(i);
+      switch (ch) {
+        
+        case '<':
+          inTag = true;
+          break;
+
+        case '>':
+          inTag = false;
+          buf.append(' ');
+          break;
+          
+       default:
+          if (!inTag) {
+            buf.append(ch);
+          }
+      }
+    }
+    return buf.toString();
   }
   
   public static String slugify(String value) {
