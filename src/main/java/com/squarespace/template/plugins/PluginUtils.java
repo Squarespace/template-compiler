@@ -63,10 +63,8 @@ public class PluginUtils {
   
   public static String formatMoney(double cents, Locale locale) {
     cents /= 100;
-    boolean isWhole = (cents == Math.round(cents));
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-    String pattern = isWhole ? "#,##0.00" : "#,##0.##";
-    DecimalFormat format = new DecimalFormat(pattern, symbols);
+    DecimalFormat format = new DecimalFormat("#,##0.00", symbols);
     return format.format(cents);
   }
 
