@@ -169,8 +169,6 @@ public class Context {
   public Instruction getPartial(String name) throws CodeSyntaxException {
     if (rawPartials == null) {
       // Template wants to use a partial but none are defined.
-      // TODO: need to figure out the correct behavior here -- should we emit an
-      // end user error, or just silently omit the partial application.
       return null;
     }
     

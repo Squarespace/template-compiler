@@ -73,16 +73,6 @@ public class CodeBuilder {
     return this;
   }
   
-//  public CodeBuilder formatter(String name, Formatter formatter) throws CodeSyntaxException {
-//    machine.accept(maker.formatter(name, formatter));
-//    return this;
-//  }
-//  
-//  public CodeBuilder formatter(String name, Formatter formatter, Arguments args) throws CodeSyntaxException {
-//    machine.accept(maker.formatter(name, formatter, args));
-//    return this;
-//  }
-  
   public CodeBuilder ifexpn(List<String> variables, List<Operator> operators) throws CodeSyntaxException {
     machine.accept(maker.ifexpn(variables, operators));
     return this;

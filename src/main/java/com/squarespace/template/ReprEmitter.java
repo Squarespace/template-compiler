@@ -84,17 +84,6 @@ public class ReprEmitter {
     }
   }
 
-  /*
-  public static void emit(FormatterInst inst, StringBuilder buf) {
-    buf.append('{');
-    emitNames(inst.getVariable(), buf);
-    buf.append('|');
-    buf.append(inst.getFormatter().getIdentifier());
-    emit(inst.getArguments(), buf);
-    buf.append('}');
-  }
-  */
-
   public static void emit(IfInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.if ");
     List<Object[]> variables = inst.getVariables();
