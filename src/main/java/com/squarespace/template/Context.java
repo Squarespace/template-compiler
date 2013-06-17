@@ -285,7 +285,7 @@ public class Context {
       node = currentFrame.node;
     } else {
       node = resolve(names[0], currentFrame);
-      for (int i = 1; i < names.length; i++) {
+      for (int i = 1, len = names.length; i < len; i++) {
         if (node.isMissingNode()) {
           break;
         }
@@ -320,7 +320,7 @@ public class Context {
 
     // Find the starting point.
     JsonNode node = lookupStack(names[0]);
-    for (int i = 1; i < names.length; i++) {
+    for (int i = 1, len = names.length; i < len; i++) {
       if (node.isMissingNode()) {
         return undefined;
       }

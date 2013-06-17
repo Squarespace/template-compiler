@@ -74,7 +74,7 @@ public class ReprEmitter {
     }
     char delimiter = args.getDelimiter();
     List<String> argList = args.getArgs();
-    for (int i = 0; i < argList.size(); i++) {
+    for (int i = 0, size = argList.size(); i < size; i++) {
       // In some cases we want to get the arguments' representation without the prefixed
       // delimiter. When rendering the template representation we want the prefix.
       if (includeDelimiter || i > 0) {
@@ -91,7 +91,7 @@ public class ReprEmitter {
     
     // There is always at least one variable.
     emitNames(variables.get(0), buf);
-    for (int i = 1; i < variables.size(); i++) {
+    for (int i = 1, size = variables.size(); i < size; i++) {
       Operator op = operators.get(i - 1);
       if (op == Operator.LOGICAL_AND) {
         buf.append(" && ");
@@ -204,7 +204,7 @@ public class ReprEmitter {
       buf.append("@");
       return;
     }
-    for (int i = 0; i < names.length; i++) {
+    for (int i = 0, len = names.length; i < len; i++) {
       if (i > 0) {
         buf.append('.');
       }

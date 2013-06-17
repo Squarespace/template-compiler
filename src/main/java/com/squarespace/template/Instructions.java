@@ -201,7 +201,7 @@ public class Instructions {
     public void invoke(Context ctx) throws CodeExecuteException {
       // Set initial boolean using truth value of first var.
       boolean result = GeneralUtils.isTruthy(ctx.resolve(variables.get(0)));
-      for (int i = 1; i < variables.size(); i++) {
+      for (int i = 1, size = variables.size(); i < size; i++) {
         Object[] var = variables.get(i);
         Operator op = operators.get(i-1);
         boolean value = GeneralUtils.isTruthy(ctx.resolve(var));
@@ -787,7 +787,7 @@ public class Instructions {
         
       } else if (node.isArray()) {
         // Javascript Array.toString() will comma-delimit the elements.
-        for (int i = 0; i < node.size(); i++) {
+        for (int i = 0, size = node.size(); i < size; i++) {
           if (i >= 1) {
             buf.append(",");
           }

@@ -35,7 +35,7 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
     Field nextField = hashMapEntryClass.getDeclaredField("next");
     nextField.setAccessible(true);
 
-    for (int i = 0; i < table.length; i++) {
+    for (int i = 0, len = table.length; i < len; i++) {
       System.out.print("Bucket " + i + ": ");
       Map.Entry<K, V> entry = table[i];
 

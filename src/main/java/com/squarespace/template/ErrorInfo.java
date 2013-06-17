@@ -132,7 +132,7 @@ public class ErrorInfo {
 
     if (withChildren && children != null) {
       buf.append(", causes follow: ");
-      for (int i = 0; i < children.size(); i++) {
+      for (int i = 0, size = children.size(); i < size; i++) {
         if (i >= 1) {
           buf.append(", ");
         }
