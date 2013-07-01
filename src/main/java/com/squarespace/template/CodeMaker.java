@@ -97,9 +97,6 @@ public class CodeMaker {
     return Arrays.asList(formatters);
   }
 
-  /**
-   * Yeah, "ifn" represents an IF instruction, since "if" cannot be a method name.
-   */
   public IfInst ifexpn(List<String> vars, List<Operator> ops) {
     return new IfInst(vars, ops);
   }
