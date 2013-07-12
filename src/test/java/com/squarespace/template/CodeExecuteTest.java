@@ -2,8 +2,11 @@ package com.squarespace.template;
 
 import static org.testng.Assert.assertEquals;
 
+import java.math.BigDecimal;
+
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -93,6 +96,7 @@ public class CodeExecuteTest extends UnitTestBase {
     assertContext(execute("3.14159", root), "3.14159");
     assertContext(execute("123.000", root), "123.0");
     assertContext(execute("null", root), "");
+
     
     root = builder().var("foo.2.bar").eof().build();
     assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}]}", root), "hi");
@@ -100,6 +104,17 @@ public class CodeExecuteTest extends UnitTestBase {
     root = builder().var("foo").eof().build();
     assertContext(execute("{\"foo\": [\"a\", \"b\", 123]}", root), "a,b,123");
   }
-  
+
+  @Test
+  public void testVariableTypes() throws CodeException {
+    RootInst root = builder().var("@").eof().build();
+    String value = "12345678900000000.1234567890000000";
+    DecimalNode node = new DecimalNode(new BigDecimal(value));
+    assertContext(execute(node, root), value);
+
+    value = "123.0";
+    node = new DecimalNode(new BigDecimal(value));
+    assertContext(execute(node, root), value);
+  }
   
 }

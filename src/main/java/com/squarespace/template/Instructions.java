@@ -762,15 +762,7 @@ public class Instructions {
             break;
             
           case BIG_DECIMAL:
-            BigDecimal bigVal = ((DecimalNode)node).decimalValue();
-            String bigString = bigVal.toString();
-            BigDecimal bigCopy = new BigDecimal(bigString);
-            bigCopy.setScale(1, BigDecimal.ROUND_HALF_UP);
-            if (bigCopy.compareTo(bigCopy) == 0) {
-              buf.append(bigCopy.toString());
-            } else {
-              buf.append(bigString);
-            }
+            buf.append(((DecimalNode)node).decimalValue().toPlainString());
             break;
             
           case INT:
