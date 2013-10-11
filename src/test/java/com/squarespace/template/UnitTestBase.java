@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.icu.text.NumberFormat;
+import com.squarespace.util.StringUtils;
 import com.squarespace.template.plugins.CommerceFormatters;
 import com.squarespace.template.plugins.CommercePredicates;
 import com.squarespace.template.plugins.ContentFormatters;
@@ -200,7 +201,7 @@ public class UnitTestBase {
 
   public static String readFile(Path path) throws IOException {
     try (InputStream input = Files.newInputStream(path)) {
-      return IOUtils.toString(input);
+      return IOUtils.toString(input, StringUtils.UTF8_CHARSET);
     }
   }
 }
