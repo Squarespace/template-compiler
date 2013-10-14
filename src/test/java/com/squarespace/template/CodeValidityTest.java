@@ -267,7 +267,6 @@ public class CodeValidityTest extends UnitTestBase {
     TRUNCATE.validateArgs(args);
     List<FormatterCall> formatters = mk.formatters(mk.fmt(SAFE), mk.fmt(TRUNCATE, args));
     root = builder().var("a", formatters).eof().build();
-    System.out.println(root.repr());
     assertContext(execute("{\"a\": \"x <> y <> z\"}", root), "x  y ...");
   }
 

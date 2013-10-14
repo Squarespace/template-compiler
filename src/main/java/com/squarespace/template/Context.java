@@ -56,6 +56,8 @@ public class Context {
   private Map<String, Instruction> compiledPartials;
 
   private JsonTemplateEngine compiler;
+
+  private LoggingHook loggingHook;
   
   /* Holds the final output of the template execution */
   private StringBuilder buf;
@@ -107,6 +109,10 @@ public class Context {
     return compiler;
   }
   
+  public void setLoggingHook(LoggingHook hook) {
+    this.loggingHook = hook;
+  }
+  
   /**
    * Execute a single instruction.
    */
@@ -126,9 +132,13 @@ public class Context {
       // In safe mode we don't raise exceptions; just append the error.
       if (safeExecution) {
         addError(error);
+
       } else {
         throw new CodeExecuteException(error, e);
       }
+      
+      // If a logging hook exists, always log the unexpected exception.
+      log(e);
     }
   }
   
@@ -332,6 +342,12 @@ public class Context {
     return node;
   }
 
+  private void log(Exception exc) {
+    if (loggingHook != null) {
+      loggingHook.log(exc);
+    }
+  }
+  
   private void push(JsonNode node) {
     stack.push(currentFrame);
     currentFrame = new Frame(node);

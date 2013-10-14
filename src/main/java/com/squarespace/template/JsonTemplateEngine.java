@@ -16,6 +16,8 @@ public class JsonTemplateEngine {
   private final PredicateTable predicateTable;
 
   private final MetaData metaData;
+
+  private LoggingHook loggingHook;
   
   /**
   * Since the FormatterTable and PredicateTable classes are extensible with custom
@@ -28,6 +30,10 @@ public class JsonTemplateEngine {
     formatterTable.setInUse();
     predicateTable.setInUse();
     this.metaData = new MetaData(formatterTable, predicateTable);
+  }
+  
+  public void setLoggingHook(LoggingHook hook) {
+    this.loggingHook = hook;
   }
   
   public MetaData getMetaData() {
@@ -70,6 +76,7 @@ public class JsonTemplateEngine {
     Context ctx = new Context(json, buf);
     ctx.setCompiler(this);
     ctx.setPartials(partials);
+    ctx.setLoggingHook(loggingHook);
     instruction.invoke(ctx);
     return ctx;
   }
@@ -80,6 +87,7 @@ public class JsonTemplateEngine {
     Context ctx = new Context(json, buf);
     ctx.setCompiler(this);
     ctx.setPartials(partials);
+    ctx.setLoggingHook(loggingHook);
     ctx.setSafeExecution();
     instruction.invoke(ctx);
     return ctx;
