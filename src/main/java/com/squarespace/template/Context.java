@@ -186,6 +186,10 @@ public class Context {
     Instruction inst = compiledPartials.get(name);
     if (inst == null) {
       JsonNode partialNode = rawPartials.get(name);
+      if (partialNode == null) {
+        // Indicate partial is missing.
+        return null;
+      }
       if (!partialNode.isTextual()) {
         // Should we bother worrying about this, or just cast the node to text?
         return null;

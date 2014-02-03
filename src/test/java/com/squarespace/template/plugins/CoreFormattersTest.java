@@ -1,5 +1,6 @@
 package com.squarespace.template.plugins;
 
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
@@ -82,6 +83,23 @@ public class CoreFormattersTest extends UnitTestBase {
       fail("Expected exception.");
     } catch (CodeExecuteException e) {
       assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_SYNTAX);
+    }
+  }
+  
+  @Test
+  public void testApplyMissingPartial() throws CodeException {
+    String template = "{@|apply foo}";
+    String partials = "{\"block\": \"hello\"}";
+    String input = "{}";
+    Instruction inst = compiler().compile(template).getCode();
+    Context ctx = new Context(JSONUtils.decode(input));
+    ctx.setCompiler(compiler());
+    ctx.setPartials(JSONUtils.decode(partials));
+    try {
+      ctx.execute(inst);
+      fail("Expected exception");
+    } catch (CodeExecuteException e) {
+      assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_MISSING);
     }
   }
   
