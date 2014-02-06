@@ -23,10 +23,6 @@ public class Plugin {
     return requiresArgs;
   }
   
-  public void fail(ErrorInfo info) throws CodeExecuteException {
-    throw new CodeExecuteException(info);
-  }
-  
   /**
    * Perform all validation of arguments passed to the Plugin, and also
    * perform any necessary conversion. Store converted args as an opaque

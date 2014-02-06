@@ -204,9 +204,7 @@ public class Context {
         List<ErrorInfo> errors = template.getErrors();
         if (!errors.isEmpty()) {
           ErrorInfo parent = error(ExecuteErrorType.COMPILE_PARTIAL_SYNTAX).name(name);
-          for (ErrorInfo error : errors) {
-            parent.child(error);
-          }
+          parent.child(errors);
           addError(parent);
         }
 
@@ -403,7 +401,7 @@ public class Context {
     return node.path((String) key);
   }
   
-  private void addError(ErrorInfo error) {
+  public void addError(ErrorInfo error) {
     if (errors == null) {
       errors = new ArrayList<>();
     }

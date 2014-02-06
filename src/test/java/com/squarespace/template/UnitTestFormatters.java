@@ -21,6 +21,14 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
     }
   };
   
+  public static Formatter NPE = new BaseFormatter("npe", true) {
+
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      throw new NullPointerException("fake NPE thrown by the test npe formatter.");
+    }
+  };
+  
   public static Formatter REQUIRED_ARGS = new BaseFormatter("required-args", true) {
   };
 

@@ -25,6 +25,7 @@ import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.CodeSyntaxException;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
+import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
@@ -67,12 +68,22 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       try {
         inst = ctx.getPartial(name);
       } catch (CodeSyntaxException e) {
-        // The partial template failed to parse. We need to raise an error.
-        fail(ctx.error(APPLY_PARTIAL_SYNTAX).name(name).data(e.getMessage()));
+        ErrorInfo parent = ctx.error(APPLY_PARTIAL_SYNTAX).name(name).data(e.getMessage());
+        parent.child(e.getErrorInfo());
+        if (ctx.safeExecutionEnabled()) {
+          ctx.addError(parent);
+        } else {
+          throw new CodeExecuteException(parent);
+        }
       }
       
       if (inst == null) {
-        fail(ctx.error(APPLY_PARTIAL_MISSING).name(name));
+        ErrorInfo error = ctx.error(APPLY_PARTIAL_MISSING).name(name);
+        if (ctx.safeExecutionEnabled()) {
+          ctx.addError(error);
+        } else {
+          throw new CodeExecuteException(error);
+        }
       }
       // Execute instruction starting with the current node, and appending to the parent
       // context's buffer.
@@ -307,7 +318,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         // version of JSONT, but it seems quite error-prone to me.
         ctx.setNode(result.replace("</script>", "</scr\"+\"ipt>"));
       } catch (IOException e) {
-        fail(ctx.error(GENERAL_ERROR).data(e.getMessage()));
+        ErrorInfo error = ctx.error(GENERAL_ERROR).data(e.getMessage());
+        if (ctx.safeExecutionEnabled()) {
+          ctx.addError(error);
+        } else {
+          throw new CodeExecuteException(error);
+        }
       }
     }
   };

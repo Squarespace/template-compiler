@@ -62,6 +62,16 @@ public class ErrorInfo {
     return this;
   }
   
+  public ErrorInfo child(List<ErrorInfo> errors) {
+    if (children == null) {
+      children = new ArrayList<>();
+    }
+    for (ErrorInfo child : errors) {
+      children.add(child);
+    }
+    return this;
+  }
+  
   public ErrorInfo code(Object code) {
     builder.put(CODE, code);
     return this;
