@@ -123,10 +123,7 @@ public class Tokenizer {
   }
   
   private char getc(int index) {
-    if (index >= length) {
-      return Patterns.EOF_CHAR;
-    }
-    return raw.charAt(index);
+    return (index < length) ? raw.charAt(index) : Patterns.EOF_CHAR;
   }
   
   private void emitInstruction(Instruction inst) throws CodeSyntaxException {

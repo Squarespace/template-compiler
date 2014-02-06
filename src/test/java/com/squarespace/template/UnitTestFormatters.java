@@ -21,7 +21,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
     }
   };
   
-  public static Formatter NPE = new BaseFormatter("npe", true) {
+  public static Formatter NPE = new BaseFormatter("npe", false) {
 
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
