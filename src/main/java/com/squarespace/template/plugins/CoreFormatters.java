@@ -72,6 +72,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         parent.child(e.getErrorInfo());
         if (ctx.safeExecutionEnabled()) {
           ctx.addError(parent);
+          return;
         } else {
           throw new CodeExecuteException(parent);
         }
@@ -81,6 +82,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         ErrorInfo error = ctx.error(APPLY_PARTIAL_MISSING).name(name);
         if (ctx.safeExecutionEnabled()) {
           ctx.addError(error);
+          return;
         } else {
           throw new CodeExecuteException(error);
         }
@@ -89,6 +91,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       // context's buffer.
       StringBuilder buf = new StringBuilder();
       JsonNode node = ctx.node();
+      if (node == null) {
+        node = MISSING_NODE;
+      }
       JsonTemplateEngine compiler = ctx.getCompiler();
       if (ctx.safeExecutionEnabled()) {
         compiler.executeWithPartialsSafe(inst, node, MISSING_NODE, buf);
