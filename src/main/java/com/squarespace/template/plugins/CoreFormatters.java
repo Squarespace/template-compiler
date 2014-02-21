@@ -72,6 +72,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         parent.child(e.getErrorInfo());
         if (ctx.safeExecutionEnabled()) {
           ctx.addError(parent);
+          // We're in safe mode, so return immediately since this 'apply' formatter
+          // can't output anything meaningful.
           return;
         } else {
           throw new CodeExecuteException(parent);
@@ -82,6 +84,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         ErrorInfo error = ctx.error(APPLY_PARTIAL_MISSING).name(name);
         if (ctx.safeExecutionEnabled()) {
           ctx.addError(error);
+          // We're in safe mode, so return immediately since this 'apply' formatter
+          // can't output anything meaningful.
           return;
         } else {
           throw new CodeExecuteException(error);
@@ -122,7 +126,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   
   
   /**
-   * CYCLE
+   * CYCLE - Iterate over an array of arguments
    */
   public static Formatter CYCLE = new BaseFormatter("cycle", true) {
     @Override
@@ -288,7 +292,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   
   
   /**
-   * ITER
+   * ITER - Outputs the index of the current array being iterated over.
    */
   public static Formatter ITER = new BaseFormatter("iter", false) {
     @Override
@@ -446,6 +450,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * STR - Output a string representation of the node.
+   */
   public static Formatter STR = new BaseFormatter("str", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {

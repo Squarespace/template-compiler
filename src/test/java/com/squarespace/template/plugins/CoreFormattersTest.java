@@ -9,6 +9,7 @@ import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
 import static com.squarespace.template.plugins.CoreFormatters.HTML;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLTAG;
+import static com.squarespace.template.plugins.CoreFormatters.ITER;
 import static com.squarespace.template.plugins.CoreFormatters.JSON;
 import static com.squarespace.template.plugins.CoreFormatters.JSON_PRETTY;
 import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
@@ -104,6 +105,21 @@ public class CoreFormattersTest extends UnitTestBase {
   }
   
   @Test
+  public void testApplyPartialErrorSafe() throws CodeException {
+    String template = "{@|apply block}";
+    String input = "{}";
+    String partials = "\"block\": \"{.section foo}{@}\"}";
+    Instruction inst = compiler().compile(template).getCode();
+    Context ctx = new Context(JSONUtils.decode(input));
+    ctx.setCompiler(compiler());
+    ctx.setSafeExecution();
+    ctx.setPartials(JSONUtils.decode(partials));
+    ctx.execute(inst);
+    assertContext(ctx, "");
+    assertEquals(ctx.getErrors().size(), 1);
+  }
+  
+  @Test
   public void testCount() throws CodeException {
     for (String val : new String[] { "null", "0", "\"foo\"" }) {
       assertFormatter(CoreFormatters.COUNT, val, "0");
@@ -182,6 +198,18 @@ public class CoreFormattersTest extends UnitTestBase {
   @Test
   public void testEncodeSpace() throws CodeException {
     assertFormatter(ENCODE_SPACE, "\"  \\n \"", "&nbsp;&nbsp;&nbsp;&nbsp;");
+  }
+  
+  @Test
+  public void testIter() throws CodeException {
+    String template = "{.repeated section foo}{@|iter}{.end}";
+    String input = "{\"foo\": [\"a\", \"b\", \"c\"]}";
+
+    Instruction inst = compiler().compile(template).getCode();
+    Context ctx = new Context(JSONUtils.decode(input));
+    ctx.setCompiler(compiler());
+    ctx.execute(inst);
+    assertContext(ctx, "123"); 
   }
   
   @Test
