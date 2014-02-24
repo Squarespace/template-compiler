@@ -1,6 +1,7 @@
-.classpath
-.project
-.settings
+/.classpath
+/.project
+/.settings
+/bin
 /target
 /test-output
 *.swp
