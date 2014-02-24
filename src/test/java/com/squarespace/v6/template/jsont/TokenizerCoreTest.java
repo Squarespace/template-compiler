@@ -17,7 +17,6 @@ import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.MISSING_WITH_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
-import static com.squarespace.template.SyntaxErrorType.PREDICATE_NEEDS_ARGS;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
@@ -194,7 +193,6 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.or plural?}", mk.or(PLURAL), mk.eof());
     
     assertFailure("{.or=}", EXTRA_CHARS);
-    assertFailure("{.collectionTypeNameEquals?}", PREDICATE_NEEDS_ARGS);
     assertFailure("{.plrul?}", PREDICATE_UNKNOWN);
     assertFailure("{.or foo?}", PREDICATE_UNKNOWN);
     assertFailure("{.or foo}", OR_EXPECTED_PREDICATE);
