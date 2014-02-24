@@ -14,17 +14,9 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ibm.icu.text.NumberFormat;
-import com.squarespace.util.StringUtils;
-import com.squarespace.template.plugins.CommerceFormatters;
-import com.squarespace.template.plugins.CommercePredicates;
 import com.squarespace.template.plugins.ContentFormatters;
-import com.squarespace.template.plugins.ContentPredicates;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
-import com.squarespace.template.plugins.SocialFormatters;
-import com.squarespace.template.plugins.SocialPredicates;
-import com.squarespace.v6.utils.JSONUtils;
 
 /**
  * Methods to simplify writing tests against the JSON template package.
@@ -36,18 +28,12 @@ public class UnitTestBase {
   private static final PredicateTable predicateTable = new PredicateTable();
   
   private static final FormatterTable formatterTable = new FormatterTable();
-  
-  static {
-    predicateTable.register(new CommercePredicates());
-    predicateTable.register(new ContentPredicates());
-    predicateTable.register(new CorePredicates());
-    predicateTable.register(new SocialPredicates());
-    predicateTable.register(new UnitTestPredicates());
 
-    formatterTable.register(new CommerceFormatters());
+  static {
+    predicateTable.register(new CorePredicates());
+    predicateTable.register(new UnitTestPredicates());
     formatterTable.register(new ContentFormatters());
     formatterTable.register(new CoreFormatters());
-    formatterTable.register(new SocialFormatters());
     formatterTable.register(new UnitTestFormatters());
 
     // Used to tune the symbol table sizes.
@@ -89,7 +75,7 @@ public class UnitTestBase {
   }
   
   public JsonNode json(String raw) {
-    return JSONUtils.decode(raw);
+    return JsonUtils.decode(raw);
   }
   
   public CodeMachine machine() {
@@ -148,7 +134,7 @@ public class UnitTestBase {
    * Execute the instruction on the given JSON node.  Return the execution context.
    */
   public Context execute(String jsonData, Instruction ... instructions) throws CodeExecuteException {
-    return execute(JSONUtils.decode(jsonData), instructions);
+    return execute(JsonUtils.decode(jsonData), instructions);
   }
   
   /**
@@ -176,7 +162,7 @@ public class UnitTestBase {
   }
   
   public String format(Formatter impl, Arguments args, String json) throws CodeException {
-    Context ctx = new Context(JSONUtils.decode(json));
+    Context ctx = new Context(JsonUtils.decode(json));
     impl.validateArgs(args);
     impl.apply(ctx, args);
     return ctx.node().asText();
@@ -201,7 +187,9 @@ public class UnitTestBase {
 
   public static String readFile(Path path) throws IOException {
     try (InputStream input = Files.newInputStream(path)) {
-      return IOUtils.toString(input, StringUtils.UTF8_CHARSET);
+      return IOUtils.toString(input, "UTF-8");
     }
   }
+  
 }
+

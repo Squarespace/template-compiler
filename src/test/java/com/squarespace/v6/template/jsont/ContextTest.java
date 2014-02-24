@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CoreFormatters;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 @Test( groups={ "unit" })
@@ -69,7 +68,7 @@ public class ContextTest extends UnitTestBase {
   public void testSafeExecutionMode() throws CodeException {
     CodeMaker mk = maker();
     Context ctx = context("{\"a\": {}}");
-    ctx.setPartials(JSONUtils.decode("{\"foo\": \"this {.section x} value\"}"));
+    ctx.setPartials(JsonUtils.decode("{\"foo\": \"this {.section x} value\"}"));
     ctx.setSafeExecution();
     ctx.setCompiler(compiler());
 

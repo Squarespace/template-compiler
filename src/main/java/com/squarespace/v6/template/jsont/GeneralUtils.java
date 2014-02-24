@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import org.apache.commons.io.output.StringBuilderWriter;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 public class GeneralUtils {
@@ -31,9 +28,9 @@ public class GeneralUtils {
   
   public static String jsonPretty(JsonNode node) throws IOException {
     StringBuilder buf = new StringBuilder();
-    JsonGenerator gen = JSON_FACTORY.createJsonGenerator(new StringBuilderWriter(buf));
+    JsonGenerator gen = JSON_FACTORY.createGenerator(new StringBuilderWriter(buf));
     gen.useDefaultPrettyPrinter();
-    gen.setCodec(JSONUtils.MAPPER);
+    gen.setCodec(JsonUtils.getMapper());
     gen.writeTree(node);
     return buf.toString();
   }

@@ -5,7 +5,6 @@ import static com.squarespace.template.Operator.LOGICAL_OR;
 import static com.squarespace.template.plugins.CoreFormatters.JSON;
 import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
 import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
-import static com.squarespace.template.plugins.CorePredicates.COLLECTION_TYPE_NAME_EQUALS;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -126,9 +125,6 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(p3.repr(), "{.or singular?}C{.end}");
     
     assertEquals(ReprEmitter.get(p3, false), "{.or singular?}");
-    
-    PredicateInst p4 = mk.predicate(COLLECTION_TYPE_NAME_EQUALS, mk.args(" abc"));
-    assertEquals(p4.repr(), "{.collectionTypeNameEquals? abc}");
   }
   
   @Test

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 @Test( groups={ "unit" })
@@ -17,9 +16,9 @@ public class GeneralUtilsTest {
 
   @Test
   public void testGetFirstMatchingNode() {
-    ObjectNode o1 = JSONUtils.createObjectNode();
+    ObjectNode o1 = JsonUtils.createObjectNode();
     o1.put("foo", "bar");
-    ObjectNode o2 = JSONUtils.createObjectNode();
+    ObjectNode o2 = JsonUtils.createObjectNode();
     o2.put("obj", o1);
     
     assertEquals(GeneralUtils.getFirstMatchingNode(o2, "bar", "obj", "foo"), o1);

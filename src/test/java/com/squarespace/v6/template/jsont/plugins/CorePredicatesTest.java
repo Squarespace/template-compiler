@@ -5,15 +5,12 @@ import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
-import com.squarespace.template.KnownDates;
 import com.squarespace.template.Predicate;
 import com.squarespace.template.UnitTestBase;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 public class CorePredicatesTest extends UnitTestBase {
@@ -44,28 +41,6 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(CorePredicates.PLURAL, context("100000.101"));
   }
   
-  @Test
-  public void testSameDay() throws CodeException {
-    long date1 = KnownDates.NOV_15_2013_123030_UTC - (3600L * 1000);
-    String json = CoreFormattersTest.getDateTestJson(date1, "America/New_York");
-    ObjectNode node = (ObjectNode) JSONUtils.decode(json);
-    ObjectNode dates = JSONUtils.createObjectNode();
-    dates.put("startDate", date1);
-    dates.put("endDate", KnownDates.NOV_15_2013_123030_UTC);
-    node.put("dates", dates);
-
-    String[] key = new String[] { "dates" };
-    Context ctx = new Context(node);
-    ctx.pushSection(key);
-    assertTrue(CorePredicates.SAME_DAY, ctx);
-
-    // 2 days prior, shouldn't match
-    dates.put("endDate", KnownDates.NOV_15_2013_123030_UTC - (86400L * 1000 * 2));
-    ctx = new Context(node);
-    ctx.pushSection(key);
-    assertFalse(CorePredicates.SAME_DAY, ctx);
-  }
-
   @Test
   public void testSingular() throws CodeException {
     assertFalse(CorePredicates.SINGULAR, context("0"));

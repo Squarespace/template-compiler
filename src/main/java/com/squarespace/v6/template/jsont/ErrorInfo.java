@@ -8,7 +8,6 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.v6.utils.JSONUtils;
 
 /**
  * Provides a class to capture state about the error, prior to constructing the 
@@ -154,7 +153,7 @@ public class ErrorInfo {
   
   public JsonNode toJson() {
     Map<String, Object> map = builder.get();
-    ObjectNode obj = JSONUtils.createObjectNode();
+    ObjectNode obj = JsonUtils.createObjectNode();
     obj.put("level", level.toString());
     Integer line = (Integer)map.get(LINE);
     obj.put("line", (line == null) ? 0 : line);
@@ -165,7 +164,7 @@ public class ErrorInfo {
     obj.put("message", type.message(map));
 
     // Append any child errors that exist.
-    ArrayNode list = JSONUtils.createArrayNode();
+    ArrayNode list = JsonUtils.createArrayNode();
     obj.put("children", list);
     if (children != null) {
       for (ErrorInfo child : children) {

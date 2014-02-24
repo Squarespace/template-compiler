@@ -3,7 +3,6 @@ package com.squarespace.template;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 /**
@@ -24,7 +23,7 @@ public class MetaData {
   }
   
   public JsonNode getJson() {
-    ObjectNode obj = JSONUtils.createObjectNode();
+    ObjectNode obj = JsonUtils.createObjectNode();
     obj.put("instructions", arrayJson(instructions));
     obj.put("predicates", arrayJson(predicates));
     obj.put("formatters", arrayJson(formatters));
@@ -32,7 +31,7 @@ public class MetaData {
   }
   
   private ArrayNode arrayJson(String[] array) {
-    ArrayNode node = JSONUtils.createArrayNode();
+    ArrayNode node = JsonUtils.createArrayNode();
     for (String elem : array) {
       node.add(elem);
     }

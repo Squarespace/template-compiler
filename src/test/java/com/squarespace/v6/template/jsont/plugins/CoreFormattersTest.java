@@ -9,7 +9,6 @@ import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
 import static com.squarespace.template.plugins.CoreFormatters.HTML;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLTAG;
-import static com.squarespace.template.plugins.CoreFormatters.ITER;
 import static com.squarespace.template.plugins.CoreFormatters.JSON;
 import static com.squarespace.template.plugins.CoreFormatters.JSON_PRETTY;
 import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
@@ -35,8 +34,8 @@ import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.UnitTestBase;
-import com.squarespace.v6.utils.JSONUtils;
 
 
 @Test( groups={ "unit" })
@@ -47,7 +46,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{a|AbsUrl}";
     String json = "{\"base-url\": \"http://foobar.com/foo\", \"a\": \"abc\"}";
     Instruction code = compiler().compile(template).getCode();
-    String result = eval(compiler().execute(code, JSONUtils.decode(json)));
+    String result = eval(compiler().execute(code, JsonUtils.decode(json)));
     assertEquals(result, "http://foobar.com/foo/abc");
   }
   
@@ -63,9 +62,9 @@ public class CoreFormattersTest extends UnitTestBase {
     cb.var("foo", mk.fmt(APPLY, args));
     Instruction root = cb.text("!").eof().build();
 
-    Context ctx = new Context(JSONUtils.decode(input));
+    Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
-    ctx.setPartials(JSONUtils.decode(partials));
+    ctx.setPartials(JsonUtils.decode(partials));
     ctx.execute(root);
     assertContext(ctx, "hi this 123 value!");
   }
@@ -76,9 +75,9 @@ public class CoreFormattersTest extends UnitTestBase {
     String partials = "{\"block\": \"{.section foo}{@}\"}";
     String input = "{\"foo\": 123}";
     Instruction inst = compiler().compile(template).getCode();
-    Context ctx = new Context(JSONUtils.decode(input));
+    Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
-    ctx.setPartials(JSONUtils.decode(partials));
+    ctx.setPartials(JsonUtils.decode(partials));
     try {
       ctx.execute(inst);
       fail("Expected exception.");
@@ -93,9 +92,9 @@ public class CoreFormattersTest extends UnitTestBase {
     String partials = "{\"block\": \"hello\"}";
     String input = "{}";
     Instruction inst = compiler().compile(template).getCode();
-    Context ctx = new Context(JSONUtils.decode(input));
+    Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
-    ctx.setPartials(JSONUtils.decode(partials));
+    ctx.setPartials(JsonUtils.decode(partials));
     try {
       ctx.execute(inst);
       fail("Expected exception");
@@ -110,10 +109,10 @@ public class CoreFormattersTest extends UnitTestBase {
     String input = "{}";
     String partials = "\"block\": \"{.section foo}{@}\"}";
     Instruction inst = compiler().compile(template).getCode();
-    Context ctx = new Context(JSONUtils.decode(input));
+    Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.setSafeExecution();
-    ctx.setPartials(JSONUtils.decode(partials));
+    ctx.setPartials(JsonUtils.decode(partials));
     ctx.execute(inst);
     assertContext(ctx, "");
     assertEquals(ctx.getErrors().size(), 1);
@@ -191,7 +190,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{time|date " + format + "}";
     String json = getDateTestJson(timestamp, tzId);
     Instruction code = compiler().compile(template).getCode();
-    return eval(compiler().execute(code, JSONUtils.decode(json)));
+    return eval(compiler().execute(code, JsonUtils.decode(json)));
   }
   
  
@@ -206,7 +205,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String input = "{\"foo\": [\"a\", \"b\", \"c\"]}";
 
     Instruction inst = compiler().compile(template).getCode();
-    Context ctx = new Context(JSONUtils.decode(input));
+    Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.execute(inst);
     assertContext(ctx, "123"); 
@@ -320,9 +319,9 @@ public class CoreFormattersTest extends UnitTestBase {
   
   protected static String getDateTestJson(long timestamp, String tzId) {
     DateTimeZone timezone = DateTimeZone.forID(tzId);
-    ObjectNode node = JSONUtils.createObjectNode();
+    ObjectNode node = JsonUtils.createObjectNode();
     node.put("time", timestamp);
-    ObjectNode website = JSONUtils.createObjectNode();
+    ObjectNode website = JsonUtils.createObjectNode();
     website.put("timeZoneOffset", timezone.getOffset(timestamp));
     website.put("timeZone", timezone.getID());
     node.put("website", website);
