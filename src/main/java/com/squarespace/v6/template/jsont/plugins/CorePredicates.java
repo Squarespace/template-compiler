@@ -2,10 +2,12 @@ package com.squarespace.template.plugins;
 
 import static com.squarespace.template.GeneralUtils.isTruthy;
 
-import org.joda.time.DateTimeZone;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.v6.utils.enums.CollectionType;
+import com.squarespace.template.Arguments;
+import com.squarespace.template.BasePredicate;
+import com.squarespace.template.BaseRegistry;
+import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.Context;
+import com.squarespace.template.Predicate;
 
 
 public class CorePredicates extends BaseRegistry<Predicate> {
