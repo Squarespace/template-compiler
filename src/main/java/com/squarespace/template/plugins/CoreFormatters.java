@@ -37,13 +37,15 @@ import com.squarespace.template.Patterns;
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
   
+  private static final String[] BASE_URL_KEY = new String[] { "base-url" };
+  
   /**
    * ABSURL - Create an absolute URL, using the "base-url" value.
    */
   public static Formatter ABSURL = new BaseFormatter("AbsUrl", false) {
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String baseUrl = ctx.resolve(new String[] { "base-url" }).asText();
+      String baseUrl = ctx.resolve(BASE_URL_KEY).asText();
       String value = ctx.node().asText();
       ctx.setNode(baseUrl + "/" + value);
     }
