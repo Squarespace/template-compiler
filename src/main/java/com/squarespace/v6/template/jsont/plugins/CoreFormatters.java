@@ -6,7 +6,6 @@ import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
 import static com.squarespace.template.GeneralUtils.eatNull;
 import static com.squarespace.template.GeneralUtils.isTruthy;
-import static com.squarespace.template.plugins.PluginUtils.slugify;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -31,7 +30,6 @@ import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonTemplateEngine;
 import com.squarespace.template.Patterns;
-import com.squarespace.v6.utils.enums.RecordType;
 
 
 public class CoreFormatters extends BaseRegistry<Formatter> {
@@ -222,72 +220,6 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
       ctx.setNode(buf.toString());
     }
-  };
-  
-  
-  /**
-   * ITEM_CLASSES
-   */
-  public static Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
-    @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode value = ctx.node();
-      
-      StringBuilder buf = new StringBuilder();
-      buf.append("hentry");
-      
-      JsonNode node = ctx.resolve("promotedBlockType");
-      if (isTruthy(node)) {
-        buf.append(" promoted promoted-block-" + slugify(node.asText()));
-      }
-      
-      node = ctx.resolve("categories");
-      if (isTruthy(node)) {
-        int size = node.size();
-        for (int i = 0; i < size; i++) {
-          buf.append(" category-" + slugify(node.path(i).asText()));
-        }
-      }
-      
-      node = ctx.resolve("tags");
-      if (isTruthy(node)) {
-        int size = node.size();
-        for (int i = 0; i < size; i++) {
-          buf.append(" tag-" + slugify(node.path(i).asText()));
-        }
-      }
-      
-      node = ctx.resolve("author");
-      JsonNode displayName = node.path("displayName");
-      if (isTruthy(node) && isTruthy(displayName)) {
-        buf.append(" author-" + slugify(displayName.asText()));
-      }
-      node = ctx.resolve("recordTypeLabel");
-      buf.append(" post-type-").append(node.asText());
-      
-      node = ctx.resolve("@index");
-      if (!node.isMissingNode()) {
-        buf.append(" article-index-" + node.asInt());
-      }
-      
-      node = ctx.resolve("starred");
-      if (isTruthy(node)) {
-        buf.append( " featured");
-      }
-
-      node = value.path("recordType");
-      if (RecordType.STORE_ITEM.value().equals(node.asInt())) {
-        if (CommerceUtils.isOnSale(value)) {
-          buf.append(" on-sale");
-        }
-        if (isTruthy(value.path("payWhatYouWant"))) {
-          buf.append(" pay-what-you-want");
-        }
-      }
-      
-      ctx.setNode(buf.toString());
-    }
-    
   };
   
   

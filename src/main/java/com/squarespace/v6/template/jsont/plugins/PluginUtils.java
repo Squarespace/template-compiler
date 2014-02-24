@@ -7,15 +7,30 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.template.GeneralUtils;
-
 
 public class PluginUtils {
 
   private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
 
   private PluginUtils() {
+  }
+  
+  /**
+   * Translate a hex digit into its corresponding integer value, and if the character is not a valid
+   * hex digit, returns -1. For example,  hexDigitToInt('e') == 14, and hexDigitToInt('x') == -1.
+   * 
+   * @param ch  candidate hex digit character
+   * @return    -1, or the integer value of the hex digit
+   */
+  public static int hexDigitToInt(char ch) {
+    if (ch >= '0' && ch <= '9') {
+      return ch - '0';
+    } else if (ch >= 'a' && ch <= 'f') {
+      return ch - 'a' + 10;
+    } else if (ch >= 'A' && ch <= 'F') {
+      return ch - 'A' + 10;
+    }
+    return -1;
   }
   
   public static void escapeHtml(String str, StringBuilder buf) {
@@ -122,47 +137,6 @@ public class PluginUtils {
     }
     buf.append(value);
   }
-  
-  public static void makeSocialButton(JsonNode website, JsonNode item, boolean inline, StringBuilder buf) {
-    JsonNode options = website.path("shareButtonOptions");
-    if (website.isMissingNode() || options.isMissingNode() || options.size() == 0) {
-      return;
-    }
-    
-    JsonNode node = GeneralUtils.getFirstMatchingNode(item, "systemDataId", "mainImageId");
-    String imageId = node.asText();
-    node = item.path("assetUrl");
-    String assetUrl = node.asText();
-    if (node.isMissingNode()) {
-      node = item.path("mainImage").path("assetUrl");
-      assetUrl = node.asText();
-    }
-    String style = (inline) ? "inline-style" : "button-style";
-    buf.append("<script>Y.use('squarespace-social-buttons');");
-    buf.append("</script>");
-    if (inline) {
-      buf.append("<span ");
-    } else {
-      buf.append("<div ");
-    }
-    buf.append("class=\"squarespace-social-buttons ");
-    buf.append(style);
-    buf.append("\" data-system-data-id=\"");
-    buf.append(imageId);
-    buf.append("\" data-asset-url=\"");
-    buf.append(assetUrl);
-    buf.append("\" data-record-type=\"");
-    buf.append(item.path("recordType").asText());
-    buf.append("\" data-full-url=\"");
-    buf.append(item.path("fullUrl").asText());
-    buf.append("\" data-title=\"");
-    escapeHtmlTag(item.path("title").asText(), buf);
-    buf.append("\">");
-    if (inline) {
-      buf.append("</span>");
-    } else {
-      buf.append("</div>");
-    }
-  }
 
 }
+
