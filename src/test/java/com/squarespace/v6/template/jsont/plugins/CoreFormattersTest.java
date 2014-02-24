@@ -46,7 +46,7 @@ public class CoreFormattersTest extends UnitTestBase {
   public void testAbsUrl() throws CodeException {
     String template = "{a|AbsUrl}";
     String json = "{\"base-url\": \"http://foobar.com/foo\", \"a\": \"abc\"}";
-    Instruction code = compiler().compile(template).getCode();
+    Instruction code = compiler().compile(template).code();
     String result = eval(compiler().execute(code, JsonUtils.decode(json)));
     assertEquals(result, "http://foobar.com/foo/abc");
   }
@@ -75,7 +75,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{@|apply block}";
     String partials = "{\"block\": \"{.section foo}{@}\"}";
     String input = "{\"foo\": 123}";
-    Instruction inst = compiler().compile(template).getCode();
+    Instruction inst = compiler().compile(template).code();
     Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.setPartials(JsonUtils.decode(partials));
@@ -92,7 +92,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{@|apply foo}";
     String partials = "{\"block\": \"hello\"}";
     String input = "{}";
-    Instruction inst = compiler().compile(template).getCode();
+    Instruction inst = compiler().compile(template).code();
     Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.setPartials(JsonUtils.decode(partials));
@@ -109,7 +109,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{@|apply block}";
     String input = "{}";
     String partials = "\"block\": \"{.section foo}{@}\"}";
-    Instruction inst = compiler().compile(template).getCode();
+    Instruction inst = compiler().compile(template).code();
     Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.setSafeExecution();
@@ -202,7 +202,7 @@ public class CoreFormattersTest extends UnitTestBase {
   private String formatDate(String format, long timestamp, String tzId) throws CodeException {
     String template = "{time|date " + format + "}";
     String json = getDateTestJson(timestamp, tzId);
-    Instruction code = compiler().compile(template).getCode();
+    Instruction code = compiler().compile(template).code();
     return eval(compiler().execute(code, JsonUtils.decode(json)));
   }
   
@@ -217,7 +217,7 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{.repeated section foo}{@|iter}{.end}";
     String input = "{\"foo\": [\"a\", \"b\", \"c\"]}";
 
-    Instruction inst = compiler().compile(template).getCode();
+    Instruction inst = compiler().compile(template).code();
     Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.execute(inst);

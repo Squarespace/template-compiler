@@ -49,6 +49,6 @@ public class ValidationTest extends UnitTestBase {
   }
   
   private List<ErrorInfo> validate(String template) throws CodeSyntaxException {
-    return compiler().validate(template).getErrors();
+    return compiler().validate(template).errors();
   }
 }

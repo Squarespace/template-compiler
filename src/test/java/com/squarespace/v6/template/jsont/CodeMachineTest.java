@@ -70,7 +70,7 @@ public class CodeMachineTest extends UnitTestBase {
   }
   
   private List<ErrorInfo> validate(String template) throws CodeException {
-    return compiler().validate(template).getErrors();
+    return compiler().validate(template).errors();
   }
   
 }

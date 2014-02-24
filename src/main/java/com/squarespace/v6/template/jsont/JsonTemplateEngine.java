@@ -103,15 +103,15 @@ public class JsonTemplateEngine {
     tokenizer.consume();
     return new CompiledTemplate() {
       @Override
-      public Instruction getCode() {
+      public Instruction code() {
         return machine.getCode();
       }
       @Override
-      public List<ErrorInfo> getErrors() {
+      public List<ErrorInfo> errors() {
         return Collections.emptyList();
       }
       @Override
-      public CodeMachine getMachine() {
+      public CodeMachine machine() {
         return machine;
       }
     };
@@ -128,15 +128,15 @@ public class JsonTemplateEngine {
     
     return new CompiledTemplate() {
       @Override
-      public Instruction getCode() {
+      public Instruction code() {
         return machine.getCode();
       }
       @Override
-      public List<ErrorInfo> getErrors() {
+      public List<ErrorInfo> errors() {
         return errors;
       }
       @Override
-      public CodeMachine getMachine() {
+      public CodeMachine machine() {
         return machine;
       }
     };
@@ -168,15 +168,15 @@ public class JsonTemplateEngine {
     // Return all of the validation objects for the template.
     return new ValidatedTemplate() {
       @Override
-      public CodeList getCode() {
+      public CodeList code() {
         return sink;
       }
       @Override
-      public List<ErrorInfo> getErrors() {
+      public List<ErrorInfo> errors() {
         return errors;
       }
       @Override
-      public CodeStats getStats() {
+      public CodeStats stats() {
         return stats;
       }
     };

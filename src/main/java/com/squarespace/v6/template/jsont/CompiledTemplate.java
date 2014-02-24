@@ -5,10 +5,10 @@ import java.util.List;
 
 public interface CompiledTemplate {
 
-  public CodeMachine getMachine();
+  public CodeMachine machine();
   
-  public List<ErrorInfo> getErrors();
+  public List<ErrorInfo> errors();
   
-  public Instruction getCode();
+  public Instruction code();
   
 }

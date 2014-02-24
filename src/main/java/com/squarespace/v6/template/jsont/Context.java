@@ -201,7 +201,7 @@ public class Context {
       CompiledTemplate template = null;
       if (safeExecution) {
         template = compiler.compileSafe(source);
-        List<ErrorInfo> errors = template.getErrors();
+        List<ErrorInfo> errors = template.errors();
         if (!errors.isEmpty()) {
           ErrorInfo parent = error(ExecuteErrorType.COMPILE_PARTIAL_SYNTAX).name(name);
           parent.child(errors);
@@ -212,7 +212,7 @@ public class Context {
         template = compiler.compile(source);
       }
       
-      inst = template.getCode();
+      inst = template.code();
       
       // Cache the compiled template in case it is used more than once.
       compiledPartials.put(name, inst);

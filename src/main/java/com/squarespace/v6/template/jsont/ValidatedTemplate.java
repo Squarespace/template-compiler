@@ -5,10 +5,10 @@ import java.util.List;
 
 public interface ValidatedTemplate {
 
-  public List<ErrorInfo> getErrors();
+  public List<ErrorInfo> errors();
   
-  public CodeList getCode();
+  public CodeList code();
   
-  public CodeStats getStats();
+  public CodeStats stats();
   
 }
