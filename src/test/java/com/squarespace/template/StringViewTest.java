@@ -6,6 +6,8 @@ import static org.testng.Assert.assertNotEquals;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.StringView;
+
 
 @Test( groups={ "unit" })
 public class StringViewTest {

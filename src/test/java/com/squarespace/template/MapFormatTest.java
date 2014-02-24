@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.MapBuilder;
+import com.squarespace.template.MapFormat;
+
 
 @Test( groups={ "unit" })
 public class MapFormatTest {

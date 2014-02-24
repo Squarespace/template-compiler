@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.DecimalNode;
+import com.squarespace.template.CodeBuilder;
+import com.squarespace.template.CodeException;
+import com.squarespace.template.Instruction;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CorePredicates;
 

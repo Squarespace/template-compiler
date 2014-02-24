@@ -10,6 +10,13 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeException;
+import com.squarespace.template.CodeMachine;
+import com.squarespace.template.CodeMaker;
+import com.squarespace.template.CodeSyntaxException;
+import com.squarespace.template.ErrorInfo;
+import com.squarespace.template.ErrorType;
+
 
 @Test( groups={ "unit" })
 public class CodeMachineTest extends UnitTestBase {

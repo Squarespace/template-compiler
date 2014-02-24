@@ -7,6 +7,10 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.squarespace.template.ErrorInfo;
+import com.squarespace.template.ErrorType;
+import com.squarespace.template.MapBuilder;
+import com.squarespace.template.MapFormat;
 
 
 @Test( groups={ "unit" })

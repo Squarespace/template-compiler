@@ -10,6 +10,8 @@ import static org.testng.Assert.assertNotEquals;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeMaker;
+import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.IfInst;

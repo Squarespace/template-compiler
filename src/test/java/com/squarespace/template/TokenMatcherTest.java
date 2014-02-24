@@ -6,6 +6,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeMaker;
+import com.squarespace.template.TokenMatcher;
+
 
 @Test( groups={ "unit" })
 public class TokenMatcherTest extends UnitTestBase {

@@ -6,6 +6,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.squarespace.template.FormatterTable;
+import com.squarespace.template.PredicateTable;
+import com.squarespace.template.Registry;
+import com.squarespace.template.SymbolTable;
 
 
 @Test( groups={ "unit" })

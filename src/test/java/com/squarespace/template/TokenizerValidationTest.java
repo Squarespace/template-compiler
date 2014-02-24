@@ -24,6 +24,12 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeSyntaxException;
+import com.squarespace.template.ErrorInfo;
+import com.squarespace.template.ErrorType;
+import com.squarespace.template.SyntaxErrorType;
+import com.squarespace.template.Tokenizer;
+
 
 /**
  * Tests the Tokenizer's validation mode, where it continues parsing after

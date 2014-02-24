@@ -11,6 +11,7 @@ import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Predicate;
 import com.squarespace.template.UnitTestBase;
+import com.squarespace.template.plugins.CorePredicates;
 
 
 public class CorePredicatesTest extends UnitTestBase {

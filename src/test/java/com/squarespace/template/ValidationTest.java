@@ -15,6 +15,10 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeSyntaxException;
+import com.squarespace.template.ErrorInfo;
+import com.squarespace.template.ErrorType;
+
 
 @Test( groups={ "unit" })
 public class ValidationTest extends UnitTestBase {

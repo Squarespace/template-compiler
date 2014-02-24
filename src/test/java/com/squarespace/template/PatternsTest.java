@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.Patterns;
+
 
 /**
  * Built-in pattern match tests, ensuring matched character ranges are fully checked.
