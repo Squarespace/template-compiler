@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -103,6 +105,50 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         ctx.getCompiler().execute(inst, node, buf);
       }
       ctx.setNode(buf.toString());
+    }
+  };
+  
+  
+  public static final Formatter COLOR_WEIGHT = new BaseFormatter("color-weight", false) {
+    
+    private final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
+    
+    private final int HALFBRIGHT = 0xFFFFFF / 2;
+
+    /**
+     * Properly handle hex colors of length 3. Width of each channel needs to be expanded.
+     */
+    private int color3(char c1, char c2, char c3) {
+      int n1 = PluginUtils.hexDigitToInt(c1);
+      int n2 = PluginUtils.hexDigitToInt(c2);
+      int n3 = PluginUtils.hexDigitToInt(c3);
+      return (n1 << 20) | (n1 << 16) | (n2 << 12) | (n2 << 8) | (n3 << 4) | n3;
+    }
+    
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      String hex = ctx.node().asText();
+      hex = hex.replace("#", "");
+      if (!VALID_COLOR.matcher(hex).matches()) {
+        return;
+      }
+      int value = 0;
+      if (hex.length() == 3) {
+        value = color3(hex.charAt(0), hex.charAt(1), hex.charAt(2));
+      } else if (hex.length() == 6) {
+        value = Integer.parseInt(hex, 16);
+      }
+      String weight = (value > HALFBRIGHT) ? "light" : "dark";
+      ctx.setNode(weight);
+    }
+  };
+
+  
+  public static final Formatter HUMANIZE_DURATION = new BaseFormatter("humanizeDuration", false) {
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      long duration = ctx.node().asLong();
+      ctx.setNode(DurationFormatUtils.formatDuration(duration, "m:ss"));
     }
   };
   

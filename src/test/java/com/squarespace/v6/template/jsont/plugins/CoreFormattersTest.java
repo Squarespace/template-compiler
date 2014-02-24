@@ -5,6 +5,7 @@ import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
 import static com.squarespace.template.plugins.CoreFormatters.APPLY;
+import static com.squarespace.template.plugins.CoreFormatters.COLOR_WEIGHT;
 import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
 import static com.squarespace.template.plugins.CoreFormatters.HTML;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
@@ -116,6 +117,18 @@ public class CoreFormattersTest extends UnitTestBase {
     ctx.execute(inst);
     assertContext(ctx, "");
     assertEquals(ctx.getErrors().size(), 1);
+  }
+  
+  @Test
+  public void testColorWeight() throws CodeException {
+    assertFormatter(COLOR_WEIGHT, "\"#fff\"", "light");
+    assertFormatter(COLOR_WEIGHT, "\"#000\"", "dark");
+    assertFormatter(COLOR_WEIGHT, "\"ffffff\"", "light");
+    assertFormatter(COLOR_WEIGHT, "\"000000\"", "dark");
+    assertFormatter(COLOR_WEIGHT, "\"#aaa\"", "light");
+    assertFormatter(COLOR_WEIGHT, "\"#444\"", "dark");
+    assertFormatter(COLOR_WEIGHT, "\"800000\"", "light");
+    assertFormatter(COLOR_WEIGHT, "\"7fffff\"", "dark");
   }
   
   @Test

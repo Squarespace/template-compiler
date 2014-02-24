@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.template.plugins.ContentFormatters;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -32,7 +31,6 @@ public class UnitTestBase {
   static {
     predicateTable.register(new CorePredicates());
     predicateTable.register(new UnitTestPredicates());
-    formatterTable.register(new ContentFormatters());
     formatterTable.register(new CoreFormatters());
     formatterTable.register(new UnitTestFormatters());
 
