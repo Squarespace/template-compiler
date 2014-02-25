@@ -3,8 +3,6 @@ package com.squarespace.template;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 
 /**
  * Symbol table holding all active predicates.  Uses reflection to discover and 
@@ -14,7 +12,7 @@ public class PredicateTable extends SymbolTable<StringView, Predicate> {
 
   private static final int NUM_BUCKETS = 128;
   
-  private static final TypeReference<Predicate> TYPE_REF = new TypeReference<Predicate>() { };
+  private static final TypeRef<Predicate> TYPE_REF = new TypeRef<Predicate>() { };
 
   private final List<String> symbolList = new ArrayList<>();
   

@@ -5,12 +5,6 @@ import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.squarespace.template.FormatterTable;
-import com.squarespace.template.PredicateTable;
-import com.squarespace.template.Registry;
-import com.squarespace.template.SymbolTable;
-
 
 @Test( groups={ "unit" })
 public class SymbolTableTest {
@@ -76,7 +70,7 @@ public class SymbolTableTest {
   
   static class NameTable extends SymbolTable<String, Name> {
     
-    private static final TypeReference<Name> TYPE_REF = new TypeReference<Name>() { };
+    private static final TypeRef<Name> TYPE_REF = new TypeRef<Name>() { };
 
     public NameTable() {
       super(TYPE_REF, 8);

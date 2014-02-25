@@ -2,8 +2,6 @@ package com.squarespace.template;
 
 import java.lang.reflect.Field;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 
 /**
  * Generic symbol table to map string symbols to instances of a given
@@ -12,13 +10,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
  */
 public abstract class SymbolTable<K, V> {
 
-  private StringViewMap<K, V> table;
+  private final StringViewMap<K, V> table;
 
-  private TypeReference<V> ref;
+  private final TypeRef<V> ref;
   
   private boolean inUse = false;
   
-  public SymbolTable(TypeReference<V> ref, int numBuckets) {
+  public SymbolTable(TypeRef<V> ref, int numBuckets) {
     table = new StringViewMap<>(numBuckets);
     this.ref = ref;
   }
@@ -73,8 +71,8 @@ public abstract class SymbolTable<K, V> {
         continue;
       }
       
-      Class<?> type = field.getType();
-      if (type.equals(ref.getType())) {
+      // Ensure that the field is or extends V
+      if (ref.clazz().isAssignableFrom(field.getType())) { 
         field.setAccessible(true);
         try {
           registerSymbol(field.get(source));

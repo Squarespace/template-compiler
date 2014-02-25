@@ -3,8 +3,6 @@ package com.squarespace.template;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 
 
 /**
@@ -14,7 +12,7 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
 
   private static final int NUM_BUCKETS = 64;
   
-  private static final TypeReference<Formatter> TYPE_REF = new TypeReference<Formatter>() { };
+  private static final TypeRef<Formatter> TYPE_REF = new TypeRef<Formatter>() { };
   
   private final List<String> symbolList = new ArrayList<>();
   
