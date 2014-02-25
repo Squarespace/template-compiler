@@ -236,8 +236,6 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      // TODO: plugin static configuration. this would allow a non-Squarespace
-      // app to set which key the timezone is derived from. - phensley
       JsonNode tzNode = ctx.resolve(timezoneKey);
       long instant = ctx.node().asLong();
       String tzName = "UTC";

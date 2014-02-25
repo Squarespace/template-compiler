@@ -112,6 +112,11 @@ public class Arguments {
     return false;
   }
 
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("Arguments does not implement hashCode()");
+  }
+  
   private void parse(StringView raw) {
     if (raw == null || raw.length() == 0) {
       return;

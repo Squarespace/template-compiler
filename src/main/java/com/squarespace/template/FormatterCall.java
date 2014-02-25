@@ -23,6 +23,7 @@ public class FormatterCall {
     return this.args;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof FormatterCall)) {
       return false;
@@ -31,4 +32,9 @@ public class FormatterCall {
     return impl.equals(other.impl) && args.equals(other.args);
   }
 
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("FormatterCall does not implement hashCode()");
+  }
+  
 }
