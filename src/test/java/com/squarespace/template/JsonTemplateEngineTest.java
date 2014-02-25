@@ -20,11 +20,15 @@ public class JsonTemplateEngineTest {
   private static final JsonTemplateEngine COMPILER;
   
   static {
+
+    // Configure static plugins to replace defaults with your values.
+    CoreFormatters.DATE.setTimezoneKey(Constants.TIMEZONE_KEY);
+    
     FORMATTERS.register(new CoreFormatters());
-    // Register your formatters here
+    // Register additional formatters
 
     PREDICATES.register(new CorePredicates());
-    // Register your predicates here
+    // Register additional predicates
 
     COMPILER = new JsonTemplateEngine(FORMATTERS, PREDICATES);
   }
