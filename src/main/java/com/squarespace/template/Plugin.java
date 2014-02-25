@@ -6,9 +6,9 @@ package com.squarespace.template;
  */
 public class Plugin {
 
-  private String identifier;
+  private final String identifier;
   
-  private boolean requiresArgs;
+  private final boolean requiresArgs;
   
   public Plugin(String identifier, boolean requiresArgs) {
     this.identifier = identifier;

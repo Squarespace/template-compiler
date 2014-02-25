@@ -12,6 +12,9 @@ public class JsonUtils {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
+  private JsonUtils() {
+  }
+  
   public static ObjectNode createObjectNode() {
     return MAPPER.createObjectNode();
   }

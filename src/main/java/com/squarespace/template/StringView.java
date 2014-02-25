@@ -27,13 +27,12 @@ package com.squarespace.template;
  * reducing pressure on the garbage collector.
  */
 public class StringView implements CharSequence {
-
   
-  private String str;
+  private final String str;
   
-  private int start;
+  private final int start;
 
-  private int end;
+  private final int end;
   
   private int hashVal;
   

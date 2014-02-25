@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
  */
 public class TokenMatcher {
 
-  private String raw;
+  private final String raw;
   
   /** Start as set by region() */
   private int start = -1;

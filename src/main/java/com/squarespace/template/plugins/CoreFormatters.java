@@ -43,12 +43,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * ABSURL - Create an absolute URL, using the "base-url" value.
    */
   public static Formatter ABSURL = new BaseFormatter("AbsUrl", false) {
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String baseUrl = ctx.resolve(BASE_URL_KEY).asText();
       String value = ctx.node().asText();
       ctx.setNode(baseUrl + "/" + value);
     }
+  
   };
   
   
@@ -111,6 +113,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
   
   
+  /**
+   * COLOR_WEIGHT
+   */
   public static final Formatter COLOR_WEIGHT = new BaseFormatter("color-weight", false) {
     
     private final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
@@ -146,12 +151,17 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   };
 
   
+  /**
+   * HUMANIZE_DURATION
+   */
   public static final Formatter HUMANIZE_DURATION = new BaseFormatter("humanizeDuration", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       long duration = ctx.node().asLong();
       ctx.setNode(DurationFormatUtils.formatDuration(duration, "m:ss"));
     }
+
   };
   
   
@@ -159,6 +169,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * COUNT - Returns a count of the number of members in an Array or Object.
    */
   public static final Formatter COUNT = new BaseFormatter("count", false) {
+  
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
@@ -168,6 +179,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       ctx.setNode(res);
     }
+  
   };
   
   
@@ -175,10 +187,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * CYCLE - Iterate over an array of arguments
    */
   public static final Formatter CYCLE = new BaseFormatter("cycle", true) {
+    
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.atLeast(1);
     }
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       int value = ctx.node().asInt();
@@ -190,6 +204,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       ctx.setNode(args.get(index));
     };
+  
   };
 
   
@@ -239,11 +254,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * ENCODE_SPACE - Replace each space character with "&nbsp;".
    */
   public static final Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String value = Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;");
       ctx.setNode(value);
     }
+
   };
   
   
@@ -251,12 +268,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * HTML - Escapes HTML characters & < > replacing them with the corresponding entity.
    */
   public static final Formatter HTML = new BaseFormatter("html", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       PluginUtils.escapeHtml(eatNull(ctx.node()), buf);
       ctx.setNode(buf.toString());
     }
+
   };
   
   
@@ -264,12 +283,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * HTMLTAG - Escapes HTML characters & < > " replacing them with the corresponding entity.
    */
   public static final Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
+  
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
       ctx.setNode(buf.toString());
     }
+  
   };
   
   
@@ -277,12 +298,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * HTMLATTR - Same as HTMLTAG.
    */
   public static final Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
+  
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
       ctx.setNode(buf.toString());
     }
+  
   };
   
   
@@ -290,10 +313,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * ITER - Outputs the index of the current array being iterated over.
    */
   public static final Formatter ITER = new BaseFormatter("iter", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       ctx.setNode(ctx.resolve("@index").asText());
     }
+
   };
   
   
@@ -301,12 +326,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * JSON - Output a text representation of the node.
    */
   public static final Formatter JSON = new BaseFormatter("json", false) {
+  
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       // NOTE: this is </script> replacement is copied verbatim from the JavaScript
       // version of JSONT, but it seems quite error-prone to me.
       ctx.setNode(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
     }
+  
   };
 
   
@@ -314,6 +341,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * JSON_PRETTY
    */
   public static final Formatter JSON_PRETTY = new BaseFormatter("json-pretty", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       try {
@@ -330,6 +358,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         }
       }
     }
+
   };
 
   
@@ -337,11 +366,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * OUTPUT
    */
   public static final Formatter OUTPUT = new BaseFormatter("output", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       List<String> values = args.getArgs();
       ctx.setNode(StringUtils.join(values.toArray(), ' '));
     }
+  
   };
   
   
@@ -381,10 +412,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * RAW
    */
   public static final Formatter RAW = new BaseFormatter("raw", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       ctx.setNode(ctx.node().toString());
     }
+
   };
 
   
@@ -392,11 +425,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * ROUND
    */
   public static final Formatter ROUND = new BaseFormatter("round", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       long value = Math.round(ctx.node().asDouble());
       ctx.setNode(value);
     }
+  
   };
   
   
@@ -404,6 +439,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * SAFE
    */
   public static final Formatter SAFE = new BaseFormatter("safe", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
@@ -412,6 +448,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         ctx.setNode(value);
       }
     }
+
   };
   
   
@@ -419,6 +456,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * SMARTYPANTS - Converts plain ASCII quote / apostrophe to corresponding Unicode curly characters.
    */
   public static final Formatter SMARTYPANTS = new BaseFormatter("smartypants", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String str = eatNull(ctx.node());
@@ -429,6 +467,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       str = str.replace("--", "\u2014");
       ctx.setNode(str);
     }
+
   };
 
   
@@ -442,6 +481,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       String result = eatNull(ctx.node());
       ctx.setNode(PluginUtils.slugify(result));
     }
+    
   };
   
   
@@ -449,10 +489,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * STR - Output a string representation of the node.
    */
   public static final Formatter STR = new BaseFormatter("str", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       ctx.setNode(eatNull(ctx.node()));
     }
+
   };
   
   
@@ -460,6 +502,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * TIMESINCE - Outputs a human-readable representation of (now - timestamp).
    */
   public static final Formatter TIMESINCE = new BaseFormatter("timesince", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -474,6 +517,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       ctx.setNode(buf.toString());
     }
+
   };
 
   
@@ -517,6 +561,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * will output a hex escape sequence, '/' to %2F, or ' ' to '+'.
    */
   public static final Formatter URL_ENCODE = new BaseFormatter("url-encode", false) {
+    
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String value = ctx.node().asText();
@@ -526,6 +571,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         // Shouldn't happen
       }
     }
+
   };
 
 }

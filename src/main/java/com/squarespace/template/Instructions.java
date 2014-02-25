@@ -154,6 +154,11 @@ public class Instructions {
   /**
    * Conditional block which tests one or more variables for "truthiness" and then
    * joins the boolean values with either an OR or AND operator.
+   * 
+   * Note: this was added to the JavaScript JSON-Template engine by someone at Squarespace
+   * before my time, and is not as expressive as it could be, e.g. there is no operator 
+   * precedence, grouping, etc.  This implementation replicates the behavior of the JS
+   * version. - phensley
    */
   static class IfInst extends BlockInstruction {
     

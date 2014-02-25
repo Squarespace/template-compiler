@@ -22,6 +22,9 @@ import com.squarespace.template.Instructions.VariableInst;
  */
 public class ReprEmitter {
 
+  private ReprEmitter() {
+  }
+  
   public static String get(Instruction inst, boolean recurse) {
     StringBuilder buf = new StringBuilder();
     inst.repr(buf, recurse);

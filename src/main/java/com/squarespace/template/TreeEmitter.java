@@ -10,6 +10,9 @@ import com.squarespace.template.Instructions.RepeatedInst;
  * purposes.
  */
 public class TreeEmitter {
+  
+  private TreeEmitter() {
+  }
 
   public static String get(Instruction inst) {
     StringBuilder buf = new StringBuilder();
