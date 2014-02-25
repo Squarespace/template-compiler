@@ -64,9 +64,9 @@ public class Instructions {
    */
   static class CommentInst extends BaseInstruction {
     
-    private StringView view;
+    private final StringView view;
     
-    private boolean multiLine;
+    private final boolean multiLine;
     
     public CommentInst(StringView view) {
       this(view, false);
@@ -242,9 +242,9 @@ public class Instructions {
    */
   static class IfPredicateInst extends BlockInstruction {
     
-    private Predicate predicate;
+    private final Predicate predicate;
 
-    private Arguments arguments;
+    private final Arguments arguments;
     
     public IfPredicateInst(Predicate predicate, Arguments arguments) {
       super(CONSEQUENT_BLOCK_LEN);
@@ -294,9 +294,9 @@ public class Instructions {
    */
   static abstract class LiteralInst extends BaseInstruction {
     
-    private String name;
+    private final String name;
     
-    private String value;
+    private final String value;
     
     public LiteralInst(String name, String value) {
       this.name = name;
@@ -335,7 +335,7 @@ public class Instructions {
    */
   static class MetaInst extends BaseInstruction {
     
-    private boolean isLeft;
+    private final boolean isLeft;
     
     public MetaInst(boolean isLeft) {
       this.isLeft = isLeft;
@@ -390,9 +390,9 @@ public class Instructions {
 
     private InstructionType type = InstructionType.PREDICATE;
     
-    private Predicate impl;
+    private final Predicate impl;
     
-    private Arguments args;
+    private final Arguments args;
     
     public PredicateInst(Predicate impl, Arguments args) {
       super(CONSEQUENT_BLOCK_LEN);
@@ -464,7 +464,7 @@ public class Instructions {
    */
   static class RepeatedInst extends BlockInstruction {
 
-    private Object[] variable;
+    private final Object[] variable;
     
     private AlternatesWithInst alternatesWith;
     
@@ -584,7 +584,7 @@ public class Instructions {
    */
   static class SectionInst extends BlockInstruction {
 
-    private Object[] variable;
+    private final Object[] variable;
     
     public SectionInst(String name) {
       super(CONSEQUENT_BLOCK_LEN);
@@ -662,7 +662,7 @@ public class Instructions {
    */
   static class TextInst extends BaseInstruction {
     
-    private StringView view;
+    private final StringView view;
     
     public TextInst(StringView view) {
       this.view = view;
@@ -705,7 +705,7 @@ public class Instructions {
    */
   static class VariableInst extends BaseInstruction {
 
-    private Object[] variable;
+    private final Object[] variable;
     
     private List<FormatterCall> formatters;
     

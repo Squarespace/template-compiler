@@ -26,9 +26,9 @@ public enum ExecuteErrorType implements ErrorType {
   
   private static final String PREFIX = "RuntimeError %(code)s at line %(line)s character %(offset)s";
 
-  private MapFormat prefixFormat;
+  private final MapFormat prefixFormat;
   
-  private MapFormat messageFormat;
+  private final MapFormat messageFormat;
   
   private ExecuteErrorType(String messageFormat) {
     this.prefixFormat = new MapFormat(PREFIX, NULL_PLACEHOLDER);

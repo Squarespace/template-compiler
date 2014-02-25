@@ -6,9 +6,9 @@ package com.squarespace.template;
  */
 public class FormatterCall {
   
-  private Formatter impl;
+  private final Formatter impl;
   
-  private Arguments args;
+  private final Arguments args;
 
   public FormatterCall(Formatter impl, Arguments args) {
     this.impl = impl;
