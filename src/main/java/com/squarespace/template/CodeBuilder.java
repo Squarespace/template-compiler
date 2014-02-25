@@ -11,9 +11,9 @@ import com.squarespace.template.Instructions.RootInst;
  */
 public class CodeBuilder {
 
-  private CodeMachine machine = new CodeMachine();
+  private final CodeMachine machine = new CodeMachine();
   
-  private CodeMaker maker = new CodeMaker();
+  private final CodeMaker maker = new CodeMaker();
   
   public CodeBuilder() {
   }

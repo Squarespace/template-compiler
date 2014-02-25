@@ -7,7 +7,7 @@ package com.squarespace.template;
  */
 public class CodeSyntaxException extends CodeException {
 
-  private ErrorInfo errorInfo;
+  private final ErrorInfo errorInfo;
   
   public CodeSyntaxException(ErrorInfo info) {
     super(info.getMessage());

@@ -6,7 +6,7 @@ package com.squarespace.template;
  */
 public class CodeExecuteException extends CodeException {
 
-  private ErrorInfo errorInfo;
+  private final ErrorInfo errorInfo;
   
   public CodeExecuteException(ErrorInfo info) {
     super(info.getMessage());

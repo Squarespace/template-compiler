@@ -10,9 +10,9 @@ import java.util.List;
  */
 class Block {
 
-  private List<Instruction> instructions;
+  private final int initialSize;
 
-  private int initialSize;
+  private List<Instruction> instructions;
   
   public Block(int initialSize) {
     this.initialSize = initialSize;
@@ -20,7 +20,7 @@ class Block {
   
   @Override
   public boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof Block)) {
+    if (!(obj instanceof Block)) {
       return false;
     }
     Block other = (Block) obj;

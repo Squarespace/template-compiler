@@ -13,14 +13,14 @@ import com.squarespace.template.Instructions.VariableInst;
  */
 public class CodeStats implements CodeSink {
 
-  private int totalInstructions;
-  
   private Counter<InstructionType> instructionCounter;
 
   private Counter<String> formatterCounter;
   
   private Counter<String> predicateCounter;
 
+  private int totalInstructions;
+  
   public CodeStats() {
     this.instructionCounter = new Counter<>();
     this.formatterCounter = new Counter<>();

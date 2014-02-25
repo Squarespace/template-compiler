@@ -36,9 +36,9 @@ public class ErrorInfo {
 
   private static final String REPR = "repr";
   
-  private ErrorType type;
+  private final ErrorType type;
   
-  private ErrorLevel level;
+  private final ErrorLevel level;
   
   private MapBuilder<String, Object> builder = new MapBuilder<>();
   
