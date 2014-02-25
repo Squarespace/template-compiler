@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 
-public class TypeRef<T> {
+public abstract class TypeRef<T> {
 
   private final Type type;
 
@@ -13,7 +13,7 @@ public class TypeRef<T> {
   public TypeRef() {
     Type superType = getClass().getGenericSuperclass();
     type = ((ParameterizedType)superType).getActualTypeArguments()[0];
-    clazz = (Class<?>) ((ParameterizedType)superType).getActualTypeArguments()[0];
+    clazz = (Class<?>) type;
   }
 
   public Type type() {

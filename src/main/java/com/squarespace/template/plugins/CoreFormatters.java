@@ -36,22 +36,31 @@ import com.squarespace.template.Patterns;
 
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
-  
-  private static final String[] BASE_URL_KEY = new String[] { "base-url" };
+  public static class AbsUrlFormatter extends BaseFormatter {
+    
+    private static String[] baseUrlKey = Constants.BASE_URL_KEY;
+
+    public AbsUrlFormatter() {
+      super("AbsUrl", false);
+    }
+    
+    public void setBaseUrlKey(String[] key) {
+      baseUrlKey = key;
+    }
+    
+    @Override
+    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+      String baseUrl = ctx.resolve(baseUrlKey).asText();
+      String value = ctx.node().asText();
+      ctx.setNode(baseUrl + "/" + value);
+    }
+
+  }
   
   /**
    * ABSURL - Create an absolute URL, using the "base-url" value.
    */
-  public static Formatter ABSURL = new BaseFormatter("AbsUrl", false) {
-
-    @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String baseUrl = ctx.resolve(BASE_URL_KEY).asText();
-      String value = ctx.node().asText();
-      ctx.setNode(baseUrl + "/" + value);
-    }
-  
-  };
+  public static final AbsUrlFormatter ABSURL = new AbsUrlFormatter();
   
   
   /**

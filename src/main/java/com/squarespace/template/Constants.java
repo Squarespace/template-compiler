@@ -14,6 +14,8 @@ public class Constants {
 
   public static final String NULL_PLACEHOLDER = "???";
 
+  public static final String[] BASE_URL_KEY = new String[] { "base-url" };
+
   public static final String[] TIMEZONE_KEY = new String[] { "website", "timeZone" };
 
   public static final JsonNode MISSING_NODE = MissingNode.getInstance();
