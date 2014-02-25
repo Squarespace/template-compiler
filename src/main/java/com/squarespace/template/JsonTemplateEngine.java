@@ -1,5 +1,6 @@
 package com.squarespace.template;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -123,8 +124,7 @@ public class JsonTemplateEngine {
     Tokenizer tokenizer = new Tokenizer(template, machine, formatterTable, predicateTable);
     tokenizer.setValidate();
     tokenizer.consume();
-    final List<ErrorInfo> errors = tokenizer.getErrors();
-    errors.addAll(machine.getErrors());
+    final List<ErrorInfo> errors = joinErrors(tokenizer.getErrors(), machine.getErrors());
     
     return new CompiledTemplate() {
       @Override
@@ -153,7 +153,6 @@ public class JsonTemplateEngine {
     Tokenizer tokenizer = new Tokenizer(template, sink, formatterTable, predicateTable);
     tokenizer.setValidate();
     tokenizer.consume();
-    final List<ErrorInfo> errors = tokenizer.getErrors();
 
     // Pass the parsed instructions to the CodeMachine for structural validation, and
     // collect some stats.
@@ -163,7 +162,8 @@ public class JsonTemplateEngine {
       machine.accept(inst);
       stats.accept(inst);
     }
-    errors.addAll(machine.getErrors());
+
+    final List<ErrorInfo> errors = joinErrors(tokenizer.getErrors(), machine.getErrors());
     
     // Return all of the validation objects for the template.
     return new ValidatedTemplate() {
@@ -180,6 +180,16 @@ public class JsonTemplateEngine {
         return stats;
       }
     };
+  }
+
+  private static final List<ErrorInfo> joinErrors(List<ErrorInfo> parseErrors, List<ErrorInfo> compileErrors) {
+    if (!parseErrors.isEmpty() || !compileErrors.isEmpty()) {
+      ArrayList<ErrorInfo> result = new ArrayList<>(parseErrors.size() + compileErrors.size());
+      result.addAll(parseErrors);
+      result.addAll(compileErrors);
+      return result;
+    }
+    return Collections.emptyList();
   }
 
 }

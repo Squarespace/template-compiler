@@ -14,6 +14,7 @@ import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,7 +39,7 @@ import com.squarespace.template.Instructions.RootInst;
  */
 public class CodeMachine implements CodeSink {
 
-  private Deque<Instruction> stack = new ArrayDeque<>();
+  private final Deque<Instruction> stack = new ArrayDeque<>();
   
   private State state;
 
@@ -66,9 +67,7 @@ public class CodeMachine implements CodeSink {
   }
   
   public List<ErrorInfo> getErrors() {
-    // Always return a new instance of an empty list, since the caller may append 
-    // further errors to it.
-    return (errors != null) ? errors : new ArrayList<ErrorInfo>(0);
+    return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
   }
   
   public void setValidate() {

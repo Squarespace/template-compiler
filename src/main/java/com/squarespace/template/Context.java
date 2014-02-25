@@ -35,7 +35,7 @@ public class Context {
   
   private static final String META_RIGHT = "}";
   
-  private ArrayDeque<Frame> stack = new ArrayDeque<>();
+  private final ArrayDeque<Frame> stack = new ArrayDeque<>();
 
   private Frame currentFrame;
 
@@ -76,10 +76,7 @@ public class Context {
   }
   
   public List<ErrorInfo> getErrors() {
-    if (errors == null) {
-      return Collections.emptyList();
-    }
-    return errors;
+    return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
   }
   
   /**
