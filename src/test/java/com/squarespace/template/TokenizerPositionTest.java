@@ -31,9 +31,9 @@ import com.squarespace.template.Instruction;
 
 @Test( groups={ "unit" })
 public class TokenizerPositionTest extends UnitTestBase {
-  
+
   private static final boolean VERBOSE = false;
-  
+
   /**
    * Sanity-checking all the line and column offsets. All line and character offsets
    * are 1-based to match the positions a text editor would report.
@@ -51,12 +51,12 @@ public class TokenizerPositionTest extends UnitTestBase {
     str = "\n\n\n{@}";
     assertLines(parse(str), mk.intlist(1, 4, 4));
     assertOffsets(parse(str), mk.intlist(1, 1, 4));
-    
+
     // TEXT, VARIABLE, TEXT, EOF
     str = "foo\n{@}\nbar";
     assertLines(parse(str), mk.intlist(1, 2, 2, 3));
     assertOffsets(parse(str), mk.intlist(1, 1, 4, 4));
-    
+
     // TEXT, VARIABLE, TEXT, VARIABLE, TEXT, END, TEXT, EOF
     str = "\n{@}A\n\n{@}B\n\n{.end}C\n";
     assertLines(parse(str), mk.intlist(1, 2, 2, 4, 4, 6, 6, 7));
@@ -66,7 +66,7 @@ public class TokenizerPositionTest extends UnitTestBase {
     str = "  {@}\n{@}";
     assertLines(parse(str), mk.intlist(1, 1, 1, 2, 2));
     assertOffsets(parse(str), mk.intlist(1, 3, 6, 1, 4));
-    
+
     // TEXT, VARIABLE, TEXT, EOF
     str = "1{@}5";
     assertLines(parse(str), mk.intlist(1, 1, 1, 1));
@@ -81,7 +81,7 @@ public class TokenizerPositionTest extends UnitTestBase {
     str = "\n {@} \n";
     assertLines(parse(str), mk.intlist(1, 2, 2, 3));
     assertOffsets(parse(str), mk.intlist(1, 2, 5, 1));
-    
+
     // TEXT, VARIABLE, TEXT, VARIABLE, TEXT, EOF
     str = "\n{@}\n{@}\n";
     assertLines(parse(str), mk.intlist(1, 2, 2, 3, 3, 4));
@@ -97,17 +97,17 @@ public class TokenizerPositionTest extends UnitTestBase {
     assertLines(parse(str), mk.intlist(1, 1, 1, 1));
     assertOffsets(parse(str), mk.intlist(1, 2, 14, 20));
   }
-  
+
   @Test
   public void testMultiLineComments() throws CodeSyntaxException {
     CodeMaker mk = maker();
 
     // TEXT, COMMENT, VARIABLE, EOF
-    String str = "\n\n{##\n\n##}{@}"; 
+    String str = "\n\n{##\n\n##}{@}";
     assertLines(parse(str), mk.intlist(1, 3, 5, 5));
     assertOffsets(parse(str), mk.intlist(1, 1, 4, 7));
   }
-  
+
   private List<Instruction> parse(String raw) throws CodeSyntaxException {
     CodeList collector = collector();
     tokenizer(raw, collector).consume();
@@ -141,5 +141,5 @@ public class TokenizerPositionTest extends UnitTestBase {
     assertEquals(actual.size(), expected.size());
     assertEquals(actual, expected);
   }
-  
+
 }

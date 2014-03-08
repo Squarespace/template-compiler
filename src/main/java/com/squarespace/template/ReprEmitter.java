@@ -40,32 +40,32 @@ public class ReprEmitter {
 
   private ReprEmitter() {
   }
-  
+
   public static String get(Instruction inst, boolean recurse) {
     StringBuilder buf = new StringBuilder();
     inst.repr(buf, recurse);
     return buf.toString();
   }
-  
+
   public static String get(Arguments args, boolean includeDelimiter) {
     StringBuilder buf = new StringBuilder();
     emit(args, includeDelimiter, buf);
     return buf.toString();
   }
-  
+
   public static String get(Object[] names) {
     StringBuilder buf = new StringBuilder();
     emitNames(names, buf);
     return buf.toString();
   }
-  
+
   public static void emit(AlternatesWithInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.alternates with}");
     if (recurse) {
       emitBlock(inst, buf, recurse);
     }
   }
-  
+
   public static void emit(CommentInst inst, StringBuilder buf) {
     buf.append("{#");
     if (inst.isMultiLine()) {
@@ -78,7 +78,7 @@ public class ReprEmitter {
     }
     buf.append('}');
   }
-  
+
   public static void emit(EndInst inst, StringBuilder buf) {
     buf.append("{.end}");
   }
@@ -86,7 +86,7 @@ public class ReprEmitter {
   public static void emit(Arguments args, StringBuilder buf) {
     emit(args, true, buf);
   }
-  
+
   public static void emit(Arguments args, boolean includeDelimiter, StringBuilder buf) {
     if (args == null || args.isEmpty()) {
       return;
@@ -107,7 +107,7 @@ public class ReprEmitter {
     buf.append("{.if ");
     List<Object[]> variables = inst.getVariables();
     List<Operator> operators = inst.getOperators();
-    
+
     // There is always at least one variable.
     emitNames(variables.get(0), buf);
     for (int i = 1, size = variables.size(); i < size; i++) {
@@ -121,7 +121,7 @@ public class ReprEmitter {
     }
     buf.append('}');
   }
-  
+
   public static void emit(IfPredicateInst inst, StringBuilder buf, boolean recurse) {
     Predicate predicate = inst.getPredicate();
     buf.append("{.if ");
@@ -129,7 +129,7 @@ public class ReprEmitter {
     emit(inst.getArguments(), buf);
     buf.append('}');
   }
-  
+
   public static void emit(LiteralInst inst, StringBuilder buf) {
     buf.append("{.").append(inst.getName()).append('}');
   }
@@ -143,7 +143,7 @@ public class ReprEmitter {
     }
     buf.append('}');
   }
-  
+
   public static void emit(PredicateInst inst, StringBuilder buf, boolean recurse) {
     Predicate predicate = inst.getPredicate();
     buf.append("{.");
@@ -162,13 +162,13 @@ public class ReprEmitter {
       emitBlock(inst, buf, recurse);
     }
   }
-  
+
   public static void emit(RepeatedInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.repeated section ");
     emitNames(inst.getVariable(), buf);
     buf.append('}');
     if (recurse) {
-      // Special case of a block, since we want the "alternates with" block to 
+      // Special case of a block, since we want the "alternates with" block to
       // be emitted between the consequent and alternative.
       emitBlock(inst.getConsequent(), buf, recurse);
       AlternatesWithInst a2 = inst.getAlternatesWith();
@@ -181,7 +181,7 @@ public class ReprEmitter {
       }
     }
   }
-  
+
   public static void emit(RootInst inst, StringBuilder buf, boolean recurse) {
     if (recurse) {
       emitBlock(inst, buf, recurse);
@@ -191,7 +191,7 @@ public class ReprEmitter {
       }
     }
   }
-  
+
   public static void emit(SectionInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.section ");
     emitNames(inst.getVariable(), buf);
@@ -205,7 +205,7 @@ public class ReprEmitter {
     StringView view = inst.getView();
     buf.append(view.data(), view.start(), view.end());
   }
-  
+
   public static void emit(VariableInst inst, StringBuilder buf) {
     buf.append('{');
     emitNames(inst.getVariable(), buf);
@@ -217,7 +217,7 @@ public class ReprEmitter {
     }
     buf.append('}');
   }
-  
+
   public static void emitNames(Object[] names, StringBuilder buf) {
     if (names == null) {
       buf.append("@");
@@ -243,7 +243,7 @@ public class ReprEmitter {
       alt.repr(buf, recurse);
     }
   }
-  
+
   private static void emitBlock(Block block, StringBuilder buf, boolean recurse) {
     List<Instruction> instructions = block.getInstructions();
     if (instructions == null) {
@@ -253,7 +253,7 @@ public class ReprEmitter {
       inst.repr(buf, recurse);
     }
   }
-  
-  
-  
+
+
+
 }

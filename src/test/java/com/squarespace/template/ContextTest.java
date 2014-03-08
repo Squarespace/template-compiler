@@ -47,7 +47,7 @@ public class ContextTest extends UnitTestBase {
     RootInst root = builder().section("a").var("b").var("c").end().eof().build();
     assertContext(execute(json, root), "21");
   }
-  
+
   @Test
   public void testLookupMiss() throws CodeException {
     CodeMaker mk = maker();
@@ -56,7 +56,7 @@ public class ContextTest extends UnitTestBase {
     assertTrue(ctx.node().isMissingNode());
     ctx.push(mk.strarray("a", "b", "c"));
     assertTrue(ctx.node().isMissingNode());
-    
+
     ctx = context("{\"a\": null}");
     ctx.push(mk.strarray("a", "b"));
     assertTrue(ctx.node().isTextual());
@@ -84,7 +84,7 @@ public class ContextTest extends UnitTestBase {
     ctx.execute(root);
     assertEquals(exceptions.size(), 1);
   }
-  
+
   @Test
   public void testSafeExecutionMode() throws CodeException {
     CodeMaker mk = maker();
@@ -93,12 +93,12 @@ public class ContextTest extends UnitTestBase {
     ctx.setSafeExecution();
     ctx.setCompiler(compiler());
 
-    // Apply a partial that contains a syntax error. In safe mode, this should just 
+    // Apply a partial that contains a syntax error. In safe mode, this should just
     // append errors to the context, not raise exceptions.
     RootInst root = builder().var("a", mk.fmt(CoreFormatters.APPLY, mk.args(" foo"))).eof().build();
     ctx.execute(root);
 
     assertEquals(ctx.getErrors().size(), 1);
   }
-  
+
 }

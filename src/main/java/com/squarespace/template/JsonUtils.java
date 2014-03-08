@@ -30,11 +30,11 @@ public class JsonUtils {
 
   private JsonUtils() {
   }
-  
+
   public static ObjectNode createObjectNode() {
     return MAPPER.createObjectNode();
   }
-  
+
   public static JsonNode decode(String input) {
     try {
       return MAPPER.readTree(input);
@@ -42,11 +42,11 @@ public class JsonUtils {
       throw new IllegalArgumentException("Unabled to decode JSON", e);
     }
   }
-  
+
   public static ArrayNode createArrayNode() {
     return MAPPER.createArrayNode();
   }
-  
+
   public static ObjectMapper getMapper() {
     return MAPPER;
   }

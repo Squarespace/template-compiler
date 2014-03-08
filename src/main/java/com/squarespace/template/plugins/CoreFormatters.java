@@ -53,17 +53,17 @@ import com.squarespace.template.Patterns;
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
   public static class AbsUrlFormatter extends BaseFormatter {
-    
+
     private static String[] baseUrlKey = Constants.BASE_URL_KEY;
 
     public AbsUrlFormatter() {
       super("AbsUrl", false);
     }
-    
+
     public void setBaseUrlKey(String[] key) {
       baseUrlKey = key;
     }
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String baseUrl = ctx.resolve(baseUrlKey).asText();
@@ -72,24 +72,24 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   }
-  
+
   /**
    * ABSURL - Create an absolute URL, using the "base-url" value.
    */
   public static final AbsUrlFormatter ABSURL = new AbsUrlFormatter();
-  
-  
+
+
   /**
    * APPLY - This will compile and execute a "partial template", caching it in the
    * context for possible later use.
    */
   public static final Formatter APPLY = new BaseFormatter("apply", true) {
-    
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.exactly(1);
     }
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String name = args.first();
@@ -108,7 +108,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
           throw new CodeExecuteException(parent);
         }
       }
-      
+
       if (inst == null) {
         ErrorInfo error = ctx.error(APPLY_PARTIAL_MISSING).name(name);
         if (ctx.safeExecutionEnabled()) {
@@ -136,15 +136,15 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       ctx.setNode(buf.toString());
     }
   };
-  
-  
+
+
   /**
    * COLOR_WEIGHT
    */
   public static final Formatter COLOR_WEIGHT = new BaseFormatter("color-weight", false) {
-    
+
     private final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
-    
+
     private final int HALFBRIGHT = 0xFFFFFF / 2;
 
     /**
@@ -156,7 +156,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       int n3 = PluginUtils.hexDigitToInt(c3);
       return (n1 << 20) | (n1 << 16) | (n2 << 12) | (n2 << 8) | (n3 << 4) | n3;
     }
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String hex = ctx.node().asText();
@@ -175,12 +175,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
 
-  
+
   /**
    * HUMANIZE_DURATION
    */
   public static final Formatter HUMANIZE_DURATION = new BaseFormatter("humanizeDuration", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       long duration = ctx.node().asLong();
@@ -188,13 +188,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   };
-  
-  
+
+
   /**
    * COUNT - Returns a count of the number of members in an Array or Object.
    */
   public static final Formatter COUNT = new BaseFormatter("count", false) {
-  
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
@@ -204,15 +204,15 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       ctx.setNode(res);
     }
-  
+
   };
-  
-  
+
+
   /**
    * CYCLE - Iterate over an array of arguments
    */
   public static final Formatter CYCLE = new BaseFormatter("cycle", true) {
-    
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.atLeast(1);
@@ -229,18 +229,18 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       ctx.setNode(args.get(index));
     };
-  
+
   };
 
-  
+
   public static class DateFormatter extends BaseFormatter {
-    
+
     private static String[] timezoneKey = Constants.TIMEZONE_KEY;
-    
+
     public DateFormatter() {
       super("date", true);
     }
-    
+
     public void setTimezoneKey(String[] key) {
       timezoneKey = key;
     }
@@ -249,7 +249,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.setOpaque(args.toString());
     };
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode tzNode = ctx.resolve(timezoneKey);
@@ -271,13 +271,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    * DATE - Format an epoch date using the site's timezone.
    */
   public static final DateFormatter DATE = new DateFormatter();
-  
-  
+
+
   /**
    * ENCODE_SPACE - Replace each space character with "&nbsp;".
    */
   public static final Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String value = Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;");
@@ -285,13 +285,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   };
-  
-  
+
+
   /**
    * HTML - Escapes HTML characters & < > replacing them with the corresponding entity.
    */
   public static final Formatter HTML = new BaseFormatter("html", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -300,71 +300,71 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   };
-  
-  
+
+
   /**
    * HTMLTAG - Escapes HTML characters & < > " replacing them with the corresponding entity.
    */
   public static final Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
-  
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
       ctx.setNode(buf.toString());
     }
-  
+
   };
-  
-  
+
+
   /**
    * HTMLATTR - Same as HTMLTAG.
    */
   public static final Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
-  
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
       ctx.setNode(buf.toString());
     }
-  
+
   };
-  
-  
+
+
   /**
    * ITER - Outputs the index of the current array being iterated over.
    */
   public static final Formatter ITER = new BaseFormatter("iter", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       ctx.setNode(ctx.resolve("@index").asText());
     }
 
   };
-  
-  
+
+
   /**
    * JSON - Output a text representation of the node.
    */
   public static final Formatter JSON = new BaseFormatter("json", false) {
-  
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       // NOTE: this is </script> replacement is copied verbatim from the JavaScript
       // version of JSONT, but it seems quite error-prone to me.
       ctx.setNode(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
     }
-  
+
   };
 
-  
+
   /**
    * JSON_PRETTY
    */
   public static final Formatter JSON_PRETTY = new BaseFormatter("json-pretty", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       try {
@@ -384,31 +384,31 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
   };
 
-  
+
   /**
    * OUTPUT
    */
   public static final Formatter OUTPUT = new BaseFormatter("output", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       List<String> values = args.getArgs();
       ctx.setNode(StringUtils.join(values.toArray(), ' '));
     }
-  
+
   };
-  
-  
+
+
   static class PluralizeArgs {
     String singular = "";
     String plural = "s";
   }
-  
+
   /**
    * PLURALIZE - Emit a string based on the plurality of the node.
    */
   public static final Formatter PLURALIZE = new BaseFormatter("pluralize", false) {
-    
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.between(0, 2);
@@ -421,7 +421,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         realArgs.plural = args.get(1);
       }
     }
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       PluralizeArgs realArgs = (PluralizeArgs) args.getOpaque();
@@ -429,13 +429,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       ctx.setNode(result.toString());
     }
   };
-  
-  
+
+
   /**
    * RAW
    */
   public static final Formatter RAW = new BaseFormatter("raw", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       ctx.setNode(ctx.node().toString());
@@ -443,26 +443,26 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
   };
 
-  
+
   /**
    * ROUND
    */
   public static final Formatter ROUND = new BaseFormatter("round", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       long value = Math.round(ctx.node().asDouble());
       ctx.setNode(value);
     }
-  
+
   };
-  
-  
+
+
   /**
    * SAFE
    */
   public static final Formatter SAFE = new BaseFormatter("safe", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
@@ -473,13 +473,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   };
-  
-  
+
+
   /**
    * SMARTYPANTS - Converts plain ASCII quote / apostrophe to corresponding Unicode curly characters.
    */
   public static final Formatter SMARTYPANTS = new BaseFormatter("smartypants", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String str = eatNull(ctx.node());
@@ -493,39 +493,39 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
   };
 
-  
+
   /**
    * SLUGIFY - Turn headline text into a slug.
    */
   public static final Formatter SLUGIFY = new BaseFormatter("slugify", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String result = eatNull(ctx.node());
       ctx.setNode(PluginUtils.slugify(result));
     }
-    
+
   };
-  
-  
+
+
   /**
    * STR - Output a string representation of the node.
    */
   public static final Formatter STR = new BaseFormatter("str", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       ctx.setNode(eatNull(ctx.node()));
     }
 
   };
-  
-  
+
+
   /**
    * TIMESINCE - Outputs a human-readable representation of (now - timestamp).
    */
   public static final Formatter TIMESINCE = new BaseFormatter("timesince", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -543,17 +543,17 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
   };
 
-  
+
   static class TruncateArgs {
     int maxLen = 100;
     String ellipses = "...";
   }
-  
+
   /**
    * TRUNCATE - Chop a string to a given length after the nearest space boundary.
    */
   public static final Formatter TRUNCATE = new BaseFormatter("truncate", false) {
-    
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       TruncateArgs obj = new TruncateArgs();
@@ -569,7 +569,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         obj.ellipses = args.get(1);
       }
     }
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       TruncateArgs obj = (TruncateArgs)args.getOpaque();
@@ -577,14 +577,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       ctx.setNode(value);
     }
   };
-  
-  
+
+
   /**
    * URL_ENCODE - Encode characters which must be escaped in URLs. This
    * will output a hex escape sequence, '/' to %2F, or ' ' to '+'.
    */
   public static final Formatter URL_ENCODE = new BaseFormatter("url-encode", false) {
-    
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       String value = ctx.node().asText();

@@ -36,45 +36,45 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Tracks all of the state needed for executing a template against a given JSON tree.
- * 
+ *
  * Compilation converts the raw text into an instruction tree. This instruction tree
  * is stateless and can be reused across multiple executions.
- * 
+ *
  * The Context is used to carry out a single execution of the template instruction tree.
  * Each execution of a template requires a fresh context object.
  */
 public class Context {
 
   private static final JsonNode DEFAULT_UNDEFINED = MissingNode.getInstance();
-  
+
   private static final String META_LEFT = "{";
-  
+
   private static final String META_RIGHT = "}";
-  
+
   private final ArrayDeque<Frame> stack = new ArrayDeque<>();
 
   private Frame currentFrame;
 
   private JsonNode undefined = DEFAULT_UNDEFINED;
-  
+
   private boolean safeExecution = false;
-  
+
   private List<ErrorInfo> errors;
-  
-  /** 
+
+  /**
    * Reference to the currently-executing instruction. All instruction execution
    * must pass control via the Context, for proper error handling.
    */
   private Instruction currentInstruction;
 
   private JsonNode rawPartials;
-  
+
   private Map<String, Instruction> compiledPartials;
 
   private JsonTemplateEngine compiler;
 
   private LoggingHook loggingHook;
-  
+
   /* Holds the final output of the template execution */
   private StringBuilder buf;
 
@@ -86,30 +86,30 @@ public class Context {
     this.currentFrame = new Frame(node);
     this.buf = buf;
   }
-  
+
   public boolean safeExecutionEnabled() {
     return safeExecution;
   }
-  
+
   public List<ErrorInfo> getErrors() {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
   }
-  
+
   /**
    * Set mode where no exceptions will be thrown; instead
    */
   public void setSafeExecution() {
     this.safeExecution = true;
   }
-  
+
   public CharSequence getMetaLeft() {
     return META_LEFT;
   }
-  
+
   public CharSequence getMetaRight() {
     return META_RIGHT;
   }
-  
+
   /**
    * Sets a compiler to be used for compiling partials. If no compiler is set,
    * partials cannot be compiled and will raise errors.
@@ -117,15 +117,15 @@ public class Context {
   public void setCompiler(JsonTemplateEngine compiler) {
     this.compiler = compiler;
   }
-  
+
   public JsonTemplateEngine getCompiler() {
     return compiler;
   }
-  
+
   public void setLoggingHook(LoggingHook hook) {
     this.loggingHook = hook;
   }
-  
+
   /**
    * Execute a single instruction.
    */
@@ -141,7 +141,7 @@ public class Context {
     } catch (Exception e) {
       String repr = ReprEmitter.get(instruction, false);
       ErrorInfo error = error(UNEXPECTED_ERROR).name(e.getClass().getSimpleName()).data(e.getMessage()).repr(repr);
-      
+
       // In safe mode we don't raise exceptions; just append the error.
       if (safeExecution) {
         addError(error);
@@ -149,12 +149,12 @@ public class Context {
       } else {
         throw new CodeExecuteException(error, e);
       }
-      
+
       // If a logging hook exists, always log the unexpected exception.
       log(e);
     }
   }
-  
+
   /**
    * Execute a list of instructions.
    */
@@ -166,7 +166,7 @@ public class Context {
       execute(inst);
     }
   }
-  
+
   public ErrorInfo error(ExecuteErrorType code) {
     ErrorInfo info = new ErrorInfo(code);
     info.code(code);
@@ -174,7 +174,7 @@ public class Context {
     info.offset(currentInstruction.getCharOffset());
     return info;
   }
-  
+
   /**
    * Lazily allocate the compiled partials cache.
    */
@@ -186,7 +186,7 @@ public class Context {
   /**
    * Returns the root instruction for a compiled partial, assuming the partial exists
    * in the partials map. Compiled partials are cached for reuse within the same
-   * context, since a partial may be applied multiple times within a template, or 
+   * context, since a partial may be applied multiple times within a template, or
    * inside a loop.
    */
   public Instruction getPartial(String name) throws CodeSyntaxException {
@@ -194,7 +194,7 @@ public class Context {
       // Template wants to use a partial but none are defined.
       return null;
     }
-    
+
     // See if we've previously compiled this exact partial.
     Instruction inst = compiledPartials.get(name);
     if (inst == null) {
@@ -207,7 +207,7 @@ public class Context {
         // Should we bother worrying about this, or just cast the node to text?
         return null;
       }
-      
+
       // Compile the partial.  This can throw a syntax exception, which the formatter
       // will catch and nest inside a runtime exception.
       String source = partialNode.asText();
@@ -224,48 +224,48 @@ public class Context {
       } else {
         template = compiler.compile(source);
       }
-      
+
       inst = template.code();
-      
+
       // Cache the compiled template in case it is used more than once.
       compiledPartials.put(name, inst);
     }
     return inst;
   }
-  
+
   public StringBuilder buffer() {
     return buf;
   }
-  
+
   public JsonNode node() {
     return currentFrame.node;
   }
 
   /**
    * Replace the node's value for the current stack frame.  This enables formatters to
-   * chain their output without requiring a change to their interface, e.g. return 
+   * chain their output without requiring a change to their interface, e.g. return
    * value, extra method args, etc.
    */
   public void setNode(JsonNode node) {
     this.currentFrame.node = node;
   }
-  
+
   public void setNode(String value) {
     setNode(new TextNode(value));
   }
-  
+
   public void setNode(int value) {
     setNode(new IntNode(value));
   }
-  
+
   public void setNode(long value) {
     setNode(new LongNode(value));
   }
-  
+
   public void setNode(double value) {
     setNode(new DoubleNode(value));
   }
-  
+
   public boolean initIteration() {
     JsonNode node = node();
     if (!node.isArray()) {
@@ -281,11 +281,11 @@ public class Context {
   public int currentIndex() {
     return currentFrame.currentIndex;
   }
-  
+
   public boolean hasNext() {
     return currentFrame.currentIndex < currentFrame.node.size();
   }
-  
+
   /**
    * Increment the array element pointer for the current frame.
    */
@@ -319,7 +319,7 @@ public class Context {
     }
     push(node);
   }
-  
+
   /**
    * Pushes the next element from the current array node onto the stack.
    */
@@ -330,13 +330,13 @@ public class Context {
     }
     push(node);
   }
-  
+
   public JsonNode resolve(Object name) {
     return lookupStack(name);
   }
 
   /**
-   * Lookup the JSON node referenced by the list of names. 
+   * Lookup the JSON node referenced by the list of names.
    */
   public JsonNode resolve(Object[] names) {
     if (names == null) {
@@ -362,7 +362,7 @@ public class Context {
       loggingHook.log(exc);
     }
   }
-  
+
   private void push(JsonNode node) {
     stack.push(currentFrame);
     currentFrame = new Frame(node);
@@ -387,12 +387,12 @@ public class Context {
     }
     return undefined;
   }
-  
+
   /**
    * Obtain the value for 'name' from the given stack frame's node.
    */
   private JsonNode resolve(Object name, Frame frame) {
-    // Special internal variable @index points to the array index for a 
+    // Special internal variable @index points to the array index for a
     // given stack frame.
     if (name.equals("@index")) {
       if (frame.currentIndex != -1) {
@@ -413,32 +413,32 @@ public class Context {
     }
     return node.path((String) key);
   }
-  
+
   public void addError(ErrorInfo error) {
     if (errors == null) {
       errors = new ArrayList<>();
     }
     errors.add(error);
   }
-  
+
   /**
    * Pop a frame off the stack.
    */
   public void pop() {
     currentFrame = stack.pop();
   }
-  
+
   static class Frame {
-    
+
     JsonNode node;
-    
+
     int currentIndex;
-    
+
     public Frame(JsonNode node) {
       this.node = node;
       this.currentIndex = -1;
     }
-    
+
   }
-  
+
 }

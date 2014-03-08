@@ -65,7 +65,7 @@ public class CodeValidityTest extends UnitTestBase {
     String json = "{\"a\": [{\"b\": 1}, {\"b\": 2}, {\"b\": 3}, {\"b\": 4}]}";
     assertContext(execute(json, root), "234");
   }
-  
+
   @Test
   public void testAlternatesWithSectionOr() throws CodeException {
     CodeBuilder cb = builder().repeated("a").alternatesWith().section("@").var("@").end();
@@ -73,14 +73,14 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"a\": [1,2,3]}", root), "23");
     assertContext(execute("{}", root), "x");
   }
-  
+
   @Test
   public void testAlternatesWithOr() throws CodeException {
     RootInst root = builder().repeated("a").text("A").alternatesWith().text("-").or().text("B").end().eof().build();
     assertContext(execute("{\"a\": [1,2,3]}", root), "A-A-A");
     assertContext(execute("{}", root), "B");
   }
-  
+
   @Test
   public void testComments() throws CodeException {
     RootInst root = builder().comment("foo").mcomment("bar\nbaz").eof().build();
@@ -90,19 +90,19 @@ public class CodeValidityTest extends UnitTestBase {
   @Test
   public void testIfExpression() throws CodeException {
     CodeMaker mk = maker();
-    
+
     // AND TESTS
-    
+
     CodeBuilder cb = builder().ifexpn(mk.strlist("a", "b"), mk.oplist(Operator.LOGICAL_AND));
     RootInst root = cb.text("A").or().text("B").end().eof().build();
-    
+
     assertContext(execute("{\"a\": 1, \"b\": 3.14159}", root), "A");
     assertContext(execute("{\"a\": true, \"b\": \"Bill\"}", root), "A");
-    
+
     assertContext(execute("{\"a\": 1}", root), "B");
     assertContext(execute("{\"a\": true, \"b\": false}", root), "B");
     assertContext(execute("{}", root), "B");
-    
+
     // Index into nested arrays.
     cb = builder().ifexpn(mk.strlist("a.0.b", "a.1.b"), mk.oplist(Operator.LOGICAL_AND));
     root = cb.text("A").or().text("B").end().eof().build();
@@ -110,16 +110,16 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"a\": [{\"b\": 3.14}, {\"b\": \"hi\"}]}", root), "A");
     assertContext(execute("{\"a\": [{\"b\": null}, {\"b\": true}]}", root), "B");
     assertContext(execute("{\"a\": [{\"b\": \"\"}, {\"b\": true}]}", root), "B");
-    
+
     root = builder().ifexpn(mk.strlist("a"), mk.oplist()).text("A").end().eof().build();
     assertContext(execute("{\"a\": 1}", root), "A");
     assertContext(execute("{}", root), "");
-    
+
     // OR TESTS
 
     cb = builder().ifexpn(mk.strlist("a", "b", "c"), mk.oplist(Operator.LOGICAL_OR, Operator.LOGICAL_OR));
     root = cb.text("A").or().text("B").end().eof().build();
-    
+
     assertContext(execute("{\"a\": true}", root), "A");
     assertContext(execute("{\"b\": \"Bill\"}", root), "A");
     assertContext(execute("{\"c\": 3.14159}", root), "A");
@@ -132,7 +132,7 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"c\": false}", root), "B");
     assertContext(execute("{\"c\": false, \"b\": 0}", root), "B");
   }
-  
+
   @Test
   public void testIfExpressionVars() throws CodeException {
     CodeMaker mk = maker();
@@ -144,7 +144,7 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"a\": {\"b\": 1}}", root), "A");
     assertContext(execute("{\"a\": {\"b\": 0, \"c\": true}}", root), "A");
     assertContext(execute("{\"a\": {\"c\": 1}}", root), "A");
-    
+
     // False cases
     assertContext(execute("{\"a\": {}}", root), "B");
     assertContext(execute("{\"a\": {\"b\": 0}}", root), "B");
@@ -164,7 +164,7 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{\"a\": 0}", root), "");
     assertContext(execute("{\"a\": 0, \"b\": \"B\"}", root), "B");
   }
-  
+
   @Test
   public void testIfPredicate() throws CodeException {
     CodeBuilder cb = builder();
@@ -173,29 +173,29 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("1", root), "B");
     assertContext(execute("0", root), "C");
   }
-  
+
   @Test
   public void testPredicate() throws CodeException {
     CodeBuilder cb = builder().section("@").predicate(PLURAL).text("A");
     cb.or(CorePredicates.SINGULAR).text("B");
     cb.or().text("C").end(); // end or
     cb.end(); // section
-    
+
     RootInst root = cb.eof().build();
     assertEquals(repr(root), "{.section @}{.plural?}A{.or singular?}B{.or}C{.end}{.end}");
-    
+
     assertContext(execute("174", root), "A");
     assertContext(execute("174.35", root), "A");
     assertContext(execute("1", root), "B");
     assertContext(execute("1.0", root), "B");
-    
+
     // zero is false-y, so entire section is skipped
     assertContext(execute("0", root), "");
   }
-  
+
   @Test
   public void testOrWithSection() throws CodeException {
-    // This construction makes almost no sense but is possible in the language, 
+    // This construction makes almost no sense but is possible in the language,
     // so adding it for coverage.
     RootInst root = builder().section("@").or().predicate(PLURAL).or().text("A").var("@").end().end().eof().build();
     assertEquals(repr(root), "{.section @}{.or}{.plural?}{.or}A{@}{.end}{.end}");
@@ -208,17 +208,17 @@ public class CodeValidityTest extends UnitTestBase {
     assertInvalid(DEAD_CODE_BLOCK, mk.predicate(PLURAL), mk.text("A"), mk.or(), mk.text("B"), mk.or());
     assertInvalid(EOF_IN_BLOCK, mk.predicate(PLURAL), mk.eof());
   }
-  
+
   @Test
   public void testRepeated() throws CodeException {
     String jsonData = "{\"foo\": [0, 0, 0]}";
     RootInst root = builder().repeated("foo").text("1").var("@").alternatesWith().text("-").end().eof().build();
     assertContext(execute(jsonData, root), "10-10-10");
-    
+
     root = builder().repeated("bar").text("1").end().eof().build();
     assertContext(execute("{}", root), "");
   }
-  
+
   @Test
   public void testRepeatedOr() throws CodeException {
     String jsonData = "{\"a\": [0, 0, 0]}";
@@ -228,7 +228,7 @@ public class CodeValidityTest extends UnitTestBase {
     jsonData = "{\"b\": [0, 0, 0]}";
     assertContext(execute(jsonData, root), "X");
   }
-  
+
   @Test
   public void testRepeatedIndex() throws CodeException {
     String jsonData = "{\"foo\": [\"A\", \"B\", \"C\"]}";
@@ -237,7 +237,7 @@ public class CodeValidityTest extends UnitTestBase {
     RootInst root = cb.build();
     // @index is 1-based
     assertContext(execute(jsonData, root), "A1.B2.C3");
-    
+
     jsonData = "{\"a\": [\"x\", \"y\"]}";
     cb = builder();
     cb.repeated("a").var("@").section("@").var("@").var("@index").end().alternatesWith().text(".").end().eof();
@@ -258,19 +258,19 @@ public class CodeValidityTest extends UnitTestBase {
     assertContext(execute("{}", root), "B");
     assertContext(execute("{\"foo\": {\"bar\": 1}}", root), "1");
   }
-  
+
   @Test
   public void testSectionScope() throws CodeException {
     RootInst root = builder().section("a").var("a").or().var("b").end().eof().build();
     assertContext(execute("{\"a\": 1, \"b\": \"B\"}", root), "1");
     assertContext(execute("{\"a\": 0, \"b\": \"B\"}", root), "B");
   }
-  
+
   @Test
   public void testText() throws CodeException  {
     RootInst root = builder().text("foo").text("bar").eof().build();
     assertContext(execute("{}", root), "foobar");
-    
+
     root = builder().eof().build();
     assertContext(execute("{}", root), "");
   }
@@ -280,12 +280,12 @@ public class CodeValidityTest extends UnitTestBase {
     RootInst root = builder().var("foo").var("bar").eof().build();
     assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "12");
   }
-  
+
   @Test
   public void testVariableFormatters() throws CodeException {
     RootInst root = builder().var("a", CoreFormatters.SAFE).eof().build();
     assertContext(execute("{\"a\": \"x <> y\"}", root), "x  y");
-    
+
     // Chain formatters together.
     CodeMaker mk = maker();
     Arguments args = mk.args(" 5");
@@ -301,7 +301,7 @@ public class CodeValidityTest extends UnitTestBase {
     assertInvalid(DEAD_CODE_BLOCK, mk.predicate(PLURAL), mk.text("A"), mk.or(), mk.text("B"), mk.or());
     assertInvalid(DEAD_CODE_BLOCK, mk.repeated("@"), mk.text("A"), mk.alternates(), mk.or(), mk.or());
   }
-  
+
   @Test
   public void testEOFInBlock() {
     CodeMaker mk = maker();
@@ -316,20 +316,20 @@ public class CodeValidityTest extends UnitTestBase {
     assertInvalid(EOF_IN_BLOCK, mk.section("a"), mk.or(PLURAL), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.repeated("@"), mk.alternates(), mk.eof());
   }
-  
+
   @Test
   public void testUnexpectedInstructions() {
     CodeMaker mk = maker();
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.or());
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.or(SINGULAR));
     assertInvalid(NOT_ALLOWED_AT_ROOT, mk.alternates());
-    
+
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("@"), mk.or(), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.section("a"), mk.or(), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.predicate(PLURAL), mk.alternates());
     assertInvalid(NOT_ALLOWED_IN_BLOCK, mk.repeated("@"), mk.alternates(), mk.alternates());
   }
-  
+
   private void assertInvalid(SyntaxErrorType type, Instruction... instructions) {
     try {
       CodeBuilder cb = builder();
@@ -341,5 +341,5 @@ public class CodeValidityTest extends UnitTestBase {
       assertEquals(e.getErrorInfo().getType(), type);
     }
   }
-  
+
 }

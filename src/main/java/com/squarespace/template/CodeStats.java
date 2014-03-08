@@ -32,11 +32,11 @@ public class CodeStats implements CodeSink {
   private Counter<InstructionType> instructionCounter;
 
   private Counter<String> formatterCounter;
-  
+
   private Counter<String> predicateCounter;
 
   private int totalInstructions;
-  
+
   public CodeStats() {
     this.instructionCounter = new Counter<>();
     this.formatterCounter = new Counter<>();
@@ -50,7 +50,7 @@ public class CodeStats implements CodeSink {
       InstructionType type = inst.getType();
       instructionCounter.increment(type);
       switch (type) {
-        
+
         case PREDICATE:
         case OR_PREDICATE:
           Predicate predicate = ((PredicateInst)inst).getPredicate();
@@ -58,34 +58,34 @@ public class CodeStats implements CodeSink {
             predicateCounter.increment(predicate.getIdentifier());
           }
           break;
-          
+
         case IF:
           if (inst instanceof IfPredicateInst) {
             predicateCounter.increment(((IfPredicateInst)inst).getPredicate().getIdentifier());
           }
           break;
-          
+
         case VARIABLE:
           for (FormatterCall formatter : ((VariableInst)inst).getFormatters()) {
             formatterCounter.increment(formatter.getFormatter().getIdentifier());
           }
           break;
-          
+
         default:
           break;
       }
     }
   }
-  
+
   @Override
   public void complete() {
-    
+
   }
-  
+
   public int getTotalInstructions() {
     return totalInstructions;
   }
-  
+
   public Map<InstructionType, Integer> getInstructionCounts() {
     return instructionCounter.getMap();
   }
@@ -93,16 +93,16 @@ public class CodeStats implements CodeSink {
   public Map<String, Integer> getFormatterCounts() {
     return formatterCounter.getMap();
   }
-  
+
   public Map<String, Integer> getPredicateCounts() {
     return predicateCounter.getMap();
   }
-  
-  
+
+
   private static class Counter<K> {
 
     private Map<K, Integer> map = new HashMap<>();
-    
+
     public void increment(K key) {
       Integer val = map.get(key);
       if (val == null) {
@@ -112,7 +112,7 @@ public class CodeStats implements CodeSink {
         map.put(key, val + 1);
       }
     }
-    
+
     public Map<K, Integer> getMap() {
       return map;
     }

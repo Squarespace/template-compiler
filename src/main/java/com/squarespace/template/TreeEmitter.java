@@ -26,7 +26,7 @@ import com.squarespace.template.Instructions.RepeatedInst;
  * purposes.
  */
 public class TreeEmitter {
-  
+
   private TreeEmitter() {
   }
 
@@ -35,7 +35,7 @@ public class TreeEmitter {
     emit(inst, 0, buf);
     return buf.toString();
   }
-  
+
   public static void emit(Instruction inst, int depth, StringBuilder buf) {
     if (inst == null) {
       indent(depth, buf);
@@ -43,7 +43,7 @@ public class TreeEmitter {
       return;
     }
     InstructionType type = inst.getType();
-    if (!type.equals(InstructionType.ROOT)) { 
+    if (!type.equals(InstructionType.ROOT)) {
       indent(depth, buf);
       buf.append(type.toString());
       buf.append('\n');
@@ -58,7 +58,7 @@ public class TreeEmitter {
         emitConsequent((BlockInstruction) inst, depth + 2, buf);
         emitAlternative((BlockInstruction) inst, depth + 2, buf);
         break;
-        
+
       case REPEATED:
         emitConsequent((BlockInstruction) inst, depth + 2, buf);
         emitAlternatesWith((RepeatedInst) inst, depth + 2, buf);
@@ -72,7 +72,7 @@ public class TreeEmitter {
         break;
     }
   }
-  
+
   private static void emitConsequent(BlockInstruction block, int depth, StringBuilder buf) {
     indent(depth, buf);
     buf.append("L:\n");
@@ -85,13 +85,13 @@ public class TreeEmitter {
     emitBlock(inst.getAlternatesWith().getConsequent(), depth + 2, buf);
     emit(inst.getAlternatesWith().getAlternative(), depth + 2, buf);
   }
-  
+
   private static void emitAlternative(BlockInstruction block, int depth, StringBuilder buf) {
     indent(depth, buf);
     buf.append("R:\n");
     emit(block.getAlternative(), depth + 2, buf);
   }
-  
+
   private static void emitBlock(Block block, int depth, StringBuilder buf) {
     if (block == null) {
       indent(depth, buf);
@@ -100,7 +100,7 @@ public class TreeEmitter {
     }
     emit(block.getInstructions(), depth, buf);
   }
-  
+
   private static void emit(List<Instruction> instructions, int depth, StringBuilder buf) {
     if (instructions == null) {
       indent(depth, buf);
@@ -111,7 +111,7 @@ public class TreeEmitter {
       emit(inst, depth, buf);
     }
   }
-  
+
   private static void indent(int depth, StringBuilder buf) {
     for (int i = 0; i < depth; i++) {
       buf.append(' ');

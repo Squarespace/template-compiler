@@ -23,40 +23,40 @@ import java.util.List;
 /**
  * A BlockInstruction contains a primary list of nested instructions, called the consequent,
  * and a single alternative instruction.
- * 
+ *
  * A conditional block (PredicateInst, IfInst) executes the consequent when the
- * condition is true, and the alternative is executed when the condition is false. 
- * 
+ * condition is true, and the alternative is executed when the condition is false.
+ *
  * A RepeatedInst just executes its consequent multiple times.
  */
 abstract class BlockInstruction extends BaseInstruction {
 
   protected Block consequent;
-  
+
   protected Instruction alternative;
-  
+
   public BlockInstruction(int consequentsLen) {
     consequent = new Block(consequentsLen);
   }
-  
+
   public Block getConsequent() {
     return consequent;
   }
-  
+
   /**
    * Set the instruction to execute instead of the consequents.
-   * 
+   *
    * For non-conditional blocks, like section, the alternate is simply the END
    * instruction, indicating a successful and complete parse of the section.
    */
   public void setAlternative(Instruction inst) {
     alternative = inst;
   }
-  
+
   public Instruction getAlternative() {
     return alternative;
   }
-  
+
   protected boolean variableListEquals(List<Object[]> t1, List<Object[]> t2) {
     if (t1 == null) {
       return (t2 == null);
@@ -75,7 +75,7 @@ abstract class BlockInstruction extends BaseInstruction {
     }
     return false;
   }
-  
+
   protected boolean blockEquals(BlockInstruction other) {
     boolean res = (consequent == null) ? (other.consequent == null) : consequent.equals(other.consequent);
     if (!res) {
@@ -83,7 +83,7 @@ abstract class BlockInstruction extends BaseInstruction {
     }
     return (alternative == null) ? (other.alternative == null) : alternative.equals(other.alternative);
   }
-  
+
   /** Helper equals() method to simplify null checking. */
   protected static boolean equals(Instruction i1, Instruction i2) {
     return (i1 == null) ? (i2 == null) : i1.equals(i2);

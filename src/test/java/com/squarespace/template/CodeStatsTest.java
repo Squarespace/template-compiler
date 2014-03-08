@@ -44,7 +44,7 @@ public class CodeStatsTest extends UnitTestBase {
     assertEquals(stats.getTotalInstructions(), 6);
     assertEquals((int)stats.getFormatterCounts().get("invalid-args"), 2);
     assertEquals((int)stats.getPredicateCounts().get("execute-error?"), 3);
-    
+
     assertEquals((int)stats.getInstructionCounts().get(IF), 1);
     assertEquals((int)stats.getInstructionCounts().get(VARIABLE), 2);
     assertEquals((int)stats.getInstructionCounts().get(TEXT), 1);

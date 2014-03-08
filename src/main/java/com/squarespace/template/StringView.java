@@ -21,43 +21,43 @@ package com.squarespace.template;
  * Tracks the location of a subsequence in a parent String. Used to avoid excessive copies
  * of Strings when processing templates, as they will consist of large blocks of characters
  * which are simply copied verbatim to the output.
- * 
+ *
  * For example, replace this:
- * 
+ *
  *   String s1 = "template data";
  *   String s2 = s1.substring(1, 4);
  *    ...
  *   StringBuffer buffer = new StringBuffer();
  *   buf.append(s2);
- *   
+ *
  * with this:
- * 
+ *
  *   String s1 = "template data";
  *   StringView s2 = new StringView(s1, 1, 4);
  *    ...
  *   StringBuffer buffer = new StringBuffer();
  *   buf.append(s2.getData(), s2.start(), s2.end());
- *   
- * Speeds things up by about 20-30%, depending on sequence length, and for the JSONT 
+ *
+ * Speeds things up by about 20-30%, depending on sequence length, and for the JSONT
  * engine greatly reduces the creation of intermediate String/char[] objects, thus
  * reducing pressure on the garbage collector.
  */
 public class StringView implements CharSequence {
-  
+
   private final String str;
-  
+
   private final int start;
 
   private final int end;
-  
+
   private int hashVal;
-  
+
   private String repr;
-  
+
   public StringView(String data) {
     this(data, 0, data.length());
   }
-  
+
   public StringView(String str, int start, int end) {
     this.str = str;
     this.start = Math.max(start, 0);
@@ -67,19 +67,19 @@ public class StringView implements CharSequence {
   public String data() {
     return str;
   }
-  
+
   public int start() {
     return this.start;
   }
-  
+
   public int end() {
     return this.end;
   }
-  
+
   public char lastChar() {
     return str.charAt(end - 1);
   }
-  
+
   /**
    * This creates an instance with a different window over the same string,
    */
@@ -98,7 +98,7 @@ public class StringView implements CharSequence {
   public String toString() {
     return repr();
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof StringView)) {
@@ -142,7 +142,7 @@ public class StringView implements CharSequence {
     return hashVal;
   }
 
-  
+
   @Override
   public int length() {
     return end - start;
@@ -157,5 +157,5 @@ public class StringView implements CharSequence {
   public CharSequence subSequence(int start, int end) {
     return subview(start, end);
   }
-    
+
 }

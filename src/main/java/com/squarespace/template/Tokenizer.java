@@ -49,11 +49,11 @@ import com.squarespace.template.Instructions.PredicateInst;
 /**
  * Tokenizes characters into instructions, expressing all rules for well-formed
  * combinations of instructions.
- * 
+ *
  * The Tokenizer is also responsible for the internal composition of an instruction,
  * where the CodeMachine is responsible for the overall composition of instructions
  * into an executable form.
- * 
+ *
  * If a potential instruction sequence cannot be parsed into an instruction, the
  * degree to which it matches an instruction pattern is an important factor in
  * whether to throw an error or emit the invalid instruction sequence as plain text.
@@ -61,46 +61,46 @@ import com.squarespace.template.Instructions.PredicateInst;
 public class Tokenizer {
 
   private final static int IF_VARIABLE_LIMIT = 5;
-  
+
   private final String raw;
 
   private final int length;
-  
+
   private final CodeSink sink;
 
   private final PredicateTable predicateTable;
-  
+
   private final FormatterTable formatterTable;
-  
+
   private final TokenMatcher matcher;
-  
+
   private final CodeMaker maker;
 
   private State state;
 
   private List<ErrorInfo> errors;
-  
+
   boolean validate = false;
-  
+
   private int textLine;
-  
+
   private int textOffset;
 
   private int instLine;
-  
+
   private int instOffset;
-  
+
   private int index = 0;
 
   private int save = 0;
-  
+
   private int metaLeft = -1;
-  
+
   private int lineCounter = 0;
-  
+
   private int lineIndex = 0;
 
-  
+
   public Tokenizer(String raw, CodeSink sink, FormatterTable formatterTable, PredicateTable predicateTable) {
     this.raw = raw;
     this.length = raw.length();
@@ -111,7 +111,7 @@ public class Tokenizer {
     this.maker = new CodeMaker();
     this.state = state_INITIAL;
   }
-  
+
   public boolean consume() throws CodeSyntaxException {
     do {
       state = state.transition();
@@ -130,29 +130,29 @@ public class Tokenizer {
       this.errors = new ArrayList<>(4);
     }
   }
-  
+
   public List<ErrorInfo> getErrors() {
     if (errors == null) {
       errors = new ArrayList<ErrorInfo>(0);
     }
     return errors;
   }
-  
+
   private char getc(int index) {
     return (index < length) ? raw.charAt(index) : Patterns.EOF_CHAR;
   }
-  
+
   private void emitInstruction(Instruction inst) throws CodeSyntaxException {
     inst.setLineNumber(instLine + 1);
     inst.setCharOffset(instOffset + 1);
     sink.accept(inst);
   }
-  
+
   private boolean emitInvalid() throws CodeSyntaxException {
     sink.accept(maker.text(new StringView(raw, matcher.start()-1, matcher.end()+1)));
     return true;
   }
-  
+
   /**
    * Text line numbering is tracked separately from other instructions.
    */
@@ -166,7 +166,7 @@ public class Tokenizer {
   private ErrorInfo error(SyntaxErrorType code) {
     return error(code, 0, false);
   }
-  
+
   private ErrorInfo error(SyntaxErrorType code, boolean textLoc) {
     return error(code, 0, textLoc);
   }
@@ -187,28 +187,28 @@ public class Tokenizer {
     }
     return info;
   }
-  
+
   private void fail(ErrorInfo info) throws CodeSyntaxException {
     if (!validate) {
       throw new CodeSyntaxException(info);
     }
     errors.add(info);
   }
-  
+
   /**
    * Attempt to parse the meta-delimited chars into an Instruction. The start parameter must
    * point to the location of a '{' character in the raw string.  The end parameter must
    * point 1 character past a '}' character in the raw string, and start must be < end.
-   * 
+   *
    * Depending on how the parse fails, this may throw a syntax exception. It all depends
-   * on the degree of ambiguity. 
-   * 
-   * For example if the starting sequence for an instruction is found and the rest is 
+   * on the degree of ambiguity.
+   *
+   * For example if the starting sequence for an instruction is found and the rest is
    * invalid, we may throw syntax error.  Instead, if the parse is clearly not an instruction
-   * candidate we ignore the entire sequence and emit a text instruction. An example of 
+   * candidate we ignore the entire sequence and emit a text instruction. An example of
    * the latter is if the first character inside the META_LEFT is whitespace.  We require
    * that instructions begin immediately following the META_LEFT character.
-   * 
+   *
    * Package-private to facilitate unit testing.
    */
   private boolean matchMeta(int start, int end) throws CodeSyntaxException {
@@ -217,13 +217,13 @@ public class Tokenizer {
     }
     int innerStart = start + 1;
     int innerEnd = end - 1;
-    
+
     // Emit a comment, skipping over the "#".
     if (getc(innerStart) == '#') {
       emitInstruction(maker.comment(raw, innerStart + 1, innerEnd));
       return true;
     }
-    
+
     // Start token matching everything between '{' and '}'
     matcher.region(innerStart, innerEnd);
 
@@ -237,7 +237,7 @@ public class Tokenizer {
     if (!matcher.keyword()) {
       return false;
     }
-    
+
     StringView keyword = matcher.consume();
     if (keyword.lastChar() == '?') {
       Predicate predicate = resolvePredicate(keyword.subview(1, keyword.length()));
@@ -248,7 +248,7 @@ public class Tokenizer {
       emitInstruction(maker.predicate(predicate, args));
       return true;
     }
-    
+
     InstructionType type = InstructionTable.get(keyword);
     if (type == null) {
       fail(error(INVALID_INSTRUCTION).data(keyword));
@@ -256,7 +256,7 @@ public class Tokenizer {
     }
     return parseInstruction(type, matcher.pointer(), matcher.end());
   }
-  
+
   /**
    * We've found the start of an instruction. Parse the rest of the range.
    */
@@ -281,7 +281,7 @@ public class Tokenizer {
         }
         emitInstruction(maker.alternates());
         return true;
-        
+
       case END:
       case META_LEFT:
       case META_RIGHT:
@@ -298,7 +298,7 @@ public class Tokenizer {
 
       case IF:
         return parseIfExpression();
-        
+
       case OR_PREDICATE:
         if (matcher.space()) {
           matcher.consume();
@@ -325,16 +325,16 @@ public class Tokenizer {
         }
         emitInstruction(maker.or());
         return true;
-        
+
       case REPEATED:
       case SECTION:
         return parseSection(type);
-        
+
       default:
         throw new RuntimeException("Resolution failure: instruction type '" + type + "' has no text representation.");
     }
   }
-  
+
   /**
    * Lookup the keyword in the predicate table, raise an error if unknown.
    */
@@ -367,7 +367,7 @@ public class Tokenizer {
     } else {
       args = new Arguments(rawArgs);
     }
-    
+
     try {
       predicate.validateArgs(args);
     } catch (ArgumentsException e) {
@@ -377,10 +377,10 @@ public class Tokenizer {
     }
     return args;
   }
-  
+
   /**
    * Parse boolean expression inside an IF instruction.
-   * 
+   *
    * NOTE: This does not currently enforce one type of boolean operator in the expression, so you
    * can mix OR with AND if you want, but there is no operator precedence or parenthesis so the
    * result may not be what was expected.
@@ -391,7 +391,7 @@ public class Tokenizer {
       return emitInvalid();
     }
     matcher.consume();
-    
+
     // First, check if this is a predicate expression. If so, parse it.
     if (matcher.predicate()) {
       Predicate predicate = resolvePredicate(matcher.consume());
@@ -402,7 +402,7 @@ public class Tokenizer {
       emitInstruction(maker.ifpred(predicate, args));
       return true;
     }
-    
+
     // Otherwise, this is an expression involving variable tests and operators.
     // If we find N variables, we'll need N-1 operators.
     List<String> vars = new ArrayList<>();
@@ -413,7 +413,7 @@ public class Tokenizer {
       if (matcher.whitespace()) {
         matcher.consume();
       }
-      
+
       if (count == IF_VARIABLE_LIMIT) {
         fail(error(IF_TOO_MANY_VARS).limit(IF_VARIABLE_LIMIT));
         return emitInvalid();
@@ -423,14 +423,14 @@ public class Tokenizer {
       if (!matcher.operator()) {
         break;
       }
-      
+
       Operator op = matcher.consume().repr().equals("&&") ? Operator.LOGICAL_AND : Operator.LOGICAL_OR;
       ops.add(op);
       if (matcher.whitespace()) {
         matcher.consume();
       }
     }
-    
+
     if (!matcher.finished()) {
       fail(error(IF_EXPECTED_VAROP).data(matcher.remainder()));
       return emitInvalid();
@@ -443,17 +443,17 @@ public class Tokenizer {
       fail(error(IF_TOO_MANY_OPERATORS));
       return emitInvalid();
     }
-    
+
     emitInstruction(maker.ifexpn(vars, ops));
     return true;
   }
-  
+
   /**
    * Parse a SECTION or REPEATED instruction:
-   * 
+   *
    *   ".section" VARIABLE
    *   ".repeated section" VARIABLE
-   * 
+   *
    */
   private boolean parseSection(InstructionType type) throws CodeSyntaxException {
     if (!matcher.whitespace()) {
@@ -461,7 +461,7 @@ public class Tokenizer {
       return emitInvalid();
     }
     matcher.consume();
-    
+
     if (type == InstructionType.REPEATED) {
       if (!matcher.wordSection()) {
         fail(error(MISSING_SECTION_KEYWORD).data(matcher.remainder()));
@@ -474,7 +474,7 @@ public class Tokenizer {
       }
       matcher.consume();
     }
-    
+
     if (!matcher.variable()) {
       fail(error(VARIABLE_EXPECTED).data(matcher.remainder()));
       return emitInvalid();
@@ -503,13 +503,13 @@ public class Tokenizer {
     }
     int start = matcher.matchStart();
     StringView variable = matcher.consume();
-    
+
     List<FormatterCall> formatters = null;
     while (matcher.pipe()) {
-      
+
       // We have one or more formatters plus optional arguments to parse.
       matcher.consume();
-      
+
       if (!matcher.formatter()) {
         fail(error(FORMATTER_INVALID, matcher.pointer() - start, false).name(matcher.remainder()));
         return emitInvalid();
@@ -520,12 +520,12 @@ public class Tokenizer {
         fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(matcher.remainder()));
         return emitInvalid();
       }
-      
+
       StringView rawArgs = null;
       if (matcher.arguments()) {
         rawArgs = matcher.consume();
       }
-      
+
       Arguments args = null;
       if (rawArgs == null) {
         if (formatter.requiresArgs()) {
@@ -536,7 +536,7 @@ public class Tokenizer {
       } else {
         args = new Arguments(rawArgs);
       }
-      
+
       try {
         formatter.validateArgs(args);
       } catch (ArgumentsException e) {
@@ -544,7 +544,7 @@ public class Tokenizer {
         fail(error(FORMATTER_ARGS_INVALID, matcher.matchStart() - start, false).name(identifier).data(e.getMessage()));
         return emitInvalid();
       }
-      
+
       if (formatters == null) {
         formatters = new ArrayList<>(2);
       }
@@ -554,7 +554,7 @@ public class Tokenizer {
     if (!matcher.finished()) {
       return false;
     }
-    
+
     if (formatters == null) {
       emitInstruction(maker.var(variable.repr()));
     } else {
@@ -569,14 +569,14 @@ public class Tokenizer {
    * of text / instructions.
    */
   private final State state_INITIAL = new State() {
-    
+
     @Override
     public State transition() throws CodeSyntaxException {
 
       while (true) {
         char ch = getc(index);
         switch (ch) {
-          
+
           case EOF_CHAR:
             // Input is finished. See if we have any text left to flush.
             if (save < length) {
@@ -587,13 +587,13 @@ public class Tokenizer {
             instOffset = index - lineIndex;
             emitInstruction(maker.eof());
             return state_EOF;
-          
+
           case NEWLINE_CHAR:
             // Keep track of which line we're currently on.
             lineCounter++;
             lineIndex = index + 1;
             break;
-            
+
           case META_LEFT_CHAR:
             instLine = lineCounter;
             instOffset = index - lineIndex;
@@ -604,20 +604,20 @@ public class Tokenizer {
               if (save < index) {
                 emitText(save, index);
               }
-              
+
               index += 3;
               return state_MULTILINE_COMMENT;
             }
-            
+
             // Skip over duplicate META_LEFT characters until we find the last one
             // before the corresponding META_RIGHT.
             metaLeft = index;
             break;
-            
+
           case META_RIGHT_CHAR:
             // We found the right-hand boundary of a potential instruction.
             if (metaLeft != -1) {
-              
+
               // Flush the text leading up to META_RIGHT, then attempt to parse the instruction.
               if (save < metaLeft) {
                 emitText(save, metaLeft);
@@ -633,20 +633,20 @@ public class Tokenizer {
               // Not an instruction candidate. Treat the entire sequence up to META_RIGHT as plain text.
               emitText(save, index + 1);
             }
-            
+
             // Set starting line of next instruction.
             textLine = lineCounter;
             textOffset = index + 1 - lineIndex;
             save = index + 1;
             break;
         }
-        
+
         index++;
       }
     }
-    
+
   };
-  
+
   /**
    * MULTILINE COMMENT state.  {## ... ##}
    */
@@ -662,12 +662,12 @@ public class Tokenizer {
             emitInstruction(maker.mcomment(raw, start, index));
             fail(error(SyntaxErrorType.EOF_IN_COMMENT, true));
             return state_EOF;
-          
+
           case NEWLINE_CHAR:
             lineCounter++;
             lineIndex = index + 1;
             break;
-            
+
           case POUND_CHAR:
             // Look-ahead for ##} sequence to terminate the comment block.
             if (getc(index + 1) == POUND_CHAR && getc(index + 2) == META_RIGHT_CHAR) {
@@ -675,35 +675,35 @@ public class Tokenizer {
               // Skip over multi-line suffix.
               index += 3;
               save = index;
-              
+
               // Return to outer state.
               return state_INITIAL;
             }
             break;
         }
-        
+
         index++;
       }
     }
   };
-  
+
   /**
    * Terminal state when EOF on the input is reached.
    */
   private final State state_EOF = new State() {
-    
+
     @Override
     public State transition() throws CodeSyntaxException {
       throw new RuntimeException("Tokenizer should never try to transition from the EOF state. "
           + "This is either a bug in the state machine or perhaps a tokenizer instance was reused.");
     }
-    
+
   };
-  
+
   interface State {
-    
+
     public State transition() throws CodeSyntaxException;
-    
+
   }
-  
+
 }

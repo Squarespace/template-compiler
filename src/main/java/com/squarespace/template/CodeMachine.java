@@ -46,29 +46,29 @@ import com.squarespace.template.Instructions.RootInst;
  * State machine which accepts instructions and assembles them into a valid tree.
  * This class captures all rules for how instructions can be composed to form a
  * well-formed executable instruction tree.
- * 
+ *
  * Each state represents a scope within the template. Each scope consists of
  * one or more instructions which execute if the branching condition is true.
- * 
+ *
  * Some block instructions also have a single alternative instruction which is taken
  * if the branching condition is false.
  */
 public class CodeMachine implements CodeSink {
 
   private final Deque<Instruction> stack = new ArrayDeque<>();
-  
+
   private State state;
 
   private RootInst root;
-  
+
   private List<ErrorInfo> errors;
-  
+
   private boolean validate = false;
-  
+
   private Instruction current;
-  
+
   private int instructionCount;
-  
+
   public CodeMachine() {
     this.root = new RootInst();
     this.current = root;
@@ -81,11 +81,11 @@ public class CodeMachine implements CodeSink {
   public RootInst getCode() {
     return root;
   }
-  
+
   public List<ErrorInfo> getErrors() {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
   }
-  
+
   public void setValidate() {
     this.validate = true;
     if (this.errors == null) {
@@ -95,17 +95,17 @@ public class CodeMachine implements CodeSink {
 
   /**
    * Once the assembly is complete, verify that we're back at the root node, e.g. all opened
-   * scopes have been properly closed. If not, there may be a bug in the state machine. 
-   * This is a sanity check to ensure that the state machine always reaches the final, 
+   * scopes have been properly closed. If not, there may be a bug in the state machine.
+   * This is a sanity check to ensure that the state machine always reaches the final,
    * expected state.
    */
   public void complete() {
     if (validate) {
-      // When errors occur in validation mode we will almost certainly see the machine in a bad state. 
+      // When errors occur in validation mode we will almost certainly see the machine in a bad state.
       // Any relevant errors will have already been captured, so just return.
       return;
     }
-    
+
     // These should never happen when the machine is driven by the tokenizer, since it always
     // (or should always) feed EOF as the final instruction.  The individual states should handle
     // EOF and raise the appropriate error, if any.
@@ -118,11 +118,11 @@ public class CodeMachine implements CodeSink {
           + "(bad test?) or (b) the state machine has a bug.");
     }
   }
-  
+
   public int getInstructionCount() {
     return instructionCount;
   }
-  
+
   /**
    * Accept one or more instructions and either push them onto the stack or allow
    * the current state to process each one, and conditionally transitions to a new state.
@@ -130,7 +130,7 @@ public class CodeMachine implements CodeSink {
   public void accept(Instruction ... instructions) throws CodeSyntaxException {
     for (Instruction inst : instructions) {
       switch (inst.getType()) {
-  
+
         // These block instructions open a new scope, so they can occur in any state,
         // We handle them here to shorten the switch bodies of the individual states.
         case IF:
@@ -139,7 +139,7 @@ public class CodeMachine implements CodeSink {
         case SECTION:
           state = pushConsequent(inst);
           break;
-          
+
         default:
           state = state.transition(inst);
       }
@@ -158,14 +158,14 @@ public class CodeMachine implements CodeSink {
 
   /**
    * Just modify the instruction stack. Exists to support special block instructions
-   * like ALTERNATES_WITH. 
+   * like ALTERNATES_WITH.
    */
   private State push(Instruction inst) {
     stack.push(current);
     current = inst;
     return stateFor(inst);
   }
-  
+
   /**
    * Pop a block instruction off the stack.  The stack should never return null,
    * and this is enforced by the state machine.
@@ -179,14 +179,14 @@ public class CodeMachine implements CodeSink {
     }
     return stateFor(current);
   }
-  
+
   /**
    * Add the instruction to the consequent block of the current instruction.
    */
   private void addConsequent(Instruction inst) {
     ((BlockInstruction)current).getConsequent().add(inst);
   }
-  
+
   /**
    * Set the instruction as the alternative branch of the current instruction.
    */
@@ -206,7 +206,7 @@ public class CodeMachine implements CodeSink {
     info.offset(inst.getCharOffset());
     return info;
   }
-  
+
   /**
    * In validation mode this adds an error to the errors list. Otherwise it will raise
    * an exception that wraps the error.
@@ -218,7 +218,7 @@ public class CodeMachine implements CodeSink {
       throw new CodeSyntaxException(info);
     }
   }
-  
+
   /**
    * Returns a string describing (in English) the offset to the current instruction.
    */
@@ -231,15 +231,15 @@ public class CodeMachine implements CodeSink {
     buf.append(current.getCharOffset());
     return buf.toString();
   }
-  
+
   /**
-   * Maps block instruction type to its state, so we don't have to maintain a 
+   * Maps block instruction type to its state, so we don't have to maintain a
    * separate stack for both instructions and states.
    */
   private State stateFor(Instruction inst) {
     InstructionType type = inst.getType();
     switch (type) {
-      
+
       case ALTERNATES_WITH:
         return state_ALTERNATES_WITH;
       case IF:
@@ -254,21 +254,21 @@ public class CodeMachine implements CodeSink {
         return state_ROOT;
       case SECTION:
         return state_SECTION;
-        
+
       default:
         throw new RuntimeException("machine fail: attempt to find state for non-block instruction " + type);
     }
   }
-    
-  
+
+
   // State definitions below
-  
+
   /**
    * ALTERNATES_WITH state. Special block which is executed between each pass over the
    * consequent block for a REPEATED instruction.
    */
   private State state_ALTERNATES_WITH = new State() {
-    
+
     @Override
     public State transition(Instruction inst) throws CodeSyntaxException {
       InstructionType type = inst.getType();
@@ -306,10 +306,10 @@ public class CodeMachine implements CodeSink {
       return this;
     }
   };
-  
+
   /**
    * IF state. A conditional block whose branching condition consists of testing
-   * if one or more variables is "truthy", and joins these tests with either a 
+   * if one or more variables is "truthy", and joins these tests with either a
    * logical AND or OR operator.
    */
   private State state_IF = new State() {
@@ -318,44 +318,44 @@ public class CodeMachine implements CodeSink {
     public State transition(Instruction inst) throws CodeSyntaxException {
       InstructionType type = inst.getType();
       switch (type) {
-        
+
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
           return state_EOF;
-          
+
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(IF));
           break;
-        
+
         case END:
           setAlternative(inst);
           return pop();
-          
+
         case OR_PREDICATE:
           setAlternative(inst);
           current = inst;
           return state_OR_PREDICATE;
-          
+
         default:
           addConsequent(inst);
       }
-      
+
       return this;
     }
   };
-  
+
   /**
    * PREDICATE state. A conditional block structure. It has a consequent block
    * which is executed when the branching condition is true, and one alternate which
    * is executed if the branching condition is false.
    */
   private State state_PREDICATE = new State() {
-    
+
     @Override
     public State transition(Instruction inst) throws CodeSyntaxException {
       InstructionType type = inst.getType();
       switch (type) {
-        
+
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
           return state_EOF;
@@ -363,36 +363,36 @@ public class CodeMachine implements CodeSink {
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(PREDICATE));
           break;
-          
+
         case END:
           setAlternative(inst);
           return pop();
-          
+
         case OR_PREDICATE:
           setAlternative(inst);
           current = inst;
           return state_OR_PREDICATE;
-          
+
         default:
           addConsequent(inst);
       }
-      
+
       return this;
     }
   };
-  
+
   /**
    * OR_PREDICATE state. Basically the identical state as the PREDICATE, but performs
    * some additional checking of an empty OR followed by another OR, which will never
    * execute.
    */
   private State state_OR_PREDICATE = new State() {
-    
+
     @Override
     public State transition(Instruction inst) throws CodeSyntaxException {
       InstructionType type = inst.getType();
       switch (type) {
-        
+
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
           return state_EOF;
@@ -400,11 +400,11 @@ public class CodeMachine implements CodeSink {
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(OR_PREDICATE));
           break;
-          
+
         case END:
           setAlternative(inst);
           return pop();
-          
+
         case OR_PREDICATE:
           // Check to ensure that we don't have an {.or} following an {.or} with a null predicate.
           PredicateInst parent = ((PredicateInst)current);
@@ -419,18 +419,18 @@ public class CodeMachine implements CodeSink {
         default:
           addConsequent(inst);
       }
-      
+
       return this;
     }
   };
-  
+
   /**
    * REPEATED state. A block which iterates over an array of elements and executes
-   * its consequent block for each element. Interleaves executing its optional 
+   * its consequent block for each element. Interleaves executing its optional
    * ALTERNATES_WITH block.
    */
   private State state_REPEATED = new State() {
-    
+
     @Override
     public State transition(Instruction inst) throws CodeSyntaxException {
       InstructionType type = inst.getType();
@@ -444,7 +444,7 @@ public class CodeMachine implements CodeSink {
           setAlternative(inst);
           current = inst;
           return state_OR_PREDICATE;
-                                
+
         case ALTERNATES_WITH:
           // Special block that lives only within the repeat instruction
           ((RepeatedInst)current).setAlternatesWith((AlternatesWithInst)inst);
@@ -460,12 +460,12 @@ public class CodeMachine implements CodeSink {
       return this;
     }
   };
-  
+
   /**
    * SECTION state. Represents opening a section scope.
    */
   private State state_SECTION = new State() {
-    
+
     @Override
     public State transition(Instruction inst) throws CodeSyntaxException {
       InstructionType type = inst.getType();
@@ -474,29 +474,29 @@ public class CodeMachine implements CodeSink {
         case EOF:
           fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
           return state_EOF;
-          
+
         case ALTERNATES_WITH:
           fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(SECTION));
           break;
-        
+
         case OR_PREDICATE:
           setAlternative(inst);
           current = inst;
           return state_OR_PREDICATE;
-        
+
         case END:
           setAlternative(inst);
           return pop();
-          
+
         default:
           addConsequent(inst);
       }
-      
+
       return this;
     }
-    
+
   };
-  
+
   /**
    * ROOT state. The outermost state in the machine. Used to ensure that all opened
    * scopes are properly closed, and only valid instructions exist at the top level
@@ -517,24 +517,24 @@ public class CodeMachine implements CodeSink {
         case END:
           fail(error(MISMATCHED_END, inst));
           break;
-          
+
         case ALTERNATES_WITH:
         case OR_PREDICATE:
           fail(error(NOT_ALLOWED_AT_ROOT, inst).data(ROOT));
           break;
-          
+
         default:
           addConsequent(inst);
       }
-      
+
       return this;
     }
-    
+
   };
-  
+
   /**
    * Final state of the machine. Once reached the machine will accept no
-   * additional instructions -- doing so will raise an error.  EOF should be the 
+   * additional instructions -- doing so will raise an error.  EOF should be the
    * last thing a parser feeds to the state machine.
    */
   private State state_EOF = new State() {
@@ -545,15 +545,15 @@ public class CodeMachine implements CodeSink {
           + "This is either a bug in the state machine or instructions were fed to the state machine "
           + "after EOF.");
     }
-    
+
   };
-  
+
   /**
    * Represents a machine state for a block instruction.
    */
   interface State {
-    
+
     public State transition(Instruction inst) throws CodeSyntaxException;
-  
+
   }
 }

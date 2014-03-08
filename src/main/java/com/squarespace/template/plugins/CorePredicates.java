@@ -29,33 +29,33 @@ import com.squarespace.template.Predicate;
 public class CorePredicates extends BaseRegistry<Predicate> {
 
   public static final Predicate DEBUG = new BasePredicate("debug?", false) {
-    
+
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       return isTruthy(ctx.resolve("debug"));
     }
 
   };
-  
-  
+
+
   public static final Predicate PLURAL = new BasePredicate("plural?", false) {
 
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       return ctx.node().asLong() > 1;
     }
-  
+
   };
 
-  
+
   public static final Predicate SINGULAR = new BasePredicate("singular?", false) {
-  
+
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       return ctx.node().asLong() == 1;
     }
-  
+
   };
 
-  
+
 }

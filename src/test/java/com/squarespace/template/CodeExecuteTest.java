@@ -37,20 +37,20 @@ import com.squarespace.template.plugins.CorePredicates;
 public class CodeExecuteTest extends UnitTestBase {
 
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";
-  
+
   @Test
   public void testLiterals() throws CodeException {
     RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().build();
     assertContext(execute("{}", root), "{ \t\n}");
   }
-  
+
   @Test
   public void testPredicates() throws CodeException {
     CodeBuilder builder = builder();
     builder.predicate(CorePredicates.PLURAL).text("A");
     builder.or(CorePredicates.SINGULAR).text("B");
     builder.or().text("C").end();
-    
+
     Instruction root = builder.eof().build();
     assertEquals(repr(root), "{.plural?}A{.or singular?}B{.or}C{.end}");
     assertContext(execute("5", root), "A");
@@ -58,7 +58,7 @@ public class CodeExecuteTest extends UnitTestBase {
     assertContext(execute("0", root), "C");
     assertContext(execute("-3.1415926", root), "C");
   }
-  
+
   @Test
   public void testSection() throws CodeException {
     RootInst root = builder().section("foo.bar").var("baz").end().eof().build();
@@ -66,7 +66,7 @@ public class CodeExecuteTest extends UnitTestBase {
     String json = "{\"foo\": {\"bar\": {\"baz\": 123}}}";
     assertEquals(repr(root), "{.section foo.bar}{baz}{.end}");
     assertContext(execute(json, root), "123");
-    
+
     root = builder().section("foo.1").var("@").end().eof().build();
     json = "{\"foo\": [\"a\", \"b\"]}";
     assertEquals(repr(root), "{.section foo.1}{@}{.end}");
@@ -90,7 +90,7 @@ public class CodeExecuteTest extends UnitTestBase {
     RootInst root = builder().text(ALPHAS, 3, 6).text(ALPHAS, 9, 12).eof().build();
     assertContext(execute("{}", root), expected);
   }
-  
+
   @Test
   public void testRepeat() throws CodeException {
     String expected = "Hi, Joe! Hi, Bob! ";
@@ -110,16 +110,16 @@ public class CodeExecuteTest extends UnitTestBase {
   public void testVariable() throws CodeException {
     RootInst root = builder().var("foo.bar").eof().build();
     assertContext(execute("{\"foo\": {\"bar\": 123}}", root), "123");
-    
+
     root = builder().var("@").eof().build();
     assertContext(execute("3.14159", root), "3.14159");
     assertContext(execute("123.000", root), "123.0");
     assertContext(execute("null", root), "");
 
-    
+
     root = builder().var("foo.2.bar").eof().build();
     assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}]}", root), "hi");
-    
+
     root = builder().var("foo").eof().build();
     assertContext(execute("{\"foo\": [\"a\", \"b\", 123]}", root), "a,b,123");
   }
@@ -135,5 +135,5 @@ public class CodeExecuteTest extends UnitTestBase {
     node = new DecimalNode(new BigDecimal(value));
     assertContext(execute(node, root), value);
   }
-  
+
 }

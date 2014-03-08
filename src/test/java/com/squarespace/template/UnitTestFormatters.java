@@ -38,14 +38,14 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
       throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
   };
-  
+
   public static Formatter INVALID_ARGS = new BaseFormatter("invalid-args", false) {
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       throw new ArgumentsException("Invalid arguments");
     }
   };
-  
+
   public static Formatter NPE = new BaseFormatter("npe", false) {
 
     @Override
@@ -53,7 +53,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
       throw new NullPointerException("fake NPE thrown by the test npe formatter.");
     }
   };
-  
+
   public static Formatter REQUIRED_ARGS = new BaseFormatter("required-args", true) {
   };
 
@@ -63,5 +63,5 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
       throw new IllegalArgumentException("unexpected error!");
     }
   };
-  
+
 }

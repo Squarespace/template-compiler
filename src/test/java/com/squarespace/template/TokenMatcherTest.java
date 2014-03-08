@@ -39,7 +39,7 @@ public class TokenMatcherTest extends UnitTestBase {
     assertEquals(tm.consume(), mk.view(" d e f"));
     assertTrue(tm.finished());
   }
-  
+
   @Test
   public void testMisses() {
     CodeMaker mk = maker();
@@ -47,7 +47,7 @@ public class TokenMatcherTest extends UnitTestBase {
     assertFalse(tm.keyword());
     assertEquals(tm.remainder(), mk.view(" .abc?"));
   }
-  
+
   @Test
   public void testRange() {
     TokenMatcher tm = new TokenMatcher(".abc?");
@@ -55,5 +55,5 @@ public class TokenMatcherTest extends UnitTestBase {
     assertEquals(tm.matchStart(), 0);
     assertEquals(tm.matchEnd(), 5);
   }
-  
+
 }

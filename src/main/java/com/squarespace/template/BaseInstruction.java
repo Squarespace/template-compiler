@@ -28,7 +28,7 @@ public abstract class BaseInstruction implements Instruction {
   private int lineNumber;
 
   private int charOffset;
-  
+
   public void setLineNumber(int number) {
     this.lineNumber = number;
   }
@@ -40,7 +40,7 @@ public abstract class BaseInstruction implements Instruction {
   public void setCharOffset(int offset) {
     this.charOffset = offset;
   }
-  
+
   public int getCharOffset() {
     return charOffset;
   }
@@ -60,13 +60,13 @@ public abstract class BaseInstruction implements Instruction {
     }
     return buf.toString();
   }
-  
+
   public static Object[] splitVariable(String name) {
     String[] parts = name.equals("@") ? null : StringUtils.split(name, '.');
     if (parts == null) {
       return null;
     }
-    
+
     // Each segment of the key path can be either a String or an Integer.
     Object[] keys = new Object[parts.length];
     for (int i = 0, len = parts.length; i < len; i++) {
@@ -74,13 +74,13 @@ public abstract class BaseInstruction implements Instruction {
     }
     return keys;
   }
-  
+
   public String repr() {
     StringBuilder buf = new StringBuilder();
     repr(buf, true);
     return buf.toString();
   }
-  
+
   /**
    * Generate a tree representation of this instruction and its children.
    */
@@ -96,7 +96,7 @@ public abstract class BaseInstruction implements Instruction {
    * Generate a printable representation of this instruction and its children.
    */
   public abstract void repr(StringBuilder buf, boolean recurse);
-  
+
   private static boolean allDigits(String str) {
     for (int i = 0, len = str.length(); i < len; i++) {
       if (!Character.isDigit(str.charAt(i))) {

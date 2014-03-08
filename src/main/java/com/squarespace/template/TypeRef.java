@@ -25,7 +25,7 @@ public abstract class TypeRef<T> {
   private final Type type;
 
   private final Class<?> clazz;
-  
+
   public TypeRef() {
     Type superType = getClass().getGenericSuperclass();
     type = ((ParameterizedType)superType).getActualTypeArguments()[0];
@@ -35,9 +35,9 @@ public abstract class TypeRef<T> {
   public Type type() {
     return type;
   }
-  
+
   public Class<?> clazz() {
     return clazz;
   }
-  
+
 }

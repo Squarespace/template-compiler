@@ -38,7 +38,7 @@ public class UnitTestPredicates extends BaseRegistry<Predicate> {
       throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
   };
-  
+
   public static Predicate INVALID_ARGS = new BasePredicate("invalid-args?", false) {
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -48,12 +48,12 @@ public class UnitTestPredicates extends BaseRegistry<Predicate> {
 
   public static Predicate REQUIRED_ARGS = new BasePredicate("required-args?", true) {
   };
-  
+
   public static Predicate UNSTABLE = new BasePredicate("unstable?", false) {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       throw new IllegalArgumentException("unexpected error!");
     }
   };
-  
+
 }

@@ -44,7 +44,7 @@ public class CorePredicatesTest extends UnitTestBase {
       ctx.pushSection(key);
       assertFalse(CorePredicates.DEBUG, ctx);  }
     }
-  
+
   @Test
   public void testPlural() throws CodeException {
     assertFalse(CorePredicates.PLURAL, context("0"));
@@ -57,7 +57,7 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(CorePredicates.PLURAL, context("3.14159"));
     assertTrue(CorePredicates.PLURAL, context("100000.101"));
   }
-  
+
   @Test
   public void testSingular() throws CodeException {
     assertFalse(CorePredicates.SINGULAR, context("0"));
@@ -70,15 +70,15 @@ public class CorePredicatesTest extends UnitTestBase {
   private void assertTrue(Predicate predicate, Context ctx) throws CodeException {
     assertTrue(predicate, ctx, Constants.EMPTY_ARGUMENTS);
   }
-  
+
   private void assertTrue(Predicate predicate, Context ctx, Arguments args) throws CodeException {
     Assert.assertTrue(predicate.apply(ctx, args));
   }
-  
+
   private void assertFalse(Predicate predicate, Context ctx) throws CodeException {
     assertFalse(predicate, ctx, EMPTY_ARGUMENTS);
   }
-  
+
   private void assertFalse(Predicate predicate, Context ctx, Arguments args) throws CodeException {
     Assert.assertFalse(predicate.apply(ctx, args));
   }

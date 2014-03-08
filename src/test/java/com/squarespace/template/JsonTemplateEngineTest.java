@@ -34,12 +34,12 @@ public class JsonTemplateEngineTest {
   private static final PredicateTable PREDICATES = new PredicateTable();
 
   private static final JsonTemplateEngine COMPILER;
-  
+
   static {
 
     // Configure static plugins to replace defaults with your values.
     CoreFormatters.DATE.setTimezoneKey(Constants.TIMEZONE_KEY);
-    
+
     FORMATTERS.register(new CoreFormatters());
     // Register additional formatters
 
@@ -52,11 +52,11 @@ public class JsonTemplateEngineTest {
   @Test
   public void testCompile() throws CodeException {
     COMPILER.compile("{.section foo}{@}{.end}");
-    
+
     try {
       COMPILER.compile("{.foo?}");
       Assert.fail("Expected CodeException");
     } catch (CodeException e) { }
   }
-  
+
 }

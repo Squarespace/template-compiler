@@ -45,7 +45,7 @@ public class CodeMachineTest extends UnitTestBase {
     cm.complete();
     assertEquals(cm.getInstructionCount(), 3);
   }
-  
+
   @Test
   public void testUnexpected() {
     CodeMaker mk = maker();
@@ -54,46 +54,46 @@ public class CodeMachineTest extends UnitTestBase {
       cm.accept(mk.eof(), mk.eof());
       fail("expected RuntimeException");
     } catch (RuntimeException e) {
-    
+
       // We're good.
 
     } catch (CodeSyntaxException e) {
       fail("did not expect CodeSyntaxException");
     }
   }
-  
+
   @Test
   public void testCodeMachineValidation() throws CodeException {
     assertErrors("{.if a}", EOF_IN_BLOCK);
     assertErrors("{.if a}{.alternates with}", NOT_ALLOWED_IN_BLOCK, EOF_IN_BLOCK);
     assertErrors("{.if a}{.alternates with}{.end}", NOT_ALLOWED_IN_BLOCK);
-    
+
     assertErrors("{.plural?}", EOF_IN_BLOCK);
     assertErrors("{.plural?}{.alternates with}", NOT_ALLOWED_IN_BLOCK, EOF_IN_BLOCK);
     assertErrors("{.plural?}{.alternates with}{.end}", NOT_ALLOWED_IN_BLOCK);
-    
+
     assertErrors("{.plural?}{.or}", EOF_IN_BLOCK);
     assertErrors("{.plural?}{.or}{.or}", DEAD_CODE_BLOCK, EOF_IN_BLOCK);
     assertErrors("{.plural?}{.or singular?}{.or}{.or}", DEAD_CODE_BLOCK, EOF_IN_BLOCK);
     assertErrors("{.plural?}{.or}{.alternates with}{.end}", NOT_ALLOWED_IN_BLOCK);
-    
+
     assertErrors("{.section a}", EOF_IN_BLOCK);
     assertErrors("{.section a}{.alternates with}", NOT_ALLOWED_IN_BLOCK, EOF_IN_BLOCK);
     assertErrors("{.section a}{.alternates with}{.end}", NOT_ALLOWED_IN_BLOCK);
-    
+
     assertErrors("{.repeated section a}", EOF_IN_BLOCK);
     assertErrors("{.repeated section a}{.alternates with}", EOF_IN_BLOCK);
     assertErrors("{.repeated section a}{.alternates with}{.alternates with}", NOT_ALLOWED_IN_BLOCK, EOF_IN_BLOCK);
   }
-  
+
   private void assertErrors(String template, ErrorType ... expected) throws CodeException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
     assertEquals(actual.toArray(), expected);
   }
-  
+
   private List<ErrorInfo> validate(String template) throws CodeException {
     return compiler().validate(template).errors();
   }
-  
+
 }

@@ -24,7 +24,7 @@ package com.squarespace.template;
 public class CodeSyntaxException extends CodeException {
 
   private final ErrorInfo errorInfo;
-  
+
   public CodeSyntaxException(ErrorInfo info) {
     super(info.getMessage());
     this.errorInfo = info;
@@ -33,5 +33,5 @@ public class CodeSyntaxException extends CodeException {
   public ErrorInfo getErrorInfo() {
     return errorInfo;
   }
-  
+
 }

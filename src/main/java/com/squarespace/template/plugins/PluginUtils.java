@@ -30,11 +30,11 @@ public class PluginUtils {
 
   private PluginUtils() {
   }
-  
+
   /**
    * Translate a hex digit into its corresponding integer value, and if the character is not a valid
    * hex digit, returns -1. For example,  hexDigitToInt('e') == 14, and hexDigitToInt('x') == -1.
-   * 
+   *
    * @param ch  candidate hex digit character
    * @return    -1, or the integer value of the hex digit
    */
@@ -48,7 +48,7 @@ public class PluginUtils {
     }
     return -1;
   }
-  
+
   public static void escapeHtml(String str, StringBuilder buf) {
     for (int i = 0; i < str.length(); i++) {
       char ch = str.charAt(i);
@@ -67,7 +67,7 @@ public class PluginUtils {
       }
     }
   }
-  
+
   public static void escapeHtmlTag(String str, StringBuilder buf) {
     for (int i = 0; i < str.length(); i++) {
       char ch = str.charAt(i);
@@ -89,7 +89,7 @@ public class PluginUtils {
       }
     }
   }
-  
+
   public static String formatMoney(double cents, Locale locale) {
     cents /= 100;
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
@@ -103,7 +103,7 @@ public class PluginUtils {
     for (int i = 0; i < str.length(); i++) {
       char ch = str.charAt(i);
       switch (ch) {
-        
+
         case '<':
           inTag = true;
           break;
@@ -112,7 +112,7 @@ public class PluginUtils {
           inTag = false;
           buf.append(' ');
           break;
-          
+
        default:
           if (!inTag) {
             buf.append(ch);
@@ -121,18 +121,18 @@ public class PluginUtils {
     }
     return buf.toString();
   }
-  
+
   public static String slugify(String value) {
     value = SLUG_KILLCHARS.matcher(value).replaceAll("");
     value = WHITESPACE.matcher(value).replaceAll("-");
     return value.toLowerCase();
   }
-  
+
   public static String truncate(String value, int maxLen, String ellipses) {
     if (value.length() <= maxLen) {
       return value;
     }
-    
+
     int end = maxLen;
     for (int i = maxLen-1; i >= 0; i--) {
       if (Character.isWhitespace(value.charAt(i))) {
@@ -142,7 +142,7 @@ public class PluginUtils {
     }
     return value.substring(0, end) + ellipses;
   }
-  
+
   /**
    * Left-pads values where 0 <= n.
    */

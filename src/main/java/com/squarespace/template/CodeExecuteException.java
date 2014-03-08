@@ -23,12 +23,12 @@ package com.squarespace.template;
 public class CodeExecuteException extends CodeException {
 
   private final ErrorInfo errorInfo;
-  
+
   public CodeExecuteException(ErrorInfo info) {
     super(info.getMessage());
     this.errorInfo = info;
   }
-  
+
   public CodeExecuteException(ErrorInfo info, Throwable cause) {
     super(info.getMessage(), cause);
     this.errorInfo = info;
@@ -37,5 +37,5 @@ public class CodeExecuteException extends CodeException {
   public ErrorInfo getErrorInfo() {
     return errorInfo;
   }
-  
+
 }

@@ -34,11 +34,11 @@ public class BlockTest extends UnitTestBase {
     Block b2 = new Block(2);
     b2.add(maker.text("foo"), maker.end(), maker.eof());
     Assert.assertEquals(b1, b2);
-    
+
     Block b3 = new Block(2);
     b3.add(maker.text("foo"), maker.eof(), maker.end());
     Assert.assertNotEquals(b1, b3);
-    
+
     Block b4 = new Block(2);
     b4.add(maker.text("foo"));
     Assert.assertNotEquals(b1, b4);
@@ -47,6 +47,6 @@ public class BlockTest extends UnitTestBase {
     Assert.assertFalse(b1.equals(null));
     Assert.assertFalse(b1.equals("foo"));
   }
-  
-  
+
+
 }

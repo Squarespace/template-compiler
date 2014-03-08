@@ -59,15 +59,15 @@ public class InstructionEqualityTest extends UnitTestBase {
     AlternatesWithInst a2 = mk.alternates();
     assertEquals(a1, a2);
     assertFalse(a1.equals(null));
-    
+
     a1.getConsequent().add(mk.text("foo"));
     assertNotEquals(a1, a2);
     assertNotEquals(a1, mk.section("foo"));
     assertNotEquals(a1, mk.end());
-    
+
     a2.getConsequent().add(mk.text("foo"));
     assertEquals(a1, a2);
-    
+
     a1.setAlternative(mk.text("bar"));
     assertNotEquals(a1, a2);
     assertNotEquals(a1, mk.section("foo"));
@@ -82,10 +82,10 @@ public class InstructionEqualityTest extends UnitTestBase {
     CodeMaker mk = maker();
     CommentInst c1 = mk.comment("foo");
     assertEquals(c1, mk.comment("foo"));
-    
+
     assertNotEquals(c1, mk.comment("  foo  "));
     assertNotEquals(c1, mk.text("foo"));
-    
+
     assertNotEquals(c1, mk.end());
     assertNotEquals(c1, mk.eof());
   }
@@ -95,7 +95,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     CodeMaker mk = maker();
     EndInst e1 = mk.end();
     assertEquals(e1, mk.end());
-    
+
     assertNotEquals(e1, mk.comment("foo"));
     assertNotEquals(e1, mk.eof());
   }
@@ -105,11 +105,11 @@ public class InstructionEqualityTest extends UnitTestBase {
     CodeMaker mk = maker();
     EofInst e1 = mk.eof();
     assertEquals(e1, mk.eof());
-    
+
     assertNotEquals(e1, mk.space());
     assertNotEquals(e1, mk.end());
   }
-  
+
   @Test
   public void testIfEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -120,10 +120,10 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(i1, mk.ifexpn(mk.strlist("@"), mk.oplist()));
     assertNotEquals(i1, mk.ifexpn(mk.strlist("bar", "foo"), mk.oplist(LOGICAL_OR)));
     assertNotEquals(i1, mk.ifexpn(mk.strlist("foo", "bar"), mk.oplist(LOGICAL_AND)));
-    
+
     testBlockEquals(i1, i2);
   }
-  
+
   @Test
   public void testIfPredicateEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -135,7 +135,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(i1, i3);
     assertNotEquals(i1, mk.ifexpn(mk.strlist("@"), mk.oplist()));
   }
-  
+
   @Test
   public void testLiteralEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -152,7 +152,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     };
     assertNotEquals(s1, fake);
   }
-  
+
   @Test
   public void testMetaEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -161,13 +161,13 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertFalse(m1.equals(null));
     assertNotEquals(m1, mk.metaRight());
     assertNotEquals(m1, mk.end());
-    
+
     m1 = mk.metaRight();
     assertEquals(m1, mk.metaRight());
     assertNotEquals(m1, mk.metaLeft());
     assertNotEquals(m1, mk.end());
   }
-  
+
   @Test
   public void testPredicateEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -178,12 +178,12 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertFalse(p1.equals(null));
     assertNotEquals(p1, mk.predicate(PLURAL, mk.args(" foo")));
     testBlockEquals(p1, p2);
-    
+
     PredicateInst p3 = mk.predicate(PLURAL, mk.args(" a b"));
     PredicateInst p4 = mk.predicate(PLURAL, mk.args(" a b"));
     assertEquals(p3, p4);
   }
-  
+
   @Test
   public void testRepeatEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -193,7 +193,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertFalse(r1.equals(null));
     assertNotEquals(r1, mk.repeated("bar.foo"));
     assertNotEquals(r1, mk.repeated("@"));
-    
+
     AlternatesWithInst a1 = mk.alternates();
     AlternatesWithInst a2 = mk.alternates();
     r1.setAlternatesWith(a1);
@@ -202,7 +202,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertEquals(r1, r2);
     testBlockEquals(r1, r2);
   }
-  
+
   @Test
   public void testRootEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -212,7 +212,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertFalse(r1.equals(null));
     assertNotEquals(r1, mk.end());
     assertNotEquals(r1, mk.section("foo"));
-    
+
     r1.getConsequent().add(mk.text("foo"));
     assertNotEquals(r1, r2);
     assertNotEquals(r1, mk.end());
@@ -221,7 +221,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     r2.getConsequent().add(mk.end());
     assertNotEquals(r1, r2);
   }
-  
+
   @Test
   public void testSectionEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -232,10 +232,10 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(s1, mk.section("bar.foo"));
     assertNotEquals(s1, mk.section("@"));
     assertNotEquals(s1, mk.end());
-    
+
     testBlockEquals(s1, s2);
   }
-  
+
   @Test
   public void testTextEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -246,7 +246,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(t1, mk.comment("foo bar"));
     assertNotEquals(t1, mk.end());
   }
-  
+
   @Test
   public void testVariableEquals() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -258,11 +258,11 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(v1, mk.var("bar.foo"));
     assertNotEquals(v1, mk.comment("foo.bar"));
     assertNotEquals(v1, mk.end());
-    
+
     v1 = mk.var("foo.bar", mk.formatters(CoreFormatters.JSON));
     assertEquals(v1, mk.var("foo.bar", mk.formatters(CoreFormatters.JSON)));
     assertFalse(v1.equals(null));
-    
+
     assertNotEquals(v1, mk.var("@", CoreFormatters.JSON));
     VariableInst x =  mk.var("foo.bar", CoreFormatters.PLURALIZE);
     assertNotEquals(v1, x);
@@ -277,12 +277,12 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(v1, v2);
     assertEquals(v2, mk.var("foo.bar", mk.fmt(CoreFormatters.PLURALIZE, args1)));
     assertNotEquals(v2, mk.var("foo.bar", mk.fmt(CoreFormatters.PLURALIZE, args2)));
-    
+
     VariableInst v3 = mk.var("a.b.c", mk.fmt(CoreFormatters.SLUGIFY, args1));
     assertEquals(v3, mk.var("a.b.c", mk.fmt(CoreFormatters.SLUGIFY, args1)));
 
   }
-  
+
   /**
    * Warning: this modifies the arguments, and assumes the block instructions
    * are initially equivalent to one another.
@@ -293,7 +293,7 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(b1, b2);
     b2.getConsequent().add(mk.text("---"));
     assertEquals(b1, b2);
-    
+
     b1.setAlternative(mk.end());
     assertNotEquals(b1, b2);
     b2.setAlternative(mk.end());
@@ -305,5 +305,5 @@ public class InstructionEqualityTest extends UnitTestBase {
     b2.getConsequent().add(mk.text("oops"));
     assertNotEquals(b1, b2);
   }
-  
+
 }

@@ -47,22 +47,22 @@ public class ArgumentsTest extends UnitTestBase {
     assertEquals(args.getDelimiter(), ' ');
     assertEquals(args.getArgs(), Arrays.asList("a", "b", "c"));
     assertEquals(args.join(), "a b c");
-    
+
     Arguments args2 = new Arguments(mk.view(" a b c"));
     assertEquals(args, args2);
-    
+
     assertFalse(args.equals(null));
     assertFalse(args.equals(" a b c"));
     assertFalse(args.equals("a b c"));
-    
+
     Arguments args3 = mk.args(":a:b:c");
     assertFalse(args.equals(args3));
-    
+
     Arguments args4 = new Arguments(null);
     assertFalse(args.equals(args4));
     assertEquals(args4, Constants.EMPTY_ARGUMENTS);
   }
-  
+
   @Test
   public void testAssertions() throws ArgumentsException {
     CodeMaker mk = maker();
@@ -74,7 +74,7 @@ public class ArgumentsTest extends UnitTestBase {
     args.atMost(3);
     args.between(0, 3);
   }
-  
+
   @Test
   public void testFailedAssertions() {
     CodeMaker mk = maker();
@@ -90,14 +90,14 @@ public class ArgumentsTest extends UnitTestBase {
       fail();
     } catch (ArgumentsException e) {
     }
-    
+
     try {
       args.exactly(2);
       fail();
     } catch (ArgumentsException e) {
     }
   }
-  
+
   @Test
   public void testOpaque() {
     CodeMaker mk = maker();

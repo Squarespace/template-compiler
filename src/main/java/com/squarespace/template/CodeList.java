@@ -26,7 +26,7 @@ import java.util.List;
 public class CodeList implements CodeSink {
 
   private List<Instruction> instList = new ArrayList<>();
-  
+
   public List<Instruction> getInstructions() {
     return instList;
   }
@@ -36,10 +36,10 @@ public class CodeList implements CodeSink {
       instList.add(inst);
     }
   }
-  
+
   @Override
   public void complete() {
     // NOOP
   }
-  
+
 }

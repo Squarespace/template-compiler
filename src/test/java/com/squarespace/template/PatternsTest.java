@@ -54,13 +54,13 @@ public class PatternsTest {
     isKeyword(".plural?");
     isKeyword(".foo-Bar?");
     isKeyword(".foo_");
-    
+
     notKeyword(" .foo");
     notKeyword("foo.bar");
     notKeyword(".foo-bar!");
     notKeyword(".123foo");
   }
-  
+
   @Test
   public void testVariable() {
     isVariable("a.b.c");
@@ -72,7 +72,7 @@ public class PatternsTest {
     isVariable("12");
     isVariable("0.name");
     isVariable("0.1.2.name");
-    
+
     notVariable(" foo");
     notVariable(".foo");
     notVariable("-foo.bar");
@@ -95,15 +95,15 @@ public class PatternsTest {
   private void isKeyword(String str) {
     assertTrue(matches(str, Patterns.KEYWORD));
   }
-  
+
   private void notKeyword(String str) {
     assertFalse(matches(str, Patterns.KEYWORD));
   }
-  
+
   private void isVariable(String str) {
     assertTrue(matches(str, Patterns.VARIABLE));
   }
-  
+
   private void notVariable(String str) {
     assertFalse(matches(str, Patterns.VARIABLE));
   }

@@ -65,7 +65,7 @@ import com.squarespace.template.plugins.CoreFormatters;
 public class TokenizerCoreTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;
-  
+
   @Test
   public void testEdgeCases() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -82,11 +82,11 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{/x}", mk.text("{/x}"), mk.eof());
 
     assertResult("{#", mk.text("{#"), mk.eof());
-    
+
     // Variable references without formatters must have zero trailing chars, including whitespace.
     // This lets us better handle passing through Javascript in the template, for example:
     // <script>function foo(){bar+=1;}</script>
-    
+
     assertResult("{foo.baz }", mk.text("{foo.baz }"), mk.eof());
     assertResult("{a.b=1;return 2;}", mk.text("{a.b=1;return 2;}"), mk.eof());
     assertResult("{return a.b}", mk.text("{return a.b}"), mk.eof());
@@ -109,34 +109,34 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.alternates with xyz}", EXTRA_CHARS);
     assertFailure("{.alternates with\t}",EXTRA_CHARS);
   }
-  
+
   @Test
   public void testComments() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{# foo bar}", mk.comment(" foo bar"), mk.eof());
     assertResult("{# ##foo}", mk.comment(" ##foo"), mk.eof());
     assertResult("{ # foo bar}", mk.text("{ # foo bar}"), mk.eof());
-    
+
     assertResult("{## foo ##}", mk.mcomment(" foo "), mk.eof());
     assertResult("{##\n##{}##\n##}", mk.mcomment("\n##{}##\n"), mk.eof());
     assertResult("{#######}", mk.mcomment("###"), mk.eof());
     assertResult("{##\n##}", mk.mcomment("\n"), mk.eof());
-    
+
     assertFailure("{## foo ", EOF_IN_COMMENT);
     assertFailure("{## foo }", EOF_IN_COMMENT);
   }
-  
+
   @Test
   public void testEnd() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{.end}", mk.end(), mk.eof());
     assertResult("{ .end}", mk.text("{ .end}"), mk.eof());
-    
+
     assertFailure("{.end xyz}", EXTRA_CHARS);
     assertFailure("{.end \t }", EXTRA_CHARS);
     assertFailure("{.endx}", INVALID_INSTRUCTION);
   }
-  
+
   @Test
   public void testFormatter() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -148,7 +148,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     Arguments args2 = mk.args("/b/c");
     assertResult("{a|pluralize/b/c}", mk.var("a", mk.fmt(CoreFormatters.PLURALIZE, args2)), mk.eof());
   }
-  
+
   @Test
   public void testFormatterErrors() throws CodeSyntaxException {
     // Too many arguments.
@@ -156,7 +156,7 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     // Argument is invalid
     assertFailure("{foo|invalid-args bar}", FORMATTER_ARGS_INVALID);
-    
+
     assertFailure("{foo|plrlize}", FORMATTER_UNKNOWN);
     assertFailure("{foo|do-stuff}", FORMATTER_UNKNOWN);
 
@@ -169,7 +169,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{foo|required-args}", FORMATTER_NEEDS_ARGS);
     assertFailure("{foo|apply}", FORMATTER_NEEDS_ARGS);
   }
-  
+
   @Test
   public void testIf() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -181,14 +181,14 @@ public class TokenizerCoreTest extends UnitTestBase {
     List<String> vars = mk.strlist("a", "b", "c", "d", "e");
     List<Operator> ops = mk.oplist(LOGICAL_OR, LOGICAL_OR, LOGICAL_OR, LOGICAL_OR);
     assertResult("{.if a||b||c||d||e}", mk.ifexpn(vars, ops), mk.eof());
-    
+
     assertFailure("{.if}", WHITESPACE_EXPECTED);
     assertFailure("{.if }", IF_EMPTY);
     assertFailure("{.if a||b||c||d||e||}", IF_TOO_MANY_OPERATORS);
     assertFailure("{.if a||b||c||d||e||f}", IF_TOO_MANY_VARS);
     assertFailure("{.if .qrs||.tuv}", IF_EXPECTED_VAROP);
   }
-  
+
   @Test
   public void testLiteral() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -196,7 +196,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.tab}", mk.tab(), mk.eof());
     assertResult("{.newline}", mk.newline(), mk.eof());
   }
-  
+
   @Test
   public void testMeta() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -205,7 +205,7 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     assertFailure("{.meta-right   }", EXTRA_CHARS);
   }
-  
+
   @Test
   public void testPredicate() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -215,26 +215,26 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.singular?}", mk.predicate(SINGULAR), mk.eof());
     assertResult("{.or}", mk.or(), mk.eof());
     assertResult("{.or plural?}", mk.or(PLURAL), mk.eof());
-    
+
     assertFailure("{.or=}", EXTRA_CHARS);
     assertFailure("{.plrul?}", PREDICATE_UNKNOWN);
     assertFailure("{.or foo?}", PREDICATE_UNKNOWN);
     assertFailure("{.or foo}", OR_EXPECTED_PREDICATE);
     assertFailure("{.or foo foo}", OR_EXPECTED_PREDICATE);
     assertFailure("{.or .foo?}", OR_EXPECTED_PREDICATE);
-    
+
     assertFailure("{.or invalid-args? a b}", PREDICATE_ARGS_INVALID);
   }
-  
+
   @Test
   public void testSection() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{.section @}", mk.section("@"), mk.eof());
     assertResult("{.section 1}", mk.section("1"), mk.eof());
-    
+
     assertFailure("{.section}", WHITESPACE_EXPECTED);
   }
-  
+
   @Test
   public void testRepeat() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -253,7 +253,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.repeated section}", WHITESPACE_EXPECTED);
     assertFailure("{.repeated section abc xyz}", EXTRA_CHARS);
   }
-  
+
   @Test
   public void testVariable() throws CodeSyntaxException {
     CodeMaker mk = maker();
@@ -275,7 +275,7 @@ public class TokenizerCoreTest extends UnitTestBase {
       assertEquals(e.getMessage().indexOf(Constants.NULL_PLACEHOLDER), -1, "found null placeholder");
     }
   }
-  
+
   private void assertFailure(String raw, String msg) {
     try {
       tokenizer(raw).consume();
@@ -286,7 +286,7 @@ public class TokenizerCoreTest extends UnitTestBase {
       }
     }
   }
-  
+
   private void assertResult(String raw, Instruction ... instructions) throws CodeSyntaxException {
     CodeList collector = collector();
     tokenizer(raw, collector).consume();
@@ -296,5 +296,5 @@ public class TokenizerCoreTest extends UnitTestBase {
     }
     assertEquals(collector.getInstructions(), expected);
   }
-  
+
 }

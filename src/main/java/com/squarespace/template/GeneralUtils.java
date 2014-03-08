@@ -30,10 +30,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class GeneralUtils {
 
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
-  
+
   private GeneralUtils() {
   }
-  
+
   public static JsonNode getFirstMatchingNode(JsonNode parent, String ... keys) {
     for (String key : keys) {
       JsonNode node = parent.path(key);
@@ -43,7 +43,7 @@ public class GeneralUtils {
     }
     return Constants.MISSING_NODE;
   }
-  
+
   public static String jsonPretty(JsonNode node) throws IOException {
     StringBuilder buf = new StringBuilder();
     JsonGenerator gen = JSON_FACTORY.createGenerator(new StringBuilderWriter(buf));
@@ -52,7 +52,7 @@ public class GeneralUtils {
     gen.writeTree(node);
     return buf.toString();
   }
-  
+
   public static String urlEncode(String val) {
     try {
       return URLEncoder.encode(val, "UTF-8");
@@ -60,7 +60,7 @@ public class GeneralUtils {
       return val;
     }
   }
-  
+
   public static boolean isTruthy(JsonNode node) {
     if (node.isTextual()) {
       return !node.asText().equals("");
@@ -73,15 +73,15 @@ public class GeneralUtils {
     }
     return node.size() != 0;
   }
-  
+
   public static String ifString(JsonNode node, String defaultString) {
     return isTruthy(node) ? node.asText() : defaultString;
   }
-  
+
   public static double ifDouble(JsonNode node, double defaultValue) {
     return isTruthy(node) ? node.asDouble() : defaultValue;
   }
-  
+
   public static String eatNull(JsonNode node) {
     return node.isNull() ? "" : node.asText();
   }

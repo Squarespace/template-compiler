@@ -39,11 +39,11 @@ public class GeneralUtilsTest {
     o1.put("foo", "bar");
     ObjectNode o2 = JsonUtils.createObjectNode();
     o2.put("obj", o1);
-    
+
     assertEquals(GeneralUtils.getFirstMatchingNode(o2, "bar", "obj", "foo"), o1);
     assertEquals(GeneralUtils.getFirstMatchingNode(o2, "x", "y"), Constants.MISSING_NODE);
   }
-  
+
   @Test
   public void testIfString() {
     // Truth-y values
@@ -51,7 +51,7 @@ public class GeneralUtilsTest {
     assertEquals(GeneralUtils.ifString(node, "000"), "123");
     node = new TextNode("456");
     assertEquals(GeneralUtils.ifString(node, "000"), "456");
-    
+
     // False-y values
     node = new IntNode(0);
     assertEquals(GeneralUtils.ifString(node, "000"), "000");

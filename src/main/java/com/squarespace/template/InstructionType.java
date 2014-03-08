@@ -37,5 +37,5 @@ public enum InstructionType {
   TEXT,
   VARIABLE
   ;
-  
+
 }

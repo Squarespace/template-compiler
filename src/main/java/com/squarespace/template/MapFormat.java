@@ -31,24 +31,24 @@ import org.apache.commons.lang3.StringEscapeUtils;
 public class MapFormat {
 
   private static final Pattern KEY_ESCAPE = Pattern.compile("%\\([a-zA-Z][a-zA-Z0-9]*\\)");
-  
+
   private static final String EMPTY_STRING = "";
-  
+
   private List<String> keys = new ArrayList<>();
-  
+
   private String format;
-  
+
   private String nullPlaceholder = EMPTY_STRING;
-  
+
   public MapFormat(String raw) {
     init(raw);
   }
-  
+
   public MapFormat(String raw, String nullPlaceholder) {
     this.nullPlaceholder = nullPlaceholder;
     init(raw);
   }
-  
+
   private void init(String raw) {
     StringBuffer buf = new StringBuffer();
     Matcher matcher = KEY_ESCAPE.matcher(raw);
@@ -68,11 +68,11 @@ public class MapFormat {
     }
     this.format = buf.toString();
   }
-  
+
   public String getFormat() {
     return format;
   }
-  
+
   public String apply(Map<String, Object> params) {
     List<Object> values = new ArrayList<>(params.size());
     for (String key : keys) {

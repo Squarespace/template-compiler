@@ -40,11 +40,11 @@ import com.squarespace.template.ErrorType;
 public class ValidationTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;
-  
+
   /**
    * In validation mode, when encountering a syntax error, the Tokenizer and CodeMachine
    * will both continue processing input, reporting all errors found.
-   * 
+   *
    * Note: due to the way validate() is currently implemented, the Tokenizer runs first,
    * processing all input into a sequence of instructions.  Then that instruction list is
    * fed to the CodeMachine.  For this reason, the CodeMachine-emitted errors will all
@@ -58,7 +58,7 @@ public class ValidationTest extends UnitTestBase {
     assertErrors("{.sekshun a}{.end}", INVALID_INSTRUCTION, MISMATCHED_END);
     assertErrors("{.or}{## foo #", EOF_IN_COMMENT, NOT_ALLOWED_AT_ROOT);
   }
-  
+
   private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
@@ -67,7 +67,7 @@ public class ValidationTest extends UnitTestBase {
     }
     assertEquals(actual.toArray(), expected);
   }
-  
+
   private List<ErrorInfo> validate(String template) throws CodeSyntaxException {
     return compiler().validate(template).errors();
   }

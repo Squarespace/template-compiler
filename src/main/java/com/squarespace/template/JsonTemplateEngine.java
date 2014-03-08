@@ -29,13 +29,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class JsonTemplateEngine {
 
   private final FormatterTable formatterTable;
-  
+
   private final PredicateTable predicateTable;
 
   private final MetaData metaData;
 
   private LoggingHook loggingHook;
-  
+
   /**
   * Since the FormatterTable and PredicateTable classes are extensible with custom
   * instances, this class accepts them as constructor arguments.  Just initialize an
@@ -48,15 +48,15 @@ public class JsonTemplateEngine {
     predicateTable.setInUse();
     this.metaData = new MetaData(formatterTable, predicateTable);
   }
-  
+
   public void setLoggingHook(LoggingHook hook) {
     this.loggingHook = hook;
   }
-  
+
   public MetaData getMetaData() {
     return this.metaData;
   }
-  
+
   /**
    * Execute the instruction against the JSON node.
    */
@@ -82,7 +82,7 @@ public class JsonTemplateEngine {
   public Context executeSafe(Instruction instruction, JsonNode json, JsonNode partials) throws CodeExecuteException {
     return executeWithPartialsSafe(instruction, json, partials, new StringBuilder());
   }
-  
+
   /**
    * Execute the instruction against the JSON node, using the partial template map, and append
    * the output to buffer.
@@ -98,7 +98,7 @@ public class JsonTemplateEngine {
     return ctx;
   }
 
-  public Context executeWithPartialsSafe(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf) 
+  public Context executeWithPartialsSafe(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf)
       throws CodeExecuteException {
 
     Context ctx = new Context(json, buf);
@@ -109,7 +109,7 @@ public class JsonTemplateEngine {
     instruction.invoke(ctx);
     return ctx;
   }
-  
+
   /**
    * Compile the template and return a wrapper containing the instructions. Useful if you want to
    * compile a template once and execute it multiple times.
@@ -133,7 +133,7 @@ public class JsonTemplateEngine {
       }
     };
   }
-  
+
   public CompiledTemplate compileSafe(String template) throws CodeSyntaxException {
     final CodeMachine machine = new CodeMachine();
     machine.setValidate();
@@ -141,7 +141,7 @@ public class JsonTemplateEngine {
     tokenizer.setValidate();
     tokenizer.consume();
     final List<ErrorInfo> errors = joinErrors(tokenizer.getErrors(), machine.getErrors());
-    
+
     return new CompiledTemplate() {
       @Override
       public Instruction code() {
@@ -157,7 +157,7 @@ public class JsonTemplateEngine {
       }
     };
   }
-  
+
   /**
    * Compiles the template in validation mode, capturing all errors.
    */
@@ -180,7 +180,7 @@ public class JsonTemplateEngine {
     }
 
     final List<ErrorInfo> errors = joinErrors(tokenizer.getErrors(), machine.getErrors());
-    
+
     // Return all of the validation objects for the template.
     return new ValidatedTemplate() {
       @Override

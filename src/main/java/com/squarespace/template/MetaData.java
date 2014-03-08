@@ -27,9 +27,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class MetaData {
 
   private final String[] instructions;
-  
+
   private final String[] formatters;
-  
+
   private final String[] predicates;
 
   public MetaData(FormatterTable formatterTable, PredicateTable predicateTable) {
@@ -37,7 +37,7 @@ public class MetaData {
     this.predicates = predicateTable.getSymbols();
     this.instructions = InstructionTable.getSymbols();
   }
-  
+
   public JsonNode getJson() {
     ObjectNode obj = JsonUtils.createObjectNode();
     obj.put("instructions", arrayJson(instructions));
@@ -45,7 +45,7 @@ public class MetaData {
     obj.put("formatters", arrayJson(formatters));
     return obj;
   }
-  
+
   private ArrayNode arrayJson(String[] array) {
     ArrayNode node = JsonUtils.createArrayNode();
     for (String elem : array) {

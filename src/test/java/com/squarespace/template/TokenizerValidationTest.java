@@ -57,24 +57,24 @@ import com.squarespace.template.Tokenizer;
 public class TokenizerValidationTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;
-  
+
   @Test
   public void testAlternatesWith() throws CodeSyntaxException {
     assertErrors("{.alternates}", WHITESPACE_EXPECTED);
     assertErrors("{.alternates x}", MISSING_WITH_KEYWORD);
     assertErrors("{.alternates with }", EXTRA_CHARS);
   }
-  
+
   @Test
   public void testComments() throws CodeSyntaxException {
     assertErrors("{##\nfoo #", EOF_IN_COMMENT);
   }
-  
+
   @Test
   public void testIfExpression() throws CodeSyntaxException {
 
     // Boolean expressions
-    
+
     assertErrors("{.i}", INVALID_INSTRUCTION);
     assertErrors("{.if}", WHITESPACE_EXPECTED);
     assertErrors("{.if }", IF_EMPTY);
@@ -84,11 +84,11 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{.if a b}", IF_EXPECTED_VAROP);
     assertErrors("{.if a || b || c || d || e || f}", SyntaxErrorType.IF_TOO_MANY_VARS);
     assertErrors("{.if a .}", IF_EXPECTED_VAROP);
-    
+
     // Predicates
     assertErrors("{.if foo?}", PREDICATE_UNKNOWN);
   }
-  
+
   @Test
   public void testOrPredicate() throws CodeSyntaxException {
     assertErrors("{.or.}", EXTRA_CHARS);
@@ -98,7 +98,7 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{.or required-args?}", PREDICATE_NEEDS_ARGS);
     assertErrors("{.or invalid-args?}", PREDICATE_ARGS_INVALID);
   }
-  
+
   @Test
   public void testRepeated() throws CodeSyntaxException {
     assertErrors("{.repeated}", WHITESPACE_EXPECTED);
@@ -108,7 +108,7 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{.repeated section.}", WHITESPACE_EXPECTED);
     assertErrors("{.repeated section a }", EXTRA_CHARS);
   }
-  
+
   @Test
   public void testSection() throws CodeSyntaxException {
     assertErrors("{.section}", WHITESPACE_EXPECTED);
@@ -116,14 +116,14 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{.section ?}", VARIABLE_EXPECTED);
     assertErrors("{.section a }", EXTRA_CHARS);
   }
-  
+
   @Test
   public void testTerminal() throws CodeSyntaxException {
     assertErrors("{.endx}", INVALID_INSTRUCTION);
     assertErrors("{.end }", EXTRA_CHARS);
     assertErrors("{.end end}", EXTRA_CHARS);
   }
-  
+
   @Test
   public void testVariables() throws CodeSyntaxException {
     assertErrors("{a|?}", FORMATTER_INVALID);
@@ -131,13 +131,13 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{a|required-args}", FORMATTER_NEEDS_ARGS);
     assertErrors("{a|invalid-args}", FORMATTER_ARGS_INVALID);
   }
-  
+
   @Test
   public void testVariableFormatters() throws CodeSyntaxException {
     assertErrors("{a|safe|safe|required-args}", FORMATTER_NEEDS_ARGS);
     assertErrors("{a|safe|safe|invalid-args}", FORMATTER_ARGS_INVALID);
   }
-  
+
   private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
@@ -149,12 +149,12 @@ public class TokenizerValidationTest extends UnitTestBase {
     }
     assertEquals(actual.toArray(), expected);
   }
-  
+
   private List<ErrorInfo> validate(String template) throws CodeSyntaxException {
     Tokenizer tokenizer = tokenizer(template);
     tokenizer.setValidate();
     tokenizer.consume();
     return tokenizer.getErrors();
   }
- 
+
 }

@@ -54,25 +54,25 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(a1.repr(), "{.alternates with}");
     assertNotEquals(a1.repr(), "{.alternatesWith}");
     assertNotEquals(a1.repr(), "{.alternateswith}");
-    
+
     a1.getConsequent().add(mk.text("---"));
     assertEquals(a1.repr(), "{.alternates with}---");
 
     assertEquals(ReprEmitter.get(a1, false), "{.alternates with}");
   }
-  
+
   @Test
   public void testCommentRepr() {
     CommentInst c1 = maker().comment("foo");
     assertEquals(c1.repr(), "{#foo}");
-    
+
     c1 = maker().mcomment("foo");
     assertEquals(c1.repr(), "{##foo##}");
-    
+
     c1 = maker().mcomment("\nfoo\nbar\nbaz\n");
     assertEquals(c1.repr(), "{##\nfoo\nbar\nbaz\n##}");
   }
-  
+
   @Test
   public void testIfRepr() {
     CodeMaker mk = maker();
@@ -85,7 +85,7 @@ public class InstructionReprTest extends UnitTestBase {
     IfInst i4 = mk.ifexpn(mk.strlist("a.b", "c.d", "e.f"), mk.oplist(LOGICAL_OR, LOGICAL_AND));
     assertEquals(i4.repr(), "{.if a.b || c.d && e.f}");
   }
-  
+
   @Test
   public void testIfPredicate() {
     CodeMaker mk = maker();
@@ -96,7 +96,7 @@ public class InstructionReprTest extends UnitTestBase {
     i1 = mk.ifpred(UnitTestPredicates.INVALID_ARGS, mk.args("/abc/def/ghi"));
     assertEquals(i1.repr(), "{.if invalid-args?/abc/def/ghi}");
   }
-  
+
   @Test
   public void testLiteralRepr() {
     CodeMaker mk = maker();
@@ -104,20 +104,20 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(mk.tab().repr(), "{.tab}");
     assertEquals(mk.newline().repr(), "{.newline}");
   }
-  
+
   @Test
   public void testMetaRepr() {
     CodeMaker mk = maker();
     assertEquals(mk.metaLeft().repr(), "{.meta-left}");
     assertEquals(mk.metaRight().repr(), "{.meta-right}");
   }
-  
+
   @Test
   public void testNames() {
     assertEquals(ReprEmitter.get(new String[] { "foo", "bar" }), "foo.bar");
     assertEquals(ReprEmitter.get(null), "@");
   }
-  
+
   @Test
   public void testPredicateRepr() {
     CodeMaker mk = maker();
@@ -127,24 +127,24 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(p1.repr(), "{.plural?}A");
     p1.setAlternative(mk.end());
     assertEquals(p1.repr(), "{.plural?}A{.end}");
-    
+
     PredicateInst p2 = mk.or();
     assertEquals(p2.repr(), "{.or}");
     p2.getConsequent().add(mk.text("B"));
     assertEquals(p2.repr(), "{.or}B");
     p2.setAlternative(mk.end());
     assertEquals(p2.repr(), "{.or}B{.end}");
-    
+
     PredicateInst p3 = mk.or(CorePredicates.SINGULAR);
     assertEquals(p3.repr(), "{.or singular?}");
     p3.getConsequent().add(mk.text("C"));
     assertEquals(p3.repr(), "{.or singular?}C");
     p3.setAlternative(mk.end());
     assertEquals(p3.repr(), "{.or singular?}C{.end}");
-    
+
     assertEquals(ReprEmitter.get(p3, false), "{.or singular?}");
   }
-  
+
   @Test
   public void testRepeatedRepr() {
     CodeMaker mk = maker();
@@ -160,10 +160,10 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(r1.repr(), "{.repeated section a.b}A{.alternates with}-");
     r1.setAlternative(mk.end());
     assertEquals(r1.repr(), "{.repeated section a.b}A{.alternates with}-{.end}");
-    
+
     assertEquals(ReprEmitter.get(r1, false), "{.repeated section a.b}");
   }
-  
+
   @Test
   public void testRootRepr() {
     CodeMaker mk = maker();
@@ -173,10 +173,10 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(r1.repr(), "A");
     r1.getConsequent().add(mk.text("B"), mk.text("C"));
     assertEquals(r1.repr(), "ABC");
-    
+
     assertEquals(ReprEmitter.get(r1, false), "");
   }
-  
+
   @Test
   public void testSectionRepr() {
     CodeMaker mk = maker();
@@ -186,7 +186,7 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(s1.repr(), "{.section a.b.c}");
     s1.getConsequent().add(mk.text("A"));
     assertEquals(s1.repr(), "{.section a.b.c}A");
-    
+
     PredicateInst p1 = mk.or();
     s1.setAlternative(p1);
     assertEquals(s1.repr(), "{.section a.b.c}A{.or}");
@@ -194,17 +194,17 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(s1.repr(), "{.section a.b.c}A{.or}B");
     p1.setAlternative(mk.end());
     assertEquals(s1.repr(), "{.section a.b.c}A{.or}B{.end}");
-    
+
     assertEquals(ReprEmitter.get(s1, false), "{.section a.b.c}");
   }
-  
+
   @Test
   public void testTextRepr() {
     CodeMaker mk = maker();
     TextInst t1 = mk.text("foo bar");
     assertEquals(t1.repr(), "foo bar");
   }
-  
+
   @Test
   public void testVariableRepr() {
     CodeMaker mk = maker();
@@ -216,10 +216,10 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(v1.repr(), "{a.b|json}");
     v1 = mk.var("@", mk.fmt(PLURALIZE, mk.args(" a1 a2")));
     assertEquals(v1.repr(), "{@|pluralize a1 a2}");
-    
+
     v1 = mk.var("@", mk.formatters(mk.fmt(PLURALIZE, mk.args(" a1 a2")), mk.fmt(TRUNCATE, mk.args(" 34"))));
     assertEquals(v1.repr(), "{@|pluralize a1 a2|truncate 34}");
   }
-  
+
 
 }

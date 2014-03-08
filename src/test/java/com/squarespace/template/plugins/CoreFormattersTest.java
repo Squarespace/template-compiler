@@ -67,12 +67,12 @@ public class CoreFormattersTest extends UnitTestBase {
     String result = eval(compiler().execute(code, JsonUtils.decode(json)));
     assertEquals(result, "http://foobar.com/foo/abc");
   }
-  
+
   @Test
   public void testApplyPartial() throws CodeException {
     String partials = "{\"block.item\": \"this {@} value\"}";
     String input = "{\"foo\": 123}";
-    
+
     CodeMaker mk = maker();
     CodeBuilder cb = builder().text("hi ");
     Arguments args = mk.args(" block.item");
@@ -86,7 +86,7 @@ public class CoreFormattersTest extends UnitTestBase {
     ctx.execute(root);
     assertContext(ctx, "hi this 123 value!");
   }
-  
+
   @Test
   public void testApplyPartialError() throws CodeException {
     String template = "{@|apply block}";
@@ -103,7 +103,7 @@ public class CoreFormattersTest extends UnitTestBase {
       assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_SYNTAX);
     }
   }
-  
+
   @Test
   public void testApplyMissingPartial() throws CodeException {
     String template = "{@|apply foo}";
@@ -120,7 +120,7 @@ public class CoreFormattersTest extends UnitTestBase {
       assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_MISSING);
     }
   }
-  
+
   @Test
   public void testApplyPartialErrorSafe() throws CodeException {
     String template = "{@|apply block}";
@@ -135,7 +135,7 @@ public class CoreFormattersTest extends UnitTestBase {
     assertContext(ctx, "");
     assertEquals(ctx.getErrors().size(), 1);
   }
-  
+
   @Test
   public void testColorWeight() throws CodeException {
     assertFormatter(COLOR_WEIGHT, "\"#fff\"", "light");
@@ -147,7 +147,7 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(COLOR_WEIGHT, "\"800000\"", "light");
     assertFormatter(COLOR_WEIGHT, "\"7fffff\"", "dark");
   }
-  
+
   @Test
   public void testCount() throws CodeException {
     for (String val : new String[] { "null", "0", "\"foo\"" }) {
@@ -156,10 +156,10 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(CoreFormatters.COUNT, "[1,2,3]", "3");
     assertFormatter(CoreFormatters.COUNT, "{\"a\": 1, \"b\": 2}", "2");
   }
-  
+
   @Test
   public void testCycle() throws CodeException {
-    CodeMaker mk = maker();     
+    CodeMaker mk = maker();
     Arguments args = mk.args(" A B C");
     String result = "";
     for (int i = -6; i < 6; i++) {
@@ -186,19 +186,19 @@ public class CoreFormattersTest extends UnitTestBase {
     r1 = formatDate("%F", NOV_15_2013_123030_UTC, tzLosAngeles);
     r2 = formatDate("%Y-%m-%d", NOV_15_2013_123030_UTC, tzLosAngeles);
     assertEquals(r1, r2);
-    
+
     r1 = formatDate("%D", NOV_15_2013_123030_UTC, tzNewYork);
     r2 = formatDate("%m/%d/%y", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
-    
+
     r1 = formatDate("%R", NOV_15_2013_123030_UTC, tzNewYork);
     r2 = formatDate("%H:%M", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
-    
+
     r1 = formatDate("%X", NOV_15_2013_123030_UTC, tzNewYork);
     r2 = formatDate("%H:%M:%S %p", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
-    
+
     // am/pm and 12-hour hour
     format = "%p %P %l";
     assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork), "PM pm  9");
@@ -210,25 +210,25 @@ public class CoreFormattersTest extends UnitTestBase {
     assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzLosAngeles), "PDT -0700");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "EST -0500");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "PST -0800");
-    
+
     // TODO: Week of Year (Joda doesn't support the full range of week-of-year calculations)
 //    format = "%U %V %W";
 //    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork), "20");
   }
-  
+
   private String formatDate(String format, long timestamp, String tzId) throws CodeException {
     String template = "{time|date " + format + "}";
     String json = getDateTestJson(timestamp, tzId);
     Instruction code = compiler().compile(template).code();
     return eval(compiler().execute(code, JsonUtils.decode(json)));
   }
-  
- 
+
+
   @Test
   public void testEncodeSpace() throws CodeException {
     assertFormatter(ENCODE_SPACE, "\"  \\n \"", "&nbsp;&nbsp;&nbsp;&nbsp;");
   }
-  
+
   @Test
   public void testIter() throws CodeException {
     String template = "{.repeated section foo}{@|iter}{.end}";
@@ -238,9 +238,9 @@ public class CoreFormattersTest extends UnitTestBase {
     Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
     ctx.execute(inst);
-    assertContext(ctx, "123"); 
+    assertContext(ctx, "123");
   }
-  
+
   @Test
   public void testHtmlEscape() throws CodeException {
     assertFormatter(HTML, "\"< foo & bar >\"", "&lt; foo &amp; bar &gt;");
@@ -256,18 +256,18 @@ public class CoreFormattersTest extends UnitTestBase {
 
     assertFormatter(JSON_PRETTY, "{ \"a\":  3.14159 }", "{\n  \"a\" : 3.14159\n}");
   }
-  
+
   @Test
   public void testOutput() throws CodeException {
     CodeMaker mk = maker();
     Arguments args = mk.args(":1:2:3");
     assertFormatter(CoreFormatters.OUTPUT, args, "{}", "1 2 3");
   }
-  
+
   @Test
   public void testPluralize() throws CodeException {
     CodeMaker mk = maker();
-    
+
     Arguments args = mk.args("");
     assertFormatter(PLURALIZE, "0", "s");
     assertFormatter(PLURALIZE, "1", "");
@@ -279,30 +279,30 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(PLURALIZE, args, "1", "");
     assertFormatter(PLURALIZE, args, "2", "A");
     assertFormatter(PLURALIZE, args, "100", "A");
-    
+
     args = mk.args("/A/B");
     assertFormatter(PLURALIZE, args, "0", "B");
     assertFormatter(PLURALIZE, args, "1", "A");
     assertFormatter(PLURALIZE, args, "2", "B");
     assertFormatter(PLURALIZE, args, "100", "B");
-    
+
     // Too many args
     args = mk.args(":1:2:3:4");
     assertInvalidArgs(PLURALIZE, args);
   }
-  
+
   @Test
   public void testRaw() throws CodeException {
     for (String json : new String[] { "123", "3.14159", "-12", "false", "true", "null", "\"abc\"" }) {
       assertFormatter(RAW, json, json);
     }
   }
-  
+
   @Test
   public void testSafe() throws CodeException {
     assertFormatter(CoreFormatters.SAFE, "\"foo <bar> bar\"", "foo  bar");
   }
-  
+
   @Test
   public void testSlugify() throws CodeException {
     String data = "\"Next Total Eclipse on 20th of March 2015\"";
@@ -312,13 +312,13 @@ public class CoreFormattersTest extends UnitTestBase {
     data = "\"1.2.3.4.5-()*&-foo.bar-baz\"";
     assertFormatter(SLUGIFY, data, "12345--foobar-baz");
   }
-  
+
   @Test
   public void testSmartypants() throws CodeException {
     assertFormatter(CoreFormatters.SMARTYPANTS, "\"Fred's\"", "Fred\u2019s");
     assertFormatter(CoreFormatters.SMARTYPANTS, "\"\\\"foo\\\"\"", "\u201cfoo\u201d");
   }
-  
+
   @Test
   public void testStr() throws CodeException {
     for (String json : new String[] { "123", "3.14159", "-12", "false", "true" }) {
@@ -327,26 +327,26 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(CoreFormatters.STR, "\"abc\"", "abc");
     assertFormatter(CoreFormatters.STR, "null", "");
   }
-  
+
   @Test
   public void testTimeSince() throws CodeException {
     String now = Long.toString(System.currentTimeMillis() - (1000 * 15));
     String result = format(TIMESINCE, now);
     assertTrue(result.contains("less than a minute ago"));
   }
-  
+
   @Test
   public void testTruncate() throws CodeException {
     CodeMaker mk = maker();
     assertFormatter(TRUNCATE, mk.args(" 5 .."), "\"foo bar baz\"", "foo ..");
   }
-  
+
   @Test
   public void testUrlEncode() throws CodeException {
     assertFormatter(CoreFormatters.URL_ENCODE, "\"\u201ca b\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
   }
-  
-  
+
+
   protected static String getDateTestJson(long timestamp, String tzId) {
     DateTimeZone timezone = DateTimeZone.forID(tzId);
     ObjectNode node = JsonUtils.createObjectNode();

@@ -30,7 +30,7 @@ public class PluginDateUtils {
 
   private PluginDateUtils() {
   }
-  
+
   static enum DatePartType {
     YEAR("year"),
     MONTH("month"),
@@ -40,19 +40,19 @@ public class PluginDateUtils {
     MINUTE("minute"),
     SECOND("second")
     ;
-    
+
     private String name;
-    
+
     private DatePartType(String name) {
       this.name = name;
     }
-    
+
     @Override
     public String toString() {
       return name;
     }
   }
-  
+
   private static void humanizeDatePlural(int value, DatePartType type, StringBuilder buf) {
     buf.append("about ");
     switch (type) {
@@ -63,7 +63,7 @@ public class PluginDateUtils {
           buf.append(value).append(' ').append(type).append('s');
         }
         break;
-        
+
       default:
         if (value == 1) {
           buf.append("a ").append(type);
@@ -115,7 +115,7 @@ public class PluginDateUtils {
     }
     buf.append("less than a minute ago");
   }
-  
+
   static enum DateTimeAggregate {
     FULL,
     H240_M0,
@@ -124,7 +124,7 @@ public class PluginDateUtils {
     MMDDYYYY,
     YYYYMMDD
   }
-  
+
   public static boolean sameDay(long instant1, long instant2, String tzName) {
     DateTimeZone zone = null;
     try {
@@ -138,7 +138,7 @@ public class PluginDateUtils {
         (date1.monthOfYear().get() == date2.monthOfYear().get()) &&
         (date1.dayOfMonth().get() == date2.dayOfMonth().get());
   }
-  
+
   /**
    * Takes a strftime()-compatible format string and outputs the properly formatted date.
    */
@@ -195,18 +195,18 @@ public class PluginDateUtils {
           leftPad(date.secondOfMinute().get(), '0', 2, buf);
           break;
 
-        case 'U': 
+        case 'U':
           // TODO: fix week-of-year number
           leftPad(date.weekOfWeekyear().get(), '0', 2, buf);
           break;
 
         case 'u': buf.append(date.dayOfWeek().get()); break;
 
-        case 'V': 
+        case 'V':
           // TODO: fix week-of-year number
           leftPad(date.weekOfWeekyear().get(), '0', 2, buf);
           break;
-        
+
         case 'v':
           // Equivalent of %e-%b-%Y
           leftPad(date.dayOfMonth().get(), ' ', 2, buf);
@@ -215,12 +215,12 @@ public class PluginDateUtils {
           buf.append('-');
           buf.append(date.getYear());
           break;
-          
-        case 'W': 
+
+        case 'W':
           // TODO: fix week-of-year number
           break;
-          
-        case 'w': buf.append(date.dayOfWeek().get()); break;          
+
+        case 'w': buf.append(date.dayOfWeek().get()); break;
         case 'X': formatAggregate(DateTimeAggregate.HHMMSSP, date, buf); break;
         case 'x': formatAggregate(DateTimeAggregate.MMDDYYYY, date, buf); break;
         case 'Y': buf.append(date.getYear()); break;
@@ -236,7 +236,7 @@ public class PluginDateUtils {
           leftPad(Math.abs(hours), '0', 2, buf);
           leftPad(Math.abs(minutes), '0', 2, buf);
           break;
-          
+
         default:
           // no match, emit literals.
           buf.append(c1).append(c2);
@@ -244,7 +244,7 @@ public class PluginDateUtils {
       index++;
     }
   }
-  
+
   private static void formatAggregate(DateTimeAggregate type, DateTime date, StringBuilder buf) {
     switch (type) {
       case FULL:
@@ -266,13 +266,13 @@ public class PluginDateUtils {
         buf.append(' ');
         buf.append(date.getZone().getShortName(date.getMillis()));
         break;
-      
+
       case H240_M0:
         leftPad(date.get(DateTimeFieldType.clockhourOfDay()), '0', 2, buf);
         buf.append(':');
         leftPad(date.minuteOfHour().get(), '0', 2, buf);
         break;
-        
+
       case HHMMSSP:
         leftPad(date.get(DateTimeFieldType.hourOfHalfday()), '0', 2, buf);
         buf.append(':');
@@ -282,7 +282,7 @@ public class PluginDateUtils {
         buf.append(' ');
         buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM": "PM");
         break;
-        
+
       case MMDDYY:
         leftPad(date.getMonthOfYear(), '0', 2, buf);
         buf.append('/');

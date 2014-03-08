@@ -26,10 +26,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Provides a class to capture state about the error, prior to constructing the 
+ * Provides a class to capture state about the error, prior to constructing the
  * exception itself. Lets us pass this object around to various places if necessary
  * before wrapping it in a CodeSyntaxException.
- * 
+ *
  * The methods are named for the small set of keys used to do pattern substitution
  * in the error messages.  The methods allow more compact code, allow call
  * chaining, and to reduce typos when specifying key names, e.g. info.put("ofset", ...)
@@ -43,23 +43,23 @@ public class ErrorInfo {
   private static final String OFFSET = "offset";
 
   private static final String TYPE = "type";
-  
+
   private static final String DATA = "data";
-  
+
   private static final String NAME = "name";
-  
+
   private static final String LIMIT = "limit";
 
   private static final String REPR = "repr";
-  
+
   private final ErrorType type;
-  
+
   private final ErrorLevel level;
-  
+
   private MapBuilder<String, Object> builder = new MapBuilder<>();
-  
+
   private List<ErrorInfo> children;
-  
+
   public ErrorInfo(ErrorType type) {
     this(type, ErrorLevel.ERROR);
   }
@@ -68,7 +68,7 @@ public class ErrorInfo {
     this.type = type;
     this.level = level;
   }
-  
+
   public ErrorInfo child(ErrorInfo child) {
     if (children == null) {
       children = new ArrayList<>();
@@ -76,7 +76,7 @@ public class ErrorInfo {
     children.add(child);
     return this;
   }
-  
+
   public ErrorInfo child(List<ErrorInfo> errors) {
     if (children == null) {
       children = new ArrayList<>();
@@ -86,7 +86,7 @@ public class ErrorInfo {
     }
     return this;
   }
-  
+
   public ErrorInfo code(Object code) {
     builder.put(CODE, code);
     return this;
@@ -96,7 +96,7 @@ public class ErrorInfo {
     builder.put(LINE, line);
     return this;
   }
-  
+
   public ErrorInfo offset(int offset) {
     builder.put(OFFSET, offset);
     return this;
@@ -106,7 +106,7 @@ public class ErrorInfo {
     builder.put(TYPE, type);
     return this;
   }
-  
+
   public ErrorInfo data(Object data) {
     builder.put(DATA, data);
     return this;
@@ -116,7 +116,7 @@ public class ErrorInfo {
     builder.put(NAME, name);
     return this;
   }
-  
+
   public ErrorInfo limit(Object limit) {
     builder.put(LIMIT, limit);
     return this;
@@ -126,19 +126,19 @@ public class ErrorInfo {
     builder.put(REPR, repr);
     return this;
   }
-  
+
   public MapBuilder<String, Object> getBuilder() {
     return builder;
   }
-  
+
   public ErrorType getType() {
     return type;
   }
-  
+
   public ErrorLevel getLevel() {
     return level;
   }
-  
+
   public List<ErrorInfo> getChildren() {
     if (children == null) {
       return Collections.emptyList();
@@ -149,7 +149,7 @@ public class ErrorInfo {
   public String getMessage() {
     return getMessage(false);
   }
-  
+
   public String getMessage( boolean withChildren) {
     Map<String, Object> params = builder.get();
     StringBuilder buf = new StringBuilder();
@@ -166,7 +166,7 @@ public class ErrorInfo {
     }
     return buf.toString();
   }
-  
+
   public JsonNode toJson() {
     Map<String, Object> map = builder.get();
     ObjectNode obj = JsonUtils.createObjectNode();
@@ -189,5 +189,5 @@ public class ErrorInfo {
     }
     return obj;
   }
-  
+
 }

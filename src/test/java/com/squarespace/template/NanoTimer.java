@@ -22,25 +22,25 @@ import java.util.Arrays;
 public class NanoTimer {
 
   private static int INITIAL_SIZE = 8;
-  
+
   private long[] times;
-  
+
   private int index;
 
   private long start;
-  
+
   public NanoTimer() {
     this(INITIAL_SIZE);
   }
-  
+
   public NanoTimer(int num) {
     times = new long[num];
   }
-  
+
   public void start() {
     start = System.nanoTime();
   }
-  
+
   public void stop() {
     if (start == -1) {
       throw new RuntimeException("stop() called before start()");
@@ -65,11 +65,11 @@ public class NanoTimer {
     }
     return results;
   }
-  
+
   private void expand() {
     int capacity = times.length * 2;
     long[] newTimes = new long[capacity];
     System.arraycopy(times, 0, newTimes, 0, index);
   }
-  
+
 }

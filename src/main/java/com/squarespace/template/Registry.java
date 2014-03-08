@@ -27,7 +27,7 @@ public interface Registry<K, V> {
 
   /**
    * Provides a way to register dynamically-constructed instances, e.g. when you need
-   * to create N symbols that are nearly identical you'd rather not create them as 
+   * to create N symbols that are nearly identical you'd rather not create them as
    * static fields but perhaps build them in a loop.
    */
   public void registerTo(SymbolTable<K, V> symbolTable);
