@@ -19,10 +19,6 @@ package com.squarespace.template;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.squarespace.template.CodeException;
-import com.squarespace.template.FormatterTable;
-import com.squarespace.template.JsonTemplateEngine;
-import com.squarespace.template.PredicateTable;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 

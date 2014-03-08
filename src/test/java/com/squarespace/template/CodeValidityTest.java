@@ -32,15 +32,6 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.Arguments;
-import com.squarespace.template.CodeBuilder;
-import com.squarespace.template.CodeException;
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.CodeSyntaxException;
-import com.squarespace.template.FormatterCall;
-import com.squarespace.template.Instruction;
-import com.squarespace.template.Operator;
-import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
@@ -51,7 +42,7 @@ import com.squarespace.template.plugins.CorePredicates;
  * CodeBuilder, producing the expected result, and invalid sequences are rejected
  * and raise the expected error.
  */
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class CodeValidityTest extends UnitTestBase {
 
   /**
@@ -309,7 +300,7 @@ public class CodeValidityTest extends UnitTestBase {
     assertInvalid(EOF_IN_BLOCK, mk.section("@"), mk.section("a"), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.repeated("@"), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.repeated("@"), mk.repeated("b"), mk.eof());
-    assertInvalid(EOF_IN_BLOCK, mk.ifexpn(mk.strlist("a","b"), mk.oplist(LOGICAL_AND)), mk.eof());
+    assertInvalid(EOF_IN_BLOCK, mk.ifexpn(mk.strlist("a", "b"), mk.oplist(LOGICAL_AND)), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.ifpred(PLURAL), mk.or(), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.predicate(PLURAL), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.section("@"), mk.or(), mk.eof());

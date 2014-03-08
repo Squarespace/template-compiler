@@ -35,7 +35,6 @@ public enum InstructionType {
   SPACE,
   TAB,
   TEXT,
-  VARIABLE
-  ;
+  VARIABLE;
 
 }

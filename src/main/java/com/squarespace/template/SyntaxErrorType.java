@@ -99,9 +99,7 @@ public enum SyntaxErrorType implements ErrorType {
   ("Variable expected, found '%(data)s'"),
 
   WHITESPACE_EXPECTED
-  ("Whitespace expected, found '%(data)s'"),
-
-  ;
+  ("Whitespace expected, found '%(data)s'");
 
   private static final String PREFIX = "SyntaxError %(code)s at line %(line)s character %(offset)s";
 

@@ -46,14 +46,6 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.Arguments;
-import com.squarespace.template.CodeList;
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.CodeSyntaxException;
-import com.squarespace.template.Constants;
-import com.squarespace.template.Instruction;
-import com.squarespace.template.Operator;
-import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.plugins.CoreFormatters;
 
 
@@ -61,7 +53,7 @@ import com.squarespace.template.plugins.CoreFormatters;
  * Tokenizer validation tests. Ensures that the parsed strings result in the correct
  * sequences of instructions, or that the expected error is raised.
  */
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class TokenizerCoreTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;
@@ -104,10 +96,10 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     assertFailure("{.alternates=with}", WHITESPACE_EXPECTED);
     assertFailure("{.alternates wxth}", MISSING_WITH_KEYWORD);
-    assertFailure("{.alternates \t with}",MISSING_WITH_KEYWORD);
+    assertFailure("{.alternates \t with}", MISSING_WITH_KEYWORD);
     assertFailure("{.alternate with}", INVALID_INSTRUCTION);
     assertFailure("{.alternates with xyz}", EXTRA_CHARS);
-    assertFailure("{.alternates with\t}",EXTRA_CHARS);
+    assertFailure("{.alternates with\t}", EXTRA_CHARS);
   }
 
   @Test
@@ -175,7 +167,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertResult("{.if a}", mk.ifexpn(mk.strlist("a"), mk.oplist()), mk.eof());
     assertResult("{.if a||b}", mk.ifexpn(mk.strlist("a", "b"), mk.oplist(LOGICAL_OR)), mk.eof());
-    assertResult("{.if a.b && c.d}", mk.ifexpn(mk.strlist("a.b","c.d"), mk.oplist(LOGICAL_AND)), mk.eof());
+    assertResult("{.if a.b && c.d}", mk.ifexpn(mk.strlist("a.b", "c.d"), mk.oplist(LOGICAL_AND)), mk.eof());
     assertResult("{.if a&&b||c}", mk.ifexpn(mk.strlist("a", "b", "c"), mk.oplist(LOGICAL_AND, LOGICAL_OR)), mk.eof());
 
     List<String> vars = mk.strlist("a", "b", "c", "d", "e");

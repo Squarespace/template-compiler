@@ -27,12 +27,8 @@ import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.CodeStats;
-import com.squarespace.template.CodeSyntaxException;
 
-
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class CodeStatsTest extends UnitTestBase {
 
   @Test

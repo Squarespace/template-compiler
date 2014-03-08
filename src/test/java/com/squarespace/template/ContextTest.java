@@ -24,16 +24,11 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.CodeException;
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.Context;
-import com.squarespace.template.JsonUtils;
-import com.squarespace.template.LoggingHook;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CoreFormatters;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class ContextTest extends UnitTestBase {
 
   @Test

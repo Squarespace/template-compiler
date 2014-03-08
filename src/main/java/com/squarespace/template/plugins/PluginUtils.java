@@ -134,7 +134,7 @@ public class PluginUtils {
     }
 
     int end = maxLen;
-    for (int i = maxLen-1; i >= 0; i--) {
+    for (int i = maxLen - 1; i >= 0; i--) {
       if (Character.isWhitespace(value.charAt(i))) {
         end = i + 1;
         break;

@@ -25,12 +25,12 @@ package com.squarespace.template;
  */
 public interface Predicate {
 
-  public String getIdentifier();
+  String getIdentifier();
 
-  public boolean requiresArgs();
+  boolean requiresArgs();
 
-  public void validateArgs(Arguments args) throws ArgumentsException;
+  void validateArgs(Arguments args) throws ArgumentsException;
 
-  public boolean apply(Context ctx, Arguments args) throws CodeExecuteException;
+  boolean apply(Context ctx, Arguments args) throws CodeExecuteException;
 
 }

@@ -23,20 +23,16 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.template.ErrorInfo;
-import com.squarespace.template.ErrorType;
-import com.squarespace.template.MapBuilder;
-import com.squarespace.template.MapFormat;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class ErrorInfoTest {
 
   static class DummyType implements ErrorType {
 
-    private MapFormat prefix = new MapFormat("%(line)s");
+    private final MapFormat prefix = new MapFormat("%(line)s");
 
-    private MapFormat format;
+    private final MapFormat format;
 
     public DummyType(String format) {
       this.format = new MapFormat(format, "?");

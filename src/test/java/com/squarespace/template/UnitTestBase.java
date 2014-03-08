@@ -31,29 +31,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.template.Arguments;
-import com.squarespace.template.ArgumentsException;
-import com.squarespace.template.CodeBuilder;
-import com.squarespace.template.CodeException;
-import com.squarespace.template.CodeExecuteException;
-import com.squarespace.template.CodeList;
-import com.squarespace.template.CodeMachine;
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.CodeSink;
-import com.squarespace.template.Context;
-import com.squarespace.template.ErrorInfo;
-import com.squarespace.template.ErrorType;
-import com.squarespace.template.Formatter;
-import com.squarespace.template.FormatterTable;
-import com.squarespace.template.Instruction;
-import com.squarespace.template.InstructionTable;
-import com.squarespace.template.JsonTemplateEngine;
-import com.squarespace.template.JsonUtils;
-import com.squarespace.template.Predicate;
-import com.squarespace.template.PredicateTable;
-import com.squarespace.template.ReprEmitter;
-import com.squarespace.template.StringView;
-import com.squarespace.template.Tokenizer;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -90,7 +67,7 @@ public class UnitTestBase {
   /**
    * This instance is stateless so it can be reused across tests.
    */
-  private CodeMaker maker = new CodeMaker();
+  private final CodeMaker maker = new CodeMaker();
 
   public static JsonTemplateEngine compiler() {
     return new JsonTemplateEngine(formatterTable, predicateTable);

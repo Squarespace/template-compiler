@@ -25,13 +25,8 @@ import java.util.Arrays;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.squarespace.template.Arguments;
-import com.squarespace.template.ArgumentsException;
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.Constants;
 
-
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class ArgumentsTest extends UnitTestBase {
 
   @Test

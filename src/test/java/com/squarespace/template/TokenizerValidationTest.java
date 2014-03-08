@@ -40,12 +40,6 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.CodeSyntaxException;
-import com.squarespace.template.ErrorInfo;
-import com.squarespace.template.ErrorType;
-import com.squarespace.template.SyntaxErrorType;
-import com.squarespace.template.Tokenizer;
-
 
 /**
  * Tests the Tokenizer's validation mode, where it continues parsing after
@@ -53,7 +47,7 @@ import com.squarespace.template.Tokenizer;
  * be reported, but these tests only verify errors raised by the Tokenizer
  * class.
  */
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class TokenizerValidationTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;

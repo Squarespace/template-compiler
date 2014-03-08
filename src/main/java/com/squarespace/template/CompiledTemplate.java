@@ -21,10 +21,10 @@ import java.util.List;
 
 public interface CompiledTemplate {
 
-  public CodeMachine machine();
+  CodeMachine machine();
 
-  public List<ErrorInfo> errors();
+  List<ErrorInfo> errors();
 
-  public Instruction code();
+  Instruction code();
 
 }

@@ -198,7 +198,7 @@ public class JsonTemplateEngine {
     };
   }
 
-  private static final List<ErrorInfo> joinErrors(List<ErrorInfo> parseErrors, List<ErrorInfo> compileErrors) {
+  private static List<ErrorInfo> joinErrors(List<ErrorInfo> parseErrors, List<ErrorInfo> compileErrors) {
     if (!parseErrors.isEmpty() || !compileErrors.isEmpty()) {
       ArrayList<ErrorInfo> result = new ArrayList<>(parseErrors.size() + compileErrors.size());
       result.addAll(parseErrors);

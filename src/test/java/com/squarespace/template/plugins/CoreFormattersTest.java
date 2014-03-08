@@ -53,10 +53,9 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.UnitTestBase;
-import com.squarespace.template.plugins.CoreFormatters;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class CoreFormattersTest extends UnitTestBase {
 
   @Test

@@ -56,7 +56,7 @@ public class ErrorInfo {
 
   private final ErrorLevel level;
 
-  private MapBuilder<String, Object> builder = new MapBuilder<>();
+  private final MapBuilder<String, Object> builder = new MapBuilder<>();
 
   private List<ErrorInfo> children;
 
@@ -150,7 +150,7 @@ public class ErrorInfo {
     return getMessage(false);
   }
 
-  public String getMessage( boolean withChildren) {
+  public String getMessage(boolean withChildren) {
     Map<String, Object> params = builder.get();
     StringBuilder buf = new StringBuilder();
     buf.append(type.prefix(params)).append(": ").append(type.message(params));

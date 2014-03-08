@@ -21,10 +21,10 @@ import java.util.List;
 
 public interface ValidatedTemplate {
 
-  public List<ErrorInfo> errors();
+  List<ErrorInfo> errors();
 
-  public CodeList code();
+  CodeList code();
 
-  public CodeStats stats();
+  CodeStats stats();
 
 }

@@ -27,7 +27,6 @@ import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Predicate;
 import com.squarespace.template.UnitTestBase;
-import com.squarespace.template.plugins.CorePredicates;
 
 
 public class CorePredicatesTest extends UnitTestBase {
@@ -39,7 +38,9 @@ public class CorePredicatesTest extends UnitTestBase {
     ctx.pushSection(key);
     assertTrue(CorePredicates.DEBUG, ctx);
 
-    for (String json : new String[] { "{\"a\": {\"b\": 1}}", "{\"debug\": 0, \"a\": {\"b\": 1}}" }) {
+    for (String json : new String[] {
+        "{\"a\": {\"b\": 1}}",
+        "{\"debug\": 0, \"a\": {\"b\": 1}}" }) {
       ctx = context(json);
       ctx.pushSection(key);
       assertFalse(CorePredicates.DEBUG, ctx);  }

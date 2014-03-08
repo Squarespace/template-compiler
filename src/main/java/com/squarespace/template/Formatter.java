@@ -27,9 +27,9 @@ package com.squarespace.template;
  */
 public interface Formatter {
 
-  public String getIdentifier();
+  String getIdentifier();
 
-  public boolean requiresArgs();
+  boolean requiresArgs();
 
   /**
    * For Formatters that take arguments, they will be called with the raw StringView
@@ -39,7 +39,7 @@ public interface Formatter {
    * For example, for a DATE formatter that takes a formatting string, an invalid
    * format escape should be caught in this method and an error thrown.
    */
-  public void validateArgs(Arguments args) throws ArgumentsException;
+  void validateArgs(Arguments args) throws ArgumentsException;
 
   /**
    * During execution of the template, the Formatter will be called with a Context
@@ -47,6 +47,6 @@ public interface Formatter {
    * Formatter's responsibility to emit output using the context. If any
    * runtime errors occur that are severe, the Formatter can throw an exception.
    */
-  public void apply(Context ctx, Arguments args) throws CodeExecuteException;
+  void apply(Context ctx, Arguments args) throws CodeExecuteException;
 
 }

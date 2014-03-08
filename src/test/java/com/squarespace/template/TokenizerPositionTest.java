@@ -23,13 +23,8 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.CodeList;
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.CodeSyntaxException;
-import com.squarespace.template.Instruction;
 
-
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class TokenizerPositionTest extends UnitTestBase {
 
   private static final boolean VERBOSE = false;

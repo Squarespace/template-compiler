@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 /**
  * Testing date formatting routines requires known fixed dates for validation.
  */
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class KnownDates {
 
   public static final long JAN_01_1970_071510_UTC = 26110000L;

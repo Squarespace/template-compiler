@@ -30,6 +30,6 @@ public interface Registry<K, V> {
    * to create N symbols that are nearly identical you'd rather not create them as
    * static fields but perhaps build them in a loop.
    */
-  public void registerTo(SymbolTable<K, V> symbolTable);
+  void registerTo(SymbolTable<K, V> symbolTable);
 
 }

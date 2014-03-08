@@ -45,11 +45,17 @@ public abstract class BaseInstruction implements Instruction {
     return charOffset;
   }
 
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("hashCode() not supported");
+  }
+
   /**
    * To facilitate clear error messages, the toString() for all instructions will
    * output the type and non-recursive representation.  Use repr() to get the
    * recursive representation alone.
    */
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder(getType().toString());
     buf.append(" (").append(lineNumber).append(',').append(charOffset).append(')');

@@ -21,8 +21,8 @@ import java.util.Map;
 
 public interface ErrorType {
 
-  public String prefix(Map<String, Object> params);
+  String prefix(Map<String, Object> params);
 
-  public String message(Map<String, Object> params);
+  String message(Map<String, Object> params);
 
 }

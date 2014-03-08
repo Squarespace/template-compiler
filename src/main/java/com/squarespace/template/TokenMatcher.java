@@ -41,37 +41,37 @@ public class TokenMatcher {
   /** End of the character range of potential matches */
   private int end = -1;
 
-  private final Matcher match_ARGS;
+  private final Matcher matcherArgs;
 
-  private final Matcher match_BOOLEAN_OP;
+  private final Matcher matcherBooleanOp;
 
-  private final Matcher match_FORMATTER;
+  private final Matcher matcherFormatter;
 
-  private final Matcher match_KEYWORD;
+  private final Matcher matcherKeyword;
 
-  private final Matcher match_PREDICATE;
+  private final Matcher matcherPredicate;
 
-  private final Matcher match_VARIABLE;
+  private final Matcher matcherVariable;
 
-  private final Matcher match_WHITESPACE;
+  private final Matcher matcherWhitespace;
 
-  private final Matcher match_WORD_SECTION;
+  private final Matcher matcherWordSection;
 
-  private final Matcher match_WORD_WITH;
+  private final Matcher matchWordWith;
 
   private boolean matched;
 
   public TokenMatcher(final String raw) {
     this.raw = raw;
-    this.match_ARGS = Patterns.ARGUMENTS.matcher(raw);
-    this.match_BOOLEAN_OP = Patterns.BOOLEAN_OP.matcher(raw);
-    this.match_FORMATTER = Patterns.FORMATTER.matcher(raw);
-    this.match_KEYWORD = Patterns.KEYWORD.matcher(raw);
-    this.match_PREDICATE = Patterns.PREDICATE.matcher(raw);
-    this.match_VARIABLE = Patterns.VARIABLE.matcher(raw);
-    this.match_WHITESPACE = Patterns.WHITESPACE.matcher(raw);
-    this.match_WORD_SECTION = Patterns.WORD_SECTION.matcher(raw);
-    this.match_WORD_WITH = Patterns.WORD_WITH.matcher(raw);
+    this.matcherArgs = Patterns.ARGUMENTS.matcher(raw);
+    this.matcherBooleanOp = Patterns.BOOLEAN_OP.matcher(raw);
+    this.matcherFormatter = Patterns.FORMATTER.matcher(raw);
+    this.matcherKeyword = Patterns.KEYWORD.matcher(raw);
+    this.matcherPredicate = Patterns.PREDICATE.matcher(raw);
+    this.matcherVariable = Patterns.VARIABLE.matcher(raw);
+    this.matcherWhitespace = Patterns.WHITESPACE.matcher(raw);
+    this.matcherWordSection = Patterns.WORD_SECTION.matcher(raw);
+    this.matchWordWith = Patterns.WORD_WITH.matcher(raw);
     region(0, raw.length());
   }
 
@@ -143,19 +143,19 @@ public class TokenMatcher {
   }
 
   public boolean arguments() {
-    return match(match_ARGS);
+    return match(matcherArgs);
   }
 
   public boolean formatter() {
-    return match(match_FORMATTER);
+    return match(matcherFormatter);
   }
 
   public boolean keyword() {
-    return match(match_KEYWORD);
+    return match(matcherKeyword);
   }
 
   public boolean operator() {
-    return match(match_BOOLEAN_OP);
+    return match(matcherBooleanOp);
   }
 
   public boolean pipe() {
@@ -163,7 +163,7 @@ public class TokenMatcher {
   }
 
   public boolean predicate() {
-    return match(match_PREDICATE);
+    return match(matcherPredicate);
   }
 
   public boolean space() {
@@ -171,19 +171,19 @@ public class TokenMatcher {
   }
 
   public boolean variable() {
-    return match(match_VARIABLE);
+    return match(matcherVariable);
   }
 
   public boolean whitespace() {
-    return match(match_WHITESPACE);
+    return match(matcherWhitespace);
   }
 
   public boolean wordSection() {
-    return match(match_WORD_SECTION);
+    return match(matcherWordSection);
   }
 
   public boolean wordWith() {
-    return match(match_WORD_WITH);
+    return match(matchWordWith);
   }
 
   /**

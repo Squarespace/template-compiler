@@ -43,6 +43,11 @@ class Block {
     return (instructions == null) ? (other.instructions == null) : instructions.equals(other.instructions);
   }
 
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
   public void add(Instruction ... instrs) {
     if (instructions == null) {
       instructions = new ArrayList<>(initialSize);

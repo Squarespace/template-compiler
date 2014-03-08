@@ -19,20 +19,20 @@ package com.squarespace.template;
 
 public interface Instruction {
 
-  public InstructionType getType();
+  InstructionType getType();
 
-  public void setLineNumber(int line);
+  void setLineNumber(int line);
 
-  public int getLineNumber();
+  int getLineNumber();
 
-  public void setCharOffset(int offset);
+  void setCharOffset(int offset);
 
-  public int getCharOffset();
+  int getCharOffset();
 
-  public void invoke(Context ctx) throws CodeExecuteException;
+  void invoke(Context ctx) throws CodeExecuteException;
 
-  public void repr(StringBuilder buf, boolean recurse);
+  void repr(StringBuilder buf, boolean recurse);
 
-  public void tree(StringBuilder buf, int depth);
+  void tree(StringBuilder buf, int depth);
 
 }

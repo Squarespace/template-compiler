@@ -19,11 +19,8 @@ package com.squarespace.template;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.squarespace.template.Block;
-import com.squarespace.template.CodeMaker;
 
-
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class BlockTest extends UnitTestBase {
 
   @Test

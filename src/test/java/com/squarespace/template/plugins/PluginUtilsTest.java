@@ -19,11 +19,9 @@ import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.plugins.PluginUtils;
 
 
-
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class PluginUtilsTest {
 
   @Test

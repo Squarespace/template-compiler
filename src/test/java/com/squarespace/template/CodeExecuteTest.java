@@ -23,9 +23,6 @@ import java.math.BigDecimal;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.DecimalNode;
-import com.squarespace.template.CodeBuilder;
-import com.squarespace.template.CodeException;
-import com.squarespace.template.Instruction;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -33,7 +30,7 @@ import com.squarespace.template.plugins.CorePredicates;
 /**
  * Executing pieces of code and verifying output.
  */
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class CodeExecuteTest extends UnitTestBase {
 
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";

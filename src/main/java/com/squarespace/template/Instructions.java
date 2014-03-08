@@ -59,6 +59,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.ALTERNATES_WITH;
     }
@@ -111,6 +116,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.COMMENT;
     }
@@ -130,6 +140,11 @@ public class Instructions {
     @Override
     public boolean equals(Object obj) {
       return (obj instanceof EndInst);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     @Override
@@ -153,6 +168,11 @@ public class Instructions {
     @Override
     public boolean equals(Object obj) {
       return (obj instanceof EofInst);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     @Override
@@ -180,9 +200,9 @@ public class Instructions {
 
     private static final List<Operator> EMPTY_OPS = Arrays.<Operator>asList();
 
-    private List<Object[]> variables = new ArrayList<>(VARIABLE_LIST_LEN);
+    private final List<Object[]> variables = new ArrayList<>(VARIABLE_LIST_LEN);
 
-    private List<Operator> operators;
+    private final List<Operator> operators;
 
     public IfInst(List<String> vars, List<Operator> ops) {
       super(CONSEQUENT_BLOCK_LEN);
@@ -213,6 +233,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.IF;
     }
@@ -223,7 +248,7 @@ public class Instructions {
       boolean result = GeneralUtils.isTruthy(ctx.resolve(variables.get(0)));
       for (int i = 1, size = variables.size(); i < size; i++) {
         Object[] var = variables.get(i);
-        Operator op = operators.get(i-1);
+        Operator op = operators.get(i - 1);
         boolean value = GeneralUtils.isTruthy(ctx.resolve(var));
         result = (op == Operator.LOGICAL_OR) ? (result || value) : (result && value);
         if (op == Operator.LOGICAL_OR) {
@@ -291,6 +316,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.IF;
     }
@@ -338,6 +368,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public void invoke(Context ctx) {
       ctx.buffer().append(value);
     }
@@ -369,6 +404,11 @@ public class Instructions {
     @Override
     public boolean equals(Object obj) {
       return (obj instanceof MetaInst) ? ((MetaInst)obj).isLeft == isLeft : false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     @Override
@@ -450,6 +490,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return type;
     }
@@ -522,6 +567,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.REPEATED;
     }
@@ -584,6 +634,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.ROOT;
     }
@@ -623,6 +678,11 @@ public class Instructions {
       }
       SectionInst other = (SectionInst) obj;
       return Arrays.equals(variable, other.variable) && blockEquals(other);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     @Override
@@ -699,6 +759,11 @@ public class Instructions {
     }
 
     @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
     public InstructionType getType() {
       return InstructionType.TEXT;
     }
@@ -728,7 +793,7 @@ public class Instructions {
 
     private final Object[] variable;
 
-    private List<FormatterCall> formatters;
+    private final List<FormatterCall> formatters;
 
     public VariableInst(String name) {
       this(name, Collections.<FormatterCall>emptyList());
@@ -754,6 +819,11 @@ public class Instructions {
         return Arrays.equals(variable, other.variable) && formatters.equals(other.formatters);
       }
       return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     @Override
@@ -795,6 +865,9 @@ public class Instructions {
             double val = node.asDouble();
             buf.append(Double.toString(val));
             break;
+
+          default:
+            break;
         }
 
       } else if (node.isArray()) {
@@ -806,7 +879,7 @@ public class Instructions {
           buf.append(node.path(i).asText());
         }
 
-      } else if (!node.isNull() && !node.isMissingNode()){
+      } else if (!node.isNull() && !node.isMissingNode()) {
         buf.append(node.asText());
       }
 

@@ -109,13 +109,13 @@ public class Tokenizer {
     this.predicateTable = predicateTable;
     this.matcher = new TokenMatcher(raw);
     this.maker = new CodeMaker();
-    this.state = state_INITIAL;
+    this.state = stateInitial;
   }
 
   public boolean consume() throws CodeSyntaxException {
     do {
       state = state.transition();
-    } while (state != state_EOF);
+    } while (state != stateEOF);
     sink.complete();
     return (validate) ? errors.size() == 0 : true;
   }
@@ -149,7 +149,7 @@ public class Tokenizer {
   }
 
   private boolean emitInvalid() throws CodeSyntaxException {
-    sink.accept(maker.text(new StringView(raw, matcher.start()-1, matcher.end()+1)));
+    sink.accept(maker.text(new StringView(raw, matcher.start() - 1, matcher.end() + 1)));
     return true;
   }
 
@@ -227,7 +227,7 @@ public class Tokenizer {
     // Start token matching everything between '{' and '}'
     matcher.region(innerStart, innerEnd);
 
-    return parseKeyword() || parseVariable() || false;
+    return parseKeyword() || parseVariable();
   }
 
   /**
@@ -568,7 +568,7 @@ public class Tokenizer {
    * This machine is pretty simple as it only needs to track an alternating sequence
    * of text / instructions.
    */
-  private final State state_INITIAL = new State() {
+  private final State stateInitial = new State() {
 
     @Override
     public State transition() throws CodeSyntaxException {
@@ -586,7 +586,7 @@ public class Tokenizer {
             instLine = lineCounter;
             instOffset = index - lineIndex;
             emitInstruction(maker.eof());
-            return state_EOF;
+            return stateEOF;
 
           case NEWLINE_CHAR:
             // Keep track of which line we're currently on.
@@ -606,7 +606,7 @@ public class Tokenizer {
               }
 
               index += 3;
-              return state_MULTILINE_COMMENT;
+              return stateMultilineComment;
             }
 
             // Skip over duplicate META_LEFT characters until we find the last one
@@ -639,6 +639,9 @@ public class Tokenizer {
             textOffset = index + 1 - lineIndex;
             save = index + 1;
             break;
+
+          default:
+            break;
         }
 
         index++;
@@ -650,7 +653,7 @@ public class Tokenizer {
   /**
    * MULTILINE COMMENT state.  {## ... ##}
    */
-  private final State state_MULTILINE_COMMENT = new State() {
+  private final State stateMultilineComment = new State() {
     @Override
     public State transition() throws CodeSyntaxException {
       int start = index;
@@ -661,7 +664,7 @@ public class Tokenizer {
           case EOF_CHAR:
             emitInstruction(maker.mcomment(raw, start, index));
             fail(error(SyntaxErrorType.EOF_IN_COMMENT, true));
-            return state_EOF;
+            return stateEOF;
 
           case NEWLINE_CHAR:
             lineCounter++;
@@ -677,8 +680,11 @@ public class Tokenizer {
               save = index;
 
               // Return to outer state.
-              return state_INITIAL;
+              return stateInitial;
             }
+            break;
+
+          default:
             break;
         }
 
@@ -690,7 +696,7 @@ public class Tokenizer {
   /**
    * Terminal state when EOF on the input is reached.
    */
-  private final State state_EOF = new State() {
+  private final State stateEOF = new State() {
 
     @Override
     public State transition() throws CodeSyntaxException {
@@ -702,7 +708,7 @@ public class Tokenizer {
 
   interface State {
 
-    public State transition() throws CodeSyntaxException;
+    State transition() throws CodeSyntaxException;
 
   }
 

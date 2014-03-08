@@ -36,9 +36,7 @@ public enum ExecuteErrorType implements ErrorType {
   ("Default error %(name)s: %(data)s"),
 
   UNEXPECTED_ERROR
-  ("Unexpected %(name)s when executing %(repr)s: %(data)s")
-
-  ;
+  ("Unexpected %(name)s when executing %(repr)s: %(data)s");
 
   private static final String PREFIX = "RuntimeError %(code)s at line %(line)s character %(offset)s";
 

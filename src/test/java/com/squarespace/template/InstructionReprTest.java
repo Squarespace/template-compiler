@@ -26,8 +26,6 @@ import static org.testng.Assert.assertNotEquals;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.CodeMaker;
-import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.IfInst;
@@ -44,7 +42,7 @@ import com.squarespace.template.plugins.CorePredicates;
 /**
  * Validates the external representations of instructions.
  */
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class InstructionReprTest extends UnitTestBase {
 
   @Test

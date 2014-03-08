@@ -22,12 +22,12 @@ package com.squarespace.template;
  */
 public interface CodeSink {
 
-  public void accept(Instruction ... instructions) throws CodeSyntaxException;
+  void accept(Instruction ... instructions) throws CodeSyntaxException;
 
   /**
    * Indicates end of instruction stream. All instructions have been fed, so the sink can now
    * perform post-processing.
    */
-  public void complete();
+  void complete();
 
 }

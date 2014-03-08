@@ -21,9 +21,9 @@ import java.util.Arrays;
 
 public class NanoTimer {
 
-  private static int INITIAL_SIZE = 8;
+  private static final int INITIAL_SIZE = 8;
 
-  private long[] times;
+  private final long[] times;
 
   private int index;
 

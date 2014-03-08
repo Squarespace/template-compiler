@@ -25,12 +25,9 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.squarespace.template.Constants;
-import com.squarespace.template.GeneralUtils;
-import com.squarespace.template.JsonUtils;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class GeneralUtilsTest {
 
   @Test

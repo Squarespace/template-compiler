@@ -22,7 +22,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class SymbolTableTest {
 
   @Test
@@ -68,7 +68,7 @@ public class SymbolTableTest {
 
   static class Name {
 
-    private String name;
+    private final String name;
 
     public Name(String n) {
       this.name = n;
@@ -81,6 +81,11 @@ public class SymbolTableTest {
     @Override
     public boolean equals(Object obj) {
       return (obj instanceof Name) ? name.equals(((Name)obj).name) : false;
+    }
+
+    @Override
+    public int hashCode() {
+      return name.hashCode();
     }
   }
 
@@ -101,7 +106,7 @@ public class SymbolTableTest {
 
   static class NameRegistry implements Registry<String, Name> {
 
-    public Name IGNORED = new Name("ignored");
+    public final Name ignored = new Name("ignored");
 
     public static final Name STATIC = new Name("static");
 

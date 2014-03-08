@@ -137,15 +137,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
   };
 
+  private static final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
+
+  private static final int HALFBRIGHT = 0xFFFFFF / 2;
 
   /**
    * COLOR_WEIGHT
    */
   public static final Formatter COLOR_WEIGHT = new BaseFormatter("color-weight", false) {
-
-    private final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
-
-    private final int HALFBRIGHT = 0xFFFFFF / 2;
 
     /**
      * Properly handle hex colors of length 3. Width of each channel needs to be expanded.

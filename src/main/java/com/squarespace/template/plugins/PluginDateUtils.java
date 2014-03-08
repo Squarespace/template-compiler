@@ -38,8 +38,7 @@ public class PluginDateUtils {
     DAY("day"),
     HOUR("hour"),
     MINUTE("minute"),
-    SECOND("second")
-    ;
+    SECOND("second");
 
     private String name;
 
@@ -134,9 +133,9 @@ public class PluginDateUtils {
     }
     DateTime date1 = new DateTime(instant1, zone);
     DateTime date2 = new DateTime(instant2, zone);
-    return (date1.year().get() == date2.year().get()) &&
-        (date1.monthOfYear().get() == date2.monthOfYear().get()) &&
-        (date1.dayOfMonth().get() == date2.dayOfMonth().get());
+    return (date1.year().get() == date2.year().get())
+        && (date1.monthOfYear().get() == date2.monthOfYear().get())
+        && (date1.dayOfMonth().get() == date2.dayOfMonth().get());
   }
 
   /**
@@ -225,7 +224,7 @@ public class PluginDateUtils {
         case 'x': formatAggregate(DateTimeAggregate.MMDDYYYY, date, buf); break;
         case 'Y': buf.append(date.getYear()); break;
         case 'y': leftPad(date.getYearOfCentury(), '0', 2, buf); break;
-        case 'Z': buf.append(zone.getShortName(date.getMillis())); break; //buf.append(date.getZone().getShortName(date.getMillis())); break;
+        case 'Z': buf.append(zone.getShortName(date.getMillis())); break;
         case 'z':
           int offset = date.getZone().getOffset(instant) / 60000;
           int hours = (int)Math.floor(offset / 60);
@@ -262,7 +261,7 @@ public class PluginDateUtils {
         buf.append(':');
         leftPad(date.secondOfMinute().get(), '0', 2, buf);
         buf.append(' ');
-        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM": "PM");
+        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
         buf.append(' ');
         buf.append(date.getZone().getShortName(date.getMillis()));
         break;
@@ -280,7 +279,7 @@ public class PluginDateUtils {
         buf.append(':');
         leftPad(date.getSecondOfMinute(), '0', 2, buf);
         buf.append(' ');
-        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM": "PM");
+        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
         break;
 
       case MMDDYY:
@@ -305,6 +304,9 @@ public class PluginDateUtils {
         leftPad(date.monthOfYear().get(), '0', 2, buf);
         buf.append('-');
         leftPad(date.dayOfMonth().get(), '0', 2, buf);
+        break;
+
+      default:
         break;
     }
   }
