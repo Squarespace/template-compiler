@@ -9,6 +9,10 @@
     <module name="FileLength"/>
     <module name="FileTabCharacter"/>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="${samedir}/suppressions.xml" default="./suppressions.xml"/>
+    </module>
+
     <!-- Trailing spaces -->
     <module name="RegexpSingleline">
         <property name="format" value="\s+$"/>
