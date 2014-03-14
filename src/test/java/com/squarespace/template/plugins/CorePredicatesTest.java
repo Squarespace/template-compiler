@@ -17,12 +17,18 @@
 package com.squarespace.template.plugins;
 
 import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
+import static com.squarespace.template.plugins.CorePredicates.EQUALS;
+import static com.squarespace.template.plugins.CorePredicates.EVEN;
+import static com.squarespace.template.plugins.CorePredicates.GREATER_THAN;
+import static com.squarespace.template.plugins.CorePredicates.LESS_THAN;
+import static com.squarespace.template.plugins.CorePredicates.LESS_THAN_OR_EQUAL;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
+import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Predicate;
@@ -45,6 +51,61 @@ public class CorePredicatesTest extends UnitTestBase {
       ctx.pushSection(key);
       assertFalse(CorePredicates.DEBUG, ctx);  }
     }
+
+  @Test
+  public void testEquals() throws CodeException {
+    CodeMaker mk = maker();
+    assertTrue(EQUALS, context("3"), mk.args(" 3"));
+    assertTrue(EQUALS, context("\"hello\""), mk.args(" \"hello\""));
+    assertTrue(EQUALS, context("[1, 2, 3]"), mk.args(":[1, 2, 3]"));
+
+    assertFalse(EQUALS, context("-1"), mk.args(" 3"));
+    assertFalse(EQUALS, context("\"hello\""), mk.args(" \"goodbye\""));
+    assertFalse(EQUALS, context("[1, 2, 3]"), mk.args(":1"));
+  }
+
+  @Test
+  public void testEven() throws CodeException {
+    assertTrue(EVEN, context("4"));
+    assertTrue(EVEN, context("-4"));
+    assertFalse(EVEN, context("5"));
+    assertFalse(EVEN, context("-5"));
+
+    assertFalse(EVEN, context("false"));
+    assertFalse(EVEN, context("\"hi\""));
+    assertFalse(EVEN, context("\"4\""));
+  }
+
+  @Test
+  public void testGreaterThan() throws CodeException {
+    CodeMaker mk = maker();
+    assertTrue(GREATER_THAN, context("3"), mk.args(" 1"));
+    assertTrue(GREATER_THAN, context("\"z\""), mk.args(" \"a\""));
+
+    assertFalse(GREATER_THAN, context("1"), mk.args(" 1"));
+    assertFalse(GREATER_THAN, context("\"a\""), mk.args(" \"z\""));
+  }
+
+  @Test
+  public void testJsonPredicateVariable() throws CodeException {
+    Context ctx = context("{\"a\": 1, \"b\": {\"c\": 1}}");
+    ctx.pushSection(new String[] { "b", "c" });
+    assertTrue(EQUALS, ctx, maker().args(" a"));
+  }
+
+  @Test
+  public void testLessThan() throws CodeException {
+    CodeMaker mk = maker();
+    assertTrue(LESS_THAN, context("1"), mk.args(" 2"));
+    assertTrue(LESS_THAN, context("-1"), mk.args(" 0"));
+  }
+
+  @Test
+  public void testLessThanOrEqual() throws CodeException {
+    CodeMaker mk = maker();
+    assertTrue(LESS_THAN_OR_EQUAL, context("1"), mk.args(" 1"));
+    assertTrue(LESS_THAN_OR_EQUAL, context("1"), mk.args(" 2"));
+  }
 
   @Test
   public void testPlural() throws CodeException {
@@ -73,6 +134,7 @@ public class CorePredicatesTest extends UnitTestBase {
   }
 
   private void assertTrue(Predicate predicate, Context ctx, Arguments args) throws CodeException {
+    predicate.validateArgs(args);
     Assert.assertTrue(predicate.apply(ctx, args));
   }
 
@@ -81,6 +143,7 @@ public class CorePredicatesTest extends UnitTestBase {
   }
 
   private void assertFalse(Predicate predicate, Context ctx, Arguments args) throws CodeException {
+    predicate.validateArgs(args);
     Assert.assertFalse(predicate.apply(ctx, args));
   }
 }

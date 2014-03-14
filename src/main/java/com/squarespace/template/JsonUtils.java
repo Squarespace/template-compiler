@@ -51,4 +51,28 @@ public class JsonUtils {
     return MAPPER;
   }
 
+  /**
+   * Compare two JsonNode objects and return an integer.
+   *
+   * @return  a negative integer, zero, or a positive integer as this object
+   *          is less than, equal to, or greater than the specified object.
+   */
+  public static int compare(JsonNode left, JsonNode right) {
+    if (left.isLong() || left.isInt()) {
+      return Long.compare(left.asLong(), right.asLong());
+
+    } else if (left.isDouble() || left.isFloat()) {
+      return Double.compare(left.asDouble(), right.asDouble());
+
+    } else if (left.isTextual()) {
+      return left.asText().compareTo(right.asText());
+
+    } else if (left.isBoolean()) {
+      return Boolean.compare(left.asBoolean(), right.asBoolean());
+    }
+
+    // Not comparable in a relative sense, default to equals.
+    return left.equals(right) ? 0 : -1;
+  }
+
 }

@@ -17,7 +17,6 @@
 package com.squarespace.template;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -67,20 +66,6 @@ public abstract class BaseInstruction implements Instruction {
     return buf.toString();
   }
 
-  public static Object[] splitVariable(String name) {
-    String[] parts = name.equals("@") ? null : StringUtils.split(name, '.');
-    if (parts == null) {
-      return null;
-    }
-
-    // Each segment of the key path can be either a String or an Integer.
-    Object[] keys = new Object[parts.length];
-    for (int i = 0, len = parts.length; i < len; i++) {
-      keys[i] = allDigits(parts[i]) ? Integer.parseInt(parts[i], 10) : parts[i];
-    }
-    return keys;
-  }
-
   public String repr() {
     StringBuilder buf = new StringBuilder();
     repr(buf, true);
@@ -103,12 +88,4 @@ public abstract class BaseInstruction implements Instruction {
    */
   public abstract void repr(StringBuilder buf, boolean recurse);
 
-  private static boolean allDigits(String str) {
-    for (int i = 0, len = str.length(); i < len; i++) {
-      if (!Character.isDigit(str.charAt(i))) {
-        return false;
-      }
-    }
-    return true;
-  }
 }

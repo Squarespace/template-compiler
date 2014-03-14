@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -51,6 +52,20 @@ public class GeneralUtils {
     gen.setCodec(JsonUtils.getMapper());
     gen.writeTree(node);
     return buf.toString();
+  }
+
+  public static Object[] splitVariable(String name) {
+    String[] parts = name.equals("@") ? null : StringUtils.split(name, '.');
+    if (parts == null) {
+      return null;
+    }
+
+    // Each segment of the key path can be either a String or an Integer.
+    Object[] keys = new Object[parts.length];
+    for (int i = 0, len = parts.length; i < len; i++) {
+      keys[i] = allDigits(parts[i]) ? Integer.parseInt(parts[i], 10) : parts[i];
+    }
+    return keys;
   }
 
   public static String urlEncode(String val) {
@@ -85,4 +100,14 @@ public class GeneralUtils {
   public static String eatNull(JsonNode node) {
     return node.isNull() ? "" : node.asText();
   }
+
+  private static boolean allDigits(String str) {
+    for (int i = 0, len = str.length(); i < len; i++) {
+      if (!Character.isDigit(str.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 }
