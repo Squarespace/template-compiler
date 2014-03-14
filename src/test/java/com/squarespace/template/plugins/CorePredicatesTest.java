@@ -17,15 +17,17 @@
 package com.squarespace.template.plugins;
 
 import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
-import static com.squarespace.template.plugins.CorePredicates.EQUALS;
+import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.EVEN;
 import static com.squarespace.template.plugins.CorePredicates.GREATER_THAN;
 import static com.squarespace.template.plugins.CorePredicates.LESS_THAN;
 import static com.squarespace.template.plugins.CorePredicates.LESS_THAN_OR_EQUAL;
+import static com.squarespace.template.plugins.CorePredicates.ODD;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
@@ -55,13 +57,13 @@ public class CorePredicatesTest extends UnitTestBase {
   @Test
   public void testEquals() throws CodeException {
     CodeMaker mk = maker();
-    assertTrue(EQUALS, context("3"), mk.args(" 3"));
-    assertTrue(EQUALS, context("\"hello\""), mk.args(" \"hello\""));
-    assertTrue(EQUALS, context("[1, 2, 3]"), mk.args(":[1, 2, 3]"));
+    assertTrue(EQUAL, context("3"), mk.args(" 3"));
+    assertTrue(EQUAL, context("\"hello\""), mk.args(" \"hello\""));
+    assertTrue(EQUAL, context("[1, 2, 3]"), mk.args(":[1, 2, 3]"));
 
-    assertFalse(EQUALS, context("-1"), mk.args(" 3"));
-    assertFalse(EQUALS, context("\"hello\""), mk.args(" \"goodbye\""));
-    assertFalse(EQUALS, context("[1, 2, 3]"), mk.args(":1"));
+    assertFalse(EQUAL, context("-1"), mk.args(" 3"));
+    assertFalse(EQUAL, context("\"hello\""), mk.args(" \"goodbye\""));
+    assertFalse(EQUAL, context("[1, 2, 3]"), mk.args(":1"));
   }
 
   @Test
@@ -80,17 +82,23 @@ public class CorePredicatesTest extends UnitTestBase {
   public void testGreaterThan() throws CodeException {
     CodeMaker mk = maker();
     assertTrue(GREATER_THAN, context("3"), mk.args(" 1"));
+    assertTrue(GREATER_THAN, context("-17"), mk.args(" -18"));
     assertTrue(GREATER_THAN, context("\"z\""), mk.args(" \"a\""));
 
     assertFalse(GREATER_THAN, context("1"), mk.args(" 1"));
+    assertFalse(GREATER_THAN, context("-18"), mk.args(" -17"));
     assertFalse(GREATER_THAN, context("\"a\""), mk.args(" \"z\""));
   }
 
   @Test
   public void testJsonPredicateVariable() throws CodeException {
-    Context ctx = context("{\"a\": 1, \"b\": {\"c\": 1}}");
-    ctx.pushSection(new String[] { "b", "c" });
-    assertTrue(EQUALS, ctx, maker().args(" a"));
+    Context ctx = context("{\"number\": 1, \"foo\": {\"bar\": 1}}");
+    ctx.pushSection(new String[] { "foo", "bar" });
+    assertTrue(EQUAL, ctx, maker().args(" number"));
+
+    JsonNode json = json("[10, 20, 30]");
+    ctx = execute("{.repeated section nums}{.equal? @index 1}{@}{.end}{.end}", json);
+    System.out.println(ctx.buffer());
   }
 
   @Test
@@ -98,6 +106,11 @@ public class CorePredicatesTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertTrue(LESS_THAN, context("1"), mk.args(" 2"));
     assertTrue(LESS_THAN, context("-1"), mk.args(" 0"));
+    assertTrue(LESS_THAN, context("\"a\""), mk.args(" \"j\""));
+
+    assertFalse(LESS_THAN, context("-17"), mk.args(" -18"));
+    assertFalse(LESS_THAN, context("-17"), mk.args(" -18"));
+    assertFalse(LESS_THAN, context("\"j\""), mk.args(" \"a\""));
   }
 
   @Test
@@ -105,6 +118,20 @@ public class CorePredicatesTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertTrue(LESS_THAN_OR_EQUAL, context("1"), mk.args(" 1"));
     assertTrue(LESS_THAN_OR_EQUAL, context("1"), mk.args(" 2"));
+    assertTrue(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.2"));
+    assertTrue(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1415"));
+    assertTrue(LESS_THAN_OR_EQUAL, context("\"c\""), mk.args(" \"c\""));
+
+    assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
+    assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
+    assertFalse(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1"));
+    assertFalse(LESS_THAN_OR_EQUAL, context("\"z\""), mk.args(" \"j\""));
+  }
+
+  @Test
+  public void testOdd() throws CodeException {
+    assertTrue(ODD, context("3"));
+    assertFalse(ODD, context("4"));
   }
 
   @Test

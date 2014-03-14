@@ -148,8 +148,8 @@ public class UnitTestBase {
   /**
    * Execute the instruction on the given JSON node.  Return the execution context.
    */
-  public Context execute(String jsonData, Instruction ... instructions) throws CodeExecuteException {
-    return execute(JsonUtils.decode(jsonData), instructions);
+  public Context execute(String jsonData, Instruction instruction) throws CodeExecuteException {
+    return execute(JsonUtils.decode(jsonData), instruction);
   }
 
   /**
@@ -160,6 +160,18 @@ public class UnitTestBase {
     for (Instruction inst : instructions) {
       ctx.execute(inst);
     }
+    return ctx;
+  }
+
+  public Context execute(String template, String jsonData) throws CodeException {
+    return execute(template, json(jsonData));
+  }
+
+  public Context execute(String template, JsonNode json) throws CodeException {
+    Context ctx = new Context(json);
+    CodeList code = collector();
+    tokenizer(template, code).consume();
+    ctx.execute(code.getInstructions());
     return ctx;
   }
 

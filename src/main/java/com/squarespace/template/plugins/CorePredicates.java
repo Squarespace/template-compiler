@@ -18,6 +18,9 @@ package com.squarespace.template.plugins;
 
 import static com.squarespace.template.GeneralUtils.isTruthy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
@@ -66,30 +69,39 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       super(identifier, true);
     }
 
+    public abstract void limitArgs(Arguments args) throws ArgumentsException;
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
-      args.exactly(1);
-      String raw = args.get(0);
+      limitArgs(args);
+      List<Object> parsed = new ArrayList<>();
+      for (int i = 0; i < args.count(); i++) {
+        parsed.add(parse(args, i));
+      }
+      args.setOpaque(parsed);
+    };
 
+    private Object parse(Arguments args, int index) throws ArgumentsException {
+      String raw = args.get(index);
       // Attempt to decode as JSON
       try {
-        args.setOpaque(JsonUtils.decode(raw));
-        return;
+        return JsonUtils.decode(raw);
       } catch (IllegalArgumentException e) {
         // Fall through..
       }
 
       // Attempt to parse variable name.
       if (Patterns.VARIABLE.matcher(raw).matches()) {
-        args.setOpaque(new VarRef(GeneralUtils.splitVariable(raw)));
-        return;
+        return new VarRef(GeneralUtils.splitVariable(raw));
       }
 
-      throw new ArgumentsException("Argument must be a valid JSON value or variable reference.");
-    };
+      throw new ArgumentsException("Argument " + raw + " must be a valid JSON value or variable reference.");
+    }
 
-    protected JsonNode resolve(Context ctx, Arguments args) {
-      Object arg = args.getOpaque();
+    @SuppressWarnings("unchecked")
+    protected JsonNode resolve(Context ctx, Arguments args, int index) {
+      List<Object> parsed = (List<Object>) args.getOpaque();
+      Object arg = parsed.get(index);
       if (arg instanceof VarRef) {
         VarRef ref = (VarRef)arg;
         return ctx.resolve(ref.reference());
@@ -99,22 +111,40 @@ public class CorePredicates extends BaseRegistry<Predicate> {
 
   }
 
-  public static final Predicate EQUALS = new JsonPredicate("equals?") {
+
+  public static final Predicate EQUAL = new JsonPredicate("equal?") {
+
+    @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
 
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode expected = resolve(ctx, args);
-      return ctx.node().equals(expected);
+      JsonNode arg0 = resolve(ctx, args, 0);
+      if (args.count() == 1) {
+        return ctx.node().equals(arg0);
+      } else {
+        return arg0.equals(resolve(ctx, args, 1));
+      }
     }
 
   };
 
 
-  public static final Predicate EVEN = new BasePredicate("even?", false) {
+  public static final Predicate EVEN = new JsonPredicate("even?") {
+
+    @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.atMost(1);
+    }
 
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
+      if (args.count() == 1) {
+        node = resolve(ctx, args, 0);
+      }
       if (node.isInt() || node.isLong()) {
         return (node.asLong() % 2) == 0;
       }
@@ -127,9 +157,17 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   public static final Predicate GREATER_THAN = new JsonPredicate("greaterThan?") {
 
     @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
+
+    @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode expected = resolve(ctx, args);
-      return JsonUtils.compare(ctx.node(), expected) > 0;
+      JsonNode arg0 = resolve(ctx, args, 0);
+      if (args.count() == 1) {
+        return JsonUtils.compare(ctx.node(), arg0) > 0;
+      }
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) > 0;
     }
 
   };
@@ -138,9 +176,17 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   public static final Predicate GREATER_THAN_OR_EQUAL = new JsonPredicate("greaterThanOrEqual?") {
 
     @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
+
+    @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode expected = resolve(ctx, args);
-      return JsonUtils.compare(ctx.node(), expected) >= 0;
+      JsonNode arg0 = resolve(ctx, args, 0);
+      if (args.count() == 1) {
+        return JsonUtils.compare(ctx.node(), arg0) >= 0;
+      }
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) >= 0;
     }
 
   };
@@ -149,9 +195,17 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   public static final Predicate LESS_THAN = new JsonPredicate("lessThan?") {
 
     @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
+
+    @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode expected = resolve(ctx, args);
-      return JsonUtils.compare(ctx.node(), expected) < 0;
+      JsonNode arg0 = resolve(ctx, args, 0);
+      if (args.count() == 1) {
+        return JsonUtils.compare(ctx.node(), arg0) < 0;
+      }
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) < 0;
     }
 
   };
@@ -160,19 +214,35 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   public static final Predicate LESS_THAN_OR_EQUAL = new JsonPredicate("lessThanOrEqual?") {
 
     @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
+
+    @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode expected = resolve(ctx, args);
-      return JsonUtils.compare(ctx.node(), expected) <= 0;
+      JsonNode arg0 = resolve(ctx, args, 0);
+      if (args.count() == 1) {
+        return JsonUtils.compare(ctx.node(), arg0) <= 0;
+      }
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) <= 0;
     }
 
   };
 
 
-  public static final Predicate ODD = new BasePredicate("odd?", false) {
+  public static final Predicate ODD = new JsonPredicate("odd?") {
+
+    @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.atMost(1);
+    }
 
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
+      if (args.count() == 1) {
+        node = resolve(ctx, args, 0);
+      }
       if (node.isInt() || node.isLong()) {
         return (node.asLong() % 2) != 0;
       }
