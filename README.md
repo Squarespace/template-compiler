@@ -1,7 +1,7 @@
 
 # Squarespace Template Compiler.
 
-A Java template compiler based on JSON-Template.
+A Java template compiler based on [JSON-Template][jsont].
 
 License: [Apache 2.0](LICENSE) ([tl;dr][license-tldr])
 
@@ -15,5 +15,13 @@ Copyright (c) 2014 SQUARESPACE, Inc.
  * Support additional features for server-side compilation.
 
 
-[license-tldr]: https://tldrlegal.com/license/apache-license-2.0-(apache-2.0) "Apache 2.0 tl;dr"
+
+[license-tldr]:
+https://tldrlegal.com/license/apache-license-2.0-(apache-2.0) "Apache 2.0 tl;dr"
+
+[jsont]:
+http://json-template.googlecode.com/svn/trunk/doc/Introducing-JSON-Template.html
+
+[nodejs]:
+http://nodejs.org
 
