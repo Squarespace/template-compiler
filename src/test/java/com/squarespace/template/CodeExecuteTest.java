@@ -36,6 +36,44 @@ public class CodeExecuteTest extends UnitTestBase {
   private static final String ALPHAS = "abcdefghijklmnopqrstuvwxyz";
 
   @Test
+  public void testBindVar() throws CodeException {
+    RootInst root = builder().bindvar("@name", "foo").var("@name").eof().build();
+    assertEquals(repr(root), "{.var @name foo}{@name}");
+    assertContext(execute("{\"foo\": 123}", root), "123");
+
+    // Bind variable to element inside array
+    root = builder().bindvar("@name", "foo.1").var("@name").eof().build();
+    assertEquals(repr(root), "{.var @name foo.1}{@name}");
+    assertContext(execute("{\"foo\": [1,2,3]}", root), "2");
+
+    // Resolve variable in outer scope
+    root = builder().bindvar("@val", "foo").section("bar").var("@val").end().eof().build();
+    assertEquals(repr(root), "{.var @val foo}{.section bar}{@val}{.end}");
+    assertContext(execute("{\"foo\": 1, \"bar\": 2}", root), "1");
+
+    // Full example with nesting
+    String json = "{\"managers\":["
+        + "{\"name\": \"Bill\", \"employees\": [{\"name\": \"Peter\"}, {\"name\": \"Michael\"}]},"
+        + "{\"name\": \"Bob\", \"employees\": [{\"name\": \"Samir\"}]}"
+        + "]}";
+    CodeBuilder cb = builder();
+    cb.repeated("managers").bindvar("@boss", "name").bindvar("@boss-idx", "@index");
+    cb.repeated("employees").var("@boss-idx").text(".").var("@index").text(" ");
+    cb.var("name").text(" is managed by ").var("@boss").text("\n").end();
+    root = cb.alternatesWith().text("---\n").end().eof().build();
+    assertContext(execute(json, root),
+        "1.1 Peter is managed by Bill\n"
+        + "1.2 Michael is managed by Bill\n"
+        + "---\n"
+        + "2.1 Samir is managed by Bob\n");
+
+    // Example with dotted access on @var
+    json = "{\"person\": {\"name\": \"Larry\", \"age\": \"21\"}}";
+    root = builder().bindvar("@person", "person").var("@person.name").text(" is ").var("@person.age").eof().build();
+    assertContext(execute(json, root), "Larry is 21");
+  }
+
+  @Test
   public void testLiterals() throws CodeException {
     RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().build();
     assertContext(execute("{}", root), "{ \t\n}");

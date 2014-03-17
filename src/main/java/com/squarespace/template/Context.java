@@ -340,6 +340,10 @@ public class Context {
     push(node);
   }
 
+  public void setVar(String name, JsonNode node) {
+    currentFrame.setVar(name, node);
+  }
+
   public JsonNode resolve(Object name) {
     return lookupStack(name);
   }
@@ -403,15 +407,22 @@ public class Context {
   private JsonNode resolve(Object name, Frame frame) {
     // Special internal variable @index points to the array index for a
     // given stack frame.
-    if (name.equals("@index")) {
-      if (frame.currentIndex != -1) {
-        // @index is 1-based
-        return new IntNode(frame.currentIndex + 1);
+    if (name instanceof String) {
+      String strName = (String)name;
+
+      if (strName.startsWith("@")) {
+        if (name.equals("@index")) {
+          if (frame.currentIndex != -1) {
+            // @index is 1-based
+            return new IntNode(frame.currentIndex + 1);
+          }
+          return Constants.MISSING_NODE;
+        }
+        JsonNode node = frame.getVar(strName);
+        return (node == null) ? Constants.MISSING_NODE : node;
       }
-      return Constants.MISSING_NODE;
-    }
-    if (name instanceof Integer) {
-      return frame.node.path((int)name);
+
+      // Fall through
     }
     return nodePath(frame.node, name);
   }
@@ -439,13 +450,26 @@ public class Context {
 
   static class Frame {
 
-    JsonNode node;
+    private Map<String, JsonNode> variables;
+
+    private JsonNode node;
 
     int currentIndex;
 
     public Frame(JsonNode node) {
       this.node = node;
       this.currentIndex = -1;
+    }
+
+    public void setVar(String name, JsonNode node) {
+      if (variables == null) {
+        variables = new HashMap<>(4);
+      }
+      variables.put(name, node);
+    }
+
+    public JsonNode getVar(String name) {
+      return (variables == null) ? null : variables.get(name);
     }
 
   }

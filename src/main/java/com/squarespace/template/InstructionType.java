@@ -20,6 +20,7 @@ package com.squarespace.template;
 public enum InstructionType {
 
   ALTERNATES_WITH,
+  BINDVAR,
   COMMENT,
   END,
   EOF,

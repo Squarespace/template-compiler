@@ -18,6 +18,7 @@ package com.squarespace.template;
 
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
+import static com.squarespace.template.SyntaxErrorType.BINDVAR_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_COMMENT;
 import static com.squarespace.template.SyntaxErrorType.EXTRA_CHARS;
 import static com.squarespace.template.SyntaxErrorType.FORMATTER_ARGS_INVALID;
@@ -100,6 +101,17 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.alternate with}", INVALID_INSTRUCTION);
     assertFailure("{.alternates with xyz}", EXTRA_CHARS);
     assertFailure("{.alternates with\t}", EXTRA_CHARS);
+  }
+
+  @Test
+  public void testBindVar() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    assertResult("{.var @name foo.bar}", mk.bindvar("@name", "foo.bar"), mk.eof());
+    assertResult("{.var @outer-index @index}", mk.bindvar("@outer-index", "@index"), mk.eof());
+
+    assertFailure("{.var=foo}", WHITESPACE_EXPECTED);
+    assertFailure("{.var foo bar}", BINDVAR_EXPECTS_NAME);
+    assertFailure("{.var @foo.bar baz}", WHITESPACE_EXPECTED);
   }
 
   @Test

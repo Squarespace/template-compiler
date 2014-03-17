@@ -19,6 +19,7 @@ package com.squarespace.template;
 import java.util.List;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
+import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.IfInst;
@@ -192,6 +193,12 @@ public class ReprEmitter {
     }
   }
 
+  public static void emit(BindVarInst inst, StringBuilder buf) {
+    buf.append("{.var ").append(inst.getName()).append(' ');
+    emitNames(inst.getVariable(), buf);
+    buf.append('}');
+  }
+
   public static void emit(SectionInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.section ");
     emitNames(inst.getVariable(), buf);
@@ -216,6 +223,12 @@ public class ReprEmitter {
       emit(formatter.getArguments(), buf);
     }
     buf.append('}');
+  }
+
+  public static String emitNames(Object[] names) {
+    StringBuilder buf = new StringBuilder();
+    emitNames(names, buf);
+    return buf.toString();
   }
 
   public static void emitNames(Object[] names, StringBuilder buf) {

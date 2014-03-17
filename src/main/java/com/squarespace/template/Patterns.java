@@ -61,6 +61,8 @@ public class Patterns {
    */
   public static final Pattern KEYWORD = Pattern.compile("\\." + _WORD + "\\??");
 
+  public static final Pattern LOCAL_VARIABLE = Pattern.compile("@" + _WORD);
+
   public static final Pattern ONESPACE = Pattern.compile("\\s");
 
   /**
@@ -73,9 +75,7 @@ public class Patterns {
    */
   public static final Pattern PREDICATE = Pattern.compile(_WORD + "\\?");
 
-  // We may want to relax this pattern later to allow other @-prefixed variable names.
-  // Sticking strictly to the upstream JSONT behavior for now.
-  public static final Pattern VARIABLE = Pattern.compile(_DOTWORD + "|@index|@");
+  public static final Pattern VARIABLE = Pattern.compile("@*" + _DOTWORD + "|@");
 
   public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 

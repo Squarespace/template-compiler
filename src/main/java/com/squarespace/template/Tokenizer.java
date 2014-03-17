@@ -21,6 +21,7 @@ import static com.squarespace.template.Patterns.META_LEFT_CHAR;
 import static com.squarespace.template.Patterns.META_RIGHT_CHAR;
 import static com.squarespace.template.Patterns.NEWLINE_CHAR;
 import static com.squarespace.template.Patterns.POUND_CHAR;
+import static com.squarespace.template.SyntaxErrorType.BINDVAR_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.EXTRA_CHARS;
 import static com.squarespace.template.SyntaxErrorType.FORMATTER_ARGS_INVALID;
 import static com.squarespace.template.SyntaxErrorType.FORMATTER_INVALID;
@@ -32,6 +33,7 @@ import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_OPERATORS;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_VARS;
 import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
 import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
+import static com.squarespace.template.SyntaxErrorType.MISSING_VARIABLE_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_WITH_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
@@ -330,9 +332,43 @@ public class Tokenizer {
       case SECTION:
         return parseSection(type);
 
+      case BINDVAR:
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        // Parse the variable name.
+        if (!matcher.localVariable()) {
+          fail(error(BINDVAR_EXPECTS_NAME).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String name = matcher.consume().repr();
+
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        if (!matcher.variable()) {
+          fail(error(MISSING_VARIABLE_NAME).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String path = matcher.consume().repr();
+
+        emitInstruction(maker.bindvar(name, path));
+        return true;
+
       default:
         throw new RuntimeException("Resolution failure: instruction type '" + type + "' has no text representation.");
     }
+  }
+
+  private boolean skipWhitespace() throws CodeSyntaxException {
+    boolean result = matcher.space();
+    if (!result) {
+      fail(error(WHITESPACE_EXPECTED).data(matcher.remainder()));
+    }
+    matcher.consume();
+    return result;
   }
 
   /**

@@ -49,6 +49,11 @@ public class CodeBuilder {
     return this;
   }
 
+  public CodeBuilder bindvar(String name, String path) throws CodeSyntaxException {
+    machine.accept(maker.bindvar(name, path));
+    return this;
+  }
+
   public CodeBuilder comment(StringView view) throws CodeSyntaxException {
     machine.accept(maker.comment(view));
     return this;

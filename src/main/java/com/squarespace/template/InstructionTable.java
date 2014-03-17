@@ -55,6 +55,7 @@ public class InstructionTable {
     add(".section", InstructionType.SECTION);
     add(".space", InstructionType.SPACE);
     add(".tab", InstructionType.TAB);
+    add(".var", InstructionType.BINDVAR);
 
     // Special-case for instructions containing whitespace (yeah).
     symbolList.add(".alternates with");

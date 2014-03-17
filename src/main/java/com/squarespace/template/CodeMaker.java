@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
+import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
@@ -55,6 +56,10 @@ public class CodeMaker {
 
   public Arguments args(String args) {
     return new Arguments(view(args));
+  }
+
+  public BindVarInst bindvar(String name, String path) {
+    return new BindVarInst(name, path);
   }
 
   public StringBuilder buf() {

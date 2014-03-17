@@ -27,6 +27,7 @@ import static org.testng.Assert.assertNotEquals;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
+import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
@@ -57,6 +58,16 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(a1.repr(), "{.alternates with}---");
 
     assertEquals(ReprEmitter.get(a1, false), "{.alternates with}");
+  }
+
+  @Test
+  public void testBindVarRepr() {
+    CodeMaker mk = maker();
+    BindVarInst s1 = mk.bindvar("@foo", "bar.baz");
+    assertEquals(s1.repr(), "{.var @foo bar.baz}");
+
+    s1 = mk.bindvar("@name", "names.0");
+    assertEquals(s1.repr(), "{.var @name names.0}");
   }
 
   @Test

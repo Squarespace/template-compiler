@@ -27,6 +27,7 @@ import static org.testng.Assert.assertNotEquals;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
+import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
@@ -70,6 +71,18 @@ public class InstructionEqualityTest extends UnitTestBase {
 
     a2.setAlternative(mk.text("bar"));
     assertEquals(a1, a2);
+  }
+
+  @Test
+  public void testBindVarEquals() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    BindVarInst s1 = mk.bindvar("foo", "bar.baz");
+    assertEquals(s1, mk.bindvar("foo", "bar.baz"));
+    assertFalse(s1.equals(null));
+
+    assertNotEquals(s1, mk.bindvar("foo", "bar"));
+    assertNotEquals(s1, mk.bindvar("bar", "bar.baz"));
+    assertNotEquals(s1, mk.var("foo"));
   }
 
   @Test

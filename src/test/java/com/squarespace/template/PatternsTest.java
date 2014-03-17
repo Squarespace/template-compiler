@@ -65,6 +65,7 @@ public class PatternsTest {
     isVariable("foo.bar.baz");
     isVariable("@");
     isVariable("@index");
+    isVariable("@foo");
     isVariable("0");
     isVariable("1");
     isVariable("12");
@@ -75,7 +76,6 @@ public class PatternsTest {
     notVariable(".foo");
     notVariable("-foo.bar");
     notVariable("12foo");
-    notVariable("@foo");
     notVariable("0 .foo");
     notVariable("0. foo");
     notVariable(".0");

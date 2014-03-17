@@ -82,6 +82,62 @@ public class Instructions {
 
   }
 
+
+  /**
+   * Set a local variable's value.
+   */
+  static class BindVarInst extends BaseInstruction {
+
+    private final String name;
+
+    private final Object[] variable;
+
+    public BindVarInst(String key, String variable) {
+      this.name = key;
+      this.variable = splitVariable(variable);
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public Object[] getVariable() {
+      return variable;
+    }
+
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      JsonNode value = ctx.resolve(variable);
+      ctx.setVar(name, value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof BindVarInst) {
+        BindVarInst other = (BindVarInst)obj;
+        return name.equals(other.name) && Arrays.equals(variable, other.variable);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.BINDVAR;
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf);
+    }
+
+  }
+
+
   /**
    * Terminal instruction representing a comment. Implementation is a NOOP.
    */
@@ -835,7 +891,6 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      StringBuilder buf = ctx.buffer();
       ctx.push(variable);
 
       // Apply any formatters.
@@ -845,46 +900,7 @@ public class Instructions {
       }
 
       // Finally, output the result.
-      JsonNode node = ctx.node();
-      if (node.isNumber()) {
-        // Formatting of numbers depending on type
-        switch (node.numberType()) {
-          case BIG_INTEGER:
-            buf.append(((BigIntegerNode)node).bigIntegerValue().toString());
-            break;
-
-          case BIG_DECIMAL:
-            buf.append(((DecimalNode)node).decimalValue().toPlainString());
-            break;
-
-          case INT:
-          case LONG:
-            buf.append(node.asLong());
-            break;
-
-          case FLOAT:
-          case DOUBLE:
-            double val = node.asDouble();
-            buf.append(Double.toString(val));
-            break;
-
-          default:
-            break;
-        }
-
-      } else if (node.isArray()) {
-        // Javascript Array.toString() will comma-delimit the elements.
-        for (int i = 0, size = node.size(); i < size; i++) {
-          if (i >= 1) {
-            buf.append(",");
-          }
-          buf.append(node.path(i).asText());
-        }
-
-      } else if (!node.isNull() && !node.isMissingNode()) {
-        buf.append(node.asText());
-      }
-
+      emitJsonNode(ctx, ctx.node());
       ctx.pop();
     }
 
@@ -893,6 +909,50 @@ public class Instructions {
       ReprEmitter.emit(this, buf);
     }
 
+  }
+
+
+  private static void emitJsonNode(Context ctx, JsonNode node) {
+    StringBuilder buf = ctx.buffer();
+
+    if (node.isNumber()) {
+      // Formatting of numbers depending on type
+      switch (node.numberType()) {
+        case BIG_INTEGER:
+          buf.append(((BigIntegerNode)node).bigIntegerValue().toString());
+          break;
+
+        case BIG_DECIMAL:
+          buf.append(((DecimalNode)node).decimalValue().toPlainString());
+          break;
+
+        case INT:
+        case LONG:
+          buf.append(node.asLong());
+          break;
+
+        case FLOAT:
+        case DOUBLE:
+          double val = node.asDouble();
+          buf.append(Double.toString(val));
+          break;
+
+        default:
+          break;
+      }
+
+    } else if (node.isArray()) {
+      // Javascript Array.toString() will comma-delimit the elements.
+      for (int i = 0, size = node.size(); i < size; i++) {
+        if (i >= 1) {
+          buf.append(",");
+        }
+        buf.append(node.path(i).asText());
+      }
+
+    } else if (!node.isNull() && !node.isMissingNode()) {
+      buf.append(node.asText());
+    }
   }
 
 }

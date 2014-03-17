@@ -29,6 +29,9 @@ public enum SyntaxErrorType implements ErrorType {
 
   // NOTE: The constructor placement below is odd but is a little easier to read.
 
+  BINDVAR_EXPECTS_NAME
+  ("{.var} expects a local variable name (e.g. @foo), found '%(data)s'"),
+
   DEAD_CODE_BLOCK
   ("This %(type)s block will never execute."),
 
@@ -76,6 +79,9 @@ public enum SyntaxErrorType implements ErrorType {
 
   MISSING_SECTION_KEYWORD
   ("Missing 'section' keyword, found '%(data)s'"),
+
+  MISSING_VARIABLE_NAME
+  ("Missing variable name, found '%(data)s'"),
 
   NOT_ALLOWED_AT_ROOT
   ("%(type)s instruction is not allowed at the template root."),
