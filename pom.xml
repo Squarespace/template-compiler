@@ -2,15 +2,23 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.squarespace.template</groupId>
   <artifactId>template-compiler</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <url>https://github.com/squarespace/squarespace-template</url>
   <description>Squarespace JSON-Template Compiler</description>
 
+<!--
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
     <version>7</version>
+  </parent>
+-->
+
+  <parent>
+    <groupId>com.squarespace</groupId>
+    <artifactId>squarespace-maven-project</artifactId>
+    <version>RELEASE</version>
   </parent>
 
   <organization>
