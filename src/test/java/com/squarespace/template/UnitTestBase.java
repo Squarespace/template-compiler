@@ -39,11 +39,11 @@ import com.squarespace.template.plugins.CorePredicates;
  */
 public class UnitTestBase {
 
-  private static final boolean DEBUG = false;
+  protected static final boolean DEBUG = false;
 
-  private static final PredicateTable predicateTable = new PredicateTable();
+  protected static final PredicateTable predicateTable = new PredicateTable();
 
-  private static final FormatterTable formatterTable = new FormatterTable();
+  protected static final FormatterTable formatterTable = new FormatterTable();
 
   static {
     predicateTable.register(new CorePredicates());
@@ -67,7 +67,7 @@ public class UnitTestBase {
   /**
    * This instance is stateless so it can be reused across tests.
    */
-  private final CodeMaker maker = new CodeMaker();
+  protected final CodeMaker maker = new CodeMaker();
 
   public static JsonTemplateEngine compiler() {
     return new JsonTemplateEngine(formatterTable, predicateTable);

@@ -21,7 +21,6 @@ import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
 import static com.squarespace.template.plugins.CoreFormatters.APPLY;
-import static com.squarespace.template.plugins.CoreFormatters.COLOR_WEIGHT;
 import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
 import static com.squarespace.template.plugins.CoreFormatters.HTML;
 import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
@@ -31,10 +30,8 @@ import static com.squarespace.template.plugins.CoreFormatters.JSON_PRETTY;
 import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
 import static com.squarespace.template.plugins.CoreFormatters.RAW;
 import static com.squarespace.template.plugins.CoreFormatters.SLUGIFY;
-import static com.squarespace.template.plugins.CoreFormatters.TIMESINCE;
 import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.util.Arrays;
@@ -57,15 +54,6 @@ import com.squarespace.template.UnitTestBase;
 
 @Test(groups = { "unit" })
 public class CoreFormattersTest extends UnitTestBase {
-
-  @Test
-  public void testAbsUrl() throws CodeException {
-    String template = "{a|AbsUrl}";
-    String json = "{\"base-url\": \"http://foobar.com/foo\", \"a\": \"abc\"}";
-    Instruction code = compiler().compile(template).code();
-    String result = eval(compiler().execute(code, JsonUtils.decode(json)));
-    assertEquals(result, "http://foobar.com/foo/abc");
-  }
 
   @Test
   public void testApplyPartial() throws CodeException {
@@ -133,18 +121,6 @@ public class CoreFormattersTest extends UnitTestBase {
     ctx.execute(inst);
     assertContext(ctx, "");
     assertEquals(ctx.getErrors().size(), 1);
-  }
-
-  @Test
-  public void testColorWeight() throws CodeException {
-    assertFormatter(COLOR_WEIGHT, "\"#fff\"", "light");
-    assertFormatter(COLOR_WEIGHT, "\"#000\"", "dark");
-    assertFormatter(COLOR_WEIGHT, "\"ffffff\"", "light");
-    assertFormatter(COLOR_WEIGHT, "\"000000\"", "dark");
-    assertFormatter(COLOR_WEIGHT, "\"#aaa\"", "light");
-    assertFormatter(COLOR_WEIGHT, "\"#444\"", "dark");
-    assertFormatter(COLOR_WEIGHT, "\"800000\"", "light");
-    assertFormatter(COLOR_WEIGHT, "\"7fffff\"", "dark");
   }
 
   @Test
@@ -325,13 +301,6 @@ public class CoreFormattersTest extends UnitTestBase {
     }
     assertFormatter(CoreFormatters.STR, "\"abc\"", "abc");
     assertFormatter(CoreFormatters.STR, "null", "");
-  }
-
-  @Test
-  public void testTimeSince() throws CodeException {
-    String now = Long.toString(System.currentTimeMillis() - (1000 * 15));
-    String result = format(TIMESINCE, now);
-    assertTrue(result.contains("less than a minute ago"));
   }
 
   @Test
