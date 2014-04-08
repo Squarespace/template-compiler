@@ -7,13 +7,34 @@ License: [Apache 2.0](LICENSE) ([tl;dr][license-tldr])
 
 Copyright (c) 2014 SQUARESPACE, Inc.
 
-## Project Goals
+## Overview
 
- * Migrate away from use of [Node.js][nodejs] running forked version of
-   JSON-Template, for server-side template compilation.
- * Improve performance, reduce memory usage where possible.
+Squarespace's template language is based on JSON-Template, a minimal
+declarative template language for Python and JavaScript, heavily influenced by
+[google-ctemplate][goog-ct].
+
+
+## Objectives
+
+The project was started with these objectives:
+
+ * Move away from using [Node.js][nodejs] for backend template compilation.
+ * Must meet or exceed performance of the legacy system. The compiler can
+   potentially execute several times for each page view, so it needs to be
+   really fast.
+ * Improve performance over the legacy system.
+ * Minimize memory usage. For example, parsing can often create and discard a
+   high number of intermedia strings.
  * Support additional features for server-side compilation.
+ * High test coverage.
+ * Support syntax error recovery.
+ * Support a template validation mode.
 
+
+## Measured Results
+
+ * Average 20x performance increase over previous Node.js + JSON-Template
+   system.
 
 
 [license-tldr]:
@@ -24,4 +45,7 @@ http://json-template.googlecode.com/svn/trunk/doc/Introducing-JSON-Template.html
 
 [nodejs]:
 http://nodejs.org
+
+[goog-ct]:
+https://code.google.com/p/ctemplate/
 
