@@ -198,6 +198,26 @@ public class CoreFormattersTest extends UnitTestBase {
     return eval(compiler().execute(code, JsonUtils.decode(json)));
   }
 
+  /**
+   * Ensure that partials can see global scope.
+   */
+  @Test
+  public void testDatePartial() throws CodeException {
+    String tzNewYork = "America/New_York";
+    String format = "%Y-%m-%d %H:%M:%S %Z";
+
+    String json = getDateTestJson(MAY_13_2013_010000_UTC, tzNewYork);
+    String template = "{@|apply block}";
+    String partials = "{\"block\": \"{time|date " + format + "}\"}";
+
+    Context ctx = new Context(JsonUtils.decode(json));
+    ctx.setCompiler(compiler());
+    ctx.setPartials(JsonUtils.decode(partials));
+
+    Instruction inst = compiler().compile(template).code();
+    ctx.execute(inst);
+    assertContext(ctx, "2013-05-12 21:00:00 EDT");
+  }
 
   @Test
   public void testEncodeSpace() throws CodeException {

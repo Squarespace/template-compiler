@@ -111,6 +111,15 @@ public class Context {
   }
 
   /**
+   * Swap the buffer for the current formatter.
+   */
+  public StringBuilder swapBuffer(StringBuilder newBuffer) {
+    StringBuilder tmp = buf;
+    buf = newBuffer;
+    return tmp;
+  }
+
+  /**
    * Sets a compiler to be used for compiling partials. If no compiler is set,
    * partials cannot be compiled and will raise errors.
    */

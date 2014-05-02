@@ -44,7 +44,6 @@ import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
-import com.squarespace.template.JsonTemplateEngine;
 import com.squarespace.template.Patterns;
 
 
@@ -91,21 +90,22 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
           throw new CodeExecuteException(error);
         }
       }
-      // Execute instruction starting with the current node, and appending to the parent
-      // context's buffer.
-      StringBuilder buf = new StringBuilder();
+
+      // Temporarily swap the buffers to capture all output of the partial.
+      StringBuilder origBuf = ctx.swapBuffer(new StringBuilder());
       JsonNode node = ctx.node();
       if (node == null) {
         node = MISSING_NODE;
       }
-      JsonTemplateEngine compiler = ctx.getCompiler();
-      if (ctx.safeExecutionEnabled()) {
-        compiler.executeWithPartialsSafe(inst, node, MISSING_NODE, buf);
-      } else {
-        ctx.getCompiler().execute(inst, node, buf);
+
+      try {
+        inst.invoke(ctx);
+      } finally {
+        StringBuilder buf = ctx.swapBuffer(origBuf);
+        ctx.setNode(buf.toString());
       }
-      ctx.setNode(buf.toString());
     }
+
   };
 
 
