@@ -16,7 +16,6 @@
 
 package com.squarespace.template.plugins;
 
-import static com.squarespace.template.Constants.MISSING_NODE;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
@@ -93,11 +92,6 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
       // Temporarily swap the buffers to capture all output of the partial.
       StringBuilder origBuf = ctx.swapBuffer(new StringBuilder());
-      JsonNode node = ctx.node();
-      if (node == null) {
-        node = MISSING_NODE;
-      }
-
       try {
         inst.invoke(ctx);
       } finally {
