@@ -55,7 +55,7 @@ public class CorePredicatesTest extends UnitTestBase {
     }
 
   @Test
-  public void testEquals() throws CodeException {
+  public void testEqual() throws CodeException {
     CodeMaker mk = maker();
     assertTrue(EQUAL, context("3"), mk.args(" 3"));
     assertTrue(EQUAL, context("\"hello\""), mk.args(" \"hello\""));
