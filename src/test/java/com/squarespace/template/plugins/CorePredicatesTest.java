@@ -23,6 +23,7 @@ import static com.squarespace.template.plugins.CorePredicates.GREATER_THAN;
 import static com.squarespace.template.plugins.CorePredicates.LESS_THAN;
 import static com.squarespace.template.plugins.CorePredicates.LESS_THAN_OR_EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.ODD;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -96,9 +97,10 @@ public class CorePredicatesTest extends UnitTestBase {
     ctx.pushSection(new String[] { "foo", "bar" });
     assertTrue(EQUAL, ctx, maker().args(" number"));
 
-    JsonNode json = json("[10, 20, 30]");
-    ctx = execute("{.repeated section nums}{.equal? @index 1}{@}{.end}{.end}", json);
-    System.out.println(ctx.buffer());
+    String template = "{.repeated section nums}{.equal? @index 2}{@}{.end}{.end}";
+    JsonNode json = json("{\"nums\": [10, 20, 30]}");
+    ctx = execute(template, json);
+    assertEquals(ctx.buffer().toString(), "20");
   }
 
   @Test

@@ -169,9 +169,9 @@ public class UnitTestBase {
 
   public Context execute(String template, JsonNode json) throws CodeException {
     Context ctx = new Context(json);
-    CodeList code = collector();
-    tokenizer(template, code).consume();
-    ctx.execute(code.getInstructions());
+    CodeMachine sink = machine();
+    tokenizer(template, sink).consume();
+    ctx.execute(sink.getCode());
     return ctx;
   }
 
