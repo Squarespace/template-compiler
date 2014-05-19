@@ -61,10 +61,12 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(EQUAL, context("3"), mk.args(" 3"));
     assertTrue(EQUAL, context("\"hello\""), mk.args(" \"hello\""));
     assertTrue(EQUAL, context("[1, 2, 3]"), mk.args(":[1, 2, 3]"));
+    assertTrue(EQUAL, context("{\"foo\": \"bar\"}"), mk.args(" {\"foo\":\"bar\"}"));
 
     assertFalse(EQUAL, context("-1"), mk.args(" 3"));
     assertFalse(EQUAL, context("\"hello\""), mk.args(" \"goodbye\""));
     assertFalse(EQUAL, context("[1, 2, 3]"), mk.args(":1"));
+    assertFalse(EQUAL, context("{\"foo\":\"bar\"}"), mk.args(":1"));
   }
 
   @Test
@@ -77,6 +79,7 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(EVEN, context("false"));
     assertFalse(EVEN, context("\"hi\""));
     assertFalse(EVEN, context("\"4\""));
+    assertFalse(EVEN, context("{\"foo\": \"bar\"}"));
   }
 
   @Test
@@ -89,6 +92,7 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(GREATER_THAN, context("1"), mk.args(" 1"));
     assertFalse(GREATER_THAN, context("-18"), mk.args(" -17"));
     assertFalse(GREATER_THAN, context("\"a\""), mk.args(" \"z\""));
+    assertFalse(GREATER_THAN, context("[]"), mk.args(" []"));
   }
 
   @Test
@@ -113,6 +117,7 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(LESS_THAN, context("-17"), mk.args(" -18"));
     assertFalse(LESS_THAN, context("-17"), mk.args(" -18"));
     assertFalse(LESS_THAN, context("\"j\""), mk.args(" \"a\""));
+    assertFalse(LESS_THAN, context("[]"), mk.args(" []"));
   }
 
   @Test
@@ -123,6 +128,7 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.2"));
     assertTrue(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1415"));
     assertTrue(LESS_THAN_OR_EQUAL, context("\"c\""), mk.args(" \"c\""));
+    assertTrue(LESS_THAN_OR_EQUAL, context("[]"), mk.args(" []"));
 
     assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
     assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
