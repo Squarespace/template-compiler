@@ -80,6 +80,16 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(EVEN, context("\"hi\""));
     assertFalse(EVEN, context("\"4\""));
     assertFalse(EVEN, context("{\"foo\": \"bar\"}"));
+
+    // Verify behavior inside repeated section
+    String template = "{.repeated section items}{.even?}{@index}{.end}{.end}";
+    JsonNode json = json("{\"items\": [{}, {}, {}, {}, {}]}");
+    Context ctx = execute(template, json);
+    assertEquals(ctx.buffer().toString(), "");
+
+    template = "{.repeated section items}{.even? @index}{@index}{.end}{.end}";
+    ctx = execute(template, json);
+    assertEquals(ctx.buffer().toString(), "24");
   }
 
   @Test
@@ -140,6 +150,17 @@ public class CorePredicatesTest extends UnitTestBase {
   public void testOdd() throws CodeException {
     assertTrue(ODD, context("3"));
     assertFalse(ODD, context("4"));
+
+    // Verify behavior inside repeated section
+    String template = "{.repeated section items}{.odd?}{@index}{.end}{.end}";
+    JsonNode json = json("{\"items\": [{}, {}, {}, {}, {}]}");
+    Context ctx = execute(template, json);
+    assertEquals(ctx.buffer().toString(), "");
+
+    template = "{.repeated section items}{.odd? @index}{@index}{.end}{.end}";
+    ctx = execute(template, json);
+    assertEquals(ctx.buffer().toString(), "135");
+
   }
 
   @Test

@@ -69,6 +69,10 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       super(identifier, true);
     }
 
+    public JsonPredicate(String identifier, boolean requiresArgs) {
+      super(identifier, requiresArgs);
+    }
+
     public abstract void limitArgs(Arguments args) throws ArgumentsException;
 
     @Override
@@ -132,7 +136,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   };
 
 
-  public static final Predicate EVEN = new JsonPredicate("even?") {
+  public static final Predicate EVEN = new JsonPredicate("even?", false) {
 
     @Override
     public void limitArgs(Arguments args) throws ArgumentsException {
@@ -230,7 +234,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   };
 
 
-  public static final Predicate ODD = new JsonPredicate("odd?") {
+  public static final Predicate ODD = new JsonPredicate("odd?", false) {
 
     @Override
     public void limitArgs(Arguments args) throws ArgumentsException {
