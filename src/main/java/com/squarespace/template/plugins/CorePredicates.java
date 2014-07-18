@@ -32,6 +32,7 @@ import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
+import com.squarespace.template.ReprEmitter;
 
 
 public class CorePredicates extends BaseRegistry<Predicate> {
@@ -74,6 +75,19 @@ public class CorePredicates extends BaseRegistry<Predicate> {
     }
 
     public abstract void limitArgs(Arguments args) throws ArgumentsException;
+
+    @Override
+    public List<String> getVariableNames(Arguments args) {
+      List<String> names = new ArrayList<>();
+      List<Object> parsed = (List<Object>) args.getOpaque();
+      for (Object arg : parsed) {
+        if (arg instanceof VarRef) {
+          String name = ReprEmitter.get(((VarRef)arg).reference());
+          names.add(name);
+        }
+      }
+      return names;
+    }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {

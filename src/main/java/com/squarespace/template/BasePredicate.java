@@ -16,6 +16,9 @@
 
 package com.squarespace.template;
 
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Default base class for Predicates.
@@ -31,6 +34,14 @@ public abstract class BasePredicate extends Plugin implements Predicate {
       throw new IllegalArgumentException("All predicates must end with '?'");
     }
     return identifier;
+  }
+
+  /**
+   * Helper method for the ReferenceScanner.  Determines if any of this predicate's
+   * arguments are variable references and returns them as a list.
+   */
+  public List<String> getVariableNames(Arguments args) {
+    return Collections.emptyList();
   }
 
   /**
