@@ -33,8 +33,14 @@ public class ReferenceScanner {
     return refs;
   }
 
+  /**
+   * Extracts reference metrics from a single instruction.
+   */
   public void extract(Instruction inst) {
     String name = null;
+    if (inst == null) {
+      return;
+    }
     if (!(inst instanceof RootInst)) {
       refs.increment(inst);
     }
@@ -46,7 +52,7 @@ public class ReferenceScanner {
 
       case ALTERNATES_WITH:
         AlternatesWithInst alternatesWith = (AlternatesWithInst)inst;
-        extract(alternatesWith.getConsequent());
+        extractBlock(alternatesWith.getConsequent());
         extract(alternatesWith.getAlternative());
         break;
 
@@ -56,7 +62,7 @@ public class ReferenceScanner {
           name = ReprEmitter.get(var);
           refs.addVariable(name);
         }
-        extract(ifInst.getConsequent());
+        extractBlock(ifInst.getConsequent());
         extract(ifInst.getAlternative());
         break;
 
@@ -64,14 +70,16 @@ public class ReferenceScanner {
       case PREDICATE:
         PredicateInst predicateInst = (PredicateInst)inst;
         Predicate predicate = predicateInst.getPredicate();
-        refs.increment(predicate);
+        if (predicate != null) {
+          refs.increment(predicate);
 
-        List<String> varRefs = predicate.getVariableNames(predicateInst.getArguments());
-        for (String varRef : varRefs) {
-          refs.addVariable(varRef);
+          List<String> varRefs = predicate.getVariableNames(predicateInst.getArguments());
+          for (String varRef : varRefs) {
+            refs.addVariable(varRef);
+          }
         }
 
-        extract(predicateInst.getConsequent());
+        extractBlock(predicateInst.getConsequent());
         extract(predicateInst.getAlternative());
         break;
 
@@ -79,21 +87,21 @@ public class ReferenceScanner {
         RepeatedInst repeated = (RepeatedInst)inst;
         name = ReprEmitter.get(repeated.getVariable());
         refs.pushSection(name);
-        extract(repeated.getConsequent());
+        extractBlock(repeated.getConsequent());
         extract(repeated.getAlternative());
         extract(repeated.getAlternatesWith());
         refs.popSection();
         break;
 
       case ROOT:
-        extract(((RootInst)inst).getConsequent());
+        extractBlock(((RootInst)inst).getConsequent());
         break;
 
       case SECTION:
         SectionInst section = (SectionInst)inst;
         name = ReprEmitter.get(section.getVariable());
         refs.pushSection(name);
-        extract(section.getConsequent());
+        extractBlock(section.getConsequent());
         extract(section.getAlternative());
         refs.popSection();
         break;
@@ -114,14 +122,23 @@ public class ReferenceScanner {
     }
   }
 
-  private void extract(Block block) {
+  /**
+   * Iterates over all instructions in the block, extracting metrics from each.
+   */
+  private void extractBlock(Block block) {
     if (block != null) {
-      for (Instruction inst : block.getInstructions()) {
-        extract(inst);
+      List<Instruction> instructions = block.getInstructions();
+      if (instructions != null) {
+        for (Instruction inst : instructions) {
+          extract(inst);
+        }
       }
     }
   }
 
+  /**
+   * Holds a set of metrics on all instructions referenced in a template.
+   */
   public static class References {
 
     private Deque<ObjectNode> variables = new ArrayDeque<>();
@@ -139,6 +156,9 @@ public class ReferenceScanner {
     public References() {
     }
 
+    /**
+     * Renders a JSON report containing the collected metrics.
+     */
     public ObjectNode report() {
       ObjectNode res = JsonUtils.createObjectNode();
       res.put("instructions", convert(instructions));
@@ -158,15 +178,21 @@ public class ReferenceScanner {
     }
 
     private void increment(Instruction inst) {
-      increment(instructions, inst.getType().name());
+      if (inst != null) {
+        increment(instructions, inst.getType().name());
+      }
     }
 
     private void increment(Predicate predicate) {
-      increment(predicates, predicate.getIdentifier());
+      if (predicate != null) {
+        increment(predicates, predicate.getIdentifier());
+      }
     }
 
     private void increment(Formatter formatter) {
-      increment(formatters, formatter.getIdentifier());
+      if (formatter != null) {
+        increment(formatters, formatter.getIdentifier());
+      }
     }
 
     private void increment(Map<String, Integer> counter, String key) {
