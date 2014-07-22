@@ -75,20 +75,19 @@ public class TreeEmitter {
 
   private static void emitConsequent(BlockInstruction block, int depth, StringBuilder buf) {
     indent(depth, buf);
-    buf.append("L:\n");
+    buf.append("true:\n");
     emitBlock(block.getConsequent(), depth + 2, buf);
   }
 
   private static void emitAlternatesWith(RepeatedInst inst, int depth, StringBuilder buf) {
     indent(depth, buf);
-    buf.append("A:\n");
-    emitBlock(inst.getAlternatesWith().getConsequent(), depth + 2, buf);
-    emit(inst.getAlternatesWith().getAlternative(), depth + 2, buf);
+    buf.append("alternates:\n");
+    emit(inst.getAlternatesWith(), depth + 2, buf);
   }
 
   private static void emitAlternative(BlockInstruction block, int depth, StringBuilder buf) {
     indent(depth, buf);
-    buf.append("R:\n");
+    buf.append("false:\n");
     emit(block.getAlternative(), depth + 2, buf);
   }
 
