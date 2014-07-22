@@ -63,7 +63,7 @@ public class InstructionTable {
 
   public static void dump() {
     try {
-      table.dump();
+//      table.dump();
     } catch (Exception e) {
       System.out.println("Error dumping buckets: " + e);
     }

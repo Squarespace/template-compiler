@@ -51,7 +51,7 @@ public abstract class SymbolTable<K, V> {
 
   public void dump() {
     try {
-      table.dump();
+//      table.dump();
     } catch (Exception e) {
       System.out.println("Error dumping buckets: " + e);
     }

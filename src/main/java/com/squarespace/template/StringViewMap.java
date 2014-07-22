@@ -16,9 +16,7 @@
 
 package com.squarespace.template;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Map;
 
 public class StringViewMap<K, V> extends HashMap<K, V> {
 
@@ -29,11 +27,9 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
   /**
    * Dump the structure of the map to debug and tune the layout. I'd prefer to switch to a
    * compiled DFA-based replacement, which will eliminate need for a HashMap and calling
-   * hashCode() on StringViews -- it will match incrementally, char-by-char.  At this
-   * point I couldn't justify the additional dev, but may once work on the LESS compiler
-   * starts.
+   * hashCode() on StringViews -- it will match incrementally, char-by-char.
    */
-  @SuppressWarnings("unchecked")
+  /* NOTE: used for periodic review
   public void dump() throws Exception {
 
     Field field = HashMap.class.getDeclaredField("table");
@@ -67,5 +63,6 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
       System.out.println();
     }
   }
+  */
 
 }
