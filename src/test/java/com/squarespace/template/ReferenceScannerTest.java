@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ReferenceScannerTest extends UnitTestBase {
 
-  private static final boolean VERBOSE = true;
+  private static final boolean VERBOSE = false;
 
   @Test
   public void testBasic() throws CodeException, JsonProcessingException {
