@@ -32,8 +32,6 @@ public class JsonTemplateEngine {
 
   private final PredicateTable predicateTable;
 
-  private final MetaData metaData;
-
   private LoggingHook loggingHook;
 
   /**
@@ -46,15 +44,10 @@ public class JsonTemplateEngine {
     this.predicateTable = predicateTable;
     formatterTable.setInUse();
     predicateTable.setInUse();
-    this.metaData = new MetaData(formatterTable, predicateTable);
   }
 
   public void setLoggingHook(LoggingHook hook) {
     this.loggingHook = hook;
-  }
-
-  public MetaData getMetaData() {
-    return this.metaData;
   }
 
   /**
