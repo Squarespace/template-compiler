@@ -29,9 +29,15 @@ public class ReferenceScanner {
 
   private final References refs = new References();
 
+  public References references() {
+    return refs;
+  }
+
   public void extract(Instruction inst) {
     String name = null;
-    refs.increment(inst);
+    if (!(inst instanceof RootInst)) {
+      refs.increment(inst);
+    }
     switch (inst.getType()) {
 
       case TEXT:
@@ -138,7 +144,7 @@ public class ReferenceScanner {
       res.put("instructions", convert(instructions));
       res.put("formatters", convert(formatters));
       res.put("predicates", convert(predicates));
-      res.put("variables", variables.getLast());
+      res.put("variables", currentNode);
       res.put("textBytes", textBytes);
       return res;
     }
@@ -205,7 +211,5 @@ public class ReferenceScanner {
     }
 
   }
-
-
 
 }
