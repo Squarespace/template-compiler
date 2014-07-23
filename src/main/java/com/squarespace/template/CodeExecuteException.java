@@ -22,6 +22,8 @@ package com.squarespace.template;
  */
 public class CodeExecuteException extends CodeException {
 
+  private static final long serialVersionUID = -1;
+
   private final ErrorInfo errorInfo;
 
   public CodeExecuteException(ErrorInfo info) {

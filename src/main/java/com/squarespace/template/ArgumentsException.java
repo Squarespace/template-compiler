@@ -22,6 +22,8 @@ package com.squarespace.template;
  */
 public class ArgumentsException extends CodeException {
 
+  private static final long serialVersionUID = -1;
+
   public ArgumentsException(String message) {
     super(message);
   }
