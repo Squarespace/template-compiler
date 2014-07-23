@@ -61,13 +61,14 @@ public class InstructionTable {
     symbolList.add(".repeated section");
   }
 
-  public static void dump() {
+  public static String dump() {
     try {
-//      table.dump();
+      return table.dump();
     } catch (Exception e) {
-      System.out.println("Error dumping buckets: " + e);
+      throw new RuntimeException("Error dumping instruction table", e);
     }
   }
+
   public static StringViewMap<StringView, InstructionType> getTable() {
     return table;
   }

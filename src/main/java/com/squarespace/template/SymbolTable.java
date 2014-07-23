@@ -49,11 +49,11 @@ public abstract class SymbolTable<K, V> {
     return table.get(symbol);
   }
 
-  public void dump() {
+  public String dump() {
     try {
-//      table.dump();
+      return table.dump();
     } catch (Exception e) {
-      System.out.println("Error dumping buckets: " + e);
+      throw new RuntimeException("Failed to dump buckets", e);
     }
   }
 

@@ -51,15 +51,19 @@ public class UnitTestBase {
     formatterTable.register(new CoreFormatters());
     formatterTable.register(new UnitTestFormatters());
 
+    String instructions = InstructionTable.dump();
+    String predicates = predicateTable.dump();
+    String formatters = formatterTable.dump();
+
     // Used to tune the symbol table sizes.
     if (DEBUG) {
       System.out.println("\nINSTRUCTION TABLE:");
-      InstructionTable.dump();
+      System.out.println(instructions);
       System.out.println("\nPREDICATE TABLE:");
-      predicateTable.dump();
+      System.out.println(predicates);
       System.out.println("============================\n");
       System.out.println("\nFORMATTER TABLE:");
-      formatterTable.dump();
+      System.out.println(formatters);
       System.out.println("============================\n");
     }
   }

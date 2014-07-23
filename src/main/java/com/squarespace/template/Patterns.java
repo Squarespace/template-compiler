@@ -81,10 +81,10 @@ public class Patterns {
 
   public static final Pattern WHITESPACE_NBSP = Pattern.compile("[\\s\u200b\u00a0]+");
 
-  // Required word following REPEATED instruction, e.g. {.repeated section foo.bar}
+  // Required word following REPEATED instruction, e.g. ".repeated section foo.bar"
   public static final Pattern WORD_SECTION = Pattern.compile("section");
 
-  // Required word following ALTERNATES_WITH instruction, e.g. {.alternates with}
+  // Required word following ALTERNATES_WITH instruction, e.g. ".alternates with"
   public static final Pattern WORD_WITH = Pattern.compile("with");
 
 }
