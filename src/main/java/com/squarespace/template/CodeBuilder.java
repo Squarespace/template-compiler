@@ -94,12 +94,12 @@ public class CodeBuilder {
     return this;
   }
 
-  public CodeBuilder ifpred(Predicate predicate) throws CodeSyntaxException {
+  public CodeBuilder ifpred(Predicate predicate) throws CodeSyntaxException, ArgumentsException {
     machine.accept(maker.ifpred(predicate));
     return this;
   }
 
-  public CodeBuilder ifpred(Predicate predicate, Arguments args) throws CodeSyntaxException {
+  public CodeBuilder ifpred(Predicate predicate, Arguments args) throws CodeSyntaxException, ArgumentsException {
     machine.accept(maker.ifpred(predicate, args));
     return this;
   }

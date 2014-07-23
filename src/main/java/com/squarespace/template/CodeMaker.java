@@ -93,12 +93,14 @@ public class CodeMaker {
     return new EofInst();
   }
 
-  public FormatterCall fmt(Formatter formatter) {
+  public FormatterCall fmt(Formatter formatter) throws ArgumentsException {
     return fmt(formatter, Constants.EMPTY_ARGUMENTS);
   }
 
-  public FormatterCall fmt(Formatter formatter, Arguments args) {
-    return new FormatterCall(formatter, args);
+  public FormatterCall fmt(Formatter formatter, Arguments args) throws ArgumentsException {
+    FormatterCall res = new FormatterCall(formatter, args);
+    formatter.validateArgs(args);
+    return res;
   }
 
   public List<FormatterCall> formatters(Formatter ... formatters) {
@@ -117,12 +119,14 @@ public class CodeMaker {
     return new IfInst(vars, ops);
   }
 
-  public IfPredicateInst ifpred(Predicate predicate) {
+  public IfPredicateInst ifpred(Predicate predicate) throws ArgumentsException {
     return ifpred(predicate, Constants.EMPTY_ARGUMENTS);
   }
 
-  public IfPredicateInst ifpred(Predicate predicate, Arguments args) {
-    return new IfPredicateInst(predicate, args);
+  public IfPredicateInst ifpred(Predicate predicate, Arguments args) throws ArgumentsException {
+    IfPredicateInst res = new IfPredicateInst(predicate, args);
+    predicate.validateArgs(args);
+    return res;
   }
 
   public List<Integer> intlist(Integer ... numbers) {

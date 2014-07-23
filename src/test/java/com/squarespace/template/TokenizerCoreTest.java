@@ -130,7 +130,7 @@ public class TokenizerCoreTest extends UnitTestBase {
   }
 
   @Test
-  public void testFormatter() throws CodeSyntaxException {
+  public void testFormatter() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     Arguments args1 = mk.args(" a1 a2");
     assertResult("{@|pluralize}", mk.var("@", CoreFormatters.PLURALIZE), mk.eof());

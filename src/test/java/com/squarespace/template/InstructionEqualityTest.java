@@ -120,7 +120,7 @@ public class InstructionEqualityTest extends UnitTestBase {
   }
 
   @Test
-  public void testIfPredicateEquals() throws CodeSyntaxException {
+  public void testIfPredicateEquals() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     IfPredicateInst i1 = mk.ifpred(PLURAL);
     IfPredicateInst i2 = mk.ifpred(PLURAL);
@@ -243,7 +243,7 @@ public class InstructionEqualityTest extends UnitTestBase {
   }
 
   @Test
-  public void testVariableEquals() throws CodeSyntaxException {
+  public void testVariableEquals() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     VariableInst v1 = mk.var("foo.bar");
     assertEquals(v1, mk.var("foo.bar"));

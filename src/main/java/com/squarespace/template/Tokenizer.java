@@ -399,7 +399,12 @@ public class Tokenizer {
       if (args == null) {
         return emitInvalid();
       }
-      emitInstruction(maker.ifpred(predicate, args));
+      try {
+        emitInstruction(maker.ifpred(predicate, args));
+      } catch (ArgumentsException e) {
+        String identifier = predicate.getIdentifier();
+        fail(error(PREDICATE_ARGS_INVALID).name(identifier).data(e.getMessage()));
+      }
       return true;
     }
 

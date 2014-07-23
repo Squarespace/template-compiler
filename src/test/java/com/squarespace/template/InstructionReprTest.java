@@ -85,13 +85,13 @@ public class InstructionReprTest extends UnitTestBase {
   }
 
   @Test
-  public void testIfPredicate() {
+  public void testIfPredicate() throws ArgumentsException {
     CodeMaker mk = maker();
     IfPredicateInst i1 = mk.ifpred(CorePredicates.PLURAL);
     assertEquals(i1.repr(), "{.if plural?}");
     i1 = mk.ifpred(UnitTestPredicates.REQUIRED_ARGS, mk.args(" 1 2 3"));
     assertEquals(i1.repr(), "{.if required-args? 1 2 3}");
-    i1 = mk.ifpred(UnitTestPredicates.INVALID_ARGS, mk.args("/abc/def/ghi"));
+    i1 = new IfPredicateInst(UnitTestPredicates.INVALID_ARGS, new Arguments(mk.view("/abc/def/ghi")));
     assertEquals(i1.repr(), "{.if invalid-args?/abc/def/ghi}");
   }
 
@@ -204,7 +204,7 @@ public class InstructionReprTest extends UnitTestBase {
   }
 
   @Test
-  public void testVariableRepr() {
+  public void testVariableRepr() throws ArgumentsException {
     CodeMaker mk = maker();
     assertEquals(mk.var("@").repr(), "{@}");
     assertEquals(mk.var("@index").repr(), "{@index}");

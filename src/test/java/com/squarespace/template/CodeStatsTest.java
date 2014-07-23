@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
 public class CodeStatsTest extends UnitTestBase {
 
   @Test
-  public void testBasics() throws CodeSyntaxException {
+  public void testBasics() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     CodeStats stats = new CodeStats();
     stats.accept(mk.text("foo"), mk.predicate(EXECUTE_ERROR), mk.or(EXECUTE_ERROR), mk.var("a", INVALID_ARGS));
