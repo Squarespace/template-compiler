@@ -16,7 +16,9 @@
 
 package com.squarespace.template;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Map;
 
 public class StringViewMap<K, V> extends HashMap<K, V> {
 
@@ -29,8 +31,8 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
    * compiled DFA-based replacement, which will eliminate need for a HashMap and calling
    * hashCode() on StringViews -- it will match incrementally, char-by-char.
    */
-  /* NOTE: used for periodic review
-  public void dump() throws Exception {
+  public String dump() throws Exception {
+    StringBuilder buf = new StringBuilder();
 
     Field field = HashMap.class.getDeclaredField("table");
     field.setAccessible(true);
@@ -48,21 +50,21 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
     nextField.setAccessible(true);
 
     for (int i = 0, len = table.length; i < len; i++) {
-      System.out.print("Bucket " + i + ": ");
+      buf.append("Bucket ").append(i).append(":\n");
       Map.Entry<K, V> entry = table[i];
 
       int num = 0;
       while (entry != null) {
         num++;
-        System.out.print(entry.getKey() + " ");
+        buf.append(entry.getKey()).append(' ');
         entry = (Map.Entry<K, V>)nextField.get(entry);
       }
       if (num > 0) {
-        System.out.print("(" + num + ")");
+        buf.append('(').append(num).append(')');
       }
-      System.out.println();
+      buf.append('\n');
     }
+    return buf.toString();
   }
-  */
 
 }
