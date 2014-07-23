@@ -23,6 +23,7 @@ import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_AT_ROOT;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
 import static com.squarespace.template.plugins.CoreFormatters.SAFE;
 import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
+import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
@@ -158,11 +159,15 @@ public class CodeValidityTest extends UnitTestBase {
 
   @Test
   public void testIfPredicate() throws CodeException {
-    CodeBuilder cb = builder();
-    RootInst root = cb.ifpred(PLURAL).text("A").or(SINGULAR).text("B").or().text("C").end().eof().build();
+    CodeMaker mk = maker();
+    RootInst root = builder().ifpred(PLURAL).text("A").or(SINGULAR).text("B").or().text("C").end().eof().build();
     assertContext(execute("5", root), "A");
     assertContext(execute("1", root), "B");
     assertContext(execute("0", root), "C");
+
+    root = builder().ifpred(EQUAL, mk.args(" 2")).text("A").or().text("B").end().eof().build();
+    assertContext(execute("2", root), "A");
+    assertContext(execute("1", root), "B");
   }
 
   @Test
@@ -279,9 +284,7 @@ public class CodeValidityTest extends UnitTestBase {
 
     // Chain formatters together.
     CodeMaker mk = maker();
-    Arguments args = mk.args(" 5");
-    TRUNCATE.validateArgs(args);
-    List<FormatterCall> formatters = mk.formatters(mk.fmt(SAFE), mk.fmt(TRUNCATE, args));
+    List<FormatterCall> formatters = mk.formatters(mk.fmt(SAFE), mk.fmt(TRUNCATE, mk.args(" 5")));
     root = builder().var("a", formatters).eof().build();
     assertContext(execute("{\"a\": \"x <> y <> z\"}", root), "x  y ...");
   }
@@ -294,7 +297,7 @@ public class CodeValidityTest extends UnitTestBase {
   }
 
   @Test
-  public void testEOFInBlock() {
+  public void testEOFInBlock() throws ArgumentsException {
     CodeMaker mk = maker();
     assertInvalid(EOF_IN_BLOCK, mk.section("@"), mk.eof());
     assertInvalid(EOF_IN_BLOCK, mk.section("@"), mk.section("a"), mk.eof());

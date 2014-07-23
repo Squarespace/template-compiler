@@ -116,7 +116,6 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       throw new ArgumentsException("Argument " + raw + " must be a valid JSON value or variable reference.");
     }
 
-    @SuppressWarnings("unchecked")
     protected JsonNode resolve(Context ctx, Arguments args, int index) {
       List<Object> parsed = (List<Object>) args.getOpaque();
       Object arg = parsed.get(index);
