@@ -148,13 +148,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
   public static class DateFormatter extends BaseFormatter {
 
-    private static String[] timezoneKey = Constants.TIMEZONE_KEY;
+    private String[] timezoneKey = Constants.TIMEZONE_KEY;
 
     public DateFormatter() {
       super("date", true);
     }
 
-    public static void setTimezoneKey(String[] key) {
+    public void setTimezoneKey(String[] key) {
       timezoneKey = key;
     }
 
