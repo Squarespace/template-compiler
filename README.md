@@ -3,7 +3,7 @@
 
 A Java template compiler based on [JSON-Template][jsont].
 
-License: [Apache 2.0](LICENSE) ([tl;dr][license-tldr])
+License: [Apache 2.0](LICENSE) ([summary][license-tldr])
 
 Copyright (c) 2014 SQUARESPACE, Inc.
 
@@ -24,7 +24,7 @@ The project was started with these objectives:
    really fast.
  * Improve performance over the legacy system.
  * Minimize memory usage. For example, parsing can often create and discard a
-   high number of intermedia strings.
+   high number of temporary strings.
  * Support additional features for server-side compilation.
  * High test coverage.
  * Support syntax error recovery.
