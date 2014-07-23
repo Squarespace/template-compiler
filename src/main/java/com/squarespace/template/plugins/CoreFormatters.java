@@ -154,7 +154,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       super("date", true);
     }
 
-    public void setTimezoneKey(String[] key) {
+    public static void setTimezoneKey(String[] key) {
       timezoneKey = key;
     }
 

@@ -67,6 +67,7 @@ public class TreeEmitter {
 
       case ROOT:
         emitBlock(((BlockInstruction) inst).getConsequent(), depth, buf);
+        break;
 
       default:
         break;
