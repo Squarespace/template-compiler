@@ -106,11 +106,9 @@ public class CodeStats implements CodeSink {
     public void increment(K key) {
       Integer val = map.get(key);
       if (val == null) {
-        val = 1;
-        map.put(key, val);
-      } else {
-        map.put(key, val + 1);
+        val = 0;
       }
+      map.put(key, val + 1);
     }
 
     public Map<K, Integer> getMap() {
