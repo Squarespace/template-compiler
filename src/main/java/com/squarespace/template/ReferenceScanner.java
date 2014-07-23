@@ -169,9 +169,6 @@ public class ReferenceScanner {
 
     private int textBytes;
 
-    public References() {
-    }
-
     /**
      * Renders a JSON report containing the collected metrics.
      */
