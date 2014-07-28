@@ -16,9 +16,7 @@
 
 package com.squarespace.template;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Map;
 
 public class StringViewMap<K, V> extends HashMap<K, V> {
 
@@ -33,6 +31,7 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
    */
   public String dump() throws Exception {
     StringBuilder buf = new StringBuilder();
+    /* TEMPORARILY DISABLED - phensley
 
     Field field = HashMap.class.getDeclaredField("table");
     field.setAccessible(true);
@@ -64,6 +63,7 @@ public class StringViewMap<K, V> extends HashMap<K, V> {
       }
       buf.append('\n');
     }
+    */
     return buf.toString();
   }
 
