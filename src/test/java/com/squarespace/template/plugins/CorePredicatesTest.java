@@ -162,6 +162,10 @@ public class CorePredicatesTest extends UnitTestBase {
     assertEquals(execute(template, "{\"num\": 6}").buffer().toString(), "A");
     assertEquals(execute(template, "{\"num\": 5}").buffer().toString(), "B");
     assertEquals(execute(template, "{}").buffer().toString(), "B");
+
+    template = "{.repeated section @}{.nth? @index 3}A{.end}{.end}";
+    assertEquals(execute(template, "[0,0,0]").buffer().toString(), "A");
+    assertEquals(execute(template, "[0,0,0,0,0,0]").buffer().toString(), "AA");
   }
 
   @Test
