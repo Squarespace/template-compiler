@@ -268,7 +268,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
         return node.asLong() % modulus.asLong() == 0;
       }
       return false;
-    };
+    }
 
   };
 
