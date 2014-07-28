@@ -225,12 +225,6 @@ public class ReprEmitter {
     buf.append('}');
   }
 
-  public static String emitNames(Object[] names) {
-    StringBuilder buf = new StringBuilder();
-    emitNames(names, buf);
-    return buf.toString();
-  }
-
   public static void emitNames(Object[] names, StringBuilder buf) {
     if (names == null) {
       buf.append("@");
@@ -266,7 +260,5 @@ public class ReprEmitter {
       inst.repr(buf, recurse);
     }
   }
-
-
 
 }
