@@ -164,7 +164,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       if (args.count() == 1) {
         node = resolve(ctx, args, 0);
       }
-      if (node.isInt() || node.isLong()) {
+      if (node.isIntegralNumber()) {
         return (node.asLong() % 2) == 0;
       }
       return false;
@@ -249,6 +249,30 @@ public class CorePredicates extends BaseRegistry<Predicate> {
   };
 
 
+  public static final Predicate NTH = new JsonPredicate("nth?", false) {
+
+    @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
+
+    @Override
+    public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
+      JsonNode node = ctx.node();
+      JsonNode modulus = resolve(ctx, args, 0);
+      if (args.count() == 2) {
+        node = modulus;
+        modulus = resolve(ctx, args, 1);
+      }
+      if (node.isIntegralNumber() && modulus.isIntegralNumber()) {
+        return node.asLong() % modulus.asLong() == 0;
+      }
+      return false;
+    };
+
+  };
+
+
   public static final Predicate ODD = new JsonPredicate("odd?", false) {
 
     @Override
@@ -262,7 +286,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       if (args.count() == 1) {
         node = resolve(ctx, args, 0);
       }
-      if (node.isInt() || node.isLong()) {
+      if (node.isIntegralNumber()) {
         return (node.asLong() % 2) != 0;
       }
       return false;

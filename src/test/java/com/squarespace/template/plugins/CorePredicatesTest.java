@@ -22,6 +22,7 @@ import static com.squarespace.template.plugins.CorePredicates.EVEN;
 import static com.squarespace.template.plugins.CorePredicates.GREATER_THAN;
 import static com.squarespace.template.plugins.CorePredicates.LESS_THAN;
 import static com.squarespace.template.plugins.CorePredicates.LESS_THAN_OR_EQUAL;
+import static com.squarespace.template.plugins.CorePredicates.NTH;
 import static com.squarespace.template.plugins.CorePredicates.ODD;
 import static org.testng.Assert.assertEquals;
 
@@ -144,6 +145,23 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
     assertFalse(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1"));
     assertFalse(LESS_THAN_OR_EQUAL, context("\"z\""), mk.args(" \"j\""));
+  }
+
+  @Test
+  public void testNth() throws CodeException {
+    CodeMaker mk = maker();
+    assertTrue(NTH, context("3"), mk.args(" 3"));
+    assertFalse(NTH, context("2"), mk.args(" 3"));
+    assertFalse(NTH, context("3"), mk.args(" 2"));
+    assertFalse(NTH, context("[]"), mk.args(" 2"));
+
+    assertFalse(NTH, context("\"a\""), mk.args(" 2"));
+    assertFalse(NTH, context("2"), mk.args(" \"a\""));
+
+    String template = "{.nth? num 3}A{.or}B{.end}";
+    assertEquals(execute(template, "{\"num\": 6}").buffer().toString(), "A");
+    assertEquals(execute(template, "{\"num\": 5}").buffer().toString(), "B");
+    assertEquals(execute(template, "{}").buffer().toString(), "B");
   }
 
   @Test
