@@ -39,6 +39,7 @@ import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.fail;
 
@@ -112,6 +113,13 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.var=foo}", WHITESPACE_EXPECTED);
     assertFailure("{.var foo bar}", BINDVAR_EXPECTS_NAME);
     assertFailure("{.var @foo.bar baz}", WHITESPACE_EXPECTED);
+    assertFailure("{.var.}", WHITESPACE_EXPECTED);
+    assertFailure("{.varx}", INVALID_INSTRUCTION);
+  }
+
+  @Test
+  public void testBV() throws CodeSyntaxException {
+    assertFailure("{.var.}", WHITESPACE_EXPECTED);
   }
 
   @Test
@@ -267,6 +275,23 @@ public class TokenizerCoreTest extends UnitTestBase {
   }
 
   private void assertFailure(String raw, SyntaxErrorType type) {
+    assertSoftFailure(raw, type);
+    assertHardFailure(raw, type);
+  }
+
+  private void assertSoftFailure(String raw, SyntaxErrorType type) {
+    Tokenizer tokenizer = tokenizer(raw);
+    tokenizer.setValidate();
+    try {
+      tokenizer.consume();
+    } catch (CodeSyntaxException e) {
+      fail("tokenizer in validate mode, unexpected exception thrown", e);
+    }
+    assertFalse(tokenizer.getErrors().isEmpty());
+    assertEquals(tokenizer.getErrors().get(0).getType(), type);
+  }
+
+  private void assertHardFailure(String raw, SyntaxErrorType type) {
     try {
       tokenizer(raw).consume();
       fail("expected SyntaxError but none thrown");

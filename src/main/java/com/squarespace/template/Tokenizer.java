@@ -284,6 +284,31 @@ public class Tokenizer {
         emitInstruction(maker.alternates());
         return true;
 
+      case BINDVAR:
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        // Parse the variable name.
+        if (!matcher.localVariable()) {
+          fail(error(BINDVAR_EXPECTS_NAME).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String name = matcher.consume().repr();
+
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        if (!matcher.variable()) {
+          fail(error(MISSING_VARIABLE_NAME).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String path = matcher.consume().repr();
+
+        emitInstruction(maker.bindvar(name, path));
+        return true;
+
       case END:
       case META_LEFT:
       case META_RIGHT:
@@ -331,31 +356,6 @@ public class Tokenizer {
       case REPEATED:
       case SECTION:
         return parseSection(type);
-
-      case BINDVAR:
-        if (!skipWhitespace()) {
-          return emitInvalid();
-        }
-
-        // Parse the variable name.
-        if (!matcher.localVariable()) {
-          fail(error(BINDVAR_EXPECTS_NAME).data(matcher.remainder()));
-          return emitInvalid();
-        }
-        String name = matcher.consume().repr();
-
-        if (!skipWhitespace()) {
-          return emitInvalid();
-        }
-
-        if (!matcher.variable()) {
-          fail(error(MISSING_VARIABLE_NAME).data(matcher.remainder()));
-          return emitInvalid();
-        }
-        String path = matcher.consume().repr();
-
-        emitInstruction(maker.bindvar(name, path));
-        return true;
 
       default:
         throw new RuntimeException("Resolution failure: instruction type '" + type + "' has no text representation.");
