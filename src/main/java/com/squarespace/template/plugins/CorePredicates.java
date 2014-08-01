@@ -76,6 +76,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
 
     public abstract void limitArgs(Arguments args) throws ArgumentsException;
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<String> getVariableNames(Arguments args) {
       List<String> names = new ArrayList<>();
@@ -116,6 +117,7 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       throw new ArgumentsException("Argument " + raw + " must be a valid JSON value or variable reference.");
     }
 
+    @SuppressWarnings("unchecked")
     protected JsonNode resolve(Context ctx, Arguments args, int index) {
       List<Object> parsed = (List<Object>) args.getOpaque();
       Object arg = parsed.get(index);
