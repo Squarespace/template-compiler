@@ -1,5 +1,6 @@
 /.checkstyle
 /.classpath
+/.gradle
 /.project
 /.settings
 /bin
@@ -8,3 +9,4 @@
 *.swp
 
 /target
+/build/

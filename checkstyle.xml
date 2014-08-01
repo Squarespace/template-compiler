@@ -114,7 +114,8 @@
         <!--module name="InnerAssignment"/-->
         <!--module name="MagicNumber"/-->
         <module name="MissingSwitchDefault"/>
-        <module name="RedundantThrows"/>
+
+        <!--<module name="RedundantThrows"/>  fails in gradle checkstyleTest -->
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
 

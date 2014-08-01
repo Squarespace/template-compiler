@@ -1,0 +1,158 @@
+
+import org.gradle.plugins.signing.Sign
+
+buildscript {
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'com.github.townsfolk:gradle-release:1.2'
+    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+  }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.12'
+}
+
+// Sign release archives
+ext.isRelease = !version.endsWith('SNAPSHOT')
+ext.isUpload = false
+gradle.taskGraph.whenReady { taskGraph ->
+  ext.isUpload = gradle.taskGraph.hasTask(':uploadArchives') || gradle.taskGraph.hasTask(':uploadInternal')
+  if (isRelease && isUpload && gradle.taskGraph.allTasks.any { it instanceof Sign }) {
+    def password = System.console().readPassword('\n\n\n===>  Signing key password: ')
+    allprojects { ext.'signing.password' = password }
+  }
+}
+
+// Disable Javadoc linting under Java 8
+if (JavaVersion.current().isJava8Compatible()) {
+  allprojects {
+    tasks.withType(Javadoc) {
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+}
+
+allprojects {
+  apply plugin: 'java'
+  apply plugin: 'eclipse'
+  apply plugin: 'license'
+  apply plugin: 'checkstyle'
+  apply plugin: 'jacoco'
+  apply plugin: 'signing'
+  apply plugin: 'maven'
+  apply plugin: 'release'
+
+  group 'com.squarespace.template'
+
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
+
+  license {
+    header rootProject.file('conf/apache-2.0-header.txt')
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    skipExistingHeaders true
+    include '**/*.java'
+  }
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    compile 'com.fasterxml.jackson.core:jackson-core:2.3.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.1'
+    compile 'commons-io:commons-io:2.1'
+    compile 'joda-time:joda-time:2.3'
+    compile 'org.apache.commons:commons-lang3:3.1'
+
+    testCompile 'org.testng:testng:6.8.7'
+  }
+
+  checkstyle {
+    toolVersion = '5.7'
+    ignoreFailures = false
+    configFile = rootProject.file('checkstyle.xml')
+  }
+
+  test {
+    useTestNG()
+    finalizedBy jacocoTestReport
+  }
+
+  jacoco {
+    toolVersion '0.7.1.201405082137'
+  }
+
+  jacocoTestReport {
+    group = 'Reporting'
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+    reports {
+      html.destination = "${buildDir}/jacoco-report"
+    }
+  }
+
+  eclipse.project {
+    natures 'net.sf.eclipsecs.core.CheckstyleNature'
+    buildCommand 'net.sf.eclipsecs.core.CheckstyleBuilder'
+  }
+
+  signing {
+    required { isRelease && isUpload }
+    sign configurations.archives
+  }
+
+  task testJar(type: Jar, dependsOn: testClasses) {
+    classifier = 'tests'
+    from sourceSets.test.output
+  }
+
+  task sourcesJar(type: Jar, dependsOn:classes) { 
+    classifier = 'sources' 
+    from sourceSets.main.allSource 
+  } 
+
+  task javadocJar(type: Jar, dependsOn:javadoc) { 
+    classifier = 'javadoc' 
+    from javadoc.destinationDir 
+  } 
+
+  artifacts {
+    archives sourcesJar
+    archives testJar
+    archives javadocJar
+  }
+
+  uploadArchives {
+    repositories.mavenDeployer {
+      repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+        authentication(
+          userName: System.getenv('OSS_USERNAME'),
+          password: System.getenv('OSS_PASSWORD')
+        )
+      }
+      snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+        authentication(
+          userName: System.getenv('OSS_USERNAME'),
+          password: System.getenv('OSS_PASSWORD')
+        )
+      }
+    }
+  }
+
+  task uploadInternal(type: Upload) {
+    description = 'Uploads archives to internal Nexus'
+    configuration = configurations.archives
+
+    repositories.mavenDeployer {
+      repository(url: NEXUS_INTERNAL_RELEASE_URL)
+      snapshotRepository(url: NEXUS_INTERNAL_SNAPSHOT_URL)
+    }
+  }
+
+}
+
