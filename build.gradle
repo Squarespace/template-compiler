@@ -37,6 +37,33 @@ if (JavaVersion.current().isJava8Compatible()) {
   }
 }
 
+def configurePom(def pom) {
+  pom.project {
+    name "template-compiler"
+    description "Template compiler based on JSON-Template"
+    url 'https://github.com/squarespace/squarespace-template'
+
+    licenses {
+      license {
+        name 'The Apache Software License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        distribution 'repo'
+      }
+    }
+
+    scm {
+      connection 'scm:git:git@github.com:squarespace/squarespace-template.git'
+      url 'scm:git:git@github.com:squarespace/squarespace-template.git'
+      developerConnection 'scm:git:git@github.com:squarespace/squarespace-template.git'
+    }
+
+    issueManagement {
+      system 'github'
+      url 'https://github.com/squarespace/squarespace-template/issues'
+    }
+  }
+}
+
 allprojects {
   apply plugin: 'java'
   apply plugin: 'eclipse'
@@ -127,6 +154,7 @@ allprojects {
     archives javadocJar
   }
 
+
   uploadArchives {
     repositories.mavenDeployer {
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
@@ -135,12 +163,15 @@ allprojects {
           password: System.getenv('OSS_PASSWORD')
         )
       }
+      
       snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
         authentication(
           userName: System.getenv('OSS_USERNAME'),
           password: System.getenv('OSS_PASSWORD')
         )
       }
+
+      configurePom(pom)
     }
   }
 
@@ -151,6 +182,7 @@ allprojects {
     repositories.mavenDeployer {
       repository(url: NEXUS_INTERNAL_RELEASE_URL)
       snapshotRepository(url: NEXUS_INTERNAL_SNAPSHOT_URL)
+      configurePom(pom)
     }
   }
 
