@@ -18,6 +18,7 @@ package com.squarespace.template.plugins;
 
 import static com.squarespace.template.plugins.PluginUtils.leftPad;
 
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
@@ -141,7 +142,7 @@ public class PluginDateUtils {
   /**
    * Takes a strftime()-compatible format string and outputs the properly formatted date.
    */
-  public static void formatDate(String fmt, long instant, String tzName, StringBuilder buf) {
+  public static void formatDate(Locale locale, String fmt, long instant, String tzName, StringBuilder buf) {
     DateTimeZone zone = null;
     try {
       zone = DateTimeZone.forID(tzName);
@@ -160,20 +161,20 @@ public class PluginDateUtils {
       }
       char c2 = fmt.charAt(index);
       switch (c2) {
-        case 'A': buf.append(date.dayOfWeek().getAsText()); break;
-        case 'a': buf.append(date.dayOfWeek().getAsShortText()); break;
-        case 'B': buf.append(date.monthOfYear().getAsText()); break;
-        case 'b': buf.append(date.monthOfYear().getAsShortText()); break;
+        case 'A': buf.append(date.dayOfWeek().getAsText(locale)); break;
+        case 'a': buf.append(date.dayOfWeek().getAsShortText(locale)); break;
+        case 'B': buf.append(date.monthOfYear().getAsText(locale)); break;
+        case 'b': buf.append(date.monthOfYear().getAsShortText(locale)); break;
         case 'C': leftPad(date.centuryOfEra().get(), '0', 2, buf); break;
-        case 'c': formatAggregate(DateTimeAggregate.FULL, date, buf); break;
-        case 'D': formatAggregate(DateTimeAggregate.MMDDYY, date, buf); break;
+        case 'c': formatAggregate(DateTimeAggregate.FULL, locale, date, buf); break;
+        case 'D': formatAggregate(DateTimeAggregate.MMDDYY, locale, date, buf); break;
         case 'd': leftPad(date.dayOfMonth().get(), '0', 2, buf); break;
         case 'e': leftPad(date.dayOfMonth().get(), ' ', 2, buf); break;
-        case 'F': formatAggregate(DateTimeAggregate.YYYYMMDD, date, buf); break;
+        case 'F': formatAggregate(DateTimeAggregate.YYYYMMDD, locale, date, buf); break;
         case 'G': buf.append(date.year().get()); break;
         case 'g': leftPad(date.yearOfCentury().get(), '0', 2, buf); break;
         case 'H': leftPad(date.hourOfDay().get(), '0', 2, buf); break;
-        case 'h': buf.append(date.monthOfYear().getAsShortText()); break;
+        case 'h': buf.append(date.monthOfYear().getAsShortText(locale)); break;
         case 'I': leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), '0', 2, buf); break;
         case 'j': leftPad(date.dayOfYear().get(), '0', 3, buf); break;
         case 'k': leftPad(date.get(DateTimeFieldType.clockhourOfDay()), ' ', 2, buf); break;
@@ -183,13 +184,13 @@ public class PluginDateUtils {
         case 'n': buf.append('\n'); break;
         case 'P': buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "am" : "pm"); break;
         case 'p': buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM"); break;
-        case 'R': formatAggregate(DateTimeAggregate.H240_M0, date, buf); break;
+        case 'R': formatAggregate(DateTimeAggregate.H240_M0, locale, date, buf); break;
         case 'S': leftPad(date.secondOfMinute().get(), '0', 2, buf); break;
         case 's': buf.append(instant / 1000); break;
         case 't': buf.append('\t'); break;
         case 'T':
           // Equivalent of %H:%M:%S
-          formatAggregate(DateTimeAggregate.H240_M0, date, buf);
+          formatAggregate(DateTimeAggregate.H240_M0, locale, date, buf);
           buf.append(':');
           leftPad(date.secondOfMinute().get(), '0', 2, buf);
           break;
@@ -220,8 +221,8 @@ public class PluginDateUtils {
           break;
 
         case 'w': buf.append(date.dayOfWeek().get()); break;
-        case 'X': formatAggregate(DateTimeAggregate.HHMMSSP, date, buf); break;
-        case 'x': formatAggregate(DateTimeAggregate.MMDDYYYY, date, buf); break;
+        case 'X': formatAggregate(DateTimeAggregate.HHMMSSP, locale, date, buf); break;
+        case 'x': formatAggregate(DateTimeAggregate.MMDDYYYY, locale, date, buf); break;
         case 'Y': buf.append(date.getYear()); break;
         case 'y': leftPad(date.getYearOfCentury(), '0', 2, buf); break;
         case 'Z': buf.append(zone.getShortName(date.getMillis())); break;
@@ -244,14 +245,14 @@ public class PluginDateUtils {
     }
   }
 
-  private static void formatAggregate(DateTimeAggregate type, DateTime date, StringBuilder buf) {
+  private static void formatAggregate(DateTimeAggregate type, Locale locale, DateTime date, StringBuilder buf) {
     switch (type) {
       case FULL:
-        buf.append(date.dayOfWeek().getAsShortText());
+        buf.append(date.dayOfWeek().getAsShortText(locale));
         buf.append(' ');
         leftPad(date.dayOfMonth().get(), '0', 2, buf);
         buf.append(' ');
-        buf.append(date.monthOfYear().getAsShortText());
+        buf.append(date.monthOfYear().getAsShortText(locale));
         buf.append(' ');
         buf.append(date.year().get());
         buf.append(' ');

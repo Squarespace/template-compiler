@@ -19,6 +19,7 @@ package com.squarespace.template;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -54,36 +55,39 @@ public class JsonTemplateEngine {
    * Execute the instruction against the JSON node.
    */
   public Context execute(Instruction instruction, JsonNode json) throws CodeExecuteException {
-    return executeWithPartials(instruction, json, null, new StringBuilder());
+    return executeWithPartials(instruction, json, null, new StringBuilder(), Locale.getDefault());
   }
 
   /**
    * Execute the instruction against the JSON node, appending the output to buffer.
    */
   public Context execute(Instruction instruction, JsonNode json, StringBuilder buf) throws CodeExecuteException {
-    return executeWithPartials(instruction, json, null, buf);
+    return executeWithPartials(instruction, json, null, buf, Locale.getDefault());
   }
 
+  public Context execute(Instruction instruction, JsonNode json, JsonNode partials) throws CodeExecuteException {
+    return execute(instruction, json, partials, Locale.getDefault());
+  }
   /**
    * Execute the instruction against the given JSON node, using the partial template map.
    */
-  public Context execute(Instruction instruction, JsonNode json, JsonNode partials)
+  public Context execute(Instruction instruction, JsonNode json, JsonNode partials, Locale locale)
       throws CodeExecuteException {
-    return executeWithPartials(instruction, json, partials, new StringBuilder());
+    return executeWithPartials(instruction, json, partials, new StringBuilder(), locale);
   }
 
   public Context executeSafe(Instruction instruction, JsonNode json, JsonNode partials) throws CodeExecuteException {
-    return executeWithPartialsSafe(instruction, json, partials, new StringBuilder());
+    return executeWithPartialsSafe(instruction, json, partials, new StringBuilder(), Locale.getDefault());
   }
 
   /**
    * Execute the instruction against the JSON node, using the partial template map, and append
    * the output to buffer.
    */
-  public Context executeWithPartials(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf)
-      throws CodeExecuteException {
+  public Context executeWithPartials(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf,
+      Locale locale) throws CodeExecuteException {
 
-    Context ctx = new Context(json, buf);
+    Context ctx = new Context(json, buf, locale);
     ctx.setCompiler(this);
     ctx.setPartials(partials);
     ctx.setLoggingHook(loggingHook);
@@ -91,10 +95,10 @@ public class JsonTemplateEngine {
     return ctx;
   }
 
-  public Context executeWithPartialsSafe(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf)
-      throws CodeExecuteException {
+  public Context executeWithPartialsSafe(Instruction instruction, JsonNode json, JsonNode partials, StringBuilder buf,
+      Locale locale) throws CodeExecuteException {
 
-    Context ctx = new Context(json, buf);
+    Context ctx = new Context(json, buf, locale);
     ctx.setCompiler(this);
     ctx.setPartials(partials);
     ctx.setLoggingHook(loggingHook);

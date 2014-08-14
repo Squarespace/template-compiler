@@ -35,6 +35,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
@@ -191,11 +192,30 @@ public class CoreFormattersTest extends UnitTestBase {
 //    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork), "20");
   }
 
+  @Test
+  public void testDateLocale() throws CodeException {
+    String tzNewYork = "America/New_York";
+    String format = "%B %d";
+
+    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork, Locale.GERMANY), "Mai 12");
+    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork, Locale.FRENCH), "mai 12");
+    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork, new Locale("es", "MX")), "mayo 12");
+    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork, new Locale("es", "SP")), "mayo 12");
+
+    format = "%A";
+    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork, Locale.GERMANY), "Freitag");
+    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork, new Locale("es", "MX")), "viernes");
+  }
+
   private String formatDate(String format, long timestamp, String tzId) throws CodeException {
+    return formatDate(format, timestamp, tzId, Locale.US);
+  }
+
+  private String formatDate(String format, long timestamp, String tzId, Locale locale) throws CodeException {
     String template = "{time|date " + format + "}";
     String json = getDateTestJson(timestamp, tzId);
     Instruction code = compiler().compile(template).code();
-    return eval(compiler().execute(code, JsonUtils.decode(json)));
+    return eval(compiler().executeWithPartials(code, JsonUtils.decode(json), null, new StringBuilder(), locale));
   }
 
   /**

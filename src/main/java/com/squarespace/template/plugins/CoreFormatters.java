@@ -174,7 +174,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         tzName = tzNode.asText();
       }
       StringBuilder buf = new StringBuilder();
-      PluginDateUtils.formatDate((String)args.getOpaque(), instant, tzName, buf);
+      PluginDateUtils.formatDate(ctx.locale(), (String)args.getOpaque(), instant, tzName, buf);
       ctx.setNode(buf.toString());
     }
 
