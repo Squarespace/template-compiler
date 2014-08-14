@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,11 +54,14 @@ public class Context {
 
   private final ArrayDeque<Frame> stack = new ArrayDeque<>();
 
+  private final Locale locale;
+
   private Frame currentFrame;
 
   private JsonNode undefined = DEFAULT_UNDEFINED;
 
   private boolean safeExecution = false;
+
 
   private List<ErrorInfo> errors;
 
@@ -79,12 +83,21 @@ public class Context {
   private StringBuilder buf;
 
   public Context(JsonNode node) {
-    this(node, new StringBuilder());
+    this(node, new StringBuilder(), Locale.getDefault());
   }
 
   public Context(JsonNode node, StringBuilder buf) {
+    this(node, buf, Locale.getDefault());
+  }
+
+  public Context(JsonNode node, Locale locale) {
+    this(node, new StringBuilder(), locale);
+  }
+
+  public Context(JsonNode node, StringBuilder buf, Locale locale) {
     this.currentFrame = new Frame(node);
     this.buf = buf;
+    this.locale = locale;
   }
 
   public boolean safeExecutionEnabled() {
@@ -93,6 +106,10 @@ public class Context {
 
   public List<ErrorInfo> getErrors() {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
+  }
+
+  public Locale locale() {
+    return locale;
   }
 
   /**
