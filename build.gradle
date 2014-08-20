@@ -135,7 +135,10 @@ allprojects {
 
   task testJar(type: Jar, dependsOn: testClasses) {
     classifier = 'tests'
-    from sourceSets.test.output
+    from(
+      sourceSets.main.output,
+      sourceSets.test.output
+    )
   }
 
   task sourcesJar(type: Jar, dependsOn:classes) { 
