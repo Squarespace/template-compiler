@@ -178,14 +178,16 @@ allprojects {
     }
   }
 
-  task uploadInternal(type: Upload) {
-    description = 'Uploads archives to internal Nexus'
-    configuration = configurations.archives
+  if (project.hasProperty('NEXUS_INTERNAL_RELEASE_URL')) {
+    task uploadInternal(type: Upload) {
+      description = 'Uploads archives to internal Nexus'
+      configuration = configurations.archives
 
-    repositories.mavenDeployer {
-      repository(url: NEXUS_INTERNAL_RELEASE_URL)
-      snapshotRepository(url: NEXUS_INTERNAL_SNAPSHOT_URL)
-      configurePom(pom)
+      repositories.mavenDeployer {
+        repository(url: NEXUS_INTERNAL_RELEASE_URL)
+        snapshotRepository(url: NEXUS_INTERNAL_SNAPSHOT_URL)
+        configurePom(pom)
+      }
     }
   }
 
