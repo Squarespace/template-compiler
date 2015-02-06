@@ -36,6 +36,7 @@ import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
+import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
 import static org.testng.Assert.assertEquals;
@@ -216,6 +217,13 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.meta-right}", mk.metaRight(), mk.eof());
 
     assertFailure("{.meta-right   }", EXTRA_CHARS);
+  }
+
+  @Test
+  public void testPredicateArgs() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    String args = ":\"foo bar\":\"foo bar\"";
+    assertResult("{.equal?:" + args + "}", mk.predicate(EQUAL, mk.args(args)), mk.eof());
   }
 
   @Test

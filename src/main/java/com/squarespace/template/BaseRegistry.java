@@ -17,7 +17,9 @@
 package com.squarespace.template;
 
 
-
+/**
+ * Base class for plugin registries.
+ */
 public abstract class BaseRegistry<T> implements Registry<StringView, T> {
 
   @Override

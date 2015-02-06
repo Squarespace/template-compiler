@@ -481,6 +481,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       try {
         ctx.setNode(URLEncoder.encode(value, "UTF-8"));
       } catch (UnsupportedEncodingException e) {
+
         // Shouldn't happen
       }
     }

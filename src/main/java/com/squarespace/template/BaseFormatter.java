@@ -22,6 +22,10 @@ package com.squarespace.template;
  */
 public abstract class BaseFormatter extends Plugin implements Formatter {
 
+  /**
+   * Constructs a formatter with the given identifier and indicates whether
+   * it requires arguments.
+   */
   public BaseFormatter(String identifier, boolean requiresArgs) {
     super(identifier, requiresArgs);
   }

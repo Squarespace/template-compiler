@@ -23,8 +23,6 @@ package com.squarespace.template;
  */
 public class CodeSyntaxException extends CodeException {
 
-  private static final long serialVersionUID = -1;
-
   private final ErrorInfo errorInfo;
 
   public CodeSyntaxException(ErrorInfo info) {

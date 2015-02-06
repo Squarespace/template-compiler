@@ -21,17 +21,45 @@ import java.util.List;
 
 
 /**
- * A Block treats a sequence of instructions as a unit.  The underlying list
+ * A Block treats a sequence of instructions as a group.  The underlying list
  * is initialized lazily on the first call to add().
  */
 class Block {
 
+  /**
+   * Initial size of the instruction list.
+   */
   private final int initialSize;
 
+  /**
+   * List of instructions.
+   */
   private List<Instruction> instructions;
 
+  /**
+   * Constructs a block having the given initial size.
+   */
   public Block(int initialSize) {
     this.initialSize = initialSize;
+  }
+
+  /**
+   * Adds an instruction to the list.
+   */
+  public void add(Instruction ... instrs) {
+    if (instructions == null) {
+      instructions = new ArrayList<>(initialSize);
+    }
+    for (Instruction inst : instrs) {
+      instructions.add(inst);
+    }
+  }
+
+  /**
+   * Returns the instruction list.
+   */
+  public List<Instruction> getInstructions() {
+    return instructions;
   }
 
   @Override
@@ -46,19 +74,6 @@ class Block {
   @Override
   public int hashCode() {
     return super.hashCode();
-  }
-
-  public void add(Instruction ... instrs) {
-    if (instructions == null) {
-      instructions = new ArrayList<>(initialSize);
-    }
-    for (Instruction inst : instrs) {
-      instructions.add(inst);
-    }
-  }
-
-  public List<Instruction> getInstructions() {
-    return instructions;
   }
 
 }

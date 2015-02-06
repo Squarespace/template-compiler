@@ -79,6 +79,9 @@ public abstract class BaseInstruction implements Instruction {
     TreeEmitter.emit(this, depth, buf);
   }
 
+  /**
+   * Invokes the instruction. Default is to do nothing.
+   */
   public void invoke(Context ctx) throws CodeExecuteException {
     // NOOP
   }
