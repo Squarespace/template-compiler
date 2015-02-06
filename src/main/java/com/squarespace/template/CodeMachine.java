@@ -55,20 +55,44 @@ import com.squarespace.template.Instructions.RootInst;
  */
 public class CodeMachine implements CodeSink {
 
+  /**
+   * Instruction stack.
+   */
   private final Deque<Instruction> stack = new ArrayDeque<>();
 
+  /**
+   * Current state of the machine.
+   */
   private State state;
 
+  /**
+   * Root instruction.
+   */
   private final RootInst root;
 
+  /**
+   * List of errors emitted during compilation.
+   */
   private List<ErrorInfo> errors;
 
+  /**
+   * Indicates whether the state machine is in validation mode.
+   */
   private boolean validate = false;
 
+  /**
+   * Current instruction.
+   */
   private Instruction current;
 
+  /**
+   * Number of instructions processed.
+   */
   private int instructionCount;
 
+  /**
+   * Constructs a state machine.
+   */
   public CodeMachine() {
     this.root = new RootInst();
     this.current = root;
@@ -82,10 +106,17 @@ public class CodeMachine implements CodeSink {
     return root;
   }
 
+  /**
+   * Returns the list of errors emitted during compilation.
+   * @return
+   */
   public List<ErrorInfo> getErrors() {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
   }
 
+  /**
+   * Puts the state machine in validation mode.
+   */
   public void setValidate() {
     this.validate = true;
     if (this.errors == null) {
@@ -107,7 +138,7 @@ public class CodeMachine implements CodeSink {
     }
 
     // These should never happen when the machine is driven by the tokenizer, since it always
-    // (or should always) feed EOF as the final instruction.  The individual states should handle
+    // (or should always) feeds EOF as the final instruction.  The individual states should handle
     // EOF and raise the appropriate error, if any.
     if (current != root) {
       throw new RuntimeException("Unclosed " + currentInfo() + ": perhaps an EOF was not fed to the machine?"
@@ -119,6 +150,9 @@ public class CodeMachine implements CodeSink {
     }
   }
 
+  /**
+   * Returns the number of instructions processed.
+   */
   public int getInstructionCount() {
     return instructionCount;
   }

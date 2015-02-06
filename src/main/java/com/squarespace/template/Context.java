@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 /**
  * Tracks all of the state needed for executing a template against a given JSON tree.
  *
- * Compilation converts the raw text into an instruction tree. This instruction tree
+ * Compilation converts the raw text into an instruction tree. The instruction tree
  * is stateless and can be reused across multiple executions.
  *
  * The Context is used to carry out a single execution of the template instruction tree.

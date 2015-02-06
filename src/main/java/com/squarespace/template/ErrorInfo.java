@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Provides a class to capture state about the error, prior to constructing the
+ * Provides a class to capture state about an error, prior to constructing the
  * exception itself. Lets us pass this object around to various places if necessary
  * before wrapping it in a CodeSyntaxException.
  *

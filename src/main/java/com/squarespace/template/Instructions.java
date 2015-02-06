@@ -33,16 +33,15 @@ import com.fasterxml.jackson.databind.node.DecimalNode;
  */
 public class Instructions {
 
-  private static final int VARIABLE_LIST_LEN = 2;
-
   // Reasonable defaults for initial embedded instruction list sizes.
+
+  private static final int VARIABLE_LIST_LEN = 2;
 
   private static final int ROOT_BLOCK_LEN = 10;
 
   private static final int CONSEQUENT_BLOCK_LEN = 4;
 
   private static final int ALTERNATES_BLOCK_LEN = 2;
-
 
   /**
    * Special case instruction. Contains a block but never executes an alternate,

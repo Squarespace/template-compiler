@@ -32,10 +32,16 @@ public class InstructionTable {
 
   private static final List<String> symbolList = new ArrayList<>();
 
+  /**
+   * Adds a mapping from the string identifier to the instruction type.
+   */
   static void add(String str, InstructionType type) {
     add(str, type, true);
   }
 
+  /**
+   * Adds a mapping from the string identifier to the instruction type.
+   */
   static void add(String str, InstructionType type, boolean isSymbol) {
     table.put(new StringView(str), type);
     if (isSymbol) {
@@ -62,6 +68,9 @@ public class InstructionTable {
     symbolList.add(".repeated section");
   }
 
+  /**
+   * Used for debugging the internal table layout.
+   */
   public static String dump() {
     try {
       return table.dump();
@@ -70,14 +79,23 @@ public class InstructionTable {
     }
   }
 
+  /**
+   * Returns the instruction table.
+   */
   public static StringViewMap<StringView, InstructionType> getTable() {
     return table;
   }
 
+  /**
+   * Returns the instruction type for the given symbol.
+   */
   public static InstructionType get(StringView symbol) {
     return table.get(symbol);
   }
 
+  /**
+   * Returns all symbols registered in the table.
+   */
   public static String[] getSymbols() {
     return symbolList.toArray(Constants.EMPTY_ARRAY_OF_STRING);
   }

@@ -21,6 +21,9 @@ import static com.squarespace.template.Constants.NULL_PLACEHOLDER;
 import java.util.Map;
 
 
+/**
+ * Errors that can occur during execution of a template.
+ */
 public enum ExecuteErrorType implements ErrorType {
 
   APPLY_PARTIAL_SYNTAX

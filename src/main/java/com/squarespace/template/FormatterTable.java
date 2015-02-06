@@ -25,20 +25,38 @@ import java.util.List;
  */
 public class FormatterTable extends SymbolTable<StringView, Formatter> {
 
+  /**
+   * Default number of hash buckets for the {@link Formatter} symbol table.
+   */
   private static final int NUM_BUCKETS = 64;
 
+  /**
+   * Tells the symbol table what type of object its holding.
+   */
   private static final TypeRef<Formatter> TYPE_REF = new TypeRef<Formatter>() { };
 
+  /**
+   * List of identifiers of the {@link Formatter}s that have been registered.
+   */
   private final List<String> symbolList = new ArrayList<>();
 
+  /**
+   * Constructs a formatter table with the default number of hash buckets
+   */
   public FormatterTable() {
     super(TYPE_REF, NUM_BUCKETS);
   }
 
+  /**
+   * Constructs a formatter table with the specified number of hash buckets.
+   */
   public FormatterTable(int numBuckets) {
     super(TYPE_REF, numBuckets);
   }
 
+  /**
+   * Returns the list of identifiers of the formatters that have been registered.
+   */
   public String[] getSymbols() {
     return symbolList.toArray(Constants.EMPTY_ARRAY_OF_STRING);
   }

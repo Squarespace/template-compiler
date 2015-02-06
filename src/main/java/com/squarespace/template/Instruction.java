@@ -17,6 +17,9 @@
 package com.squarespace.template;
 
 
+/**
+ * Common methods for all instructions.
+ */
 public interface Instruction {
 
   InstructionType getType();

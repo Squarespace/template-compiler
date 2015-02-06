@@ -22,19 +22,34 @@ package com.squarespace.template;
  */
 public class FormatterCall {
 
+  /**
+   * The formatter implementation to call.
+   */
   private final Formatter impl;
 
+  /**
+   * The arguments to be passed to the formatter.
+   */
   private final Arguments args;
 
+  /**
+   * Constructs a call to the given {@link Formatter} with the given {@link Arguments}.
+   */
   public FormatterCall(Formatter impl, Arguments args) {
     this.impl = impl;
     this.args = args;
   }
 
+  /**
+   * Returns the formatter to be called.
+   */
   public Formatter getFormatter() {
     return this.impl;
   }
 
+  /**
+   * Returns the arguments to the formatter call.
+   */
   public Arguments getArguments() {
     return this.args;
   }

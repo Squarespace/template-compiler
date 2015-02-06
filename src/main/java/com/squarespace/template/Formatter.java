@@ -27,8 +27,14 @@ package com.squarespace.template;
  */
 public interface Formatter {
 
+  /**
+   * Name of the formatter.
+   */
   String getIdentifier();
 
+  /**
+   * Indicates whether the formatter requires arguments.
+   */
   boolean requiresArgs();
 
   /**

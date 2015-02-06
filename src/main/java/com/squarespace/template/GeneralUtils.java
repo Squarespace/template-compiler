@@ -28,6 +28,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
+/**
+ * Utility methods used by various parts of the framework.
+ */
 public class GeneralUtils {
 
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
@@ -35,6 +38,10 @@ public class GeneralUtils {
   private GeneralUtils() {
   }
 
+  /**
+   * Checks the {@code parent} node to see if it contains one of the keys, and
+   * returns the first that matches. If none match it returns {@link Constants#MISSING_NODE}
+   */
   public static JsonNode getFirstMatchingNode(JsonNode parent, String ... keys) {
     for (String key : keys) {
       JsonNode node = parent.path(key);
@@ -45,6 +52,9 @@ public class GeneralUtils {
     return Constants.MISSING_NODE;
   }
 
+  /**
+   * Formats the {@code node} as a string using the pretty printer.
+   */
   public static String jsonPretty(JsonNode node) throws IOException {
     StringBuilder buf = new StringBuilder();
     JsonGenerator gen = JSON_FACTORY.createGenerator(new StringBuilderWriter(buf));
@@ -54,6 +64,9 @@ public class GeneralUtils {
     return buf.toString();
   }
 
+  /**
+   * Splits a variable name into its parts.
+   */
   public static Object[] splitVariable(String name) {
     String[] parts = name.equals("@") ? null : StringUtils.split(name, '.');
     if (parts == null) {
@@ -68,6 +81,9 @@ public class GeneralUtils {
     return keys;
   }
 
+  /**
+   * URL-encodes the string.
+   */
   public static String urlEncode(String val) {
     try {
       return URLEncoder.encode(val, "UTF-8");
@@ -76,6 +92,9 @@ public class GeneralUtils {
     }
   }
 
+  /**
+   * Determines the boolean value of a node based on its type.
+   */
   public static boolean isTruthy(JsonNode node) {
     if (node.isTextual()) {
       return !node.asText().equals("");
@@ -97,10 +116,17 @@ public class GeneralUtils {
     return isTruthy(node) ? node.asDouble() : defaultValue;
   }
 
+  /**
+   * Obtains the text representation of a node, converting {@code null} to
+   * empty string.
+   */
   public static String eatNull(JsonNode node) {
     return node.isNull() ? "" : node.asText();
   }
 
+  /**
+   * Indicates if the string consists of all digits.
+   */
   private static boolean allDigits(String str) {
     for (int i = 0, len = str.length(); i < len; i++) {
       if (!Character.isDigit(str.charAt(i))) {

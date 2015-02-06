@@ -22,6 +22,9 @@ package com.squarespace.template;
  */
 public interface CodeSink {
 
+  /**
+   * Accepts one or more instructions.
+   */
   void accept(Instruction ... instructions) throws CodeSyntaxException;
 
   /**

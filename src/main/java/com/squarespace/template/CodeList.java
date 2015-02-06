@@ -25,18 +25,33 @@ import java.util.List;
  */
 public class CodeList implements CodeSink {
 
+  /**
+   * List of instructions.
+   */
   private List<Instruction> instList = new ArrayList<>();
 
+  /**
+   * Returns the list of instructions collected.
+   */
   public List<Instruction> getInstructions() {
     return instList;
   }
 
+  /**
+   * Accepts instructions and appends them to the internal list.
+   *
+   * See {@link CodeSink#accept(Instruction...)}
+   */
+  @Override
   public void accept(Instruction ... instructions) throws CodeSyntaxException {
     for (Instruction inst : instructions) {
       instList.add(inst);
     }
   }
 
+  /**
+   * See {@link CodeSink#complete()}
+   */
   @Override
   public void complete() {
     // NOOP
