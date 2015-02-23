@@ -54,4 +54,13 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
     }
   };
 
+  @Override
+  public void registerTo(SymbolTable<StringView, Formatter> table) {
+    table.add(EXECUTE_ERROR);
+    table.add(INVALID_ARGS);
+    table.add(NPE);
+    table.add(REQUIRED_ARGS);
+    table.add(UNSTABLE);
+  }
+
 }

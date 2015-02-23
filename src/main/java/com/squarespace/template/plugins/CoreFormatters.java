@@ -44,6 +44,8 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
+import com.squarespace.template.StringView;
+import com.squarespace.template.SymbolTable;
 
 
 public class CoreFormatters extends BaseRegistry<Formatter> {
@@ -487,5 +489,30 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   };
+
+  @Override
+  public void registerTo(SymbolTable<StringView, Formatter> table) {
+    table.add(APPLY);
+    table.add(COUNT);
+    table.add(CYCLE);
+    table.add(DATE);
+    table.add(ENCODE_SPACE);
+    table.add(HTML);
+    table.add(HTMLATTR);
+    table.add(HTMLTAG);
+    table.add(ITER);
+    table.add(JSON);
+    table.add(JSON_PRETTY);
+    table.add(OUTPUT);
+    table.add(PLURALIZE);
+    table.add(RAW);
+    table.add(ROUND);
+    table.add(SAFE);
+    table.add(SLUGIFY);
+    table.add(SMARTYPANTS);
+    table.add(STR);
+    table.add(TRUNCATE);
+    table.add(URL_ENCODE);
+  }
 
 }

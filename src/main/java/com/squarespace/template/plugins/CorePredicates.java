@@ -33,6 +33,8 @@ import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
 import com.squarespace.template.ReprEmitter;
+import com.squarespace.template.StringView;
+import com.squarespace.template.SymbolTable;
 
 
 public class CorePredicates extends BaseRegistry<Predicate> {
@@ -314,5 +316,19 @@ public class CorePredicates extends BaseRegistry<Predicate> {
 
   };
 
+  @Override
+  public void registerTo(SymbolTable<StringView, Predicate> table) {
+    table.add(DEBUG);
+    table.add(EQUAL);
+    table.add(EVEN);
+    table.add(GREATER_THAN);
+    table.add(GREATER_THAN_OR_EQUAL);
+    table.add(LESS_THAN);
+    table.add(LESS_THAN_OR_EQUAL);
+    table.add(NTH);
+    table.add(ODD);
+    table.add(PLURAL);
+    table.add(SINGULAR);
+  };
 
 }

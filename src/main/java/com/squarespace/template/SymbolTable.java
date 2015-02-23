@@ -16,7 +16,6 @@
 
 package com.squarespace.template;
 
-import java.lang.reflect.Field;
 
 
 /**
@@ -28,13 +27,10 @@ public abstract class SymbolTable<K, V> {
 
   private final StringViewMap<K, V> table;
 
-  private final TypeRef<V> ref;
-
   private boolean inUse = false;
 
-  public SymbolTable(TypeRef<V> ref, int numBuckets) {
+  public SymbolTable(int numBuckets) {
     table = new StringViewMap<>(numBuckets);
-    this.ref = ref;
   }
 
   public void setInUse() {
@@ -42,7 +38,7 @@ public abstract class SymbolTable<K, V> {
   }
 
   public void register(Registry<K, V> source) {
-    registerClass(source);
+    source.registerTo(this);
   }
 
   public V get(K symbol) {
@@ -69,37 +65,8 @@ public abstract class SymbolTable<K, V> {
   }
 
   /**
-   * Callback to cast the object, retrieve the key and store it in the table.
+   * Store the given type in the table.
    */
-  public abstract void registerSymbol(Object impl);
-
-  /**
-   * Use reflection to iterate over all static fields on the class and
-   * register each that matches our type reference.
-   */
-  private void registerClass(Registry<K, V> source) {
-
-    // Scan for static instances
-    Field[] fields = source.getClass().getDeclaredFields();
-    for (Field field : fields) {
-
-      if (!java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-        continue;
-      }
-
-      // Ensure that the field is or extends V
-      if (ref.clazz().isAssignableFrom(field.getType())) {
-        field.setAccessible(true);
-        try {
-          registerSymbol(field.get(source));
-        } catch (IllegalAccessException e) {
-          throw new RuntimeException("failed to register " + source, e);
-        }
-      }
-    }
-
-    // Register dynamic instances
-    source.registerTo(this);
-  }
+  public abstract void add(V impl);
 
 }

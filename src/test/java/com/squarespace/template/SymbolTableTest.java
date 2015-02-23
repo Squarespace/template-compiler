@@ -91,15 +91,12 @@ public class SymbolTableTest {
 
   static class NameTable extends SymbolTable<String, Name> {
 
-    private static final TypeRef<Name> TYPE_REF = new TypeRef<Name>() { };
-
     public NameTable() {
-      super(TYPE_REF, 8);
+      super(8);
     }
 
     @Override
-    public void registerSymbol(Object impl) {
-      Name name = (Name) impl;
+    public void add(Name name) {
       put(name.getName(), name);
     }
   }
@@ -111,8 +108,9 @@ public class SymbolTableTest {
     public static final Name STATIC = new Name("static");
 
     @Override
-    public void registerTo(SymbolTable<String, Name> symbolTable) {
-      symbolTable.registerSymbol(new Name("dynamic"));
+    public void registerTo(SymbolTable<String, Name> table) {
+      table.add(STATIC);
+      table.add(new Name("dynamic"));
     }
 
   }

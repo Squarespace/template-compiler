@@ -31,11 +31,6 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
   private static final int NUM_BUCKETS = 64;
 
   /**
-   * Tells the symbol table what type of object its holding.
-   */
-  private static final TypeRef<Formatter> TYPE_REF = new TypeRef<Formatter>() { };
-
-  /**
    * List of identifiers of the {@link Formatter}s that have been registered.
    */
   private final List<String> symbolList = new ArrayList<>();
@@ -44,14 +39,14 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
    * Constructs a formatter table with the default number of hash buckets
    */
   public FormatterTable() {
-    super(TYPE_REF, NUM_BUCKETS);
+    super(NUM_BUCKETS);
   }
 
   /**
    * Constructs a formatter table with the specified number of hash buckets.
    */
   public FormatterTable(int numBuckets) {
-    super(TYPE_REF, numBuckets);
+    super(numBuckets);
   }
 
   /**
@@ -65,8 +60,7 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
    * Callback to cast the Formatter and store it in the table.
    */
   @Override
-  public void registerSymbol(Object impl) {
-    Formatter formatter = (Formatter) impl;
+  public void add(Formatter formatter) {
     put(new StringView(formatter.getIdentifier()), formatter);
     symbolList.add(formatter.getIdentifier());
   }

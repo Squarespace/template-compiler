@@ -28,16 +28,14 @@ public class PredicateTable extends SymbolTable<StringView, Predicate> {
 
   private static final int NUM_BUCKETS = 128;
 
-  private static final TypeRef<Predicate> TYPE_REF = new TypeRef<Predicate>() { };
-
   private final List<String> symbolList = new ArrayList<>();
 
   public PredicateTable() {
-    super(TYPE_REF, NUM_BUCKETS);
+    super(NUM_BUCKETS);
   }
 
   public PredicateTable(int numBuckets) {
-    super(TYPE_REF, numBuckets);
+    super(numBuckets);
   }
 
   public String[] getSymbols() {
@@ -45,11 +43,10 @@ public class PredicateTable extends SymbolTable<StringView, Predicate> {
   }
 
   /**
-   * Callback to cast the Predicate and store it in the table.
+   * Store the Predicate in the symbol table.
    */
   @Override
-  public void registerSymbol(Object impl) {
-    Predicate predicate = (Predicate) impl;
+  public void add(Predicate predicate) {
     put(new StringView(predicate.getIdentifier()), predicate);
     symbolList.add(predicate.getIdentifier());
   }

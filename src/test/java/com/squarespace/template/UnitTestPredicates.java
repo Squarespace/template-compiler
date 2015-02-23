@@ -45,4 +45,12 @@ public class UnitTestPredicates extends BaseRegistry<Predicate> {
     }
   };
 
+  @Override
+  public void registerTo(SymbolTable<StringView, Predicate> table) {
+    table.add(EXECUTE_ERROR);
+    table.add(INVALID_ARGS);
+    table.add(REQUIRED_ARGS);
+    table.add(UNSTABLE);
+  }
+
 }
