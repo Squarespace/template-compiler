@@ -51,6 +51,34 @@ import com.squarespace.template.SymbolTable;
 public class CoreFormatters extends BaseRegistry<Formatter> {
 
   /**
+   * Registers the active formatters in this registry.
+   */
+  @Override
+  public void registerTo(SymbolTable<StringView, Formatter> table) {
+    table.add(APPLY);
+    table.add(COUNT);
+    table.add(CYCLE);
+    table.add(DATE);
+    table.add(ENCODE_SPACE);
+    table.add(HTML);
+    table.add(HTMLATTR);
+    table.add(HTMLTAG);
+    table.add(ITER);
+    table.add(JSON);
+    table.add(JSON_PRETTY);
+    table.add(OUTPUT);
+    table.add(PLURALIZE);
+    table.add(RAW);
+    table.add(ROUND);
+    table.add(SAFE);
+    table.add(SLUGIFY);
+    table.add(SMARTYPANTS);
+    table.add(STR);
+    table.add(TRUNCATE);
+    table.add(URL_ENCODE);
+  }
+
+  /**
    * APPLY - This will compile and execute a "partial template", caching it in the
    * context for possible later use.
    */
@@ -489,30 +517,5 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
   };
-
-  @Override
-  public void registerTo(SymbolTable<StringView, Formatter> table) {
-    table.add(APPLY);
-    table.add(COUNT);
-    table.add(CYCLE);
-    table.add(DATE);
-    table.add(ENCODE_SPACE);
-    table.add(HTML);
-    table.add(HTMLATTR);
-    table.add(HTMLTAG);
-    table.add(ITER);
-    table.add(JSON);
-    table.add(JSON_PRETTY);
-    table.add(OUTPUT);
-    table.add(PLURALIZE);
-    table.add(RAW);
-    table.add(ROUND);
-    table.add(SAFE);
-    table.add(SLUGIFY);
-    table.add(SMARTYPANTS);
-    table.add(STR);
-    table.add(TRUNCATE);
-    table.add(URL_ENCODE);
-  }
 
 }

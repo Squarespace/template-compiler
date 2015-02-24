@@ -39,6 +39,24 @@ import com.squarespace.template.SymbolTable;
 
 public class CorePredicates extends BaseRegistry<Predicate> {
 
+  /**
+   * Registers the active predicates in this registry.
+   */
+  @Override
+  public void registerTo(SymbolTable<StringView, Predicate> table) {
+    table.add(DEBUG);
+    table.add(EQUAL);
+    table.add(EVEN);
+    table.add(GREATER_THAN);
+    table.add(GREATER_THAN_OR_EQUAL);
+    table.add(LESS_THAN);
+    table.add(LESS_THAN_OR_EQUAL);
+    table.add(NTH);
+    table.add(ODD);
+    table.add(PLURAL);
+    table.add(SINGULAR);
+  };
+
   public static final Predicate DEBUG = new BasePredicate("debug?", false) {
 
     @Override
@@ -314,21 +332,6 @@ public class CorePredicates extends BaseRegistry<Predicate> {
       return ctx.node().asLong() == 1;
     }
 
-  };
-
-  @Override
-  public void registerTo(SymbolTable<StringView, Predicate> table) {
-    table.add(DEBUG);
-    table.add(EQUAL);
-    table.add(EVEN);
-    table.add(GREATER_THAN);
-    table.add(GREATER_THAN_OR_EQUAL);
-    table.add(LESS_THAN);
-    table.add(LESS_THAN_OR_EQUAL);
-    table.add(NTH);
-    table.add(ODD);
-    table.add(PLURAL);
-    table.add(SINGULAR);
   };
 
 }
