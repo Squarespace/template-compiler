@@ -6,7 +6,9 @@
 /bin
 /target
 /test-output
+/templatec
 *.swp
+.DS_Store
 
 /target
 /build/

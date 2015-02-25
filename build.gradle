@@ -1,4 +1,5 @@
 
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.plugins.signing.Sign
 
 buildscript {
@@ -67,6 +68,7 @@ def configurePom(def pom) {
 allprojects {
   apply plugin: 'java'
   apply plugin: 'eclipse'
+  apply plugin: 'application'
   apply plugin: 'license'
   apply plugin: 'checkstyle'
   apply plugin: 'jacoco'
@@ -78,6 +80,11 @@ allprojects {
 
   sourceCompatibility = 1.7
   targetCompatibility = 1.7
+
+  project.ext {
+    BUILD_DATE = new java.util.Date()
+    BUILD_COMMIT = ('git rev-parse HEAD').execute().text.trim()
+  }
 
   license {
     header rootProject.file('conf/apache-2.0-header.txt')
@@ -96,7 +103,10 @@ allprojects {
     compile 'commons-io:commons-io:2.1'
     compile 'joda-time:joda-time:2.3'
     compile 'org.apache.commons:commons-lang3:3.1'
-
+    
+    // TODO: move when separating cli into subproject
+    compile 'net.sourceforge.argparse4j:argparse4j:0.4.4'
+	
     testCompile 'org.testng:testng:6.8.7'
   }
 
@@ -157,6 +167,55 @@ allprojects {
     archives javadocJar
   }
 
+  mainClassName = 'com.squarespace.template.cli.TemplateC'
+
+  processResources {
+    from (sourceSets.main.resources.srcDirs) {
+      include '**/build.properties'
+      filter(ReplaceTokens, tokens: [
+        'build.version': project.version,
+        'build.date': BUILD_DATE.toString(),
+        'build.commit': BUILD_COMMIT
+      ])
+    }
+
+    from (sourceSets.main.resources.srcDirs) {
+      exclude '**/build.properties'
+    }
+  }
+
+  // Ensure this always runs, to generate fresh build.properties
+  processResources.outputs.upToDateWhen { false }
+
+  task execJar(type: Jar, dependsOn: classes) {
+    classifier = 'exec'
+    manifest {
+      attributes 'Main-Class': "${mainClassName}"
+    }
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+    from {
+      configurations.runtime.collect {
+        it.isDirectory() ? it : zipTree(it)
+      }
+    }
+  }
+
+  jar {
+    manifest {
+      attributes 'Main-Class': "${mainClassName}"
+    }
+  }
+
+  task makeCli(type: Exec, dependsOn: execJar,
+    description: 'Creates executable "templatec" command') {
+
+    def inputScript = "src/main/resources/scripts/templatec.in"
+    def inputArchive = execJar.archivePath
+    workingDir '.'
+    executable 'bash'
+    args '-c', "cat ${inputScript} ${inputArchive} >templatec; chmod ug+x templatec"
+  }
 
   uploadArchives {
     repositories.mavenDeployer {
