@@ -108,7 +108,6 @@ public class CodeMachine implements CodeSink {
 
   /**
    * Returns the list of errors emitted during compilation.
-   * @return
    */
   public List<ErrorInfo> getErrors() {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;

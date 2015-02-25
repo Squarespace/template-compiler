@@ -70,7 +70,6 @@ public class Arguments {
 
   /**
    * Returns the first argument.
-   * @return
    */
   public String first() {
     return args.get(0);
