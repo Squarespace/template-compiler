@@ -164,6 +164,8 @@ allprojects {
     from javadoc.destinationDir 
   } 
 
+  mainClassName = 'com.squarespace.template.cli.TemplateC'
+
   task execJar(type: Jar, dependsOn: classes) {
     classifier = 'exec'
     manifest {
@@ -184,8 +186,6 @@ allprojects {
     archives javadocJar
     archives execJar
   }
-
-  mainClassName = 'com.squarespace.template.cli.TemplateC'
 
   processResources {
     from (sourceSets.main.resources.srcDirs) {
