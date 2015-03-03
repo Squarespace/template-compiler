@@ -558,7 +558,7 @@ public class Tokenizer {
       StringView name = matcher.consume();
       Formatter formatter = formatterTable.get(name);
       if (formatter == null) {
-        fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(matcher.remainder()));
+        fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(name));
         return emitInvalid();
       }
 
