@@ -53,16 +53,12 @@ public class TemplateC {
 
   private static final String PROGRAM_NAME = "templatec";
 
-  private static final PredicateTable predicateTable = new PredicateTable();
-
-  private static final FormatterTable formatterTable = new FormatterTable();
-
-  static {
-    predicateTable.register(new CorePredicates());
-    formatterTable.register(new CoreFormatters());
+  public static void main(String[] args) {
+    TemplateC command = new TemplateC();
+    command.execute(args);
   }
 
-  public static void main(String[] args) {
+  protected void execute(String[] args) {
     String version = buildVersion();
     ArgumentParser parser = ArgumentParsers.newArgumentParser(PROGRAM_NAME)
       .description("Compile template files")
@@ -98,7 +94,7 @@ public class TemplateC {
   /**
    * Compile a template against a given json tree and emit the result.
    */
-  private static void compile(String templatePath, String jsonPath, String partialsPath) {
+  protected void compile(String templatePath, String jsonPath, String partialsPath) {
     int exitCode = 1;
     try {
       String template = readFile(templatePath);
@@ -133,11 +129,17 @@ public class TemplateC {
     }
   }
 
-  private static JsonTemplateEngine compiler() {
+  protected JsonTemplateEngine compiler() {
+    FormatterTable formatterTable = new FormatterTable();
+    formatterTable.register(new CoreFormatters());
+
+    PredicateTable predicateTable = new PredicateTable();
+    predicateTable.register(new CorePredicates());
+
     return new JsonTemplateEngine(formatterTable, predicateTable);
   }
 
-  private static String readFile(String rawPath) throws IOException {
+  protected String readFile(String rawPath) throws IOException {
     try (Reader reader = new InputStreamReader(new FileInputStream(rawPath), "UTF-8")) {
       return IOUtils.toString(reader);
     }
@@ -146,7 +148,7 @@ public class TemplateC {
   /**
    * Build the version string.
    */
-  private static String buildVersion() {
+  protected String buildVersion() {
     StringBuilder buf = new StringBuilder();
     buf.append("${prog} version ")
       .append(BuildProperties.version())
