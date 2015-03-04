@@ -55,14 +55,14 @@ public class CodeValidityTest extends UnitTestBase {
   public void testAlternatesWith() throws CodeException {
     RootInst root = builder().repeated("a").alternatesWith().section("b").var("@").end().end().eof().build();
     String json = "{\"a\": [{\"b\": 1}, {\"b\": 2}, {\"b\": 3}, {\"b\": 4}]}";
-    assertContext(execute(json, root), "234");
+    assertContext(execute(json, root), "123");
   }
 
   @Test
   public void testAlternatesWithSectionOr() throws CodeException {
     CodeBuilder cb = builder().repeated("a").alternatesWith().section("@").var("@").end();
     RootInst root = cb.or().text("x").end().eof().build();
-    assertContext(execute("{\"a\": [1,2,3]}", root), "23");
+    assertContext(execute("{\"a\": [1,2,3]}", root), "12");
     assertContext(execute("{}", root), "x");
   }
 

@@ -638,18 +638,22 @@ public class Instructions {
       ctx.pushSection(variable);
       if (ctx.initIteration()) {
         // We have an array node and can now iterate.
+        int lastIndex = ctx.arraySize() - 1;
         while (ctx.hasNext()) {
           int index = ctx.currentIndex();
 
           // Push the array element onto the stack to be processed by the consequent.
           ctx.pushNext();
 
+          ctx.execute(consequent.getInstructions());
+
           // In between each pass, execute the alternatesWith block.
-          if (index > 0) {
+          // Note: We must do this here to ensure any variables created inside the
+          // consequent block are available to the alternates-with block.
+          if (index < lastIndex) {
             ctx.execute(alternatesWith);
           }
 
-          ctx.execute(consequent.getInstructions());
           ctx.pop();
 
           // Point to next array element.

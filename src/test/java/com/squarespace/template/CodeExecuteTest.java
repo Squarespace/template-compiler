@@ -160,6 +160,14 @@ public class CodeExecuteTest extends UnitTestBase {
   }
 
   @Test
+  public void testVariableScope() throws CodeException {
+    RootInst root = builder().repeated("names")
+        .bindvar("@curr", "name").alternatesWith().var("@curr").end().eof().build();
+    String json = "{\"names\": [{\"name\": \"bob\"}, {\"name\": \"larry\"}]}";
+    assertContext(execute(json, root), "bob");
+  }
+
+  @Test
   public void testVariableTypes() throws CodeException {
     RootInst root = builder().var("@").eof().build();
     String value = "12345678900000000.1234567890000000";

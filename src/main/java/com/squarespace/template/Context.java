@@ -313,6 +313,13 @@ public class Context {
   }
 
   /**
+   * Return the current frame's array size.
+   */
+  public int arraySize() {
+    return currentFrame.node.size();
+  }
+
+  /**
    * Increment the array element pointer for the current frame.
    */
   public void increment() {
