@@ -65,7 +65,7 @@ public class TemplateC {
   public static void main(String[] args) {
     String version = buildVersion();
     ArgumentParser parser = ArgumentParsers.newArgumentParser(PROGRAM_NAME)
-      .description("Complete template files")
+      .description("Compile template files")
       .version(version);
 
     parser.addArgument("--version", "-v")
