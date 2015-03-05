@@ -17,6 +17,7 @@
 package com.squarespace.template;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.AlternatesWithInst;
@@ -74,6 +76,7 @@ public class ReferenceScanner {
 
       case IF:
         IfInst ifInst = (IfInst)inst;
+        refs.addIfInstruction(ifInst);
         for (Object[] var : ifInst.getVariables()) {
           name = ReprEmitter.get(var);
           refs.addVariable(name);
@@ -167,6 +170,8 @@ public class ReferenceScanner {
 
     private Map<String, Integer> predicates = new HashMap<>();
 
+    private List<String> ifVariants = new ArrayList<>();
+
     private int textBytes;
 
     /**
@@ -179,6 +184,8 @@ public class ReferenceScanner {
       res.put("predicates", convert(predicates));
       res.put("variables", currentNode);
       res.put("textBytes", textBytes);
+      // NOTE: this is temporary - phensley
+      res.put("ifInstructions", convert(ifVariants));
       return res;
     }
 
@@ -186,6 +193,14 @@ public class ReferenceScanner {
       ObjectNode res = JsonUtils.createObjectNode();
       for (Entry<String, Integer> entry : map.entrySet()) {
         res.put(entry.getKey(), entry.getValue());
+      }
+      return res;
+    }
+
+    private ArrayNode convert(List<String> list) {
+      ArrayNode res = JsonUtils.createArrayNode();
+      for (String elem : list) {
+        res.add(elem);
       }
       return res;
     }
@@ -224,6 +239,14 @@ public class ReferenceScanner {
       if (node.isMissingNode()) {
         currentNode.put(name, NullNode.getInstance());
       }
+    }
+
+    // NOTE: This is temporary, to assess the .if instruction variants out there and
+    // assess the impact of migration. Will remove this once data is gathered. - phensley
+    private void addIfInstruction(IfInst inst) {
+      StringBuilder buf = new StringBuilder();
+      ReprEmitter.emit(inst, buf, false);
+      ifVariants.add(buf.toString());
     }
 
     /**

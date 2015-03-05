@@ -29,15 +29,18 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.commons.io.IOUtils;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.BuildProperties;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CompiledTemplate;
 import com.squarespace.template.Context;
 import com.squarespace.template.FormatterTable;
+import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonTemplateEngine;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.PredicateTable;
+import com.squarespace.template.ReferenceScanner;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -68,11 +71,11 @@ public class TemplateC {
       .action(Arguments.version())
       .help("Show the version and exit");
 
-    parser.addArgument("template")
-      .type(String.class)
-      .help("Template source");
+    parser.addArgument("--stats", "-s")
+      .action(Arguments.storeTrue())
+      .help("Dump stats for the template");
 
-    parser.addArgument("json")
+    parser.addArgument("--json", "-j")
       .type(String.class)
       .help("JSON tree");
 
@@ -80,9 +83,18 @@ public class TemplateC {
       .type(String.class)
       .help("JSON partials");
 
+    parser.addArgument("template")
+    .type(String.class)
+    .help("Template source");
+
     try {
       Namespace res = parser.parseArgs(args);
-      compile(res.getString("template"), res.getString("json"), res.getString("partials"));
+      if (res.getBoolean("stats")) {
+        stats(res.getString("template"));
+
+      } else {
+        compile(res.getString("template"), res.getString("json"), res.getString("partials"));
+      }
 
     } catch (ArgumentParserException e) {
       parser.handleError(e);
@@ -98,7 +110,10 @@ public class TemplateC {
     int exitCode = 1;
     try {
       String template = readFile(templatePath);
-      String json = readFile(jsonPath);
+      String json = "{}";
+      if (jsonPath != null) {
+        json = readFile(jsonPath);
+      }
 
       String partials = null;
       if (partialsPath != null) {
@@ -117,6 +132,32 @@ public class TemplateC {
 
       System.out.print(context.buffer().toString());
       exitCode = 0;
+
+    } catch (CodeException e) {
+      System.err.println(e.getMessage());
+
+    } catch (Exception e) {
+      e.printStackTrace();
+
+    } finally {
+      System.exit(exitCode);
+    }
+  }
+
+  /**
+   * Scan the compiled template and dump stats.
+   */
+  protected void stats(String templatePath) {
+    int exitCode = 1;
+    try {
+      String template = readFile(templatePath);
+
+      CompiledTemplate compiled = compiler().compile(template);
+      ReferenceScanner scanner = new ReferenceScanner();
+      scanner.extract(compiled.code());
+      ObjectNode report = scanner.references().report();
+      String result = GeneralUtils.jsonPretty(report);
+      System.out.println(result);
 
     } catch (CodeException e) {
       System.err.println(e.getMessage());
