@@ -336,12 +336,9 @@ public class Instructions {
    * Represents a conditional which tests a predicate.
    *
    * NOTE: I'm not sure why this form of if expression was added to the language,
-   * since it is redundant with a normal predicate call:
+   * since it is redundant with a normal predicate call.
    *
-   *  {.if foo?}  does the same thing as  {.foo?}
-   *
-   * I've implemented it to preserve compatibility with the JavaScript JSONT
-   * code, but it can be removed.
+   * Example:  {.if foo?}  does the same thing as  {.foo?}
    */
   static class IfPredicateInst extends BlockInstruction {
 
