@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
@@ -75,15 +76,23 @@ public class ReferenceScanner {
         break;
 
       case IF:
-        IfInst ifInst = (IfInst)inst;
-        refs.addIfInstruction(ifInst);
-        for (Object[] var : ifInst.getVariables()) {
-          name = ReprEmitter.get(var);
-          refs.addVariable(name);
+      {
+        BlockInstruction blockInst = (BlockInstruction)inst;
+        refs.addIfInstruction(blockInst);
+        if (inst instanceof IfInst) {
+          IfInst ifInst = (IfInst)inst;
+          for (Object[] var : ifInst.getVariables()) {
+            name = ReprEmitter.get(var);
+            refs.addVariable(name);
+          }
+        } else {
+          IfPredicateInst ifInst = (IfPredicateInst)inst;
+          refs.increment(ifInst.getPredicate());
         }
-        extractBlock(ifInst.getConsequent());
-        extract(ifInst.getAlternative());
+        extractBlock(blockInst.getConsequent());
+        extract(blockInst.getAlternative());
         break;
+      }
 
       case OR_PREDICATE:
       case PREDICATE:
@@ -243,9 +252,13 @@ public class ReferenceScanner {
 
     // NOTE: This is temporary, to assess the .if instruction variants out there and
     // assess the impact of migration. Will remove this once data is gathered. - phensley
-    private void addIfInstruction(IfInst inst) {
+    private void addIfInstruction(BlockInstruction inst) {
       StringBuilder buf = new StringBuilder();
-      ReprEmitter.emit(inst, buf, false);
+      if (inst instanceof IfInst) {
+        ReprEmitter.emit((IfInst)inst, buf, false);
+      } else {
+        ReprEmitter.emit((IfPredicateInst)inst, buf, false);
+      }
       ifVariants.add(buf.toString());
     }
 
