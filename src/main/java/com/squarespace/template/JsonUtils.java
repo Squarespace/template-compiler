@@ -21,6 +21,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
@@ -36,10 +37,25 @@ public class JsonUtils {
   }
 
   public static JsonNode decode(String input) {
+    return decode(input, false);
+  }
+
+  /**
+   * Attempt to decode the input as JSON. Returns the {@link JsonNode} if
+   * the decode is successful.
+   *
+   * If the decode fails and the {@code failQuietly} flag is true, returns a
+   * {@link MissingNode}. Otherwise an {@link IllegalArgumentException} will
+   * be thrown.
+   */
+  public static JsonNode decode(String input, boolean failQuietly) {
     try {
       return MAPPER.readTree(input);
     } catch (IOException e) {
-      throw new IllegalArgumentException("Unabled to decode JSON", e);
+      if (failQuietly) {
+        return MissingNode.getInstance();
+      }
+      throw new IllegalArgumentException("Unable to decode JSON", e);
     }
   }
 

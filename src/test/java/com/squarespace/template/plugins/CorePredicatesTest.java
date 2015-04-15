@@ -68,6 +68,22 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(EQUAL, context("\"hello\""), mk.args(" \"goodbye\""));
     assertFalse(EQUAL, context("[1, 2, 3]"), mk.args(":1"));
     assertFalse(EQUAL, context("{\"foo\":\"bar\"}"), mk.args(":1"));
+
+    // Compare 2 variables
+    String template = "{.equal? a b}yes{.or}no{.end}";
+    Context ctx = execute(template, "{\"a\": 1, \"b\": 1}");
+    assertEquals(ctx.buffer().toString(), "yes");
+
+    ctx = execute(template, "{\"a\": 1, \"b\": 2}");
+    assertEquals(ctx.buffer().toString(), "no");
+
+    // Compare variable with JSON
+    template = "{.equal? 1 b}yes{.or}no{.end}";
+    ctx = execute(template, "{\"b\": 1}");
+    assertEquals(ctx.buffer().toString(), "yes");
+
+    ctx = execute(template, "{\"b\": 2}");
+    assertEquals(ctx.buffer().toString(), "no");
   }
 
   @Test

@@ -29,6 +29,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.commons.io.IOUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.BuildProperties;
 import com.squarespace.template.CodeException;
@@ -123,13 +124,35 @@ public class TemplateC {
       CompiledTemplate compiled = compiler().compile(template);
       Instruction code = compiled.code();
 
-      Context context = null;
-      if (partials == null) {
-        context = compiler().execute(code, JsonUtils.decode(json));
-      } else {
-        context = compiler().execute(code, JsonUtils.decode(json), JsonUtils.decode(partials));
+      // Parse the JSON context
+      JsonNode jsonTree = null;
+      try {
+        jsonTree = JsonUtils.decode(json);
+      } catch (IllegalArgumentException e) {
+        System.err.println("Caught error trying to parse JSON: " + e.getCause().getMessage());
+        return;
       }
 
+      // Parse the optional JSON partials dictionary.
+      JsonNode partialsTree = null;
+      if (partials != null) {
+        try {
+          partialsTree = JsonUtils.decode(partials);
+        } catch (IllegalArgumentException e) {
+          System.err.println("Caught error trying to parse partials: " + e.getCause().getMessage());
+          return;
+        }
+      }
+
+      // Perform the compile.
+      Context context = null;
+      if (partialsTree == null) {
+        context = compiler().execute(code, jsonTree);
+      } else {
+        context = compiler().execute(code, jsonTree, partialsTree);
+      }
+
+      // If compile was successful, print the output.
       System.out.print(context.buffer().toString());
       exitCode = 0;
 

@@ -122,11 +122,10 @@ public class CorePredicates extends BaseRegistry<Predicate> {
 
     private Object parse(Arguments args, int index) throws ArgumentsException {
       String raw = args.get(index);
-      // Attempt to decode as JSON
-      try {
-        return JsonUtils.decode(raw);
-      } catch (IllegalArgumentException e) {
-        // Fall through..
+      // Attempt to decode as JSON.
+      JsonNode result = JsonUtils.decode(raw, true);
+      if (!result.isMissingNode()) {
+        return result;
       }
 
       // Attempt to parse variable name.
