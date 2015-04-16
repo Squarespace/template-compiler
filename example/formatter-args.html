@@ -1,0 +1,22 @@
+
+The argument delimiter for a formatter is the first character
+after the formatter's name.  In the case below its a space ' ' char.
+{timestamp|date %Y}
+
+This is fine for most purposes, as we rarely have spaces inside the
+argument itself.
+{timestamp|date %H:%M:%S}
+
+But suppose we want spaces in the output of the date formatter. We 
+just need to pick a delimiter character that won't appear in the 
+format string:
+{timestamp|date:%Y %m %d}
+
+Here's another variant, where we want to use both spaces and colons in
+the output:
+{timestamp|date,%Y %m %d %H:%M:%S}
+
+The only other character we can't use is PIPE '|' since its used to 
+pipe output to the next formatter:
+{timestamp|date,%Y %m %d %H:%M:%S|json-pretty}
+
