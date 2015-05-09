@@ -26,7 +26,6 @@
     </module>
 
     <module name="TreeWalker">
-        <property name="cacheFile" value="target/checkstyle-cachefile"/>
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
