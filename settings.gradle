@@ -1,2 +1,4 @@
 rootProject.name='template-compiler'
+include ':template-cli'
+include ':template-core'
 

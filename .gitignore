@@ -1,17 +1,17 @@
-/.checkstyle
-/.classpath
-/.gradle
-/.project
-/.settings
-/bin
-/target
-/test-output
-/templatec
-*.swp
-.DS_Store
+.checkstyle
+.classpath
+.gradle
+.project
+.settings
 
-/target
-/build/
-/.idea
-/*.iml
+bin/
+build/
+target/
+test-output
+templatec
+
+.DS_Store
+.idea
+*.swp
+*.iml
 

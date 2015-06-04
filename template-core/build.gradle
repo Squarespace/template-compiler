@@ -1,0 +1,27 @@
+
+description = 'Template compiler core'
+
+dependencies {
+  compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+  compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+  compile 'commons-io:commons-io:2.1'
+  compile 'joda-time:joda-time:2.3'
+  compile 'org.apache.commons:commons-lang3:3.1'
+
+  testCompile "org.testng:testng:${testngVersion}"
+}
+
+configurations {
+  tests {
+    extendsFrom testRuntime
+  }
+}
+
+artifacts {
+  archives sourcesJar
+  archives testJar
+  archives javadocJar
+  tests testJar
+}
+
+
