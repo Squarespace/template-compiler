@@ -9,16 +9,20 @@ buildscript {
   }
 
   dependencies {
+    classpath files(
+      "/Users/phensley/playground/gradle-eclipse-checkstyle/build/classes/main", 
+      "/Users/phensley/playground/gradle-eclipse-checkstyle/build/resources/main")
     classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
   }
 }
 
 plugins {
   id 'net.researchgate.release' version '2.0.2'
+//  id 'com.glonk.eclipse-checkstyle' version '0.0.3'
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.3'
+  gradleVersion = '2.4'
 }
 
 // Sign release archives
@@ -74,6 +78,7 @@ allprojects {
   apply plugin: 'application'
   apply plugin: 'license'
   apply plugin: 'checkstyle'
+  apply plugin: 'com.glonk.eclipse-checkstyle'
   apply plugin: 'jacoco'
   apply plugin: 'signing'
   apply plugin: 'maven'
@@ -135,9 +140,9 @@ allprojects {
     }
   }
 
-  eclipse.project {
-    natures 'net.sf.eclipsecs.core.CheckstyleNature'
-    buildCommand 'net.sf.eclipsecs.core.CheckstyleBuilder'
+  eclipseCheckstyle {
+    syncFormatter = true
+    exclude = ['derived']
   }
 
   signing {
