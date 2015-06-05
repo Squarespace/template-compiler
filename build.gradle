@@ -12,7 +12,7 @@ buildscript {
 plugins {
   id 'net.researchgate.release' version '2.0.2'
   id 'com.github.hierynomus.license' version '0.11.0'
-  id 'com.glonk.eclipse-checkstyle' version '0.0.3'
+  id 'com.glonk.eclipse-checkstyle' version '0.0.4'
 }
 
 task wrapper(type: Wrapper) {
