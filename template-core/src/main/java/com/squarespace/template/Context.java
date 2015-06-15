@@ -62,7 +62,6 @@ public class Context {
 
   private boolean safeExecution = false;
 
-
   private List<ErrorInfo> errors;
 
   /**
@@ -101,11 +100,7 @@ public class Context {
   }
 
   public static Context subContext(final Context ctx, StringBuilder buf) {
-    Context result = new SubContext(ctx, buf);
-    if (ctx.safeExecutionEnabled()) {
-      result.setSafeExecution();
-    }
-    return result;
+    return new SubContext(ctx, buf);
   }
 
   public boolean safeExecutionEnabled() {
@@ -511,8 +506,12 @@ public class Context {
     private final Context parent;
 
     public SubContext(Context parent, StringBuilder buf) {
-      super(parent.node(), buf);
+      super(parent.node(), buf, parent.locale());
       this.parent = parent;
+      this.setLoggingHook(parent.loggingHook);
+      if (parent.safeExecutionEnabled()) {
+        this.setSafeExecution();
+      }
     }
 
     @Override
