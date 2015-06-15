@@ -100,6 +100,14 @@ public class Context {
     this.locale = locale;
   }
 
+  public static Context subContext(final Context ctx, StringBuilder buf) {
+    Context result = new SubContext(ctx, buf);
+    if (ctx.safeExecutionEnabled()) {
+      result.setSafeExecution();
+    }
+    return result;
+  }
+
   public boolean safeExecutionEnabled() {
     return safeExecution;
   }
@@ -494,6 +502,22 @@ public class Context {
 
     public JsonNode getVar(String name) {
       return (variables == null) ? null : variables.get(name);
+    }
+
+  }
+
+  static class SubContext extends Context {
+
+    private final Context parent;
+
+    public SubContext(Context parent, StringBuilder buf) {
+      super(parent.node(), buf);
+      this.parent = parent;
+    }
+
+    @Override
+    public void addError(ErrorInfo error) {
+      parent.addError(error);
     }
 
   }

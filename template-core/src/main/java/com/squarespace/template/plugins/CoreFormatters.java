@@ -86,12 +86,16 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
-      args.exactly(1);
+      args.between(1, 2);
     }
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public void apply(final Context ctx, Arguments args) throws CodeExecuteException {
       String name = args.first();
+      boolean privateContext = false;
+      if (args.count() == 2) {
+        privateContext = args.get(1).equals("private");
+      }
       Instruction inst = null;
       try {
         inst = ctx.getPartial(name);
@@ -121,11 +125,19 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
 
       // Temporarily swap the buffers to capture all output of the partial.
-      StringBuilder origBuf = ctx.swapBuffer(new StringBuilder());
+      StringBuilder buf = new StringBuilder();
+      StringBuilder origBuf = ctx.swapBuffer(buf);
       try {
-        inst.invoke(ctx);
+        // If we want to hide the parent context during execution, create a new
+        // temporary sub-context.
+        if (privateContext) {
+          Context partialCtx = Context.subContext(ctx, buf);
+          inst.invoke(partialCtx);
+        } else {
+          inst.invoke(ctx);
+        }
       } finally {
-        StringBuilder buf = ctx.swapBuffer(origBuf);
+        ctx.swapBuffer(origBuf);
         ctx.setNode(buf.toString());
       }
     }

@@ -125,6 +125,21 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testApplyPartialPrivate() throws CodeException {
+    // The "private" argument hides the entire parent context from the partial
+    String template = "{child|apply block private}{child|apply block}";
+    String partials = "{\"block\": \"hello {name}\"}";
+    String input = "{\"name\": \"bob\", \"child\": {}}";
+    Instruction inst = compiler().compile(template).code();
+    Context ctx = new Context(JsonUtils.decode(input));
+    ctx.setCompiler(compiler());
+    ctx.setSafeExecution();
+    ctx.setPartials(JsonUtils.decode(partials));
+    ctx.execute(inst);
+    assertContext(ctx, "hello hello bob");
+  }
+
+  @Test
   public void testCount() throws CodeException {
     for (String val : new String[] { "null", "0", "\"foo\"" }) {
       assertFormatter(CoreFormatters.COUNT, val, "0");
