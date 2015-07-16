@@ -3,11 +3,13 @@ language: java
 
 jdk:
   - oraclejdk7
-  - oraclejdk8
 
 branches:
   only:
     - master
 
-script: "./gradlew check test --stacktrace --continue"
+script: "./gradlew check test --info --continue"
+
+after_success:
+    - ./gradlew jacocoTestReport coveralls --info
 
