@@ -4,6 +4,7 @@
 A Java template compiler based on [JSON-Template][jsont].
 
 [![Build Status](https://travis-ci.org/Squarespace/template-compiler.svg?branch=master)](https://travis-ci.org/Squarespace/template-compiler) 
+[![Coverage Status](https://coveralls.io/repos/Squarespace/template-compiler/badge.svg?branch=master&service=github)](https://coveralls.io/github/Squarespace/template-compiler?branch=master)
 
 License: [Apache 2.0](LICENSE) ([summary][license-tldr])
 
