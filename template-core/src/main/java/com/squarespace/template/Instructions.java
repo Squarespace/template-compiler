@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
@@ -85,15 +86,18 @@ public class Instructions {
   /**
    * Set a local variable's value.
    */
-  static class BindVarInst extends BaseInstruction {
+  static class BindVarInst extends BaseInstruction implements Formattable {
 
     private final String name;
 
     private final Object[] variable;
 
+    private List<FormatterCall> formatters;
+
     public BindVarInst(String key, String variable) {
       this.name = key;
       this.variable = splitVariable(variable);
+      setFormatters(null);
     }
 
     public String getName() {
@@ -105,8 +109,24 @@ public class Instructions {
     }
 
     @Override
+    public List<FormatterCall> getFormatters() {
+      return formatters;
+    }
+
+    @Override
+    public void setFormatters(List<FormatterCall> formatters) {
+      this.formatters = formatters == null ? Collections.<FormatterCall>emptyList() : formatters;
+    }
+
+    @Override
     public void invoke(Context ctx) throws CodeExecuteException {
       JsonNode value = ctx.resolve(variable);
+
+      for (FormatterCall formatter : formatters) {
+        Formatter impl = formatter.getFormatter();
+        impl.apply(ctx, formatter.getArguments());
+      }
+
       ctx.setVar(name, value);
     }
 
@@ -114,7 +134,9 @@ public class Instructions {
     public boolean equals(Object obj) {
       if (obj instanceof BindVarInst) {
         BindVarInst other = (BindVarInst)obj;
-        return name.equals(other.name) && Arrays.equals(variable, other.variable);
+        return name.equals(other.name)
+            && Arrays.equals(variable, other.variable)
+            && Objects.equals(formatters, other.formatters);
       }
       return false;
     }
@@ -847,34 +869,41 @@ public class Instructions {
    * invoke() method will determine which representation to emit for the final
    * value.
    */
-  static class VariableInst extends BaseInstruction {
+  static class VariableInst extends BaseInstruction implements Formattable {
 
     private final Object[] variable;
 
-    private final List<FormatterCall> formatters;
+    private List<FormatterCall> formatters;
 
     public VariableInst(String name) {
-      this(name, Collections.<FormatterCall>emptyList());
+      this(name, null);
     }
 
     public VariableInst(String name, List<FormatterCall> formatters) {
       this.variable = splitVariable(name);
-      this.formatters = formatters;
+      setFormatters(formatters);
     }
 
     public Object[] getVariable() {
       return variable;
     }
 
+    @Override
     public List<FormatterCall> getFormatters() {
       return formatters;
+    }
+
+    @Override
+    public void setFormatters(List<FormatterCall> formatters) {
+      this.formatters = formatters == null ? Collections.<FormatterCall>emptyList() : formatters;
     }
 
     @Override
     public boolean equals(Object obj) {
       if (obj instanceof VariableInst) {
         VariableInst other = (VariableInst) obj;
-        return Arrays.equals(variable, other.variable) && formatters.equals(other.formatters);
+        return Arrays.equals(variable, other.variable)
+            && Objects.equals(formatters, other.formatters);
       }
       return false;
     }

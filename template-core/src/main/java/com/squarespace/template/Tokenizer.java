@@ -45,7 +45,9 @@ import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.PredicateInst;
+import com.squarespace.template.Instructions.VariableInst;
 
 
 /**
@@ -285,6 +287,7 @@ public class Tokenizer {
         return true;
 
       case BINDVAR:
+      {
         if (!skipWhitespace()) {
           return emitInvalid();
         }
@@ -304,10 +307,15 @@ public class Tokenizer {
           fail(error(MISSING_VARIABLE_NAME).data(matcher.remainder()));
           return emitInvalid();
         }
-        String path = matcher.consume().repr();
 
-        emitInstruction(maker.bindvar(name, path));
-        return true;
+        String path = matcher.consume().repr();
+        BindVarInst instruction = maker.bindvar(name, path);
+        boolean result = parseFormatters(instruction, start);
+        if (result) {
+          emitInstruction(instruction);
+        }
+        return result;
+      }
 
       case END:
       case META_LEFT:
@@ -545,6 +553,19 @@ public class Tokenizer {
     int start = matcher.matchStart();
     StringView variable = matcher.consume();
 
+    VariableInst instruction = maker.var(variable.repr());
+    boolean result = parseFormatters(instruction, start);
+    if (result) {
+      emitInstruction(instruction);
+    }
+    return result;
+  }
+
+  /**
+   * Parse a formatter chain that may follow either a variable reference
+   * or bind instruction.
+   */
+  private boolean parseFormatters(Formattable inst, int start) throws CodeSyntaxException {
     List<FormatterCall> formatters = null;
     while (matcher.pipe()) {
 
@@ -596,11 +617,7 @@ public class Tokenizer {
       return false;
     }
 
-    if (formatters == null) {
-      emitInstruction(maker.var(variable.repr()));
-    } else {
-      emitInstruction(maker.var(variable.repr(), formatters));
-    }
+    inst.setFormatters(formatters);
     return true;
   }
 

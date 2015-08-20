@@ -62,6 +62,14 @@ public class CodeMaker {
     return new BindVarInst(name, path);
   }
 
+  public BindVarInst bindvar(String name, String path, List<FormatterCall> formatters) {
+    BindVarInst inst = new BindVarInst(name, path);
+    if (!formatters.isEmpty()) {
+      inst.setFormatters(formatters);
+    }
+    return inst;
+  }
+
   public StringBuilder buf() {
     return new StringBuilder();
   }

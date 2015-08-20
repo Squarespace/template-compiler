@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
+
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
 import static com.squarespace.template.SyntaxErrorType.BINDVAR_EXPECTS_NAME;
@@ -110,6 +112,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertResult("{.var @name foo.bar}", mk.bindvar("@name", "foo.bar"), mk.eof());
     assertResult("{.var @outer-index @index}", mk.bindvar("@outer-index", "@index"), mk.eof());
+    assertResult("{.var @name foo|htmlattr}", mk.bindvar("@name",  "foo", mk.formatters(HTMLATTR)), mk.eof());
 
     assertFailure("{.var=foo}", WHITESPACE_EXPECTED);
     assertFailure("{.var foo bar}", BINDVAR_EXPECTS_NAME);
