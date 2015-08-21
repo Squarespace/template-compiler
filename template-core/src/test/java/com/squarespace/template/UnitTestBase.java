@@ -195,8 +195,8 @@ public class UnitTestBase {
   public String format(Formatter impl, Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
     impl.validateArgs(args);
-    impl.apply(ctx, args);
-    return ctx.node().asText();
+    JsonNode node = impl.apply(ctx, args, ctx.node());
+    return node.asText();
   }
 
   public void assertFormatter(Formatter impl, String json, String expected) throws CodeException {

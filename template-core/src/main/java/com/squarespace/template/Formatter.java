@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 /**
  * A Formatter is a function that examines a value and emits a string. Formatters
@@ -53,6 +55,6 @@ public interface Formatter {
    * Formatter's responsibility to emit output using the context. If any
    * runtime errors occur that are severe, the Formatter can throw an exception.
    */
-  void apply(Context ctx, Arguments args) throws CodeExecuteException;
+  JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException;
 
 }

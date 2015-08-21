@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 /**
  * Default base class for Formatters.
@@ -35,8 +37,8 @@ public abstract class BaseFormatter extends Plugin implements Formatter {
    * been validated and optionally converted by validateArgs(). Formatters append
    * output to the Context.
    */
-  public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-    // NOOP
+  public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    return node;
   }
 
 

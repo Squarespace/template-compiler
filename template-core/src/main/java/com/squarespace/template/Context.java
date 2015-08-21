@@ -299,19 +299,35 @@ public class Context {
   }
 
   public void setNode(String value) {
-    setNode(new TextNode(value));
+    setNode(buildNode(value));
   }
 
   public void setNode(int value) {
-    setNode(new IntNode(value));
+    setNode(buildNode(value));
   }
 
   public void setNode(long value) {
-    setNode(new LongNode(value));
+    setNode(buildNode(value));
   }
 
   public void setNode(double value) {
-    setNode(new DoubleNode(value));
+    setNode(buildNode(value));
+  }
+
+  public JsonNode buildNode(String value) {
+    return new TextNode(value);
+  }
+
+  public JsonNode buildNode(int value) {
+    return new IntNode(value);
+  }
+
+  public JsonNode buildNode(long value) {
+    return new LongNode(value);
+  }
+
+  public JsonNode buildNode(double value) {
+    return new DoubleNode(value);
   }
 
   public boolean initIteration() {

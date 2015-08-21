@@ -70,7 +70,7 @@ public class ContextTest extends UnitTestBase {
     };
 
     CodeMaker mk = maker();
-    Context ctx = context("{}");
+    Context ctx = context("{\"a\": \"b\"}");
     ctx.setSafeExecution();
     ctx.setLoggingHook(hook);
 

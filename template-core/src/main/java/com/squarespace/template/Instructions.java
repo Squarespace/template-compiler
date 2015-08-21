@@ -120,13 +120,7 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      JsonNode value = ctx.resolve(variable);
-
-      for (FormatterCall formatter : formatters) {
-        Formatter impl = formatter.getFormatter();
-        impl.apply(ctx, formatter.getArguments());
-      }
-
+      JsonNode value = applyFormatters(ctx, formatters, ctx.resolve(variable));
       ctx.setVar(name, value);
     }
 
@@ -921,17 +915,12 @@ public class Instructions {
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.push(variable);
-      CodeLimiter limiter = ctx.getCodeLimiter();
-
-      // Apply any formatters.
-      for (FormatterCall formatter : formatters) {
-        limiter.check();
-        Formatter impl = formatter.getFormatter();
-        impl.apply(ctx, formatter.getArguments());
-      }
+      JsonNode value = applyFormatters(ctx, formatters, ctx.node());
 
       // Finally, output the result.
-      emitJsonNode(ctx, ctx.node());
+      if (!value.isMissingNode()) {
+        emitJsonNode(ctx.buffer(), value);
+      }
       ctx.pop();
     }
 
@@ -942,10 +931,22 @@ public class Instructions {
 
   }
 
+  private static JsonNode applyFormatters(Context ctx, List<FormatterCall> formatters, JsonNode value)
+      throws CodeExecuteException {
 
-  private static void emitJsonNode(Context ctx, JsonNode node) {
-    StringBuilder buf = ctx.buffer();
+    CodeLimiter limiter = ctx.getCodeLimiter();
+    for (FormatterCall formatter : formatters) {
+      if (value.isMissingNode()) {
+        break;
+      }
+      limiter.check();
+      Formatter impl = formatter.getFormatter();
+      value = impl.apply(ctx, formatter.getArguments(), value);
+    }
+    return value;
+  }
 
+  private static void emitJsonNode(StringBuilder buf, JsonNode node) {
     if (node.isNumber()) {
       // Formatting of numbers depending on type
       switch (node.numberType()) {
@@ -973,7 +974,7 @@ public class Instructions {
       }
 
     } else if (node.isArray()) {
-      // Javascript Array.toString() will comma-delimit the elements.
+      // JavaScript Array.toString() will comma-delimit the elements.
       for (int i = 0, size = node.size(); i < size; i++) {
         if (i >= 1) {
           buf.append(",");

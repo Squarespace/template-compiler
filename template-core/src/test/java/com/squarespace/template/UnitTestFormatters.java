@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 /**
  * Implementations to test the Formatter interface.
@@ -24,7 +26,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
 
   public static final Formatter EXECUTE_ERROR = new BaseFormatter("execute-error", false) {
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
   };
@@ -39,7 +41,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
   public static final Formatter NPE = new BaseFormatter("npe", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       throw new NullPointerException("fake NPE thrown by the test npe formatter.");
     }
   };
@@ -49,7 +51,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
 
   public static final Formatter UNSTABLE = new BaseFormatter("unstable", false) {
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       throw new IllegalArgumentException("unexpected error!");
     }
   };

@@ -91,7 +91,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
     @Override
-    public void apply(final Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(final Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String name = args.first();
       boolean privateContext = false;
       if (args.count() == 2) {
@@ -107,7 +107,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
           ctx.addError(parent);
           // We're in safe mode, so return immediately since this 'apply' formatter
           // can't output anything meaningful.
-          return;
+          return Constants.MISSING_NODE;
         } else {
           throw new CodeExecuteException(parent);
         }
@@ -119,7 +119,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
           ctx.addError(error);
           // We're in safe mode, so return immediately since this 'apply' formatter
           // can't output anything meaningful.
-          return;
+          return Constants.MISSING_NODE;
         } else {
           throw new CodeExecuteException(error);
         }
@@ -139,8 +139,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
 
       } finally {
         ctx.swapBuffer(origBuf);
-        ctx.setNode(buf.toString());
       }
+      return ctx.buildNode(buf.toString());
     }
 
   };
@@ -152,13 +152,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter COUNT = new BaseFormatter("count", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode node = ctx.node();
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       int res = 0;
       if (node.isArray() || node.isObject()) {
         res = node.size();
       }
-      ctx.setNode(res);
+      return ctx.buildNode(res);
     }
 
   };
@@ -175,15 +174,15 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      int value = ctx.node().asInt();
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      int value = node.asInt();
       int count = args.count();
       // Indices are 1-based and modulus of negative values is adjusted to properly wrap.
       int index = (value - 1) % count;
       if (index < 0) {
         index += count;
       }
-      ctx.setNode(args.get(index));
+      return ctx.buildNode(args.get(index));
     };
 
   };
@@ -207,9 +206,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     };
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       JsonNode tzNode = ctx.resolve(timezoneKey);
-      long instant = ctx.node().asLong();
+      long instant = node.asLong();
       String tzName = "UTC";
       if (tzNode.isMissingNode()) {
         tzName = DateTimeZone.getDefault().getID();
@@ -218,7 +217,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
       }
       StringBuilder buf = new StringBuilder();
       PluginDateUtils.formatDate(ctx.locale(), (String)args.getOpaque(), instant, tzName, buf);
-      ctx.setNode(buf.toString());
+      return ctx.buildNode(buf.toString());
     }
 
   }
@@ -235,9 +234,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String value = Patterns.ONESPACE.matcher(ctx.node().asText()).replaceAll("&nbsp;");
-      ctx.setNode(value);
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String value = Patterns.ONESPACE.matcher(node.asText()).replaceAll("&nbsp;");
+      return ctx.buildNode(value);
     }
 
   };
@@ -249,10 +248,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter HTML = new BaseFormatter("html", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtml(eatNull(ctx.node()), buf);
-      ctx.setNode(buf.toString());
+      PluginUtils.escapeHtml(eatNull(node), buf);
+      return ctx.buildNode(buf.toString());
     }
 
   };
@@ -264,10 +263,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
-      ctx.setNode(buf.toString());
+      PluginUtils.escapeHtmlTag(eatNull(node), buf);
+      return ctx.buildNode(buf.toString());
     }
 
   };
@@ -279,10 +278,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtmlTag(eatNull(ctx.node()), buf);
-      ctx.setNode(buf.toString());
+      PluginUtils.escapeHtmlTag(eatNull(node), buf);
+      return ctx.buildNode(buf.toString());
     }
 
   };
@@ -294,8 +293,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter ITER = new BaseFormatter("iter", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.setNode(ctx.resolve("@index").asText());
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      return ctx.buildNode(ctx.resolve("@index").asText());
     }
 
   };
@@ -307,10 +306,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter JSON = new BaseFormatter("json", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       // NOTE: this is </script> replacement is copied verbatim from the JavaScript
       // version of JSONT, but it seems quite error-prone to me.
-      ctx.setNode(ctx.node().toString().replace("</script>", "</scr\"+\"ipt>"));
+      return ctx.buildNode(node.toString().replace("</script>", "</scr\"+\"ipt>"));
     }
 
   };
@@ -322,12 +321,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter JSON_PRETTY = new BaseFormatter("json-pretty", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       try {
-        String result = GeneralUtils.jsonPretty(ctx.node());
+        String result = GeneralUtils.jsonPretty(node);
         // NOTE: this is </script> replacement is copied verbatim from the JavaScript
         // version of JSONT, but it seems quite error-prone to me.
-        ctx.setNode(result.replace("</script>", "</scr\"+\"ipt>"));
+        return ctx.buildNode(result.replace("</script>", "</scr\"+\"ipt>"));
+
       } catch (IOException e) {
         ErrorInfo error = ctx.error(GENERAL_ERROR).data(e.getMessage());
         if (ctx.safeExecutionEnabled()) {
@@ -336,6 +336,7 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
           throw new CodeExecuteException(error);
         }
       }
+      return Constants.MISSING_NODE;
     }
 
   };
@@ -347,9 +348,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter OUTPUT = new BaseFormatter("output", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       List<String> values = args.getArgs();
-      ctx.setNode(StringUtils.join(values.toArray(), ' '));
+      return ctx.buildNode(StringUtils.join(values.toArray(), ' '));
     }
 
   };
@@ -379,10 +380,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       PluralizeArgs realArgs = (PluralizeArgs) args.getOpaque();
-      CharSequence result = (ctx.node().asLong() == 1) ? realArgs.singular : realArgs.plural;
-      ctx.setNode(result.toString());
+      CharSequence result = (node.asLong() == 1) ? realArgs.singular : realArgs.plural;
+      return ctx.buildNode(result.toString());
     }
   };
 
@@ -393,8 +394,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter RAW = new BaseFormatter("raw", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.setNode(ctx.node().toString());
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      return ctx.buildNode(node.toString());
     }
 
   };
@@ -406,9 +407,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter ROUND = new BaseFormatter("round", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      long value = Math.round(ctx.node().asDouble());
-      ctx.setNode(value);
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      long value = Math.round(node.asDouble());
+      return ctx.buildNode(value);
     }
 
   };
@@ -422,12 +423,12 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     private final Pattern pattern = Pattern.compile("<[^>]*?>", Pattern.MULTILINE);
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode node = ctx.node();
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       if (isTruthy(node)) {
         String value = pattern.matcher(node.asText()).replaceAll("");
-        ctx.setNode(value);
+        return ctx.buildNode(value);
       }
+      return node;
     }
 
   };
@@ -439,14 +440,14 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter SMARTYPANTS = new BaseFormatter("smartypants", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String str = eatNull(ctx.node());
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String str = eatNull(node);
       str = str.replaceAll("(^|[-\u2014\\s(\\[\"])'", "$1\u2018");
       str = str.replace("'", "\u2019");
       str = str.replaceAll("(^|[-\u2014/\\[(\u2018\\s])\"", "$1\u201c");
       str = str.replace("\"", "\u201d");
       str = str.replace("--", "\u2014");
-      ctx.setNode(str);
+      return ctx.buildNode(str);
     }
 
   };
@@ -458,9 +459,9 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter SLUGIFY = new BaseFormatter("slugify", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String result = eatNull(ctx.node());
-      ctx.setNode(PluginUtils.slugify(result));
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String result = eatNull(node);
+      return ctx.buildNode(PluginUtils.slugify(result));
     }
 
   };
@@ -472,8 +473,8 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter STR = new BaseFormatter("str", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      ctx.setNode(eatNull(ctx.node()));
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      return ctx.buildNode(eatNull(node));
     }
 
   };
@@ -506,10 +507,10 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
     }
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       TruncateArgs obj = (TruncateArgs)args.getOpaque();
-      String value = PluginUtils.truncate(ctx.node().asText(), obj.maxLen, obj.ellipses);
-      ctx.setNode(value);
+      String value = PluginUtils.truncate(node.asText(), obj.maxLen, obj.ellipses);
+      return ctx.buildNode(value);
     }
   };
 
@@ -521,14 +522,21 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
   public static final Formatter URL_ENCODE = new BaseFormatter("url-encode", false) {
 
     @Override
-    public void apply(Context ctx, Arguments args) throws CodeExecuteException {
-      String value = ctx.node().asText();
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String value = node.asText();
       try {
-        ctx.setNode(URLEncoder.encode(value, "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
+        return ctx.buildNode(URLEncoder.encode(value, "UTF-8"));
 
-        // Shouldn't happen
+      } catch (UnsupportedEncodingException e) {
+        // Should never happen
+        ErrorInfo error = ctx.error(GENERAL_ERROR).data(e.getMessage());
+        if (ctx.safeExecutionEnabled()) {
+          ctx.addError(error);
+        } else {
+          throw new CodeExecuteException(error);
+        }
       }
+      return Constants.MISSING_NODE;
     }
 
   };
