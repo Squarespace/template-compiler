@@ -331,6 +331,8 @@ public class CoreFormattersTest extends UnitTestBase {
   @Test
   public void testSafe() throws CodeException {
     assertFormatter(CoreFormatters.SAFE, "\"foo <bar> bar\"", "foo  bar");
+    assertFormatter(CoreFormatters.SAFE, "\"<script\\nsrc=\\\"url\\\"\\n>foobar</script>\"", "foobar");
+    assertFormatter(CoreFormatters.SAFE, "\"<div>\\n<b>\\nfoobar\\n</b>\\n</div>\"", "\n\nfoobar\n\n");
   }
 
   @Test

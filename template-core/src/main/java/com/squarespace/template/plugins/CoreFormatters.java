@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTimeZone;
@@ -418,11 +419,13 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
    */
   public static final Formatter SAFE = new BaseFormatter("safe", false) {
 
+    private final Pattern pattern = Pattern.compile("<[^>]*?>", Pattern.MULTILINE);
+
     @Override
     public void apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode node = ctx.node();
       if (isTruthy(node)) {
-        String value = node.asText().replaceAll("<.*?>", "");
+        String value = pattern.matcher(node.asText()).replaceAll("");
         ctx.setNode(value);
       }
     }
