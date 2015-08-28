@@ -132,11 +132,11 @@ public class CoreFormatters extends BaseRegistry<Formatter> {
         // If we want to hide the parent context during execution, create a new
         // temporary sub-context.
         if (privateContext) {
-          Context partialCtx = Context.subContext(ctx, buf);
-          inst.invoke(partialCtx);
+          Context.subContext(ctx, buf).execute(inst);
         } else {
-          inst.invoke(ctx);
+          ctx.execute(inst);
         }
+
       } finally {
         ctx.swapBuffer(origBuf);
         ctx.setNode(buf.toString());

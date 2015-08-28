@@ -892,9 +892,11 @@ public class Instructions {
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
       ctx.push(variable);
+      CodeLimiter limiter = ctx.getCodeLimiter();
 
       // Apply any formatters.
       for (FormatterCall formatter : formatters) {
+        limiter.check();
         Formatter impl = formatter.getFormatter();
         impl.apply(ctx, formatter.getArguments());
       }

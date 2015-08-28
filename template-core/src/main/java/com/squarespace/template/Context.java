@@ -78,6 +78,8 @@ public class Context {
 
   private LoggingHook loggingHook;
 
+  private CodeLimiter codeLimiter = new NoopCodeLimiter();
+
   /* Holds the final output of the template execution */
   private StringBuilder buf;
 
@@ -99,7 +101,7 @@ public class Context {
     this.locale = locale;
   }
 
-  public static Context subContext(final Context ctx, StringBuilder buf) {
+  public static Context subContext(Context ctx, StringBuilder buf) {
     return new SubContext(ctx, buf);
   }
 
@@ -155,6 +157,14 @@ public class Context {
     this.loggingHook = hook;
   }
 
+  public CodeLimiter getCodeLimiter() {
+    return codeLimiter;
+  }
+
+  public void setCodeLimiter(CodeLimiter limiter) {
+    this.codeLimiter = limiter;
+  }
+
   /**
    * Execute a single instruction.
    */
@@ -164,17 +174,27 @@ public class Context {
     }
     currentInstruction = instruction;
     try {
+      codeLimiter.check();
       instruction.invoke(this);
+
     } catch (CodeExecuteException e) {
+      // This is thrown explicitly when an instruction / plugin needs to
+      // abort execution. Instructions and plugins must first check if
+      // safe execution mode is enabled before throwing. This gives us
+      // the flexibility to abort execution even when safe mode is enabled
+      // for severe errors, or when a hard resource limit is reached.
       throw e;
+
     } catch (Exception e) {
       String repr = ReprEmitter.get(instruction, false);
-      ErrorInfo error = error(UNEXPECTED_ERROR).name(e.getClass().getSimpleName()).data(e.getMessage()).repr(repr);
+      ErrorInfo error = error(UNEXPECTED_ERROR)
+          .name(e.getClass().getSimpleName())
+          .data(e.getMessage())
+          .repr(repr);
 
       // In safe mode we don't raise exceptions; just append the error.
       if (safeExecution) {
         addError(error);
-
       } else {
         throw new CodeExecuteException(error, e);
       }
@@ -188,11 +208,10 @@ public class Context {
    * Execute a list of instructions.
    */
   public void execute(List<Instruction> instructions) throws CodeExecuteException {
-    if (instructions == null) {
-      return;
-    }
-    for (Instruction inst : instructions) {
-      execute(inst);
+    if (instructions != null) {
+      for (Instruction inst : instructions) {
+        execute(inst);
+      }
     }
   }
 
@@ -509,6 +528,7 @@ public class Context {
       super(parent.node(), buf, parent.locale());
       this.parent = parent;
       this.setLoggingHook(parent.loggingHook);
+      this.setCodeLimiter(parent.codeLimiter);
       if (parent.safeExecutionEnabled()) {
         this.setSafeExecution();
       }

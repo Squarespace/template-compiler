@@ -32,6 +32,9 @@ public enum ExecuteErrorType implements ErrorType {
   APPLY_PARTIAL_MISSING
   ("Attempt to apply partial '%(name)s' which could not be found."),
 
+  CODE_LIMIT_REACHED
+  ("A %(name)s code limit was reached %(data)s"),
+
   COMPILE_PARTIAL_SYNTAX
   ("Compiling partial '%(name)s' raised errors:"),
 
