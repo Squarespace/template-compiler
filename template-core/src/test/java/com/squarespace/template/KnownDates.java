@@ -34,5 +34,8 @@ public class KnownDates {
   // Friday
   public static final long NOV_15_2013_123030_UTC = 1384518630000L;
 
+  // Tuesday
+  public static final long AUG_24_2015_172345_UTC = 1440437025000L;
+
 }
 

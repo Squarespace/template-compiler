@@ -19,10 +19,15 @@ package com.squarespace.template;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
+
 /**
  * Implementations to test the Formatter interface.
  */
-public class UnitTestFormatters extends BaseRegistry<Formatter> {
+public class UnitTestFormatters implements BaseRegistry<Formatter> {
+
+  public static final Formatter DUMMY = new BaseFormatter("dummy", false) {
+
+  };
 
   public static final Formatter EXECUTE_ERROR = new BaseFormatter("execute-error", false) {
     @Override
@@ -58,6 +63,7 @@ public class UnitTestFormatters extends BaseRegistry<Formatter> {
 
   @Override
   public void registerTo(SymbolTable<StringView, Formatter> table) {
+    table.add(DUMMY);
     table.add(EXECUTE_ERROR);
     table.add(INVALID_ARGS);
     table.add(NPE);

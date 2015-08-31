@@ -74,9 +74,18 @@ public class PluginDateUtils {
     buf.append(" ago");
   }
 
-  public static void humanizeDate(long value, boolean showSeconds, StringBuilder buf) {
-    int offset = TimeZone.getDefault().getRawOffset();
-    Duration delta = new Duration(System.currentTimeMillis() - value + offset);
+  public static void humanizeDate(long instantMs, boolean showSeconds, StringBuilder buf) {
+    humanizeDate(instantMs, System.currentTimeMillis(), TimeZone.getDefault().getID(), showSeconds, buf);
+  }
+
+  public static void humanizeDate(long instantMs, String tzId, boolean showSeconds, StringBuilder buf) {
+    humanizeDate(instantMs, System.currentTimeMillis(), tzId, showSeconds, buf);
+  }
+
+  public static void humanizeDate(long instantMs, long baseMs, String tzId, boolean showSeconds, StringBuilder buf) {
+    DateTimeZone timeZone = DateTimeZone.forID(tzId);
+    int offset = timeZone.getOffset(instantMs);
+    Duration delta = new Duration(baseMs - instantMs + offset);
 
     int days = (int)delta.getStandardDays();
     int years = (int)Math.floor(days / 365.0);

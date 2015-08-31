@@ -170,9 +170,14 @@ public class CoreFormattersTest extends UnitTestBase {
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "2013-11-15 07:30:30 EST");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "2013-11-15 04:30:30 PST");
 
-    String r1 = formatDate("%a %d %b %Y %H:%M:%S %p %Z", NOV_15_2013_123030_UTC, tzNewYork);
+    String r1 = formatDate("%a %d %b %Y %I:%M:%S %p %Z", NOV_15_2013_123030_UTC, tzNewYork);
     String r2 = formatDate("%c", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
+
+    r1 = formatDate("%a %d %b %Y %I:%M:%S %p %Z", MAY_13_2013_010000_UTC, tzNewYork);
+    r2 = formatDate("%c", MAY_13_2013_010000_UTC, tzNewYork);
+    assertEquals(r1, r2);
+
 
     r1 = formatDate("%F", NOV_15_2013_123030_UTC, tzLosAngeles);
     r2 = formatDate("%Y-%m-%d", NOV_15_2013_123030_UTC, tzLosAngeles);
@@ -182,12 +187,20 @@ public class CoreFormattersTest extends UnitTestBase {
     r2 = formatDate("%m/%d/%y", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
 
+    r1 = formatDate("%x", NOV_15_2013_123030_UTC, tzNewYork);
+    r2 = formatDate("%m/%d/%Y", NOV_15_2013_123030_UTC, tzNewYork);
+    assertEquals(r1, r2);
+
     r1 = formatDate("%R", NOV_15_2013_123030_UTC, tzNewYork);
     r2 = formatDate("%H:%M", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
 
     r1 = formatDate("%X", NOV_15_2013_123030_UTC, tzNewYork);
-    r2 = formatDate("%H:%M:%S %p", NOV_15_2013_123030_UTC, tzNewYork);
+    r2 = formatDate("%I:%M:%S %p", NOV_15_2013_123030_UTC, tzNewYork);
+    assertEquals(r1, r2);
+
+    r1 = formatDate("%X", MAY_13_2013_010000_UTC, tzNewYork);
+    r2 = formatDate("%I:%M:%S %p", MAY_13_2013_010000_UTC, tzNewYork);
     assertEquals(r1, r2);
 
     // am/pm and 12-hour hour
@@ -364,6 +377,7 @@ public class CoreFormattersTest extends UnitTestBase {
   public void testTruncate() throws CodeException {
     CodeMaker mk = maker();
     assertFormatter(TRUNCATE, mk.args(" 5 .."), "\"foo bar baz\"", "foo ..");
+    assertFormatter(TRUNCATE, mk.args(" 100 .."), "\"foo bar baz\"", "foo bar baz");
   }
 
   @Test

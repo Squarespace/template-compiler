@@ -37,7 +37,7 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 
 
-public class CorePredicates extends BaseRegistry<Predicate> {
+public class CorePredicates implements BaseRegistry<Predicate> {
 
   /**
    * Registers the active predicates in this registry.

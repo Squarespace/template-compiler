@@ -49,7 +49,7 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 
 
-public class CoreFormatters extends BaseRegistry<Formatter> {
+public class CoreFormatters implements BaseRegistry<Formatter> {
 
   /**
    * Registers the active formatters in this registry.

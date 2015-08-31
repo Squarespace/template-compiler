@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 SQUARESPACE, Inc.
+ * Copyright (c) 2015 SQUARESPACE, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@
 
 package com.squarespace.template;
 
+import static org.testng.Assert.assertEquals;
 
-/**
- * Base class for plugin registries.
- */
-public interface BaseRegistry<T> extends Registry<StringView, T> {
+import org.testng.annotations.Test;
 
-  @Override
-  void registerTo(SymbolTable<StringView, T> symbolTable);
+
+@Test(groups = { "unit" })
+public class NoopCodeLimiterTest extends UnitTestBase {
+
+  @Test
+  public void testCodeLimiter() throws CodeException {
+    // Instructions: root text { var formatter } text
+    Context ctx = execute("a{@|htmlattr}c", "\"b\"");
+    assertEquals(ctx.getCodeLimiter().instructionCount(), 5);
+  }
 
 }

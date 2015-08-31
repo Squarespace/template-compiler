@@ -41,5 +41,4 @@ public abstract class BaseFormatter extends Plugin implements Formatter {
     return node;
   }
 
-
 }

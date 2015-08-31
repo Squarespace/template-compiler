@@ -17,6 +17,8 @@
 package com.squarespace.template.plugins;
 import static org.testng.Assert.assertEquals;
 
+import java.util.Locale;
+
 import org.testng.annotations.Test;
 
 
@@ -24,8 +26,29 @@ import org.testng.annotations.Test;
 @Test(groups = { "unit" })
 public class PluginUtilsTest {
 
+  private static final char[] HEX_DIGIT = "0123456789abcdef".toCharArray();
+
+  @Test
+  public void testHexDigitToInt() {
+    for (int i = 0; i < HEX_DIGIT.length; i++) {
+      assertEquals(PluginUtils.hexDigitToInt(HEX_DIGIT[i]), i);
+      assertEquals(PluginUtils.hexDigitToInt(Character.toUpperCase(HEX_DIGIT[i])), i);
+    }
+    assertEquals(PluginUtils.hexDigitToInt('x'), -1);
+    assertEquals(PluginUtils.hexDigitToInt('Y'), -1);
+    assertEquals(PluginUtils.hexDigitToInt('-'), -1);
+  }
+
+  @Test
+  public void testFormatMoney() {
+    assertEquals(PluginUtils.formatMoney(100, Locale.US), "1.00");
+    assertEquals(PluginUtils.formatMoney(12345, Locale.US), "123.45");
+    assertEquals(PluginUtils.formatMoney(12345, Locale.GERMAN), "123,45");
+  }
+
   @Test
   public void testRemoveTags() {
     assertEquals(PluginUtils.removeTags("hi,<\nhello < >world"), "hi, world");
   }
+
 }

@@ -19,7 +19,7 @@ package com.squarespace.template;
 /**
  * Implementations to test the Predicate interface.
  */
-public class UnitTestPredicates extends BaseRegistry<Predicate> {
+public class UnitTestPredicates implements BaseRegistry<Predicate> {
 
   public static final Predicate EXECUTE_ERROR = new BasePredicate("execute-error?", false) {
     @Override
