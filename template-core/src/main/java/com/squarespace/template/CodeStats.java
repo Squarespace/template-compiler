@@ -44,36 +44,34 @@ public class CodeStats implements CodeSink {
   }
 
   @Override
-  public void accept(Instruction... instructions) throws CodeSyntaxException {
-    for (Instruction inst : instructions) {
-      totalInstructions++;
-      InstructionType type = inst.getType();
-      instructionCounter.increment(type);
-      switch (type) {
+  public void accept(Instruction instruction) throws CodeSyntaxException {
+    totalInstructions++;
+    InstructionType type = instruction.getType();
+    instructionCounter.increment(type);
+    switch (type) {
 
-        case PREDICATE:
-        case OR_PREDICATE:
-          Predicate predicate = ((PredicateInst)inst).getPredicate();
-          if (predicate != null) {
-            predicateCounter.increment(predicate.getIdentifier());
-          }
-          break;
+      case PREDICATE:
+      case OR_PREDICATE:
+        Predicate predicate = ((PredicateInst)instruction).getPredicate();
+        if (predicate != null) {
+          predicateCounter.increment(predicate.identifier());
+        }
+        break;
 
-        case IF:
-          if (inst instanceof IfPredicateInst) {
-            predicateCounter.increment(((IfPredicateInst)inst).getPredicate().getIdentifier());
-          }
-          break;
+      case IF:
+        if (instruction instanceof IfPredicateInst) {
+          predicateCounter.increment(((IfPredicateInst)instruction).getPredicate().identifier());
+        }
+        break;
 
-        case VARIABLE:
-          for (FormatterCall formatter : ((VariableInst)inst).getFormatters()) {
-            formatterCounter.increment(formatter.getFormatter().getIdentifier());
-          }
-          break;
+      case VARIABLE:
+        for (FormatterCall formatter : ((VariableInst)instruction).getFormatters()) {
+          formatterCounter.increment(formatter.getFormatter().identifier());
+        }
+        break;
 
-        default:
-          break;
-      }
+      default:
+        break;
     }
   }
 

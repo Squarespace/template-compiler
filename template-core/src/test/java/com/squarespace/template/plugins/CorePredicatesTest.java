@@ -16,6 +16,8 @@
 
 package com.squarespace.template.plugins;
 
+import static com.squarespace.template.plugins.CorePredicates.GREATER_THAN_OR_EQUAL;
+
 import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
 import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.EVEN;
@@ -33,9 +35,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
+import com.squarespace.template.CodeSyntaxException;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Predicate;
+import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.UnitTestBase;
 
 
@@ -115,11 +119,30 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(GREATER_THAN, context("3"), mk.args(" 1"));
     assertTrue(GREATER_THAN, context("-17"), mk.args(" -18"));
     assertTrue(GREATER_THAN, context("\"z\""), mk.args(" \"a\""));
+    assertTrue(GREATER_THAN, context("1"), mk.args(" 5 4"));
 
     assertFalse(GREATER_THAN, context("1"), mk.args(" 1"));
     assertFalse(GREATER_THAN, context("-18"), mk.args(" -17"));
     assertFalse(GREATER_THAN, context("\"a\""), mk.args(" \"z\""));
     assertFalse(GREATER_THAN, context("[]"), mk.args(" []"));
+    assertFalse(GREATER_THAN, context("1"), mk.args(" 4 5"));
+  }
+
+  @Test
+  public void testGreaterThanOrEqual() throws CodeException {
+    CodeMaker mk = maker();
+
+    assertTrue(GREATER_THAN_OR_EQUAL, context("1"), mk.args(" 1"));
+    assertTrue(GREATER_THAN_OR_EQUAL, context("3"), mk.args(" 1"));
+    assertTrue(GREATER_THAN_OR_EQUAL, context("-17"), mk.args(" -18"));
+    assertTrue(GREATER_THAN_OR_EQUAL, context("\"z\""), mk.args(" \"a\""));
+    assertTrue(GREATER_THAN_OR_EQUAL, context("[]"), mk.args(" []"));
+    assertTrue(GREATER_THAN_OR_EQUAL, context("{}"), mk.args(" 5 4"));
+    assertTrue(GREATER_THAN_OR_EQUAL, context("{}"), mk.args(" 5 5"));
+
+    assertFalse(GREATER_THAN_OR_EQUAL, context("-18"), mk.args(" -17"));
+    assertFalse(GREATER_THAN_OR_EQUAL, context("\"a\""), mk.args(" \"z\""));
+    assertFalse(GREATER_THAN_OR_EQUAL, context("{}"), mk.args(" 4 5"));
   }
 
   @Test
@@ -132,6 +155,15 @@ public class CorePredicatesTest extends UnitTestBase {
     JsonNode json = json("{\"nums\": [10, 20, 30]}");
     ctx = execute(template, json);
     assertEquals(ctx.buffer().toString(), "20");
+
+    // Ensure that invalid arguments are caught and proper error raised.
+    template = "{.equal? 1 -}#{.end}";
+    try {
+      execute("{.equal? 1 .}#{.end}", json("{}"));
+      Assert.fail("Expected CodeSyntaxException PREDICATE_ARGS_INVALID to be thrown");
+    } catch (CodeSyntaxException e) {
+      assertEquals(e.getErrorInfo().getType(), SyntaxErrorType.PREDICATE_ARGS_INVALID);
+    }
   }
 
   @Test
@@ -140,11 +172,14 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(LESS_THAN, context("1"), mk.args(" 2"));
     assertTrue(LESS_THAN, context("-1"), mk.args(" 0"));
     assertTrue(LESS_THAN, context("\"a\""), mk.args(" \"j\""));
+    assertTrue(LESS_THAN, context("{}"), mk.args(" 1 2"));
 
     assertFalse(LESS_THAN, context("-17"), mk.args(" -18"));
     assertFalse(LESS_THAN, context("-17"), mk.args(" -18"));
     assertFalse(LESS_THAN, context("\"j\""), mk.args(" \"a\""));
     assertFalse(LESS_THAN, context("[]"), mk.args(" []"));
+    assertFalse(LESS_THAN, context("{}"), mk.args(" 2 2"));
+    assertFalse(LESS_THAN, context("{}"), mk.args(" 3 2"));
   }
 
   @Test
@@ -156,11 +191,14 @@ public class CorePredicatesTest extends UnitTestBase {
     assertTrue(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1415"));
     assertTrue(LESS_THAN_OR_EQUAL, context("\"c\""), mk.args(" \"c\""));
     assertTrue(LESS_THAN_OR_EQUAL, context("[]"), mk.args(" []"));
+    assertTrue(LESS_THAN_OR_EQUAL, context("{}"), mk.args(" 1 2"));
+    assertTrue(LESS_THAN_OR_EQUAL, context("{}"), mk.args(" 2 2"));
 
     assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
     assertFalse(LESS_THAN_OR_EQUAL, context("-10"), mk.args(" -20"));
     assertFalse(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1"));
     assertFalse(LESS_THAN_OR_EQUAL, context("\"z\""), mk.args(" \"j\""));
+    assertFalse(LESS_THAN_OR_EQUAL, context("{}"), mk.args(" 3 2"));
   }
 
   @Test

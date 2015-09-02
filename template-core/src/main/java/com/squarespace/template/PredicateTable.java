@@ -47,8 +47,8 @@ public class PredicateTable extends SymbolTable<StringView, Predicate> {
    */
   @Override
   public void add(Predicate predicate) {
-    put(new StringView(predicate.getIdentifier()), predicate);
-    symbolList.add(predicate.getIdentifier());
+    put(new StringView(predicate.identifier()), predicate);
+    symbolList.add(predicate.identifier());
   }
 
 }

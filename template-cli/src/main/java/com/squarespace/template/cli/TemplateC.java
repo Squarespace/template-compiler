@@ -21,12 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Namespace;
-
 import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,16 +28,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.BuildProperties;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CompiledTemplate;
+import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
 import com.squarespace.template.FormatterTable;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
-import com.squarespace.template.JsonTemplateEngine;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.PredicateTable;
 import com.squarespace.template.ReferenceScanner;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
+
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 
 /**
@@ -121,7 +121,7 @@ public class TemplateC {
         partials = readFile(partialsPath);
       }
 
-      CompiledTemplate compiled = compiler().compile(template);
+      CompiledTemplate compiled = compiler().compile(template, false);
       Instruction code = compiled.code();
 
       // Parse the JSON context
@@ -138,6 +138,10 @@ public class TemplateC {
       if (partials != null) {
         try {
           partialsTree = JsonUtils.decode(partials);
+          if (!(partialsTree instanceof ObjectNode)) {
+            System.err.println("Partials map JSON must be an object. Found " + partialsTree.getNodeType());
+            return;
+          }
         } catch (IllegalArgumentException e) {
           System.err.println("Caught error trying to parse partials: " + e.getCause().getMessage());
           return;
@@ -145,12 +149,11 @@ public class TemplateC {
       }
 
       // Perform the compile.
-      Context context = null;
-      if (partialsTree == null) {
-        context = compiler().execute(code, jsonTree);
-      } else {
-        context = compiler().execute(code, jsonTree, partialsTree);
-      }
+      Context context = compiler().newExecutor()
+          .code(code)
+          .json(jsonTree)
+          .partialsMap((ObjectNode)partialsTree)
+          .execute();
 
       // If compile was successful, print the output.
       System.out.print(context.buffer().toString());
@@ -175,7 +178,7 @@ public class TemplateC {
     try {
       String template = readFile(templatePath);
 
-      CompiledTemplate compiled = compiler().compile(template);
+      CompiledTemplate compiled = compiler().compile(template, false);
       ReferenceScanner scanner = new ReferenceScanner();
       scanner.extract(compiled.code());
       ObjectNode report = scanner.references().report();
@@ -193,14 +196,14 @@ public class TemplateC {
     }
   }
 
-  protected JsonTemplateEngine compiler() {
+  protected Compiler compiler() {
     FormatterTable formatterTable = new FormatterTable();
     formatterTable.register(new CoreFormatters());
 
     PredicateTable predicateTable = new PredicateTable();
     predicateTable.register(new CorePredicates());
 
-    return new JsonTemplateEngine(formatterTable, predicateTable);
+    return new Compiler(formatterTable, predicateTable);
   }
 
   protected String readFile(String rawPath) throws IOException {

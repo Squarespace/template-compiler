@@ -99,18 +99,12 @@ public class CoreFormatters implements BaseRegistry<Formatter> {
       }
       Instruction inst = null;
       try {
+        // In safe execution mode this will never raise an exception.
         inst = ctx.getPartial(name);
       } catch (CodeSyntaxException e) {
         ErrorInfo parent = ctx.error(APPLY_PARTIAL_SYNTAX).name(name).data(e.getMessage());
         parent.child(e.getErrorInfo());
-        if (ctx.safeExecutionEnabled()) {
-          ctx.addError(parent);
-          // We're in safe mode, so return immediately since this 'apply' formatter
-          // can't output anything meaningful.
-          return Constants.MISSING_NODE;
-        } else {
-          throw new CodeExecuteException(parent);
-        }
+        throw new CodeExecuteException(parent);
       }
 
       if (inst == null) {

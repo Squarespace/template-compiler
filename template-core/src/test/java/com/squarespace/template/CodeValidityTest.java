@@ -327,9 +327,12 @@ public class CodeValidityTest extends UnitTestBase {
   private void assertInvalid(SyntaxErrorType type, Instruction... instructions) {
     try {
       CodeBuilder cb = builder();
-      cb.accept(instructions);
+      for (Instruction inst : instructions) {
+        cb.accept(inst);
+      }
       cb.build();
       fail(type + " should have raised a syntax exception");
+
     } catch (CodeSyntaxException e) {
       // Exception means success.
       assertEquals(e.getErrorInfo().getType(), type);

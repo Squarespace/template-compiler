@@ -16,15 +16,34 @@
 
 package com.squarespace.template;
 
+import java.util.Collections;
 import java.util.List;
 
 
-public interface ValidatedTemplate {
+public class ValidatedTemplate {
 
-  List<ErrorInfo> errors();
+  private final CodeList codeList;
 
-  CodeList code();
+  private final CodeStats codeStats;
 
-  CodeStats stats();
+  private final List<ErrorInfo> errors;
+
+  public ValidatedTemplate(CodeList codeList, CodeStats codeStats, List<ErrorInfo> errors) {
+    this.codeList = codeList;
+    this.codeStats = codeStats;
+    this.errors = errors == null ? Collections.<ErrorInfo>emptyList() : errors;
+  }
+
+  public CodeList code() {
+    return codeList;
+  }
+
+  public CodeStats stats() {
+    return codeStats;
+  }
+
+  public List<ErrorInfo> errors() {
+    return errors;
+  }
 
 }

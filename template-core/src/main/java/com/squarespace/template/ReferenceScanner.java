@@ -101,7 +101,7 @@ public class ReferenceScanner {
         if (predicate != null) {
           refs.increment(predicate);
 
-          List<String> varRefs = predicate.getVariableNames(predicateInst.getArguments());
+          List<String> varRefs = getVariableNames(predicateInst.getArguments());
           for (String varRef : varRefs) {
             refs.addVariable(varRef);
           }
@@ -148,6 +148,19 @@ public class ReferenceScanner {
         break;
 
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<String> getVariableNames(Arguments args) {
+    List<String> names = new ArrayList<>();
+    List<Object> parsed = (List<Object>) args.getOpaque();
+    for (Object arg : parsed) {
+      if (arg instanceof VariableRef) {
+        String name = ReprEmitter.get(((VariableRef)arg).reference());
+        names.add(name);
+      }
+    }
+    return names;
   }
 
   /**
@@ -222,13 +235,13 @@ public class ReferenceScanner {
 
     private void increment(Predicate predicate) {
       if (predicate != null) {
-        increment(predicates, predicate.getIdentifier());
+        increment(predicates, predicate.identifier());
       }
     }
 
     private void increment(Formatter formatter) {
       if (formatter != null) {
-        increment(formatters, formatter.getIdentifier());
+        increment(formatters, formatter.identifier());
       }
     }
 

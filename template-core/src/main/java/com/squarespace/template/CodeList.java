@@ -40,13 +40,11 @@ public class CodeList implements CodeSink {
   /**
    * Accepts instructions and appends them to the internal list.
    *
-   * See {@link CodeSink#accept(Instruction...)}
+   * See {@link CodeSink#accept(Instruction)}
    */
   @Override
-  public void accept(Instruction ... instructions) throws CodeSyntaxException {
-    for (Instruction inst : instructions) {
-      instList.add(inst);
-    }
+  public void accept(Instruction instruction) throws CodeSyntaxException {
+    instList.add(instruction);
   }
 
   /**

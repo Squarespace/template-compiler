@@ -16,15 +16,27 @@
 
 package com.squarespace.template;
 
+import java.util.Collections;
 import java.util.List;
 
 
-public interface CompiledTemplate {
+public class CompiledTemplate {
 
-  CodeMachine machine();
+  private final Instruction code;
 
-  List<ErrorInfo> errors();
+  private final List<ErrorInfo> errors;
 
-  Instruction code();
+  public CompiledTemplate(Instruction code, List<ErrorInfo> errors) {
+    this.code = code;
+    this.errors = (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
+  }
+
+  public Instruction code() {
+    return code;
+  }
+
+  public List<ErrorInfo> errors() {
+    return errors;
+  }
 
 }

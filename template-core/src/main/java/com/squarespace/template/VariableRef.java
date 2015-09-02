@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 SQUARESPACE, Inc.
+ * Copyright (c) 2015 SQUARESPACE, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,16 @@
 package com.squarespace.template;
 
 
-/**
- * Interface for classes which accept lists of instructions.
- */
-public interface CodeSink {
+public class VariableRef {
 
-  /**
-   * Accepts one or more instructions.
-   */
-  void accept(Instruction instruction) throws CodeSyntaxException;
+  private final Object[] reference;
 
-  /**
-   * Indicates end of instruction stream. All instructions have been fed, so the sink can now
-   * perform post-processing.
-   */
-  void complete();
+  public VariableRef(String raw) {
+    this.reference = GeneralUtils.splitVariable(raw);
+  }
+
+  public Object[] reference() {
+    return reference;
+  }
 
 }

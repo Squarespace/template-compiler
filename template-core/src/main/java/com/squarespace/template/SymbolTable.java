@@ -37,8 +37,9 @@ public abstract class SymbolTable<K, V> {
     this.inUse = true;
   }
 
-  public void register(Registry<K, V> source) {
+  public SymbolTable<K, V> register(Registry<K, V> source) {
     source.registerTo(this);
+    return this;
   }
 
   public V get(K symbol) {
@@ -55,11 +56,11 @@ public abstract class SymbolTable<K, V> {
 
   protected void put(K key, V value) {
     if (inUse) {
-      throw new RuntimeException("Attempt to add a symbol after table in use.");
+      throw new IllegalStateException("Attempt to add a symbol after table in use.");
     }
     // Prevent registering duplicate symbols.
     if (table.get(key) != null) {
-      throw new RuntimeException("A symbol named '" + key + "' is already registered!");
+      throw new IllegalStateException("A symbol named '" + key + "' is already registered!");
     }
     table.put(key, value);
   }

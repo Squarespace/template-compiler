@@ -32,21 +32,32 @@ public class ReferenceScannerTest extends UnitTestBase {
 
   @Test
   public void testBasic() throws CodeException, JsonProcessingException {
-    ObjectNode result = scan("{.section nums}{.even? @}#{@|json}{.end}{.end}");
+    ObjectNode result = scan("{.section nums}{.even? @foo}#{@|json}{.end}{.even?}#{.end}{.end}");
     render(result);
 
-    for (String type : new String[] { "VARIABLE", "TEXT", "SECTION", "PREDICATE" }) {
-      assertEquals(result.get("instructions").get(type).asInt(), 1);
-    }
-    assertEquals(result.get("instructions").get("END").asInt(), 2);
-    assertEquals(result.get("predicates").get("even?").asInt(), 1);
+    assertEquals(result.get("instructions").get("VARIABLE").asInt(), 1);
+    assertEquals(result.get("instructions").get("SECTION").asInt(), 1);
+    assertEquals(result.get("instructions").get("TEXT").asInt(), 2);
+    assertEquals(result.get("instructions").get("PREDICATE").asInt(), 2);
+    assertEquals(result.get("instructions").get("END").asInt(), 3);
+    assertEquals(result.get("predicates").get("even?").asInt(), 2);
     assertEquals(result.get("formatters").get("json").asInt(), 1);
     assertTrue(result.get("variables").get("nums").isObject());
-    assertEquals(result.get("textBytes").asInt(), 1);
+    assertEquals(result.get("textBytes").asInt(), 2);
     if (DEBUG) {
       String json = JsonUtils.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(result);
       System.out.println(json);
     }
+  }
+
+  @Test
+  public void testPredicates() throws CodeException {
+    ObjectNode result = scan("{.even? 2}#{.or odd? foo}!{.end}");
+    render(result);
+
+    assertEquals(result.get("instructions").get("PREDICATE").asInt(), 1);
+    assertEquals(result.get("instructions").get("OR_PREDICATE").asInt(), 1);
+    assertEquals(result.get("instructions").get("TEXT").asInt(), 2);
   }
 
   @Test
@@ -61,6 +72,10 @@ public class ReferenceScannerTest extends UnitTestBase {
   public void testInstructions() throws CodeException {
     ObjectNode result = scan("{.if a || b}{.newline}{.meta-left}{.space}{.or}{.section a}{.end}{.end}");
     render(result);
+
+    result = scan("{.if even?}a{.or}b{.end}");
+    render(result);
+    assertEquals(result.get("predicates").get("even?").asInt(), 1);
   }
 
   @Test
@@ -98,7 +113,7 @@ public class ReferenceScannerTest extends UnitTestBase {
 
   private ObjectNode scan(String source) throws CodeException {
     ReferenceScanner scanner = new ReferenceScanner();
-    CompiledTemplate template = compiler().compile(source);
+    CompiledTemplate template = compiler().compile(source, false);
     scanner.extract(template.code());
     return scanner.references().report();
   }

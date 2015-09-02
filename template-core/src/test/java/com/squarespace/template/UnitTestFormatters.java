@@ -54,6 +54,13 @@ public class UnitTestFormatters implements BaseRegistry<Formatter> {
   public static final Formatter REQUIRED_ARGS = new BaseFormatter("required-args", true) {
   };
 
+  public static final Formatter RETURNS_MISSING = new BaseFormatter("returns-missing", false) {
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      return Constants.MISSING_NODE;
+    }
+  };
+
   public static final Formatter UNSTABLE = new BaseFormatter("unstable", false) {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -68,6 +75,7 @@ public class UnitTestFormatters implements BaseRegistry<Formatter> {
     table.add(INVALID_ARGS);
     table.add(NPE);
     table.add(REQUIRED_ARGS);
+    table.add(RETURNS_MISSING);
     table.add(UNSTABLE);
   }
 

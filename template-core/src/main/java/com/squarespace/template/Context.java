@@ -56,6 +56,8 @@ public class Context {
 
   private final Locale locale;
 
+  private Compiler compiler;
+
   private Frame currentFrame;
 
   private JsonNode undefined = DEFAULT_UNDEFINED;
@@ -74,8 +76,6 @@ public class Context {
 
   private Map<String, Instruction> compiledPartials;
 
-  private JsonTemplateEngine compiler;
-
   private LoggingHook loggingHook;
 
   private CodeLimiter codeLimiter = new NoopCodeLimiter();
@@ -87,18 +87,10 @@ public class Context {
     this(node, new StringBuilder(), Locale.getDefault());
   }
 
-  public Context(JsonNode node, StringBuilder buf) {
-    this(node, buf, Locale.getDefault());
-  }
-
-  public Context(JsonNode node, Locale locale) {
-    this(node, new StringBuilder(), locale);
-  }
-
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
-    this.currentFrame = new Frame(node);
-    this.buf = buf;
-    this.locale = locale;
+    this.currentFrame = new Frame(node == null ? JsonUtils.createObjectNode() : node);
+    this.buf = buf == null ? new StringBuilder() : buf;
+    this.locale = locale == null ? Locale.getDefault() : locale;
   }
 
   public static Context subContext(Context ctx, StringBuilder buf) {
@@ -145,11 +137,11 @@ public class Context {
    * Sets a compiler to be used for compiling partials. If no compiler is set,
    * partials cannot be compiled and will raise errors.
    */
-  public void setCompiler(JsonTemplateEngine compiler) {
+  public void setCompiler(Compiler compiler) {
     this.compiler = compiler;
   }
 
-  public JsonTemplateEngine getCompiler() {
+  public Compiler getCompiler() {
     return compiler;
   }
 
@@ -259,23 +251,18 @@ public class Context {
       // Compile the partial.  This can throw a syntax exception, which the formatter
       // will catch and nest inside a runtime exception.
       String source = partialNode.asText();
-      CompiledTemplate template = null;
+      CompiledTemplate template = compiler.compile(source, safeExecution);
       if (safeExecution) {
-        template = compiler.compileSafe(source);
         List<ErrorInfo> errors = template.errors();
         if (!errors.isEmpty()) {
           ErrorInfo parent = error(ExecuteErrorType.COMPILE_PARTIAL_SYNTAX).name(name);
           parent.child(errors);
           addError(parent);
         }
-
-      } else {
-        template = compiler.compile(source);
       }
 
-      inst = template.code();
-
       // Cache the compiled template in case it is used more than once.
+      inst = template.code();
       compiledPartials.put(name, inst);
     }
     return inst;
@@ -287,31 +274,6 @@ public class Context {
 
   public JsonNode node() {
     return currentFrame.node;
-  }
-
-  /**
-   * Replace the node's value for the current stack frame.  This enables formatters to
-   * chain their output without requiring a change to their interface, e.g. return
-   * value, extra method args, etc.
-   */
-  public void setNode(JsonNode node) {
-    this.currentFrame.node = node;
-  }
-
-  public void setNode(String value) {
-    setNode(buildNode(value));
-  }
-
-  public void setNode(int value) {
-    setNode(buildNode(value));
-  }
-
-  public void setNode(long value) {
-    setNode(buildNode(value));
-  }
-
-  public void setNode(double value) {
-    setNode(buildNode(value));
   }
 
   public JsonNode buildNode(String value) {

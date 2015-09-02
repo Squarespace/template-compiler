@@ -28,13 +28,12 @@ import com.squarespace.template.BasePredicate;
 import com.squarespace.template.BaseRegistry;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
-import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
-import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.VariableRef;
 
 
 public class CorePredicates implements BaseRegistry<Predicate> {
@@ -66,20 +65,6 @@ public class CorePredicates implements BaseRegistry<Predicate> {
 
   };
 
-  private static class VarRef {
-
-    private final Object[] reference;
-
-    public VarRef(Object[] reference) {
-      this.reference = reference;
-    }
-
-    public Object[] reference() {
-      return reference;
-    }
-
-  }
-
   /**
    * Class of predicates that take 1 argument which is either (a) a JSON value or
    * (b) a variable reference.
@@ -95,20 +80,6 @@ public class CorePredicates implements BaseRegistry<Predicate> {
     }
 
     public abstract void limitArgs(Arguments args) throws ArgumentsException;
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<String> getVariableNames(Arguments args) {
-      List<String> names = new ArrayList<>();
-      List<Object> parsed = (List<Object>) args.getOpaque();
-      for (Object arg : parsed) {
-        if (arg instanceof VarRef) {
-          String name = ReprEmitter.get(((VarRef)arg).reference());
-          names.add(name);
-        }
-      }
-      return names;
-    }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -130,7 +101,7 @@ public class CorePredicates implements BaseRegistry<Predicate> {
 
       // Attempt to parse variable name.
       if (Patterns.VARIABLE.matcher(raw).matches()) {
-        return new VarRef(GeneralUtils.splitVariable(raw));
+        return new VariableRef(raw);
       }
 
       throw new ArgumentsException("Argument " + raw + " must be a valid JSON value or variable reference.");
@@ -140,8 +111,8 @@ public class CorePredicates implements BaseRegistry<Predicate> {
     protected JsonNode resolve(Context ctx, Arguments args, int index) {
       List<Object> parsed = (List<Object>) args.getOpaque();
       Object arg = parsed.get(index);
-      if (arg instanceof VarRef) {
-        VarRef ref = (VarRef)arg;
+      if (arg instanceof VariableRef) {
+        VariableRef ref = (VariableRef)arg;
         return ctx.resolve(ref.reference());
       }
       return (JsonNode)arg;

@@ -16,8 +16,10 @@
 
 package com.squarespace.template.plugins;
 
+import static com.squarespace.template.plugins.CoreFormatters.ROUND;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
+import static com.squarespace.template.ExecuteErrorType.COMPILE_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
 import static com.squarespace.template.plugins.CoreFormatters.APPLY;
@@ -50,6 +52,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
+import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.UnitTestBase;
 
 
@@ -80,12 +83,12 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{@|apply block}";
     String partials = "{\"block\": \"{.section foo}{@}\"}";
     String input = "{\"foo\": 123}";
-    Instruction inst = compiler().compile(template).code();
-    Context ctx = new Context(JsonUtils.decode(input));
-    ctx.setCompiler(compiler());
-    ctx.setPartials(JsonUtils.decode(partials));
     try {
-      ctx.execute(inst);
+      compiler().newExecutor()
+          .template(template)
+          .json(input)
+          .partialsMap((ObjectNode)JsonUtils.decode(partials))
+          .execute();
       fail("Expected exception.");
     } catch (CodeExecuteException e) {
       assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_SYNTAX);
@@ -93,7 +96,21 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
-  public void testApplyMissingPartial() throws CodeException {
+  public void testApplyPartialErrorSafe() throws CodeException {
+    String template = "{@|apply block}";
+    String partials = "{\"block\": \"{@|no-formatter}\"}";
+    Context ctx = compiler().newExecutor()
+        .template(template)
+        .partialsMap(((ObjectNode)JsonUtils.decode(partials)))
+        .json("123")
+        .safeExecution(true)
+        .execute();
+    assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), COMPILE_PARTIAL_SYNTAX);
+  }
+
+  @Test
+  public void testApplyPartialMissing() throws CodeException {
     String template = "{@|apply foo}";
     String partials = "{\"block\": \"hello\"}";
     String input = "{}";
@@ -110,10 +127,23 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
-  public void testApplyPartialErrorSafe() throws CodeException {
+  public void testApplyPartialMissingSafe() throws CodeException {
+    Context ctx = compiler().newExecutor()
+        .template("{@|apply foo}")
+        .json("{}")
+        .partialsMap((ObjectNode)JsonUtils.decode("{}"))
+        .safeExecution(true)
+        .execute();
+
+    assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_MISSING);
+  }
+
+  @Test
+  public void testApplyPartialErrorSyntax() throws CodeException {
     String template = "{@|apply block}";
     String input = "{}";
-    String partials = "\"block\": \"{.section foo}{@}\"}";
+    String partials = "{\"block\": \"{.section foo}{@}\"}";
     Instruction inst = compiler().compile(template).code();
     Context ctx = new Context(JsonUtils.decode(input));
     ctx.setCompiler(compiler());
@@ -122,6 +152,7 @@ public class CoreFormattersTest extends UnitTestBase {
     ctx.execute(inst);
     assertContext(ctx, "");
     assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), COMPILE_PARTIAL_SYNTAX);
   }
 
   @Test
@@ -243,7 +274,12 @@ public class CoreFormattersTest extends UnitTestBase {
     String template = "{time|date " + format + "}";
     String json = getDateTestJson(timestamp, tzId);
     Instruction code = compiler().compile(template).code();
-    return eval(compiler().executeWithPartials(code, JsonUtils.decode(json), null, new StringBuilder(), locale));
+    Context ctx = compiler().newExecutor()
+        .code(code)
+        .json(json)
+        .locale(locale)
+        .execute();
+    return eval(ctx);
   }
 
   /**
@@ -265,6 +301,15 @@ public class CoreFormattersTest extends UnitTestBase {
     Instruction inst = compiler().compile(template).code();
     ctx.execute(inst);
     assertContext(ctx, "2013-05-12 21:00:00 EDT");
+  }
+
+  @Test
+  public void testDateNoTimeZone() throws CodeException {
+    Context ctx = compiler().newExecutor()
+        .template("{@|date %Y}")
+        .json("167200000")
+        .execute();
+    assertEquals(ctx.buffer().toString(), "1970");
   }
 
   @Test
@@ -342,10 +387,19 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testRound() throws CodeException {
+    CodeMaker mk = maker();
+    Arguments args = mk.args("");
+    assertFormatter(ROUND, args, "1.44", "1");
+    assertFormatter(ROUND, args, "1.6", "2");
+  }
+
+  @Test
   public void testSafe() throws CodeException {
     assertFormatter(CoreFormatters.SAFE, "\"foo <bar> bar\"", "foo  bar");
     assertFormatter(CoreFormatters.SAFE, "\"<script\\nsrc=\\\"url\\\"\\n>foobar</script>\"", "foobar");
     assertFormatter(CoreFormatters.SAFE, "\"<div>\\n<b>\\nfoobar\\n</b>\\n</div>\"", "\n\nfoobar\n\n");
+    assertFormatter(CoreFormatters.SAFE, "{}", "");
   }
 
   @Test
@@ -376,8 +430,16 @@ public class CoreFormattersTest extends UnitTestBase {
   @Test
   public void testTruncate() throws CodeException {
     CodeMaker mk = maker();
+    assertFormatter(TRUNCATE, mk.args(""), "\"foo\"", "foo");
     assertFormatter(TRUNCATE, mk.args(" 5 .."), "\"foo bar baz\"", "foo ..");
     assertFormatter(TRUNCATE, mk.args(" 100 .."), "\"foo bar baz\"", "foo bar baz");
+
+    Context ctx = compiler().newExecutor()
+        .template("{@|truncate xyz}")
+        .safeExecution(true)
+        .execute();
+    assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), SyntaxErrorType.FORMATTER_ARGS_INVALID);
   }
 
   @Test

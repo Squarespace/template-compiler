@@ -31,7 +31,7 @@ public class Plugin {
     this.requiresArgs = requiresArgs;
   }
 
-  public String getIdentifier() {
+  public String identifier() {
     return identifier;
   }
 

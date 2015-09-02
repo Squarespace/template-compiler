@@ -30,9 +30,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 public interface Formatter {
 
   /**
-   * Name of the formatter.
+   * Name used to uniquely identify this formatter. This determines
+   * the syntax used to invoke the formatter.
    */
-  String getIdentifier();
+  String identifier();
 
   /**
    * Indicates whether the formatter requires arguments.

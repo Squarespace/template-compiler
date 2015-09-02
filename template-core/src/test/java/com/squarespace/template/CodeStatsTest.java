@@ -35,8 +35,13 @@ public class CodeStatsTest extends UnitTestBase {
   public void testBasics() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     CodeStats stats = new CodeStats();
-    stats.accept(mk.text("foo"), mk.predicate(EXECUTE_ERROR), mk.or(EXECUTE_ERROR), mk.var("a", INVALID_ARGS));
-    stats.accept(mk.ifpred(EXECUTE_ERROR), mk.var("b", INVALID_ARGS));
+    stats.accept(mk.text("foo"));
+    stats.accept(mk.predicate(EXECUTE_ERROR));
+    stats.accept(mk.or(EXECUTE_ERROR));
+    stats.accept(mk.var("a", INVALID_ARGS));
+    stats.accept(mk.ifpred(EXECUTE_ERROR));
+    stats.accept(mk.var("b", INVALID_ARGS));
+
     assertEquals(stats.getTotalInstructions(), 6);
     assertEquals((int)stats.getFormatterCounts().get("invalid-args"), 2);
     assertEquals((int)stats.getPredicateCounts().get("execute-error?"), 3);

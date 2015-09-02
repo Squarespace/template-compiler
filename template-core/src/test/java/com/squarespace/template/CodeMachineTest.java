@@ -34,7 +34,9 @@ public class CodeMachineTest extends UnitTestBase {
   public void testBasics() throws CodeSyntaxException {
     CodeMaker mk = maker();
     CodeMachine cm = machine();
-    cm.accept(mk.text("A"), mk.var("@"), mk.eof());
+    cm.accept(mk.text("A"));
+    cm.accept(mk.var("@"));
+    cm.accept(mk.eof());
     cm.complete();
     assertEquals(cm.getInstructionCount(), 3);
   }
@@ -44,14 +46,13 @@ public class CodeMachineTest extends UnitTestBase {
     CodeMaker mk = maker();
     CodeMachine cm = machine();
     try {
-      cm.accept(mk.eof(), mk.eof());
+      cm.accept(mk.eof());
+      cm.accept(mk.eof());
       fail("expected RuntimeException");
     } catch (RuntimeException e) {
-
       // We're good.
-
-    } catch (CodeSyntaxException e) {
-      fail("did not expect CodeSyntaxException");
+    } catch (CodeException e) {
+      fail("did not expect CodeException");
     }
   }
 

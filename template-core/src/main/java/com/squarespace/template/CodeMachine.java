@@ -50,8 +50,8 @@ import com.squarespace.template.Instructions.RootInst;
  * Each state represents a scope within the template. Each scope consists of
  * one or more instructions which execute if the branching condition is true.
  *
- * Some block instructions also have a single alternative instruction which is taken
- * if the branching condition is false.
+ * Some block instructions also have a single alternative instruction which is
+ * executed if the branching condition is false.
  */
 public class CodeMachine implements CodeSink {
 
@@ -160,25 +160,23 @@ public class CodeMachine implements CodeSink {
    * Accept one or more instructions and either push them onto the stack or allow
    * the current state to process each one, and conditionally transitions to a new state.
    */
-  public void accept(Instruction ... instructions) throws CodeSyntaxException {
-    for (Instruction inst : instructions) {
-      switch (inst.getType()) {
+  public void accept(Instruction instruction) throws CodeSyntaxException {
+    switch (instruction.getType()) {
 
-        // These block instructions open a new scope, so they can occur in any state,
-        // We handle them here to shorten the switch bodies of the individual states.
-        case IF:
-        case PREDICATE:
-        case REPEATED:
-        case SECTION:
-          state = pushConsequent(inst);
-          break;
+      // These block instructions open a new scope, so they can occur in any state,
+      // We handle them here to shorten the switch bodies of the individual states.
+      case IF:
+      case PREDICATE:
+      case REPEATED:
+      case SECTION:
+        state = pushConsequent(instruction);
+        break;
 
-        default:
-          state = state.transition(inst);
-      }
-      // Count all instructions accepted by the machine.
-      instructionCount++;
+      default:
+        state = state.transition(instruction);
     }
+    // Count all instructions accepted by the machine.
+    instructionCount++;
   }
 
   /**

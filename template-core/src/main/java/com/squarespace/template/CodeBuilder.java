@@ -68,8 +68,8 @@ public class CodeBuilder {
   /**
    * Feeds multiple instructions to the machine.
    */
-  public CodeBuilder accept(Instruction ... instructions) throws CodeSyntaxException {
-    machine.accept(instructions);
+  public CodeBuilder accept(Instruction instruction) throws CodeSyntaxException {
+    machine.accept(instruction);
     return this;
   }
 

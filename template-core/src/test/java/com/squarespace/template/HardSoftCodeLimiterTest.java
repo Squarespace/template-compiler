@@ -24,6 +24,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -134,6 +136,40 @@ public class HardSoftCodeLimiterTest extends UnitTestBase {
       assertEquals(e.getErrorInfo().getType(), CODE_LIMIT_REACHED);
       assertEquals(limiter.instructionCount(), 6);
     }
+  }
+
+  @Test
+  public void testBothLimits() throws CodeException {
+    final AtomicInteger softCount = new AtomicInteger();
+    final AtomicInteger hardCount = new AtomicInteger();
+    HardSoftCodeLimiter.Handler handler = new HardSoftCodeLimiter.Handler() {
+
+      @Override
+      public void onLimit(Limit limit, HardSoftCodeLimiter limiter) throws CodeExecuteException {
+        if (limit.equals(Limit.SOFT)) {
+          softCount.incrementAndGet();
+        }
+        if (limit.equals(Limit.HARD)) {
+          hardCount.incrementAndGet();
+        }
+      }
+    };
+
+    CodeLimiter codeLimiter = HardSoftCodeLimiter.builder()
+        .setSoftLimit(5)
+        .setHardLimit(10)
+        .setResolution(1)
+        .setHandler(handler)
+        .build();
+
+    compiler().newExecutor()
+        .template("{.repeated section @}{.even?}{@}{.or}#{.end}{.end}")
+        .json("[0,1,2,3,4,5,6,7,8,9]")
+        .codeLimiter(codeLimiter)
+        .execute();
+
+    assertEquals(softCount.get(), 1);
+    assertEquals(hardCount.get(), 1);
   }
 
   @Test

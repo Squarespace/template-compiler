@@ -30,7 +30,7 @@ public class TreeEmitterTest extends UnitTestBase {
   @Test
   public void testTreeEmitter() throws CodeException {
     String raw = "{.repeated section a}a{.or even? b}b{.end}";
-    Instruction inst = compiler().compile(raw).code();
+    Instruction inst = compiler().compile(raw, false).code();
     String result = SPACES.matcher(TreeEmitter.get(inst)).replaceAll(" ");
     assertTrue(result.contains("REPEATED true: TEXT alternates: null false: OR_PREDICATE"));
   }

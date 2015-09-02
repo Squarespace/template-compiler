@@ -89,7 +89,7 @@ public class ReprEmitter {
   }
 
   public static void emit(Arguments args, boolean includeDelimiter, StringBuilder buf) {
-    if (args == null || args.isEmpty()) {
+    if (args.isEmpty()) {
       return;
     }
     char delimiter = args.getDelimiter();
@@ -126,7 +126,7 @@ public class ReprEmitter {
   public static void emit(IfPredicateInst inst, StringBuilder buf, boolean recurse) {
     Predicate predicate = inst.getPredicate();
     buf.append("{.if ");
-    buf.append(predicate.getIdentifier());
+    buf.append(predicate.identifier());
     emit(inst.getArguments(), buf);
     buf.append('}');
   }
@@ -149,11 +149,11 @@ public class ReprEmitter {
     Predicate predicate = inst.getPredicate();
     buf.append("{.");
     if (inst.getType() == InstructionType.PREDICATE) {
-      buf.append(predicate.getIdentifier());
+      buf.append(predicate.identifier());
     } else {
       buf.append("or");
       if (predicate != null) {
-        buf.append(' ').append(predicate.getIdentifier());
+        buf.append(' ').append(predicate.identifier());
       }
     }
     emit(inst.getArguments(), buf);
@@ -219,7 +219,7 @@ public class ReprEmitter {
     List<FormatterCall> formatters = inst.getFormatters();
     for (FormatterCall formatter : formatters) {
       buf.append('|');
-      buf.append(formatter.getFormatter().getIdentifier());
+      buf.append(formatter.getFormatter().identifier());
       emit(formatter.getArguments(), buf);
     }
     buf.append('}');

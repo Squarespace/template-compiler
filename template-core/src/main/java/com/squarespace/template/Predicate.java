@@ -16,7 +16,6 @@
 
 package com.squarespace.template;
 
-import java.util.List;
 
 /**
  * A predicate is a function that returns either true of false.
@@ -27,11 +26,16 @@ import java.util.List;
  */
 public interface Predicate {
 
-  String getIdentifier();
+  /**
+   * Name used to uniquely identify this predicate. This determines
+   * the syntax used to invoke the predicate.
+   */
+  String identifier();
 
+  /**
+   * Indicates whether the predicate requires arguments.
+   */
   boolean requiresArgs();
-
-  List<String> getVariableNames(Arguments args);
 
   void validateArgs(Arguments args) throws ArgumentsException;
 

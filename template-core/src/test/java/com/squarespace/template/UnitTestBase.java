@@ -73,8 +73,8 @@ public class UnitTestBase {
    */
   protected final CodeMaker maker = new CodeMaker();
 
-  public static JsonTemplateEngine compiler() {
-    return new JsonTemplateEngine(formatterTable, predicateTable);
+  public static Compiler compiler() {
+    return new Compiler(formatterTable, predicateTable);
   }
 
   public CodeBuilder builder() {

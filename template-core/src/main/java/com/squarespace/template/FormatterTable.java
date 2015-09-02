@@ -61,8 +61,8 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
    */
   @Override
   public void add(Formatter formatter) {
-    put(new StringView(formatter.getIdentifier()), formatter);
-    symbolList.add(formatter.getIdentifier());
+    put(new StringView(formatter.identifier()), formatter);
+    symbolList.add(formatter.identifier());
   }
 
 }

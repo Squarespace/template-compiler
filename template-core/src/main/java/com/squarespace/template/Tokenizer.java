@@ -415,7 +415,7 @@ public class Tokenizer {
     try {
       predicate.validateArgs(args);
     } catch (ArgumentsException e) {
-      String identifier = predicate.getIdentifier();
+      String identifier = predicate.identifier();
       fail(error(PREDICATE_ARGS_INVALID).name(identifier).data(e.getMessage()));
       return null;
     }
@@ -446,7 +446,7 @@ public class Tokenizer {
       try {
         emitInstruction(maker.ifpred(predicate, args));
       } catch (ArgumentsException e) {
-        String identifier = predicate.getIdentifier();
+        String identifier = predicate.identifier();
         fail(error(PREDICATE_ARGS_INVALID).name(identifier).data(e.getMessage()));
       }
       return true;
@@ -588,13 +588,10 @@ public class Tokenizer {
         rawArgs = matcher.consume();
       }
 
-      Arguments args = null;
-      if (rawArgs == null) {
-        if (formatter.requiresArgs()) {
+      Arguments args = Constants.EMPTY_ARGUMENTS;
+      if (formatter.requiresArgs() && rawArgs == null) {
           fail(error(FORMATTER_NEEDS_ARGS, matcher.matchStart() - start, false).data(formatter));
           return emitInvalid();
-        }
-        args = new Arguments();
       } else {
         args = new Arguments(rawArgs);
       }
@@ -602,7 +599,7 @@ public class Tokenizer {
       try {
         formatter.validateArgs(args);
       } catch (ArgumentsException e) {
-        String identifier = formatter.getIdentifier();
+        String identifier = formatter.identifier();
         fail(error(FORMATTER_ARGS_INVALID, matcher.matchStart() - start, false).name(identifier).data(e.getMessage()));
         return emitInvalid();
       }
