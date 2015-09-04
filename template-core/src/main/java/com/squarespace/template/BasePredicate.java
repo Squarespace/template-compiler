@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import com.squarespace.template.ReferenceScanner.References;
+
 
 /**
  * Default base class for Predicates.
@@ -24,13 +26,6 @@ public abstract class BasePredicate extends Plugin implements Predicate {
 
   public BasePredicate(String identifier, boolean requiresArgs) {
     super(validateIdentifier(identifier), requiresArgs);
-  }
-
-  private static String validateIdentifier(String identifier) {
-    if (!identifier.endsWith("?")) {
-      throw new IllegalArgumentException("All predicates must end with '?'");
-    }
-    return identifier;
   }
 
   /**
@@ -42,6 +37,18 @@ public abstract class BasePredicate extends Plugin implements Predicate {
    */
   public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
     return true;
+  }
+
+  @Override
+  public void addReferences(Arguments args, References refs) {
+    // NOOP
+  }
+
+  private static String validateIdentifier(String identifier) {
+    if (!identifier.endsWith("?")) {
+      throw new IllegalArgumentException("All predicates must end with '?'");
+    }
+    return identifier;
   }
 
 }

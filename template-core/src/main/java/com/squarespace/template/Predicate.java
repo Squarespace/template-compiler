@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import com.squarespace.template.ReferenceScanner.References;
+
 
 /**
  * A predicate is a function that returns either true of false.
@@ -36,6 +38,13 @@ public interface Predicate {
    * Indicates whether the predicate requires arguments.
    */
   boolean requiresArgs();
+
+  /**
+   * Allows the predicate to declare anything (variables, etc) it references.
+   * TODO: once there is a more general way of accessing parsed arguments
+   * this should be removed.
+   */
+  void addReferences(Arguments args, References refs);
 
   void validateArgs(Arguments args) throws ArgumentsException;
 

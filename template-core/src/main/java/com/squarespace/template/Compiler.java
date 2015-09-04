@@ -112,7 +112,7 @@ public class Compiler {
     if (parseErrors.isEmpty() && compileErrors.isEmpty()) {
       return Collections.emptyList();
     }
-    ArrayList<ErrorInfo> result = new ArrayList<>(parseErrors.size() + compileErrors.size());
+    List<ErrorInfo> result = new ArrayList<>(parseErrors.size() + compileErrors.size());
     result.addAll(parseErrors);
     result.addAll(compileErrors);
     return result;

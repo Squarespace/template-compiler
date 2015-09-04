@@ -100,11 +100,7 @@ public class ReferenceScanner {
         Predicate predicate = predicateInst.getPredicate();
         if (predicate != null) {
           refs.increment(predicate);
-
-          List<String> varRefs = getVariableNames(predicateInst.getArguments());
-          for (String varRef : varRefs) {
-            refs.addVariable(varRef);
-          }
+          predicate.addReferences(predicateInst.getArguments(), refs);
         }
 
         extractBlock(predicateInst.getConsequent());
@@ -148,19 +144,6 @@ public class ReferenceScanner {
         break;
 
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<String> getVariableNames(Arguments args) {
-    List<String> names = new ArrayList<>();
-    List<Object> parsed = (List<Object>) args.getOpaque();
-    for (Object arg : parsed) {
-      if (arg instanceof VariableRef) {
-        String name = ReprEmitter.get(((VariableRef)arg).reference());
-        names.add(name);
-      }
-    }
-    return names;
   }
 
   /**
@@ -211,41 +194,25 @@ public class ReferenceScanner {
       return res;
     }
 
-    private ObjectNode convert(Map<String, Integer> map) {
-      ObjectNode res = JsonUtils.createObjectNode();
-      for (Entry<String, Integer> entry : map.entrySet()) {
-        res.put(entry.getKey(), entry.getValue());
-      }
-      return res;
-    }
-
-    private ArrayNode convert(List<String> list) {
-      ArrayNode res = JsonUtils.createArrayNode();
-      for (String elem : list) {
-        res.add(elem);
-      }
-      return res;
-    }
-
-    private void increment(Instruction inst) {
+    public void increment(Instruction inst) {
       if (inst != null) {
         increment(instructions, inst.getType().name());
       }
     }
 
-    private void increment(Predicate predicate) {
+    public void increment(Predicate predicate) {
       if (predicate != null) {
         increment(predicates, predicate.identifier());
       }
     }
 
-    private void increment(Formatter formatter) {
+    public void increment(Formatter formatter) {
       if (formatter != null) {
         increment(formatters, formatter.identifier());
       }
     }
 
-    private void increment(Map<String, Integer> counter, String key) {
+    public void increment(Map<String, Integer> counter, String key) {
       Integer value = counter.get(key);
       if (value == null) {
         value = 0;
@@ -256,7 +223,7 @@ public class ReferenceScanner {
     /**
      * Adds a variable to the current scope.
      */
-    private void addVariable(String name) {
+    public void addVariable(String name) {
       JsonNode node = currentNode.path(name);
       if (node.isMissingNode()) {
         currentNode.put(name, NullNode.getInstance());
@@ -296,6 +263,22 @@ public class ReferenceScanner {
      */
     private void popSection() {
       currentNode = variables.pop();
+    }
+
+    private ObjectNode convert(Map<String, Integer> map) {
+      ObjectNode res = JsonUtils.createObjectNode();
+      for (Entry<String, Integer> entry : map.entrySet()) {
+        res.put(entry.getKey(), entry.getValue());
+      }
+      return res;
+    }
+
+    private ArrayNode convert(List<String> list) {
+      ArrayNode res = JsonUtils.createArrayNode();
+      for (String elem : list) {
+        res.add(elem);
+      }
+      return res;
     }
 
   }

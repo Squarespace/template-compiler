@@ -31,6 +31,8 @@ import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
+import com.squarespace.template.ReferenceScanner.References;
+import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.VariableRef;
@@ -82,6 +84,11 @@ public class CorePredicates implements BaseRegistry<Predicate> {
     public abstract void limitArgs(Arguments args) throws ArgumentsException;
 
     @Override
+    public void addReferences(Arguments args, References refs) {
+      addVariableNames(args, refs);
+    }
+
+    @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       limitArgs(args);
       List<Object> parsed = new ArrayList<>();
@@ -116,6 +123,17 @@ public class CorePredicates implements BaseRegistry<Predicate> {
         return ctx.resolve(ref.reference());
       }
       return (JsonNode)arg;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addVariableNames(Arguments args, References refs) {
+      List<Object> parsed = (List<Object>) args.getOpaque();
+      for (Object arg : parsed) {
+        if (arg instanceof VariableRef) {
+          String name = ReprEmitter.get(((VariableRef)arg).reference());
+          refs.addVariable(name);
+        }
+      }
     }
 
   }
