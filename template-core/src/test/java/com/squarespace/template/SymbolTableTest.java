@@ -28,7 +28,8 @@ public class SymbolTableTest {
   @Test
   public void testSymbolTable() {
     NameTable table = new NameTable();
-    table.register(new NameRegistry());
+    NameRegistry registry = new NameRegistry();
+    registry.registerNames(table);
     Assert.assertEquals(table.get("ignored"), null);
     Assert.assertEquals(table.get("static"), new Name("static"));
     Assert.assertEquals(table.get("dynamic"), new Name("dynamic"));
@@ -102,14 +103,13 @@ public class SymbolTableTest {
     }
   }
 
-  static class NameRegistry implements Registry<String, Name> {
+  static class NameRegistry {
 
     public final Name ignored = new Name("ignored");
 
     public static final Name STATIC = new Name("static");
 
-    @Override
-    public void registerTo(SymbolTable<String, Name> table) {
+    public void registerNames(SymbolTable<String, Name> table) {
       table.add(STATIC);
       table.add(new Name("dynamic"));
     }

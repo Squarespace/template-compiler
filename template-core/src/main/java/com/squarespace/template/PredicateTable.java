@@ -42,6 +42,10 @@ public class PredicateTable extends SymbolTable<StringView, Predicate> {
     return symbolList.toArray(Constants.EMPTY_ARRAY_OF_STRING);
   }
 
+  public void register(PredicateRegistry registry) {
+    registry.registerPredicates(this);
+  }
+
   /**
    * Store the Predicate in the symbol table.
    */

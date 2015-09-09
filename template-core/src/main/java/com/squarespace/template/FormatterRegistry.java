@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 SQUARESPACE, Inc.
+ * Copyright (c) 2015 SQUARESPACE, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package com.squarespace.template;
 
 
 /**
- * Base class for plugin registries.
+ * Registers formatter implementations into a symbol table.
  */
-public interface BaseRegistry<T> extends Registry<StringView, T> {
+public interface FormatterRegistry {
 
-  @Override
-  void registerTo(SymbolTable<StringView, T> symbolTable);
+  void registerFormatters(SymbolTable<StringView, Formatter> table);
 
 }

@@ -37,11 +37,6 @@ public abstract class SymbolTable<K, V> {
     this.inUse = true;
   }
 
-  public SymbolTable<K, V> register(Registry<K, V> source) {
-    source.registerTo(this);
-    return this;
-  }
-
   public V get(K symbol) {
     return table.get(symbol);
   }

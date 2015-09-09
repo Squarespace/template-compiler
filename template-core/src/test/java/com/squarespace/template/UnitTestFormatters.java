@@ -23,7 +23,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Implementations to test the Formatter interface.
  */
-public class UnitTestFormatters implements BaseRegistry<Formatter> {
+public class UnitTestFormatters implements FormatterRegistry {
+
+  @Override
+  public void registerFormatters(SymbolTable<StringView, Formatter> table) {
+    table.add(DUMMY);
+    table.add(EXECUTE_ERROR);
+    table.add(INVALID_ARGS);
+    table.add(NPE);
+    table.add(REQUIRED_ARGS);
+    table.add(RETURNS_MISSING);
+    table.add(UNSTABLE);
+  }
 
   public static final Formatter DUMMY = new BaseFormatter("dummy", false) {
 
@@ -67,16 +78,5 @@ public class UnitTestFormatters implements BaseRegistry<Formatter> {
       throw new IllegalArgumentException("unexpected error!");
     }
   };
-
-  @Override
-  public void registerTo(SymbolTable<StringView, Formatter> table) {
-    table.add(DUMMY);
-    table.add(EXECUTE_ERROR);
-    table.add(INVALID_ARGS);
-    table.add(NPE);
-    table.add(REQUIRED_ARGS);
-    table.add(RETURNS_MISSING);
-    table.add(UNSTABLE);
-  }
 
 }

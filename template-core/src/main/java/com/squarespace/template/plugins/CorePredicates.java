@@ -25,12 +25,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BasePredicate;
-import com.squarespace.template.BaseRegistry;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
+import com.squarespace.template.PredicateRegistry;
 import com.squarespace.template.ReferenceScanner.References;
 import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.StringView;
@@ -38,13 +38,13 @@ import com.squarespace.template.SymbolTable;
 import com.squarespace.template.VariableRef;
 
 
-public class CorePredicates implements BaseRegistry<Predicate> {
+public class CorePredicates implements PredicateRegistry {
 
   /**
    * Registers the active predicates in this registry.
    */
   @Override
-  public void registerTo(SymbolTable<StringView, Predicate> table) {
+  public void registerPredicates(SymbolTable<StringView, Predicate> table) {
     table.add(DEBUG);
     table.add(EQUAL);
     table.add(EVEN);

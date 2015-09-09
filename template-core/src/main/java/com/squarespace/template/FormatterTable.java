@@ -56,6 +56,10 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
     return symbolList.toArray(Constants.EMPTY_ARRAY_OF_STRING);
   }
 
+  public void register(FormatterRegistry registry) {
+    registry.registerFormatters(this);
+  }
+
   /**
    * Callback to cast the Formatter and store it in the table.
    */

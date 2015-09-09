@@ -35,13 +35,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
-import com.squarespace.template.BaseRegistry;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.CodeSyntaxException;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.Formatter;
+import com.squarespace.template.FormatterRegistry;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
@@ -49,13 +49,13 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 
 
-public class CoreFormatters implements BaseRegistry<Formatter> {
+public class CoreFormatters implements FormatterRegistry {
 
   /**
    * Registers the active formatters in this registry.
    */
   @Override
-  public void registerTo(SymbolTable<StringView, Formatter> table) {
+  public void registerFormatters(SymbolTable<StringView, Formatter> table) {
     table.add(APPLY);
     table.add(COUNT);
     table.add(CYCLE);

@@ -19,7 +19,15 @@ package com.squarespace.template;
 /**
  * Implementations to test the Predicate interface.
  */
-public class UnitTestPredicates implements BaseRegistry<Predicate> {
+public class UnitTestPredicates implements PredicateRegistry {
+
+  @Override
+  public void registerPredicates(SymbolTable<StringView, Predicate> table) {
+    table.add(EXECUTE_ERROR);
+    table.add(INVALID_ARGS);
+    table.add(REQUIRED_ARGS);
+    table.add(UNSTABLE);
+  }
 
   public static final Predicate EXECUTE_ERROR = new BasePredicate("execute-error?", false) {
     @Override
@@ -44,13 +52,5 @@ public class UnitTestPredicates implements BaseRegistry<Predicate> {
       throw new IllegalArgumentException("unexpected error!");
     }
   };
-
-  @Override
-  public void registerTo(SymbolTable<StringView, Predicate> table) {
-    table.add(EXECUTE_ERROR);
-    table.add(INVALID_ARGS);
-    table.add(REQUIRED_ARGS);
-    table.add(UNSTABLE);
-  }
 
 }
