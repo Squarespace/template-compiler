@@ -50,7 +50,8 @@ public class PluginUtils {
   }
 
   public static void escapeHtml(String str, StringBuilder buf) {
-    for (int i = 0; i < str.length(); i++) {
+    int length = str.length();
+    for (int i = 0; i < length; i++) {
       char ch = str.charAt(i);
       switch (ch) {
         case '&':
@@ -69,7 +70,8 @@ public class PluginUtils {
   }
 
   public static void escapeHtmlTag(String str, StringBuilder buf) {
-    for (int i = 0; i < str.length(); i++) {
+    int length = str.length();
+    for (int i = 0; i < length; i++) {
       char ch = str.charAt(i);
       switch (ch) {
         case '&':
@@ -86,6 +88,45 @@ public class PluginUtils {
           break;
         default:
           buf.append(ch);
+      }
+    }
+  }
+
+  public static void escapeHtmlAttribute(String source, StringBuilder dest) {
+    int length = source.length();
+    for (int i = 0; i < length; i++) {
+      char ch = source.charAt(i);
+      switch (ch) {
+        case '{':
+          dest.append("&#123;");
+          break;
+
+        case '}':
+          dest.append("&#125;");
+          break;
+
+        case '>':
+          dest.append("&gt;");
+          break;
+
+        case '"':
+          dest.append("&quot;");
+          break;
+
+        case '|':
+          dest.append("&#124;");
+          break;
+
+        case '<':
+          dest.append("&lt;");
+          break;
+
+        case '&':
+          dest.append("&amp;");
+          break;
+
+        default:
+          dest.append(ch);
       }
     }
   }
