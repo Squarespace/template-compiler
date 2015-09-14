@@ -1,0 +1,11 @@
+
+description = 'Squarespace template compiler platform plugins'
+
+dependencies {
+  compile project(':template-core')
+
+  testCompile project(path: ':template-core', configuration: 'tests')
+  testCompile "org.testng:testng:${testngVersion}"
+}
+
+
