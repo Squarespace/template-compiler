@@ -39,15 +39,15 @@ public class SocialFormatters implements FormatterRegistry {
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
-    table.add(ACTIVATE_TWITTER_LINKS);
-    table.add(COMMENT_COUNT);
-    table.add(COMMENT_LINK);
-    table.add(COMMENTS);
-    table.add(GOOGLE_CALENDAR_URL);
-    table.add(LIKE_BUTTON);
-    table.add(SOCIAL_BUTTON);
-    table.add(SOCIAL_BUTTON_INLINE);
-    table.add(TWITTER_FOLLOW_BUTTON);
+    table.add(new ActivateTwitterLinksFormatter());
+    table.add(new CommentCountFormatter());
+    table.add(new CommentLinkFormatter());
+    table.add(new CommentsFormatter());
+    table.add(new GoogleCalendarUrlFormatter());
+    table.add(new LikeButtonFormatter());
+    table.add(new SocialButtonFormatter());
+    table.add(new SocialButtonInlineFormatter());
+    table.add(new TwitterFollowButtonFormatter());
   }
 
   private static final String CALENDAR_DATE_FORMAT = "%Y%m%dT%H%M%SZ";
@@ -71,7 +71,12 @@ public class SocialFormatters implements FormatterRegistry {
       );
 
 
-  public static final Formatter ACTIVATE_TWITTER_LINKS = new BaseFormatter("activate-twitter-links", false) {
+  public static class ActivateTwitterLinksFormatter extends BaseFormatter {
+
+    public ActivateTwitterLinksFormatter() {
+      super("activate-twitter-links", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String text = node.asText();
@@ -88,10 +93,14 @@ public class SocialFormatters implements FormatterRegistry {
       matcher.appendTail(buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class CommentsFormatter extends BaseFormatter {
 
-  public static final Formatter COMMENTS = new BaseFormatter("comments", false) {
+    public CommentsFormatter() {
+      super("comments", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -106,7 +115,7 @@ public class SocialFormatters implements FormatterRegistry {
       }
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
 
   private static void addCommentCount(JsonNode item, StringBuilder buf) {
@@ -122,8 +131,12 @@ public class SocialFormatters implements FormatterRegistry {
     }
   }
 
+  public static class CommentLinkFormatter extends BaseFormatter {
 
-  public static final Formatter COMMENT_LINK = new BaseFormatter("comment-link", false) {
+    public CommentLinkFormatter() {
+      super("comment-link", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -145,20 +158,27 @@ public class SocialFormatters implements FormatterRegistry {
       }
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class CommentCountFormatter extends BaseFormatter {
 
-  public static final Formatter COMMENT_COUNT = new BaseFormatter("comment-count", false) {
+    public CommentCountFormatter() {
+      super("comment-count", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       addCommentCount(item, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class GoogleCalendarUrlFormatter extends BaseFormatter {
 
-  public static final Formatter GOOGLE_CALENDAR_URL = new BaseFormatter("google-calendar-url", false) {
+    public GoogleCalendarUrlFormatter() {
+      super("google-calendar-url", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -179,7 +199,7 @@ public class SocialFormatters implements FormatterRegistry {
       }
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
   private static String getLocationString(JsonNode location) {
     StringBuilder sb = new StringBuilder();
@@ -205,7 +225,12 @@ public class SocialFormatters implements FormatterRegistry {
   }
 
 
-  public static final Formatter LIKE_BUTTON = new BaseFormatter("like-button", false) {
+  public static class LikeButtonFormatter extends BaseFormatter {
+
+    public LikeButtonFormatter() {
+      super("like-button", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       JsonNode settings = ctx.resolve("websiteSettings");
@@ -220,10 +245,14 @@ public class SocialFormatters implements FormatterRegistry {
       }
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class SocialButtonFormatter extends BaseFormatter {
 
-  public static final Formatter SOCIAL_BUTTON = new BaseFormatter("social-button", false) {
+    public SocialButtonFormatter() {
+      super("social-button", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       JsonNode website = ctx.resolve("website");
@@ -231,10 +260,14 @@ public class SocialFormatters implements FormatterRegistry {
       PlatformUtils.makeSocialButton(website, node, false, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class SocialButtonInlineFormatter extends BaseFormatter {
 
-  public static final Formatter SOCIAL_BUTTON_INLINE = new BaseFormatter("social-button-inline", false) {
+    public SocialButtonInlineFormatter() {
+      super("social-button-inline", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       JsonNode website = ctx.resolve("website");
@@ -242,10 +275,15 @@ public class SocialFormatters implements FormatterRegistry {
       PlatformUtils.makeSocialButton(website, node, true, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
 
-  public static final Formatter TWITTER_FOLLOW_BUTTON = new BaseFormatter("twitter-follow-button", false) {
+  public static class TwitterFollowButtonFormatter extends BaseFormatter {
+
+    public TwitterFollowButtonFormatter() {
+      super("twitter-follow-button", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode account) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -262,6 +300,6 @@ public class SocialFormatters implements FormatterRegistry {
       buf.append("\"></div>");
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
 }

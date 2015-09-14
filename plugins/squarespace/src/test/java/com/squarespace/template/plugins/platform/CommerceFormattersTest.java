@@ -16,26 +16,27 @@
 
 package com.squarespace.template.plugins.platform;
 
-import static com.squarespace.template.plugins.platform.CommerceFormatters.MONEY_FORMAT_DASH;
-
 import org.testng.annotations.Test;
 
 import com.squarespace.template.CodeException;
+import com.squarespace.template.Formatter;
+import com.squarespace.template.plugins.platform.CommerceFormatters.MoneyDashFormatter;
 
 
-@Test(groups = { "unit" })
 public class CommerceFormattersTest extends TemplateUnitTestBase {
+
+  private static final Formatter MONEY_DASH_FORMAT = new MoneyDashFormatter();
 
   @Test
   public void testMoneyFormat() throws CodeException {
-    assertFormatter(MONEY_FORMAT_DASH, "1", "0.01");
-    assertFormatter(MONEY_FORMAT_DASH, "10", "0.10");
-    assertFormatter(MONEY_FORMAT_DASH, "1201", "12.01");
-    assertFormatter(MONEY_FORMAT_DASH, "350", "3.50");
-    assertFormatter(MONEY_FORMAT_DASH, "100", "1.00");
-    assertFormatter(MONEY_FORMAT_DASH, "100000", "1,000.00");
-    assertFormatter(MONEY_FORMAT_DASH, "100003", "1,000.03");
-    assertFormatter(MONEY_FORMAT_DASH, "1241313", "12,413.13");
+    assertFormatter(MONEY_DASH_FORMAT, "1", "0.01");
+    assertFormatter(MONEY_DASH_FORMAT, "10", "0.10");
+    assertFormatter(MONEY_DASH_FORMAT, "1201", "12.01");
+    assertFormatter(MONEY_DASH_FORMAT, "350", "3.50");
+    assertFormatter(MONEY_DASH_FORMAT, "100", "1.00");
+    assertFormatter(MONEY_DASH_FORMAT, "100000", "1,000.00");
+    assertFormatter(MONEY_DASH_FORMAT, "100003", "1,000.03");
+    assertFormatter(MONEY_DASH_FORMAT, "1241313", "12,413.13");
   }
 
 }

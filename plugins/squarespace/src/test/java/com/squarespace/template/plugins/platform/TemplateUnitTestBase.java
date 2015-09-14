@@ -17,20 +17,30 @@
 package com.squarespace.template.plugins.platform;
 
 
+import com.squarespace.template.FormatterTable;
+import com.squarespace.template.PredicateTable;
 import com.squarespace.template.UnitTestBase;
 
 
 public class TemplateUnitTestBase extends UnitTestBase {
 
-  static {
-    formatterTable.register(new CommerceFormatters());
-    formatterTable.register(new ContentFormatters());
-    formatterTable.register(new SocialFormatters());
+  @Override
+  public FormatterTable formatterTable() {
+    FormatterTable table = super.formatterTable();
+    table.register(new CommerceFormatters());
+    table.register(new ContentFormatters());
+    table.register(new SocialFormatters());
+    return table;
+  }
 
-    predicateTable.register(new CommercePredicates());
-    predicateTable.register(new ContentPredicates());
-    predicateTable.register(new SlidePredicates());
-    predicateTable.register(new SocialPredicates());
+  @Override
+  public PredicateTable predicateTable() {
+    PredicateTable table = super.predicateTable();
+    table.register(new CommercePredicates());
+    table.register(new ContentPredicates());
+    table.register(new SlidePredicates());
+    table.register(new SocialPredicates());
+    return table;
   }
 
 }

@@ -48,37 +48,34 @@ public class ContentFormatters implements FormatterRegistry {
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
-    table.add(ABSURL);
-    table.add(AUDIO_PLAYER);
-    table.add(CAPITALIZE);
-    table.add(CHILD_IMAGE_META);
-    table.add(COLOR_WEIGHT);
-    table.add(COVER_IMAGE_META);
-    table.add(HEIGHT);
-    table.add(HUMANIZE_DURATION);
-    table.add(IMAGE);
-    table.add(IMAGE_COLOR);
-    table.add(IMAGE_META);
-    table.add(ITEM_CLASSES);
-    table.add(RESIZED_HEIGHT_FOR_WIDTH);
-    table.add(RESIZED_WIDTH_FOR_HEIGHT);
-    table.add(SQSP_THUMB_FOR_HEIGHT);
-    table.add(SQSP_THUMB_FOR_WIDTH);
-    table.add(TIMESINCE);
-    table.add(VIDEO);
-    table.add(WIDTH);
+    table.add(new AbsUrlFormatter(Constants.BASE_URL_KEY));
+    table.add(new AudioPlayerFormatter());
+    table.add(new CapitalizeFormatter());
+    table.add(new ChildImageMetaFormatter());
+    table.add(new ColorWeightFormatter());
+    table.add(new CoverImageMetaFormatter());
+    table.add(new HeightFormatter());
+    table.add(new HumanizeDurationFormatter());
+    table.add(new ImageFormatter());
+    table.add(new ImageColorFormatter());
+    table.add(new ImageMetaFormatter());
+    table.add(new ItemClassesFormatter());
+    table.add(new ResizedHeightForWidthFormatter());
+    table.add(new ResizedWidthForHeightFormatter());
+    table.add(new SqspThumbForHeightFormatter());
+    table.add(new SqspThumbForWidthFormatter());
+    table.add(new TimesinceFormatter());
+    table.add(new VideoFormatter());
+    table.add(new WidthFormatter());
   }
 
   public static class AbsUrlFormatter extends BaseFormatter {
 
-    private static String[] baseUrlKey = Constants.BASE_URL_KEY;
+    private final String[] baseUrlKey;
 
-    public AbsUrlFormatter() {
+    public AbsUrlFormatter(String[] baseUrlKey) {
       super("AbsUrl", false);
-    }
-
-    public void setBaseUrlKey(String[] key) {
-      baseUrlKey = key;
+      this.baseUrlKey = baseUrlKey;
     }
 
     @Override
@@ -90,13 +87,12 @@ public class ContentFormatters implements FormatterRegistry {
 
   }
 
-  /**
-   * ABSURL - Create an absolute URL, using the "base-url" value.
-   */
-  public static final AbsUrlFormatter ABSURL = new AbsUrlFormatter();
+  public static class AudioPlayerFormatter extends BaseFormatter {
 
+    public AudioPlayerFormatter() {
+      super("audio-player", false);
+    }
 
-  public static final Formatter AUDIO_PLAYER = new BaseFormatter("audio-player", false) {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String assetUrl = node.path("structuredContent").path("audioAssetUrl").asText();
@@ -108,21 +104,25 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("\" id=\"audio-player-").append(id).append("\"></div>");
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class CapitalizeFormatter extends BaseFormatter {
 
-  public static final Formatter CAPITALIZE = new BaseFormatter("capitalize", false) {
+    public CapitalizeFormatter() {
+      super("capitalize", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String text = node.asText();
       return ctx.buildNode(text.toUpperCase());
-    };
-  };
+    }
+  }
 
 
-  private static class ImageMetaFormatter extends BaseFormatter {
+  private abstract static class ImageMetaBaseFormatter extends BaseFormatter {
 
-    public ImageMetaFormatter(String identifier) {
+    public ImageMetaBaseFormatter(String identifier) {
       super(identifier, false);
     }
 
@@ -153,7 +153,12 @@ public class ContentFormatters implements FormatterRegistry {
     }
   }
 
-  public static final Formatter CHILD_IMAGE_META = new ImageMetaFormatter("child-image-meta") {
+  public static class ChildImageMetaFormatter extends ImageMetaBaseFormatter {
+
+    public ChildImageMetaFormatter() {
+      super("child-image-meta");
+    }
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.atMost(1);
@@ -168,6 +173,7 @@ public class ContentFormatters implements FormatterRegistry {
         }
       }
     }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       int index = (Integer)args.getOpaque();
@@ -175,8 +181,8 @@ public class ContentFormatters implements FormatterRegistry {
       StringBuilder buf = new StringBuilder();
       outputImageMeta(child, buf);
       return ctx.buildNode(buf.toString());
-    };
-  };
+    }
+  }
 
 
   private static final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
@@ -186,7 +192,11 @@ public class ContentFormatters implements FormatterRegistry {
   /**
    * COLOR_WEIGHT
    */
-  public static final Formatter COLOR_WEIGHT = new BaseFormatter("color-weight", false) {
+  public static class ColorWeightFormatter extends BaseFormatter {
+
+    public ColorWeightFormatter() {
+      super("color-weight", false);
+    }
 
     /**
      * Properly handle hex colors of length 3. Width of each channel needs to be expanded.
@@ -261,7 +271,12 @@ public class ContentFormatters implements FormatterRegistry {
     return altText;
   }
 
-  public static final Formatter HEIGHT = new BaseFormatter("height", false) {
+  public static class HeightFormatter extends BaseFormatter {
+
+    public HeightFormatter() {
+      super("height", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String[] parts = splitDimensions(node);
@@ -278,7 +293,11 @@ public class ContentFormatters implements FormatterRegistry {
   /**
    * HUMANIZE_DURATION
    */
-  public static final Formatter HUMANIZE_DURATION = new BaseFormatter("humanizeDuration", false) {
+  public static class HumanizeDurationFormatter extends BaseFormatter {
+
+    public HumanizeDurationFormatter() {
+      super("humanizeDuration", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -296,11 +315,17 @@ public class ContentFormatters implements FormatterRegistry {
     return false;
   }
 
-  public static final Formatter IMAGE = new BaseFormatter("image", false) {
+  public static class ImageFormatter extends BaseFormatter {
+
+    public ImageFormatter() {
+      super("image", false);
+    }
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.atMost(1);
-    };
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String focalPoint = getFocalPoint(node);
@@ -362,10 +387,13 @@ public class ContentFormatters implements FormatterRegistry {
       JsonNode image = ctx.node();
       return getAltTextFromContentItem(image);
     }
-  };
+  }
 
+  public static class ImageColorFormatter extends BaseFormatter {
 
-  public static final Formatter IMAGE_COLOR = new BaseFormatter("image-color", false) {
+    public ImageColorFormatter() {
+      super("image-color", false);
+    }
 
     private final List<String> positions = Arrays.asList(
         "topLeft", "topRight", "bottomLeft", "bottomRight", "center"
@@ -383,6 +411,7 @@ public class ContentFormatters implements FormatterRegistry {
         }
       }
     }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       JsonNode colorData = node.path("colorData");
@@ -413,10 +442,13 @@ public class ContentFormatters implements FormatterRegistry {
 
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class ImageMetaFormatter extends ImageMetaBaseFormatter {
 
-  public static final Formatter IMAGE_META = new ImageMetaFormatter("image-meta") {
+    public ImageMetaFormatter() {
+      super("image-meta");
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -424,10 +456,13 @@ public class ContentFormatters implements FormatterRegistry {
       outputImageMeta(node, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  public static class CoverImageMetaFormatter extends ImageMetaBaseFormatter {
 
-  public static final Formatter COVER_IMAGE_META = new ImageMetaFormatter("cover-image-meta") {
+    public CoverImageMetaFormatter() {
+      super("cover-image-meta");
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -441,7 +476,12 @@ public class ContentFormatters implements FormatterRegistry {
   /**
    * ITEM_CLASSES
    */
-  public static final Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
+  public static class ItemClassesFormatter extends BaseFormatter {
+
+    public ItemClassesFormatter() {
+      super("item-classes", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode value) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -496,11 +536,11 @@ public class ContentFormatters implements FormatterRegistry {
       return ctx.buildNode(buf.toString());
     }
 
-  };
+  }
 
-  private static abstract class ResizeFormatter extends BaseFormatter {
+  private static abstract class ResizeBaseFormatter extends BaseFormatter {
 
-    public ResizeFormatter(String identifier) {
+    public ResizeBaseFormatter(String identifier) {
       super(identifier, true);
     }
 
@@ -545,31 +585,48 @@ public class ContentFormatters implements FormatterRegistry {
   }
 
 
-  public static final Formatter RESIZED_HEIGHT_FOR_WIDTH = new ResizeFormatter("resizedHeightForWidth") {
+  public static class ResizedHeightForWidthFormatter extends ResizeBaseFormatter {
+
+    public ResizedHeightForWidthFormatter() {
+      super("resizedHeightForWidth");
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return resize(ctx, node, false, (Integer)args.getOpaque());
     }
-  };
+  }
 
+  public static class ResizedWidthForHeightFormatter extends ResizeBaseFormatter {
 
-  public static final Formatter RESIZED_WIDTH_FOR_HEIGHT = new ResizeFormatter("resizedWidthForHeight") {
+    public ResizedWidthForHeightFormatter() {
+      super("resizedWidthForHeight");
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return resize(ctx, node, true, (Integer)args.getOpaque());
     }
-  };
+  }
 
+  public static class SqspThumbForWidthFormatter extends ResizeBaseFormatter {
 
-  public static final Formatter SQSP_THUMB_FOR_WIDTH = new ResizeFormatter("squarespaceThumbnailForWidth") {
+    public SqspThumbForWidthFormatter() {
+      super("squarespaceThumbnailForWidth");
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return ctx.buildNode(getSquarespaceSizeForWidth((Integer)args.getOpaque()));
     }
-  };
+  }
 
+  public static class SqspThumbForHeightFormatter extends ResizeBaseFormatter {
 
-  public static final Formatter SQSP_THUMB_FOR_HEIGHT = new ResizeFormatter("squarespaceThumbnailForHeight") {
+    public SqspThumbForHeightFormatter() {
+      super("squarespaceThumbnailForHeight");
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       JsonNode resized = resize(ctx, node, true, (Integer)args.getOpaque());
@@ -578,13 +635,17 @@ public class ContentFormatters implements FormatterRegistry {
       }
       return resized;
     }
-  };
+  }
 
 
   /**
    * TIMESINCE - Outputs a human-readable representation of (now - timestamp).
    */
-  public static final Formatter TIMESINCE = new BaseFormatter("timesince", false) {
+  public static class TimesinceFormatter extends BaseFormatter {
+
+    public TimesinceFormatter() {
+      super("timesince", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -600,10 +661,14 @@ public class ContentFormatters implements FormatterRegistry {
       return ctx.buildNode(buf.toString());
     }
 
-  };
+  }
 
+  public static class WidthFormatter extends BaseFormatter {
 
-  public static final Formatter WIDTH = new BaseFormatter("width", false) {
+    public WidthFormatter() {
+      super("width", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String[] parts = splitDimensions(node);
@@ -614,10 +679,13 @@ public class ContentFormatters implements FormatterRegistry {
         return ctx.buildNode(width);
       }
     }
-  };
+  }
 
+  public static class VideoFormatter extends BaseFormatter {
 
-  public static final Formatter VIDEO = new BaseFormatter("video", false) {
+    public VideoFormatter() {
+      super("video", false);
+    }
 
     private final Set<String> validArgs = new HashSet<>(Arrays.asList("load-false", "color-data"));
 
@@ -699,6 +767,6 @@ public class ContentFormatters implements FormatterRegistry {
       return ctx.buildNode(buf.toString());
     }
 
-  };
+  }
 
 }

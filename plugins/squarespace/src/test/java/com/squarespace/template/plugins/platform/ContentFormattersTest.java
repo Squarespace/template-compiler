@@ -17,14 +17,6 @@
 package com.squarespace.template.plugins.platform;
 
 
-import static com.squarespace.template.plugins.platform.ContentFormatters.IMAGE_COLOR;
-import static com.squarespace.template.plugins.platform.ContentFormatters.RESIZED_HEIGHT_FOR_WIDTH;
-import static com.squarespace.template.plugins.platform.ContentFormatters.RESIZED_WIDTH_FOR_HEIGHT;
-import static com.squarespace.template.plugins.platform.ContentFormatters.SQSP_THUMB_FOR_HEIGHT;
-import static com.squarespace.template.plugins.platform.ContentFormatters.SQSP_THUMB_FOR_WIDTH;
-
-import static com.squarespace.template.plugins.platform.ContentFormatters.COLOR_WEIGHT;
-import static com.squarespace.template.plugins.platform.ContentFormatters.TIMESINCE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -34,11 +26,38 @@ import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
+import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.plugins.platform.ContentFormatters.ColorWeightFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.HeightFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.ImageColorFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.ResizedHeightForWidthFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.ResizedWidthForHeightFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForHeightFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForWidthFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.TimesinceFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.WidthFormatter;
 
 
-@Test(groups = {"unit"})
 public class ContentFormattersTest extends TemplateUnitTestBase {
+
+  private static final Formatter COLOR_WEIGHT = new ColorWeightFormatter();
+
+  private static final Formatter HEIGHT = new HeightFormatter();
+
+  private static final Formatter IMAGE_COLOR = new ImageColorFormatter();
+
+  private static final Formatter RESIZED_WIDTH_FOR_HEIGHT = new ResizedWidthForHeightFormatter();
+
+  private static final Formatter RESIZED_HEIGHT_FOR_WIDTH = new ResizedHeightForWidthFormatter();
+
+  private static final Formatter SQSP_THUMB_FOR_HEIGHT = new SqspThumbForHeightFormatter();
+
+  private static final Formatter SQSP_THUMB_FOR_WIDTH = new SqspThumbForWidthFormatter();
+
+  private static final Formatter TIMESINCE = new TimesinceFormatter();
+
+  private static final Formatter WIDTH = new WidthFormatter();
 
   @Test
   public void testAbsUrl() throws CodeException {
@@ -124,8 +143,8 @@ public class ContentFormattersTest extends TemplateUnitTestBase {
   @Test
   public void testWidthHeight() throws CodeException {
     String json = "\"100x200\"";
-    assertFormatter(ContentFormatters.WIDTH, json, "100");
-    assertFormatter(ContentFormatters.HEIGHT, json, "200");
+    assertFormatter(WIDTH, json, "100");
+    assertFormatter(HEIGHT, json, "200");
   }
 
 }

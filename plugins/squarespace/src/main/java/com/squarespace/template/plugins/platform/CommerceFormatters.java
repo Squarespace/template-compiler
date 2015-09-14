@@ -35,39 +35,49 @@ public class CommerceFormatters implements FormatterRegistry {
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
-    table.add(ADD_TO_CART_BTN);
-    table.add(BOOKKEEPER_FORMAT);
-    table.add(CART_QUANTITY);
-    table.add(CART_SUBTOTAL);
-    table.add(CART_URL);
-    table.add(COUPON_DESCRIPTOR);
-    table.add(FROM_PRICE);
-    table.add(MONEY_FORMAT_CAMEL);
-    table.add(MONEY_FORMAT_DASH);
-    table.add(MONEY_STRING);
-    table.add(NORMAL_PRICE);
-    table.add(PERCENTAGE_FORMAT);
-    table.add(PRODUCT_CHECKOUT);
-    table.add(PRODUCT_PRICE);
-    table.add(PRODUCT_QUICK_VIEW);
-    table.add(PRODUCT_STATUS);
-    table.add(QUANTITY_INPUT);
-    table.add(SALE_PRICE);
-    table.add(SUMMARY_FORM_FIELD);
-    table.add(VARIANT_DESCRIPTOR);
-    table.add(VARIANTS_SELECT);
+    table.add(new AddToCartButtonFormatter());
+    table.add(new BookkeeperMoneyFormatter());
+    table.add(new CartQuantityFormatter());
+    table.add(new CartSubtotalFormatter());
+    table.add(new CartUrlFormatter());
+    table.add(new CouponDescriptorFormatter());
+    table.add(new FromPriceFormatter());
+    table.add(new MoneyCamelFormatter());
+    table.add(new MoneyDashFormatter());
+    table.add(new MoneyStringFormatter());
+    table.add(new NormalPriceFormatter());
+    table.add(new PercentageFormatter());
+    table.add(new ProductCheckoutFormatter());
+    table.add(new ProductPriceFormatter());
+    table.add(new ProductQuickViewFormatter());
+    table.add(new ProductStatusFormatter());
+    table.add(new QuantityInputFormatter());
+    table.add(new SalePriceFormatter());
+    table.add(new SummaryFormFieldFormatter());
+    table.add(new VariantDescriptorFormatter());
+    table.add(new VariantsSelectFormatter());
   }
 
-  protected static final Formatter ADD_TO_CART_BTN = new BaseFormatter("add-to-cart-btn", false) {
+  protected static class AddToCartButtonFormatter extends BaseFormatter {
+
+    public AddToCartButtonFormatter() {
+      super("add-to-cart-btn", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeAddToCartBtnString(node, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter CART_QUANTITY = new BaseFormatter("cart-quantity", false) {
+  protected static class CartQuantityFormatter extends BaseFormatter {
+
+    public CartQuantityFormatter() {
+      super("cart-quantity", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -83,9 +93,14 @@ public class CommerceFormatters implements FormatterRegistry {
       buf.append("</span>");
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter CART_SUBTOTAL = new BaseFormatter("cart-subtotal", false) {
+  protected static class CartSubtotalFormatter extends BaseFormatter {
+
+    public CartSubtotalFormatter() {
+      super("cart-subtotal", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -97,16 +112,26 @@ public class CommerceFormatters implements FormatterRegistry {
       buf.append("</span>");
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter CART_URL = new BaseFormatter("cart-url", false) {
+  protected static class CartUrlFormatter extends BaseFormatter {
+
+    public CartUrlFormatter() {
+      super("cart-url", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return ctx.buildNode("/commerce/show-cart");
     }
-  };
+  }
 
-  protected static final Formatter COUPON_DESCRIPTOR = new BaseFormatter("coupon-descriptor", false) {
+  protected static class CouponDescriptorFormatter extends BaseFormatter {
+
+    public CouponDescriptorFormatter() {
+      super("coupon-descriptor", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -115,8 +140,12 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   };
 
+  protected static class FromPriceFormatter extends BaseFormatter {
 
-  protected static final Formatter FROM_PRICE = new BaseFormatter("from-price", false) {
+    public FromPriceFormatter() {
+      super("from-price", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       double price = CommerceUtils.getFromPrice(item);
@@ -124,9 +153,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   };
 
-  private static class MoneyFormatter extends BaseFormatter {
+  protected abstract static class MoneyBaseFormatter extends BaseFormatter {
 
-    public MoneyFormatter(String identifier) {
+    public MoneyBaseFormatter(String identifier) {
       super(identifier, false);
     }
 
@@ -137,19 +166,40 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   }
 
-  protected static final Formatter MONEY_FORMAT_DASH = new MoneyFormatter("money-format");
+  protected static class MoneyCamelFormatter extends MoneyBaseFormatter {
 
-  protected static final Formatter MONEY_FORMAT_CAMEL = new MoneyFormatter("moneyFormat");
+    public MoneyCamelFormatter() {
+      super("moneyFormat");
+    }
 
-  protected static final Formatter BOOKKEEPER_FORMAT = new BaseFormatter("bookkeeper-money-format", false) {
+  }
+
+  protected static class MoneyDashFormatter extends MoneyBaseFormatter {
+
+    public MoneyDashFormatter() {
+      super("money-format");
+    }
+  }
+
+  protected static class BookkeeperMoneyFormatter extends BaseFormatter {
+
+    public BookkeeperMoneyFormatter() {
+      super("bookkeeper-money-format", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       double value = ctx.node().asDouble();
       return ctx.buildNode(PlatformUtils.formatBookkeeperMoney(value, Locale.US));
     }
-  };
+  }
 
-  protected static final Formatter MONEY_STRING = new BaseFormatter("money-string", false) {
+  protected static class MoneyStringFormatter extends BaseFormatter {
+
+    public MoneyStringFormatter() {
+      super("money-string", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       double value = node.asDouble();
@@ -157,9 +207,14 @@ public class CommerceFormatters implements FormatterRegistry {
       CommerceUtils.writeMoneyString(value, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter PERCENTAGE_FORMAT = new BaseFormatter("percentage-format", false) {
+  protected static class PercentageFormatter extends BaseFormatter {
+
+    public PercentageFormatter() {
+      super("percentage-format", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       double value = node.asDouble();
@@ -168,17 +223,26 @@ public class CommerceFormatters implements FormatterRegistry {
       buf.append(formatted);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter NORMAL_PRICE = new BaseFormatter("normal-price", false) {
+  protected static class NormalPriceFormatter extends BaseFormatter {
+
+    public NormalPriceFormatter() {
+      super("normal-price", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       return ctx.buildNode(CommerceUtils.getNormalPrice(item));
     }
-  };
+  }
 
+  protected static class ProductCheckoutFormatter extends BaseFormatter {
 
-  protected static final Formatter PRODUCT_CHECKOUT = new BaseFormatter("product-checkout", false) {
+    public ProductCheckoutFormatter() {
+      super("product-checkout", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -187,10 +251,14 @@ public class CommerceFormatters implements FormatterRegistry {
       CommerceUtils.writeAddToCartBtnString(item, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  protected static class ProductPriceFormatter extends BaseFormatter {
 
-  protected static final Formatter PRODUCT_PRICE = new BaseFormatter("product-price", false) {
+    public ProductPriceFormatter() {
+      super("product-price", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -199,10 +267,13 @@ public class CommerceFormatters implements FormatterRegistry {
       buf.append("</div>");
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
+  protected static class ProductQuickViewFormatter extends BaseFormatter {
 
-  public static final Formatter PRODUCT_QUICK_VIEW = new BaseFormatter("product-quick-view", false) {
+    public ProductQuickViewFormatter() {
+      super("product-quick-view", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -219,11 +290,14 @@ public class CommerceFormatters implements FormatterRegistry {
       return ctx.buildNode(String.format("<span class=\"sqs-product-quick-view-button "
           + "sqs-editable-button\" data-id=\"%s\" data-group=\"%s\">Quick View</span>", id, group));
     }
+  }
 
-  };
+  protected static class ProductStatusFormatter extends BaseFormatter {
 
+    public ProductStatusFormatter() {
+      super("product-status", false);
+    }
 
-  protected static final Formatter PRODUCT_STATUS = new BaseFormatter("product-status", false) {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       if (CommerceUtils.isSoldOut(item)) {
@@ -233,48 +307,73 @@ public class CommerceFormatters implements FormatterRegistry {
       }
       return Constants.MISSING_NODE;
     }
-  };
+  }
 
-  protected static final Formatter QUANTITY_INPUT = new BaseFormatter("quantity-input", false) {
+  protected static class QuantityInputFormatter extends BaseFormatter {
+
+    public QuantityInputFormatter() {
+      super("quantity-input", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeQuantityInputString(node, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter SALE_PRICE = new BaseFormatter("sale-price", false) {
+  protected static class SalePriceFormatter extends BaseFormatter {
+
+    public SalePriceFormatter() {
+      super("sale-price", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       return ctx.buildNode(CommerceUtils.getSalePrice(item));
     }
-  };
+  }
 
-  protected static final Formatter VARIANT_DESCRIPTOR = new BaseFormatter("variant-descriptor", false) {
+  protected static class VariantDescriptorFormatter extends BaseFormatter {
+
+    public VariantDescriptorFormatter() {
+      super("variant-descriptor", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeVariantFormat(node, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter VARIANTS_SELECT = new BaseFormatter("variants-select", false) {
+  protected static class VariantsSelectFormatter extends BaseFormatter {
+
+    public VariantsSelectFormatter() {
+      super("variants-select", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeVariantSelectString(node, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 
-  protected static final Formatter SUMMARY_FORM_FIELD = new BaseFormatter("summary-form-field", false) {
+  protected static class SummaryFormFieldFormatter extends BaseFormatter {
+
+    public SummaryFormFieldFormatter() {
+      super("summary-form-field", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeSummaryFormFieldString(node, buf);
       return ctx.buildNode(buf.toString());
     }
-  };
+  }
 }

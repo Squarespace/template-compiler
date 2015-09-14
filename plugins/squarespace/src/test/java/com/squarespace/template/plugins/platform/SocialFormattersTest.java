@@ -22,18 +22,24 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.CodeException;
+import com.squarespace.template.Formatter;
 import com.squarespace.template.KnownDates;
+import com.squarespace.template.plugins.platform.SocialFormatters.ActivateTwitterLinksFormatter;
+import com.squarespace.template.plugins.platform.SocialFormatters.GoogleCalendarUrlFormatter;
 
 
-@Test(groups = { "unit" })
 public class SocialFormattersTest extends TemplateUnitTestBase {
+
+  private static final Formatter ACTIVATE_TWITTER_LINKS = new ActivateTwitterLinksFormatter();
+
+  private static final Formatter GOOGLE_CALENDAR_URL = new GoogleCalendarUrlFormatter();
 
   private static final long ONE_DAY = 86400 * 1000;
 
   @Test
   public void testActivateTwitterLinks() throws CodeException {
     String json = "\"#foo and #bar\"";
-    String result = format(SocialFormatters.ACTIVATE_TWITTER_LINKS, json);
+    String result = format(ACTIVATE_TWITTER_LINKS, json);
     assertTrue(result.contains("twitter.com/search/foo"));
     assertTrue(result.contains("twitter.com/search/bar"));
   }
@@ -43,7 +49,7 @@ public class SocialFormattersTest extends TemplateUnitTestBase {
     long end = KnownDates.NOV_15_2013_123030_UTC;
     long start = end - ONE_DAY;
     String json = "{\"startDate\": " + start + ", \"endDate\": " + end + ", \"title\": \"foo\"}";
-    String result = format(SocialFormatters.GOOGLE_CALENDAR_URL, json);
+    String result = format(GOOGLE_CALENDAR_URL, json);
     assertTrue(result.contains("dates=20131114T123030Z/20131115T123030Z"));
   }
 
