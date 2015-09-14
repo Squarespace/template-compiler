@@ -21,7 +21,7 @@ public class DumpSymbols {
 
   private static void dumpPredicates() {
     PredicateTable table = new PredicateTable();
-    
+
     table.register(new CommercePredicates());
     table.register(new ContentPredicates());
     table.register(new CorePredicates());
@@ -39,7 +39,7 @@ public class DumpSymbols {
     table.register(new SocialFormatters());
     dump(table.getSymbols());
   }
-  
+
   private static void dump(String[] symbols) {
     List<String> syms = Arrays.asList(symbols);
     syms.sort(null);
@@ -47,5 +47,5 @@ public class DumpSymbols {
       System.out.println(sym);
     }
   }
-  
+
 }

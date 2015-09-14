@@ -36,7 +36,7 @@ public class SocialPredicates implements PredicateRegistry {
     table.add(COMMENTS);
     table.add(DISQUS);
   }
-  
+
   public static final Predicate COMMENTS = new BasePredicate("comments?", false) {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {

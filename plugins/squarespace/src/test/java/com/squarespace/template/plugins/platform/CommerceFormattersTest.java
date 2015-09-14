@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 import com.squarespace.template.CodeException;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class CommerceFormattersTest extends TemplateUnitTestBase {
 
   @Test

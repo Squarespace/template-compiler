@@ -67,7 +67,7 @@ public class ContentPredicates implements PredicateRegistry {
     table.add(SAME_DAY);
     table.add(SERVICE_NAME_EMAIL);
     table.add(SHOW_PAST_EVENTS);
-    
+
     for (String name : GALLERY_DESIGN_SELECT) {
       table.add(new GallerySelectPredicate("design", name));
     }
@@ -104,7 +104,7 @@ public class ContentPredicates implements PredicateRegistry {
       table.add(new PromotedBlockTypePredicate(identifier, blockType));
     }
   }
-  
+
   public static final Predicate CALENDAR_VIEW = new BasePredicate("calendar-view?", false) {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
@@ -374,7 +374,7 @@ public class ContentPredicates implements PredicateRegistry {
 
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      JsonNode node = ctx.resolve("options").path(option);;
+      JsonNode node = ctx.resolve("options").path(option);
       return !node.isMissingNode() ? name.equals(node.asText()) : false;
     }
   }
@@ -403,7 +403,7 @@ public class ContentPredicates implements PredicateRegistry {
       return view.path("showPastOrUpcomingEvents").asText().equals("past");
     }
   };
-  
+
 
   private static class RecordTypePredicate extends BasePredicate {
 
@@ -466,7 +466,8 @@ public class ContentPredicates implements PredicateRegistry {
   ));
 
   private static final String[] PROMOTED_BLOCK_TYPES = new String[] {
-    "map","embed","image","code","quote","twitter","link","video","foursquare","instagram","form"
+    "map", "embed", "image", "code", "quote", "twitter", "link",
+    "video", "foursquare", "instagram", "form"
   };
 
 }

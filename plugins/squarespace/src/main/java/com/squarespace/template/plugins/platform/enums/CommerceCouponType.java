@@ -29,21 +29,21 @@ public enum CommerceCouponType implements PlatformEnum {
   SINGLE_PRODUCT(4, "single-product");
 
   private static final Map<Integer, CommerceCouponType> CODE_MAP = codeMap(CommerceCouponType.class);
-  
+
   private final int code;
-  
+
   private final String stringValue;
-  
+
   private CommerceCouponType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }
-  
+
   @Override
   public int code() {
     return code;
   }
-  
+
   @Override
   public String stringValue() {
     return stringValue;

@@ -20,7 +20,7 @@ package com.squarespace.template.plugins.platform.enums;
 interface PlatformEnum {
 
   int code();
-  
+
   String stringValue();
 
 }

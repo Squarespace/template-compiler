@@ -24,22 +24,22 @@ public enum FolderBehavior implements PlatformEnum {
   NONE(3, "none");
 
   private final int code;
-  
+
   private final String stringValue;
-  
+
   private FolderBehavior(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }
-  
+
   @Override
   public int code() {
     return code;
   }
-  
+
   @Override
   public String stringValue() {
     return stringValue;
   }
-  
+
 }

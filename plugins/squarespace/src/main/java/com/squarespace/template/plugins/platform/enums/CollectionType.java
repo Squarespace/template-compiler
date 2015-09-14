@@ -39,30 +39,30 @@ public enum CollectionType implements PlatformEnum {
   SLIDE_ALBUM(16, "slide-album"),
   SLIDE_VIDEO(17, "slide-video"),
   ALBUM_BLOCK(18, "album-block");
-  
+
   private final int code;
-  
+
   private final String stringValue;
-  
+
   private static final Map<Integer, CollectionType> CODE_MAP = codeMap(CollectionType.class);
-  
+
   private CollectionType(int code, String strValue) {
     this.code = code;
     this.stringValue = strValue;
   }
-  
+
   @Override
   public int code() {
     return code;
   }
-  
+
   @Override
   public String stringValue() {
     return stringValue;
   }
-  
+
   public static CollectionType fromCode(int code) {
     return CODE_MAP.get(code);
   }
-  
+
 }

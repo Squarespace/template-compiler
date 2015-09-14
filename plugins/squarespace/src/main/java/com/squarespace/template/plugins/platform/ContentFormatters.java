@@ -68,7 +68,7 @@ public class ContentFormatters implements FormatterRegistry {
     table.add(VIDEO);
     table.add(WIDTH);
   }
-  
+
   public static class AbsUrlFormatter extends BaseFormatter {
 
     private static String[] baseUrlKey = Constants.BASE_URL_KEY;
@@ -110,7 +110,7 @@ public class ContentFormatters implements FormatterRegistry {
     }
   };
 
-  
+
   public static final Formatter CAPITALIZE = new BaseFormatter("capitalize", false) {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -292,7 +292,7 @@ public class ContentFormatters implements FormatterRegistry {
     if (image.path("licensedAssetPreview").isObject()) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -367,18 +367,18 @@ public class ContentFormatters implements FormatterRegistry {
 
   public static final Formatter IMAGE_COLOR = new BaseFormatter("image-color", false) {
 
-    private final List<String> POSITIONS = Arrays.asList(
+    private final List<String> positions = Arrays.asList(
         "topLeft", "topRight", "bottomLeft", "bottomRight", "center"
         );
 
-    private final Set<String> POSITION_SET = new HashSet<>(POSITIONS);
+    private final Set<String> positionSet = new HashSet<>(positions);
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.atMost(2);
       if (args.count() >= 1) {
         String pos = args.first();
-        if (!POSITION_SET.contains(pos)) {
+        if (!positionSet.contains(pos)) {
           throw new ArgumentsException("illegal value '" + pos + "' found");
         }
       }
@@ -404,7 +404,7 @@ public class ContentFormatters implements FormatterRegistry {
         }
 
       } else {
-        for (String key : POSITIONS) {
+        for (String key : positions) {
           buf.append("data-color-").append(key).append("=\"#");
           buf.append(colorData.path(key + "Average").asText());
           buf.append("\" ");
@@ -441,7 +441,7 @@ public class ContentFormatters implements FormatterRegistry {
   /**
    * ITEM_CLASSES
    */
-  public static Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
+  public static final Formatter ITEM_CLASSES = new BaseFormatter("item-classes", false) {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode value) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
@@ -483,7 +483,7 @@ public class ContentFormatters implements FormatterRegistry {
 
       node = ctx.resolve("starred");
       if (isTruthy(node)) {
-        buf.append( " featured");
+        buf.append(" featured");
       }
 
       node = value.path("recordType");
@@ -619,12 +619,12 @@ public class ContentFormatters implements FormatterRegistry {
 
   public static final Formatter VIDEO = new BaseFormatter("video", false) {
 
-    private final Set<String> VALID_ARGS = new HashSet<>(Arrays.asList("load-false", "color-data"));
+    private final Set<String> validArgs = new HashSet<>(Arrays.asList("load-false", "color-data"));
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       for (String arg : args.getArgs()) {
-        if (!VALID_ARGS.contains(arg)) {
+        if (!validArgs.contains(arg)) {
           throw new ArgumentsException("'" + arg + "' is not an expected value");
         }
       }
@@ -669,11 +669,21 @@ public class ContentFormatters implements FormatterRegistry {
           buf.append("data-image-focal-point=\"").append(focalPoint).append("\" ");
 
           if (useColorData && isTruthy(colorData)) {
-            buf.append("data-color-topleft=\"#").append(colorData.path("topLeftAverage").asText()).append("\" ");
-            buf.append("data-color-topright=\"#").append(colorData.path("topRightAverage").asText()).append("\" ");
-            buf.append("data-color-bottomleft=\"#").append(colorData.path("bottomLeftAverage").asText()).append("\" ");
-            buf.append("data-color-bottomright=\"#").append(colorData.path("bottomRightAverage").asText()).append("\" ");
-            buf.append("data-color-center=\"#").append(colorData.path("centerAverage").asText()).append("\" ");
+            buf.append("data-color-topleft=\"#")
+               .append(colorData.path("topLeftAverage").asText())
+               .append("\" ");
+            buf.append("data-color-topright=\"#")
+               .append(colorData.path("topRightAverage").asText())
+               .append("\" ");
+            buf.append("data-color-bottomleft=\"#")
+               .append(colorData.path("bottomLeftAverage").asText())
+               .append("\" ");
+            buf.append("data-color-bottomright=\"#")
+               .append(colorData.path("bottomRightAverage").asText())
+               .append("\" ");
+            buf.append("data-color-center=\"#")
+               .append(colorData.path("centerAverage").asText())
+               .append("\" ");
           }
 
           buf.append("/>"); // close <img>

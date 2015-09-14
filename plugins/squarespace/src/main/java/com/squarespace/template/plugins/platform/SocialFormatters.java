@@ -49,7 +49,7 @@ public class SocialFormatters implements FormatterRegistry {
     table.add(SOCIAL_BUTTON_INLINE);
     table.add(TWITTER_FOLLOW_BUTTON);
   }
-  
+
   private static final String CALENDAR_DATE_FORMAT = "%Y%m%dT%H%M%SZ";
 
   private static final Pattern TWITTER_LINKS_REGEX = Pattern.compile(
@@ -82,8 +82,8 @@ public class SocialFormatters implements FormatterRegistry {
       // Hate using StringBuffer, but see Sun bug 5066679
       StringBuffer buf = new StringBuffer();
       while (matcher.find()) {
-        matcher.appendReplacement(buf, "<a target=\"new\" href=\"http://www.twitter.com/search/" +
-            GeneralUtils.urlEncode(matcher.group(2)) + "\">" + matcher.group(2) + "</a>");
+        matcher.appendReplacement(buf, "<a target=\"new\" href=\"http://www.twitter.com/search/"
+            + GeneralUtils.urlEncode(matcher.group(2)) + "\">" + matcher.group(2) + "</a>");
       }
       matcher.appendTail(buf);
       return ctx.buildNode(buf.toString());
@@ -204,7 +204,7 @@ public class SocialFormatters implements FormatterRegistry {
     return sb.toString();
   }
 
-  
+
   public static final Formatter LIKE_BUTTON = new BaseFormatter("like-button", false) {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {

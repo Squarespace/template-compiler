@@ -25,7 +25,7 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.KnownDates;
 
 
-@Test( groups={ "unit" })
+@Test(groups = { "unit" })
 public class SocialFormattersTest extends TemplateUnitTestBase {
 
   private static final long ONE_DAY = 86400 * 1000;

@@ -30,14 +30,14 @@ public class PlatformUtils {
 
   private PlatformUtils() {
   }
-  
+
   /**
    * Like money-format (e.g. 0.00) but with a currency (dollar) sign and parentheses on negative values.
    * Fully internationalized. Uses NumberFormat under the hood.
    */
-  public static String formatBookkeeperMoney(double cents, Locale locale){
+  public static String formatBookkeeperMoney(double cents, Locale locale) {
     NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
-    return formatter.format(cents/100);
+    return formatter.format(cents / 100);
   }
 
   public static String formatPercentage(double percentage, Locale locale) {

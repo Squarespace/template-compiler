@@ -26,30 +26,30 @@ public enum CommerceDiscountType implements PlatformEnum {
   FLAT(1, "flat"),
   PERCENTAGE(2, "percentage"),
   FREE_SHIPPING(3, "free-shipping");
-  
+
   private static final Map<Integer, CommerceDiscountType> CODE_MAP = codeMap(CommerceDiscountType.class);
-  
+
   private final int code;
-  
+
   private final String stringValue;
-  
+
   private CommerceDiscountType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }
-  
+
   @Override
   public int code() {
     return code;
   }
-  
+
   @Override
   public String stringValue() {
     return stringValue;
   }
-  
+
   public static CommerceDiscountType fromCode(int code) {
     return CODE_MAP.get(code);
   }
-  
+
 }

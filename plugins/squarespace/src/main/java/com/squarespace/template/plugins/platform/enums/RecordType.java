@@ -40,11 +40,11 @@ public enum RecordType implements PlatformEnum {
   TWEET(50, "tweet"),
   CHECKIN(52, "checkin"),
   KBARTICLE(54, "kbarticle");
-  
+
   private final int code;
-  
+
   private final String stringValue;
-  
+
   private RecordType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
@@ -54,10 +54,10 @@ public enum RecordType implements PlatformEnum {
   public int code() {
     return code;
   }
-  
+
   @Override
   public String stringValue() {
     return stringValue;
   }
-  
+
 }

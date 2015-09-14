@@ -43,16 +43,16 @@ public enum SliceType implements PlatformEnum {
   TWITTER(19, "twitter");
 
   private static final Map<String, SliceType> NAME_MAP = stringValueMap(SliceType.class);
-  
+
   private final int code;
-  
+
   private final String stringValue;
 
   private SliceType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }
-  
+
   @Override
   public int code() {
     return code;
@@ -66,5 +66,5 @@ public enum SliceType implements PlatformEnum {
   public static SliceType valueForName(String name) {
     return NAME_MAP.get(name);
   }
-  
+
 }

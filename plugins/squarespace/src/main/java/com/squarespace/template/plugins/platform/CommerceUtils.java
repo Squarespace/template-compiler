@@ -64,10 +64,14 @@ public class CommerceUtils {
         }
 
         JsonNode first = variants.get(0);
-        double price = isTruthy(first.path("onSale")) ? first.path("salePrice").asDouble() : first.path("price").asDouble();
+        double price = isTruthy(first.path("onSale"))
+            ? first.path("salePrice").asDouble()
+            : first.path("price").asDouble();
         for (int i = 1; i < variants.size(); i++) {
           JsonNode var = variants.get(i);
-          double current = isTruthy(var.path("onSale")) ? var.path("salePrice").asDouble() : var.path("price").asDouble();
+          double current = isTruthy(var.path("onSale"))
+              ? var.path("salePrice").asDouble()
+              : var.path("price").asDouble();
           if (current < price) {
             price = current;
           }
@@ -272,7 +276,8 @@ public class CommerceUtils {
   public static void writeAddToCartBtnString(JsonNode item, StringBuilder buf) {
     JsonNode structuredContent = item.path("structuredContent");
 
-    boolean useForm = !StringUtils.isEmpty(structuredContent.path("additionalFieldsFormId").asText()) && structuredContent.has("additionalFieldsForm");
+    String formId = structuredContent.path("additionalFieldsFormId").asText();
+    boolean useForm = !StringUtils.isEmpty(formId) && structuredContent.has("additionalFieldsForm");
 
     HtmlElementBuilder buttonNode = new HtmlElementBuilder("div");
 
@@ -282,7 +287,8 @@ public class CommerceUtils {
       buttonNode.addClass("use-form");
     }
 
-    String buttonText = structuredContent.path("useCustomAddButtonText").asBoolean() ? structuredContent.path("customAddButtonText").asText() : "Add To Cart";
+    boolean useCustom = structuredContent.path("useCustomAddButtonText").asBoolean();
+    String buttonText = useCustom ? structuredContent.path("customAddButtonText").asText() : "Add To Cart";
 
     buttonNode.set("data-item-id", item.path("id").asText());
     buttonNode.set("data-original-label", buttonText);
@@ -309,7 +315,8 @@ public class CommerceUtils {
 
   private static final MapFormat ALL_ORDERS_SHP = new MapFormat("Free shipping on any order.");
 
-  private static final MapFormat ORDERS_OVER_AMT = new MapFormat("Save %(discountAmt)s on any order over %(minPrice)s.");
+  private static final MapFormat ORDERS_OVER_AMT = new MapFormat(
+      "Save %(discountAmt)s on any order over %(minPrice)s.");
 
   private static final MapFormat ORDERS_OVER_SHP = new MapFormat("Free shipping on any order over %(minPrice)s.");
 
@@ -373,6 +380,9 @@ public class CommerceUtils {
         if (freeShipTpl != null) {
           buf.append(freeShipTpl.apply(tplData.get()));
         }
+        return;
+
+      default:
         return;
     }
     buf.append(amountTpl.apply(tplData.get()));
@@ -566,10 +576,13 @@ public class CommerceUtils {
 
     switch (fieldType) {
       case "name":
+      {
         valueString = values.path("First").asText() + " " + values.path("Last").asText();
         break;
+      }
 
       case "phone":
+      {
         String countryCode = StringUtils.trimToNull(values.path("Country").asText());
 
         valueString = "";
@@ -578,10 +591,15 @@ public class CommerceUtils {
           valueString += "+" + countryCode + " ";
         }
 
-        valueString += String.format("%s-%s-%s", values.path("Areacode").asText(), values.path("Prefix").asText(), values.path("Line").asText());
+        String areaCode = values.path("Areacode").asText();
+        String prefix = values.path("Prefix").asText();
+        String line = values.path("Line").asText();
+        valueString += String.format("%s-%s-%s", areaCode, prefix, line);
         break;
+      }
 
       case "likert":
+      {
         valueString = "<div style=\"padding-left:5px;\">";
 
         Iterator<Entry<String, JsonNode>> likertFields = values.fields();
@@ -590,14 +608,16 @@ public class CommerceUtils {
 
           String question = likertField.getKey();
           String answer = likertField.getValue().asText();
-
-          valueString += String.format("<div><span style=\"font-weight:bold;\">%s:</span> %s</div>", question, getStringForLikertValue(answer));
+          String likeStr = getStringForLikertValue(answer);
+          valueString += String.format("<div><span style=\"font-weight:bold;\">%s:</span> %s</div>", question, likeStr);
         }
 
         valueString += "</div>";
         break;
+      }
 
       case "address":
+      {
         valueString = "<div style=\"padding-left:5px;\"><div>" + values.path("Line1").asText() + "</div>";
 
         String line2 = StringUtils.trimToNull(values.path("Line2").asText());
@@ -606,15 +626,26 @@ public class CommerceUtils {
           valueString += "<div>" + line2 + "</div>";
         }
 
-        valueString += String.format("<div>%s, %s %s %s</div>", values.path("City").asText(), values.path("State").asText(), values.path("Zip").asText(), values.path("Country").asText());
+        String city = values.path("City").asText();
+        String state = values.path("State").asText();
+        String zip = values.path("Zip").asText();
+        String country = values.path("Country").asText();
+        valueString += String.format("<div>%s, %s %s %s</div>", city, state, zip, country);
         valueString += "</div>";
         break;
+      }
 
       case "date":
-        valueString = String.format("%s/%s/%s", values.path("Month").asText(), values.path("Day").asText(), values.path("Year").asText());
+      {
+        String month = values.path("Month").asText();
+        String day = values.path("Day").asText();
+        String year = values.path("Year").asText();
+        valueString = String.format("%s/%s/%s", month, day, year);
         break;
+      }
 
       case "time":
+      {
         String hour = StringUtils.trimToNull(values.path("Hour").asText());
         String minute = StringUtils.trimToNull(values.path("Minute").asText());
         String second = StringUtils.trimToNull(values.path("Second").asText());
@@ -633,8 +664,10 @@ public class CommerceUtils {
 
         valueString = String.format("%s:%s:%s %s", hour, minute, second, values.path("Ampm"));
         break;
+      }
 
       case "checkbox":
+      {
         /**
          * Because form submissions are not modeled, we have no easy way to migrate bad checkbox submissions
          * (value -> values). We need this fix.
@@ -652,6 +685,7 @@ public class CommerceUtils {
 
         valueString = StringUtils.join(valuesList, ", ");
         break;
+      }
 
       default:
         valueString = field.path("value").asText();
@@ -662,13 +696,14 @@ public class CommerceUtils {
       valueString = "N/A";
     }
 
+    String rawTitle = field.path("rawTitle").asText();
     buf.append("<div class=\"foobar\" style=\"font-size:11px; margin-top:3px\">");
-    buf.append(String.format("<span style=\"font-weight:bold;\">%s:</span> %s", field.path("rawTitle").asText(), valueString));
+    buf.append(String.format("<span style=\"font-weight:bold;\">%s:</span> %s", rawTitle, valueString));
     buf.append("</div>");
   }
 
   private static String getStringForLikertValue(String value) {
-    String string = null;
+    String string = "Neutral";
 
     switch (value) {
       case "-2":
@@ -689,6 +724,9 @@ public class CommerceUtils {
 
       case "2":
         string = "Strongly Agree";
+        break;
+
+      default:
         break;
     }
 

@@ -26,7 +26,7 @@ public class TemplateUnitTestBase extends UnitTestBase {
     formatterTable.register(new CommerceFormatters());
     formatterTable.register(new ContentFormatters());
     formatterTable.register(new SocialFormatters());
-    
+
     predicateTable.register(new CommercePredicates());
     predicateTable.register(new ContentPredicates());
     predicateTable.register(new SlidePredicates());

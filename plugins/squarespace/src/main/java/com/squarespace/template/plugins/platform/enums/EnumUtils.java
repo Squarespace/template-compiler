@@ -24,7 +24,7 @@ public class EnumUtils {
 
   private EnumUtils() {
   }
-  
+
   public static <T extends PlatformEnum> Map<Integer, T> codeMap(Class<T> enumClass) {
     Map<Integer, T> map = new HashMap<>();
     for (T value : enumClass.getEnumConstants()) {
@@ -32,7 +32,7 @@ public class EnumUtils {
     }
     return map;
   }
-  
+
   public static <T extends PlatformEnum> Map<String, T> stringValueMap(Class<T> enumClass) {
     Map<String, T> map = new HashMap<>();
     for (T value : enumClass.getEnumConstants()) {

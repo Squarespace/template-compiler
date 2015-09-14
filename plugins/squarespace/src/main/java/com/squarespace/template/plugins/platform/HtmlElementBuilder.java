@@ -30,46 +30,46 @@ import com.squarespace.template.plugins.PluginUtils;
 
 /**
  * TEMPORARY PORT FROM V6
- * 
+
  * I'm going to eventually kill the need for this code by allowing formatters
  * to have private compiled partials. - phensley
  */
 public class HtmlElementBuilder {
-  
+
   private static final Set<String> SELF_CLOSING_TAGS = Collections.singleton("img");
-  
+
   private final String tagName;
-  
+
   private Map<String, String> attributes = new TreeMap<>();
 
   private String content;
-  
+
   private List<HtmlElementBuilder> children = new ArrayList<>();
-  
+
   public HtmlElementBuilder(String tagName) {
     this.tagName = tagName;
   }
-  
+
   public void addClass(String className) {
     set("class", StringUtils.trimToEmpty(attributes.get("class")) + " " + className);
   }
-  
+
   public void addStyle(String property, String value) {
     set("style", StringUtils.trimToEmpty(attributes.get("style")) + property + ":" + value + ";");
   }
-  
+
   public void set(String attribute, Object value) {
     attributes.put(attribute, value.toString());
   }
-  
+
   public void setContent(String content) {
     this.content = content;
   }
-  
+
   public void appendChild(HtmlElementBuilder element) {
     this.children.add(element);
   }
-  
+
   /**
    * Build the HTML.
    */
@@ -77,7 +77,7 @@ public class HtmlElementBuilder {
     boolean selfClosing = SELF_CLOSING_TAGS.contains(tagName);
     buf.append("<");
     buf.append(tagName);
-    
+
     for (String attributeName : attributes.keySet()) {
       buf.append(" ").append(attributeName).append("=\"");
       PluginUtils.escapeHtmlAttribute(StringUtils.trimToEmpty(attributes.get(attributeName)), buf);
@@ -85,9 +85,9 @@ public class HtmlElementBuilder {
     }
 
     if (!selfClosing) {
-      buf.append(">");        
+      buf.append(">");
     }
-    
+
     if (!children.isEmpty()) {
       for (HtmlElementBuilder child : children) {
         child.render(buf);
@@ -99,10 +99,10 @@ public class HtmlElementBuilder {
     if (!selfClosing) {
       buf.append("</");
       buf.append(tagName);
-      buf.append(">");        
+      buf.append(">");
     } else {
       buf.append(" />");
     }
   }
-  
+
 }

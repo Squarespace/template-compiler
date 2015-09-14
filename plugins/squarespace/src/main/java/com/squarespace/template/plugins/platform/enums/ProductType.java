@@ -24,23 +24,23 @@ public enum ProductType implements PlatformEnum {
   PHYSICAL(1, "physical"),
   DIGITAL(2, "digital"),
   SERVICE(3, "service");
-  
+
   private static final Map<Integer, ProductType> CODE_MAP = EnumUtils.codeMap(ProductType.class);
-  
+
   private final int code;
-  
+
   private final String stringValue;
-  
+
   private ProductType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }
-  
+
   @Override
   public int code() {
     return code;
   }
-  
+
   @Override
   public String stringValue() {
     return stringValue;
@@ -49,5 +49,5 @@ public enum ProductType implements PlatformEnum {
   public static ProductType fromCode(int code) {
     return CODE_MAP.get(code);
   }
-  
+
 }
