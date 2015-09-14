@@ -1,4 +1,9 @@
 rootProject.name='template-compiler'
 include ':template-cli'
 include ':template-core'
+//include ':template-plugins-squarespace'
+
+project(':template-cli').projectDir = "$rootDir/cli" as File
+project(':template-core').projectDir = "$rootDir/core" as File
+//project(':template-plugins-squarespace').projectDir = "$rootDir/plugins/squarespace" as File
 
