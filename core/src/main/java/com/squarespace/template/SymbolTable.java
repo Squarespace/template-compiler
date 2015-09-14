@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import java.util.Collection;
+
 
 
 /**
@@ -39,6 +41,10 @@ public abstract class SymbolTable<K, V> {
 
   public V get(K symbol) {
     return table.get(symbol);
+  }
+
+  public Collection<V> values() {
+    return table.values();
   }
 
   public String dump() {

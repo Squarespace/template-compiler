@@ -16,23 +16,11 @@
 
 package com.squarespace.template.plugins;
 
-import static com.squarespace.template.plugins.CoreFormatters.ROUND;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.COMPILE_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
-import static com.squarespace.template.plugins.CoreFormatters.APPLY;
-import static com.squarespace.template.plugins.CoreFormatters.ENCODE_SPACE;
-import static com.squarespace.template.plugins.CoreFormatters.HTML;
-import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
-import static com.squarespace.template.plugins.CoreFormatters.HTMLTAG;
-import static com.squarespace.template.plugins.CoreFormatters.JSON;
-import static com.squarespace.template.plugins.CoreFormatters.JSON_PRETTY;
-import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
-import static com.squarespace.template.plugins.CoreFormatters.RAW;
-import static com.squarespace.template.plugins.CoreFormatters.SLUGIFY;
-import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -54,10 +42,67 @@ import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.UnitTestBase;
+import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
+import com.squarespace.template.plugins.CoreFormatters.CountFormatter;
+import com.squarespace.template.plugins.CoreFormatters.CycleFormatter;
+import com.squarespace.template.plugins.CoreFormatters.EncodeSpaceFormatter;
+import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
+import com.squarespace.template.plugins.CoreFormatters.HtmlFormatter;
+import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
+import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
+import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
+import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
+import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.RawFormatter;
+import com.squarespace.template.plugins.CoreFormatters.RoundFormatter;
+import com.squarespace.template.plugins.CoreFormatters.SafeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.SlugifyFormatter;
+import com.squarespace.template.plugins.CoreFormatters.SmartypantsFormatter;
+import com.squarespace.template.plugins.CoreFormatters.StrFormatter;
+import com.squarespace.template.plugins.CoreFormatters.TruncateFormatter;
+import com.squarespace.template.plugins.CoreFormatters.UrlEncodeFormatter;
 
 
 @Test(groups = { "unit" })
 public class CoreFormattersTest extends UnitTestBase {
+
+  private static final Formatter APPLY = new ApplyFormatter();
+
+  private static final Formatter COUNT = new CountFormatter();
+
+  private static final Formatter CYCLE = new CycleFormatter();
+
+  private static final Formatter ENCODE_SPACE = new EncodeSpaceFormatter();
+
+  private static final Formatter HTML = new HtmlFormatter();
+
+  private static final Formatter HTMLATTR = new HtmlAttrFormatter();
+
+  private static final Formatter HTMLTAG = new HtmlTagFormatter();
+
+  private static final Formatter JSON = new JsonFormatter();
+
+  private static final Formatter JSON_PRETTY = new JsonPrettyFormatter();
+
+  private static final Formatter OUTPUT = new OutputFormatter();
+
+  private static final Formatter PLURALIZE = new PluralizeFormatter();
+
+  private static final Formatter RAW = new RawFormatter();
+
+  private static final Formatter ROUND = new RoundFormatter();
+
+  private static final Formatter SAFE = new SafeFormatter();
+
+  private static final Formatter SLUGIFY = new SlugifyFormatter();
+
+  private static final Formatter SMARTYPANTS = new SmartypantsFormatter();
+
+  private static final Formatter STR = new StrFormatter();
+
+  private static final Formatter TRUNCATE = new TruncateFormatter();
+
+  private static final Formatter URL_ENCODE = new UrlEncodeFormatter();
 
   @Test
   public void testApplyPartial() throws CodeException {
@@ -173,10 +218,10 @@ public class CoreFormattersTest extends UnitTestBase {
   @Test
   public void testCount() throws CodeException {
     for (String val : new String[] { "null", "0", "\"foo\"" }) {
-      assertFormatter(CoreFormatters.COUNT, val, "0");
+      assertFormatter(COUNT, val, "0");
     }
-    assertFormatter(CoreFormatters.COUNT, "[1,2,3]", "3");
-    assertFormatter(CoreFormatters.COUNT, "{\"a\": 1, \"b\": 2}", "2");
+    assertFormatter(COUNT, "[1,2,3]", "3");
+    assertFormatter(COUNT, "{\"a\": 1, \"b\": 2}", "2");
   }
 
   @Test
@@ -185,7 +230,7 @@ public class CoreFormattersTest extends UnitTestBase {
     Arguments args = mk.args(" A B C");
     String result = "";
     for (int i = -6; i < 6; i++) {
-      result += format(CoreFormatters.CYCLE, args, Integer.toString(i));
+      result += format(CYCLE, args, Integer.toString(i));
     }
     assertEquals("CABCABCABCAB", result);
   }
@@ -349,7 +394,7 @@ public class CoreFormattersTest extends UnitTestBase {
   public void testOutput() throws CodeException {
     CodeMaker mk = maker();
     Arguments args = mk.args(":1:2:3");
-    assertFormatter(CoreFormatters.OUTPUT, args, "{}", "1 2 3");
+    assertFormatter(OUTPUT, args, "{}", "1 2 3");
   }
 
   @Test
@@ -396,10 +441,10 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testSafe() throws CodeException {
-    assertFormatter(CoreFormatters.SAFE, "\"foo <bar> bar\"", "foo  bar");
-    assertFormatter(CoreFormatters.SAFE, "\"<script\\nsrc=\\\"url\\\"\\n>foobar</script>\"", "foobar");
-    assertFormatter(CoreFormatters.SAFE, "\"<div>\\n<b>\\nfoobar\\n</b>\\n</div>\"", "\n\nfoobar\n\n");
-    assertFormatter(CoreFormatters.SAFE, "{}", "");
+    assertFormatter(SAFE, "\"foo <bar> bar\"", "foo  bar");
+    assertFormatter(SAFE, "\"<script\\nsrc=\\\"url\\\"\\n>foobar</script>\"", "foobar");
+    assertFormatter(SAFE, "\"<div>\\n<b>\\nfoobar\\n</b>\\n</div>\"", "\n\nfoobar\n\n");
+    assertFormatter(SAFE, "{}", "");
   }
 
   @Test
@@ -414,17 +459,17 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testSmartypants() throws CodeException {
-    assertFormatter(CoreFormatters.SMARTYPANTS, "\"Fred's\"", "Fred\u2019s");
-    assertFormatter(CoreFormatters.SMARTYPANTS, "\"\\\"foo\\\"\"", "\u201cfoo\u201d");
+    assertFormatter(SMARTYPANTS, "\"Fred's\"", "Fred\u2019s");
+    assertFormatter(SMARTYPANTS, "\"\\\"foo\\\"\"", "\u201cfoo\u201d");
   }
 
   @Test
   public void testStr() throws CodeException {
     for (String json : new String[] { "123", "3.14159", "-12", "false", "true" }) {
-      assertFormatter(CoreFormatters.STR, json, json);
+      assertFormatter(STR, json, json);
     }
-    assertFormatter(CoreFormatters.STR, "\"abc\"", "abc");
-    assertFormatter(CoreFormatters.STR, "null", "");
+    assertFormatter(STR, "\"abc\"", "abc");
+    assertFormatter(STR, "null", "");
   }
 
   @Test
@@ -444,7 +489,7 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testUrlEncode() throws CodeException {
-    assertFormatter(CoreFormatters.URL_ENCODE, "\"\u201ca b\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
+    assertFormatter(URL_ENCODE, "\"\u201ca b\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
   }
 
 

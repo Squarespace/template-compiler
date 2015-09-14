@@ -18,9 +18,6 @@ package com.squarespace.template;
 
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
-import static com.squarespace.template.plugins.CoreFormatters.JSON;
-import static com.squarespace.template.plugins.CoreFormatters.PLURALIZE;
-import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -37,6 +34,9 @@ import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.Instructions.SectionInst;
 import com.squarespace.template.Instructions.TextInst;
 import com.squarespace.template.Instructions.VariableInst;
+import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
+import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.TruncateFormatter;
 import com.squarespace.template.plugins.CorePredicates;
 
 
@@ -45,6 +45,12 @@ import com.squarespace.template.plugins.CorePredicates;
  */
 @Test(groups = { "unit" })
 public class InstructionReprTest extends UnitTestBase {
+
+  private static final Formatter JSON = new JsonFormatter();
+
+  private static final Formatter PLURALIZE = new PluralizeFormatter();
+
+  private static final Formatter TRUNCATE = new TruncateFormatter();
 
   @Test
   public void testAlternatesWithRepr() {

@@ -41,6 +41,12 @@ public interface Formatter {
   boolean requiresArgs();
 
   /**
+   * Initialize an instance of a formatter, allowing it to perform tasks
+   * like tokenizing private templates.
+   */
+  void initialize(Compiler compiler) throws CodeException;
+
+  /**
    * For Formatters that take arguments, they will be called with the raw StringView
    * covering their arguments during the tokenization phase. The Formatter must
    * raise a syntax error if the arguments are invalid.

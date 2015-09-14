@@ -18,8 +18,6 @@ package com.squarespace.template;
 
 import static com.squarespace.template.ExecuteErrorType.CODE_LIMIT_REACHED;
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
-import static com.squarespace.template.plugins.CoreFormatters.APPLY;
-import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -31,9 +29,15 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.HardSoftCodeLimiter.Limit;
 import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
+import com.squarespace.template.plugins.CoreFormatters.TruncateFormatter;
 
 
 public class HardSoftCodeLimiterTest extends UnitTestBase {
+
+  private static final Formatter APPLY = new ApplyFormatter();
+
+  private static final Formatter TRUNCATE = new TruncateFormatter();
 
   @Test
   public void testNoLimit() throws CodeException {

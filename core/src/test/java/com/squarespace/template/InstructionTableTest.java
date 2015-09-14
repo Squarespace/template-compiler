@@ -22,7 +22,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 
-public class InstructionTableTest {
+public class InstructionTableTest extends UnitTestBase {
 
   @Test
   public void testTable() {
@@ -43,6 +43,28 @@ public class InstructionTableTest {
       found3 |= symbol.equals(".repeated section");
     }
     assertTrue(found1 && found2 && found3, "Missing expected instructions");
+  }
+
+  @Test
+  public void testDumpSymbolTables() {
+    PredicateTable predicateTable = predicateTable();
+    FormatterTable formatterTable = formatterTable();
+
+    String instructions = InstructionTable.dump();
+    String predicates = predicateTable.dump();
+    String formatters = formatterTable.dump();
+
+    // Used to tune the symbol table sizes.
+    if (DEBUG) {
+      System.out.println("\nINSTRUCTION TABLE:");
+      System.out.println(instructions);
+      System.out.println("\nPREDICATE TABLE:");
+      System.out.println(predicates);
+      System.out.println("============================\n");
+      System.out.println("\nFORMATTER TABLE:");
+      System.out.println(formatters);
+      System.out.println("============================\n");
+    }
   }
 
 }

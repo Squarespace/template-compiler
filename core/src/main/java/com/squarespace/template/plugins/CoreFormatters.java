@@ -56,34 +56,38 @@ public class CoreFormatters implements FormatterRegistry {
    */
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
-    table.add(APPLY);
-    table.add(COUNT);
-    table.add(CYCLE);
-    table.add(DATE);
-    table.add(ENCODE_SPACE);
-    table.add(HTML);
-    table.add(HTMLATTR);
-    table.add(HTMLTAG);
-    table.add(ITER);
-    table.add(JSON);
-    table.add(JSON_PRETTY);
-    table.add(OUTPUT);
-    table.add(PLURALIZE);
-    table.add(RAW);
-    table.add(ROUND);
-    table.add(SAFE);
-    table.add(SLUGIFY);
-    table.add(SMARTYPANTS);
-    table.add(STR);
-    table.add(TRUNCATE);
-    table.add(URL_ENCODE);
+    table.add(new ApplyFormatter());
+    table.add(new CountFormatter());
+    table.add(new CycleFormatter());
+    table.add(new DateFormatter());
+    table.add(new EncodeSpaceFormatter());
+    table.add(new HtmlFormatter());
+    table.add(new HtmlAttrFormatter());
+    table.add(new HtmlTagFormatter());
+    table.add(new IterFormatter());
+    table.add(new JsonFormatter());
+    table.add(new JsonPrettyFormatter());
+    table.add(new OutputFormatter());
+    table.add(new PluralizeFormatter());
+    table.add(new RawFormatter());
+    table.add(new RoundFormatter());
+    table.add(new SafeFormatter());
+    table.add(new SlugifyFormatter());
+    table.add(new SmartypantsFormatter());
+    table.add(new StrFormatter());
+    table.add(new TruncateFormatter());
+    table.add(new UrlEncodeFormatter());
   }
 
   /**
    * APPLY - This will compile and execute a "partial template", caching it in the
    * context for possible later use.
    */
-  public static final Formatter APPLY = new BaseFormatter("apply", true) {
+  public static class ApplyFormatter extends BaseFormatter {
+
+    public ApplyFormatter() {
+      super("apply", true);
+    }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -119,31 +123,20 @@ public class CoreFormatters implements FormatterRegistry {
         }
       }
 
-      // Temporarily swap the buffers to capture all output of the partial.
-      StringBuilder buf = new StringBuilder();
-      StringBuilder origBuf = ctx.swapBuffer(buf);
-      try {
-        // If we want to hide the parent context during execution, create a new
-        // temporary sub-context.
-        if (privateContext) {
-          Context.subContext(ctx, buf).execute(inst);
-        } else {
-          ctx.execute(inst);
-        }
-
-      } finally {
-        ctx.swapBuffer(origBuf);
-      }
-      return ctx.buildNode(buf.toString());
+      return execute(ctx, inst, node, privateContext);
     }
 
-  };
+  }
 
 
   /**
    * COUNT - Returns a count of the number of members in an Array or Object.
    */
-  public static final Formatter COUNT = new BaseFormatter("count", false) {
+  public static class CountFormatter extends BaseFormatter {
+
+    public CountFormatter() {
+      super("count", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -154,13 +147,17 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(res);
     }
 
-  };
+  }
 
 
   /**
    * CYCLE - Iterate over an array of arguments
    */
-  public static final Formatter CYCLE = new BaseFormatter("cycle", true) {
+  public static class CycleFormatter extends BaseFormatter {
+
+    public CycleFormatter() {
+      super("cycle", true);
+    }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -177,9 +174,9 @@ public class CoreFormatters implements FormatterRegistry {
         index += count;
       }
       return ctx.buildNode(args.get(index));
-    };
+    }
 
-  };
+  }
 
 
   public static class DateFormatter extends BaseFormatter {
@@ -197,7 +194,7 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.setOpaque(args.toString());
-    };
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -216,16 +213,15 @@ public class CoreFormatters implements FormatterRegistry {
 
   }
 
-  /**
-   * DATE - Format an epoch date using the site's timezone.
-   */
-  public static final DateFormatter DATE = new DateFormatter();
-
 
   /**
    * ENCODE_SPACE - Replace each space character with "&nbsp;".
    */
-  public static final Formatter ENCODE_SPACE = new BaseFormatter("encode-space", false) {
+  public static class EncodeSpaceFormatter extends BaseFormatter {
+
+    public EncodeSpaceFormatter() {
+      super("encode-space", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -233,13 +229,17 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(value);
     }
 
-  };
+  }
 
 
   /**
    * HTML - Escapes HTML characters & < > replacing them with the corresponding entity.
    */
-  public static final Formatter HTML = new BaseFormatter("html", false) {
+  public static class HtmlFormatter extends BaseFormatter {
+
+    public HtmlFormatter() {
+      super("html", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -248,13 +248,17 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(buf.toString());
     }
 
-  };
+  }
 
 
   /**
    * HTMLTAG - Escapes HTML characters & < > " replacing them with the corresponding entity.
    */
-  public static final Formatter HTMLTAG = new BaseFormatter("htmltag", false) {
+  public static class HtmlTagFormatter extends BaseFormatter {
+
+    public HtmlTagFormatter() {
+      super("htmltag", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -263,13 +267,17 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(buf.toString());
     }
 
-  };
+  }
 
 
   /**
    * HTMLATTR - Same as HTMLTAG.
    */
-  public static final Formatter HTMLATTR = new BaseFormatter("htmlattr", false) {
+  public static class HtmlAttrFormatter extends BaseFormatter {
+
+    public HtmlAttrFormatter() {
+      super("htmlattr", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -278,26 +286,34 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(buf.toString());
     }
 
-  };
+  }
 
 
   /**
    * ITER - Outputs the index of the current array being iterated over.
    */
-  public static final Formatter ITER = new BaseFormatter("iter", false) {
+  public static class IterFormatter extends BaseFormatter {
+
+    public IterFormatter() {
+      super("iter", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return ctx.buildNode(ctx.resolve("@index").asText());
     }
 
-  };
+  }
 
 
   /**
    * JSON - Output a text representation of the node.
    */
-  public static final Formatter JSON = new BaseFormatter("json", false) {
+  public static class JsonFormatter extends BaseFormatter {
+
+    public JsonFormatter() {
+      super("json", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -306,13 +322,17 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(node.toString().replace("</script>", "</scr\"+\"ipt>"));
     }
 
-  };
+  }
 
 
   /**
    * JSON_PRETTY
    */
-  public static final Formatter JSON_PRETTY = new BaseFormatter("json-pretty", false) {
+  public static class JsonPrettyFormatter extends BaseFormatter {
+
+    public JsonPrettyFormatter() {
+      super("json-pretty", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -333,13 +353,17 @@ public class CoreFormatters implements FormatterRegistry {
       return Constants.MISSING_NODE;
     }
 
-  };
+  }
 
 
   /**
    * OUTPUT
    */
-  public static final Formatter OUTPUT = new BaseFormatter("output", false) {
+  public static class OutputFormatter extends BaseFormatter {
+
+    public OutputFormatter() {
+      super("output", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -347,8 +371,7 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(StringUtils.join(values.toArray(), ' '));
     }
 
-  };
-
+  }
 
   static class PluralizeArgs {
     String singular = "";
@@ -358,7 +381,11 @@ public class CoreFormatters implements FormatterRegistry {
   /**
    * PLURALIZE - Emit a string based on the plurality of the node.
    */
-  public static final Formatter PLURALIZE = new BaseFormatter("pluralize", false) {
+  public static class PluralizeFormatter extends BaseFormatter {
+
+    public PluralizeFormatter() {
+      super("pluralize", false);
+    }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -379,26 +406,34 @@ public class CoreFormatters implements FormatterRegistry {
       CharSequence result = (node.asLong() == 1) ? realArgs.singular : realArgs.plural;
       return ctx.buildNode(result.toString());
     }
-  };
+  }
 
 
   /**
    * RAW
    */
-  public static final Formatter RAW = new BaseFormatter("raw", false) {
+  public static class RawFormatter extends BaseFormatter {
+
+    public RawFormatter() {
+      super("raw", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return ctx.buildNode(node.toString());
     }
 
-  };
+  }
 
 
   /**
    * ROUND
    */
-  public static final Formatter ROUND = new BaseFormatter("round", false) {
+  public static class RoundFormatter extends BaseFormatter {
+
+    public RoundFormatter() {
+      super("round", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -406,15 +441,19 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(value);
     }
 
-  };
+  }
 
 
   /**
    * SAFE
    */
-  public static final Formatter SAFE = new BaseFormatter("safe", false) {
+  public static class SafeFormatter extends BaseFormatter {
 
     private final Pattern pattern = Pattern.compile("<[^>]*?>", Pattern.MULTILINE);
+
+    public SafeFormatter() {
+      super("safe", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -425,13 +464,17 @@ public class CoreFormatters implements FormatterRegistry {
       return node;
     }
 
-  };
+  }
 
 
   /**
    * SMARTYPANTS - Converts plain ASCII quote / apostrophe to corresponding Unicode curly characters.
    */
-  public static final Formatter SMARTYPANTS = new BaseFormatter("smartypants", false) {
+  public static class SmartypantsFormatter extends BaseFormatter {
+
+    public SmartypantsFormatter() {
+      super("smartypants", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -444,13 +487,17 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(str);
     }
 
-  };
+  }
 
 
   /**
    * SLUGIFY - Turn headline text into a slug.
    */
-  public static final Formatter SLUGIFY = new BaseFormatter("slugify", false) {
+  public static class SlugifyFormatter extends BaseFormatter {
+
+    public SlugifyFormatter() {
+      super("slugify", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -458,20 +505,24 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(PluginUtils.slugify(result));
     }
 
-  };
+  }
 
 
   /**
    * STR - Output a string representation of the node.
    */
-  public static final Formatter STR = new BaseFormatter("str", false) {
+  public static class StrFormatter extends BaseFormatter {
+
+    public StrFormatter() {
+      super("str", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return ctx.buildNode(eatNull(node));
     }
 
-  };
+  }
 
 
   static class TruncateArgs {
@@ -482,7 +533,11 @@ public class CoreFormatters implements FormatterRegistry {
   /**
    * TRUNCATE - Chop a string to a given length after the nearest space boundary.
    */
-  public static final Formatter TRUNCATE = new BaseFormatter("truncate", false) {
+  public static class TruncateFormatter extends BaseFormatter {
+
+    public TruncateFormatter() {
+      super("truncate", false);
+    }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
@@ -506,14 +561,18 @@ public class CoreFormatters implements FormatterRegistry {
       String value = PluginUtils.truncate(node.asText(), obj.maxLen, obj.ellipses);
       return ctx.buildNode(value);
     }
-  };
+  }
 
 
   /**
    * URL_ENCODE - Encode characters which must be escaped in URLs. This
    * will output a hex escape sequence, '/' to %2F, or ' ' to '+'.
    */
-  public static final Formatter URL_ENCODE = new BaseFormatter("url-encode", false) {
+  public static class UrlEncodeFormatter extends BaseFormatter {
+
+    public UrlEncodeFormatter() {
+      super("url-encode", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
@@ -533,6 +592,6 @@ public class CoreFormatters implements FormatterRegistry {
       return Constants.MISSING_NODE;
     }
 
-  };
+  }
 
 }

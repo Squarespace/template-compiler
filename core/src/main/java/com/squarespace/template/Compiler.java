@@ -38,8 +38,7 @@ public class Compiler {
   public Compiler(FormatterTable formatterTable, PredicateTable predicateTable) {
     this.formatterTable = formatterTable;
     this.predicateTable = predicateTable;
-    formatterTable.setInUse();
-    predicateTable.setInUse();
+    formatterTable.initialize(this);
   }
 
   public FormatterTable formatterTable() {

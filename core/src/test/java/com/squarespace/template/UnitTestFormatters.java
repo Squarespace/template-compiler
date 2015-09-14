@@ -27,56 +27,118 @@ public class UnitTestFormatters implements FormatterRegistry {
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
-    table.add(DUMMY);
-    table.add(EXECUTE_ERROR);
-    table.add(INVALID_ARGS);
-    table.add(NPE);
-    table.add(REQUIRED_ARGS);
-    table.add(RETURNS_MISSING);
-    table.add(UNSTABLE);
+    table.add(new DummyFormatter());
+    table.add(new DummyTemplateFormatter());
+    table.add(new ExecuteErrorFormatter());
+    table.add(new InvalidArgsFormatter());
+    table.add(new NpeFormatter());
+    table.add(new RequiredArgsFormatter());
+    table.add(new ReturnsMissingFormatter());
+    table.add(new UnstableFormatter());
   }
 
-  public static final Formatter DUMMY = new BaseFormatter("dummy", false) {
+  public static class DummyFormatter extends BaseFormatter {
 
-  };
+    public DummyFormatter() {
+      super("dummy", false);
+    }
 
-  public static final Formatter EXECUTE_ERROR = new BaseFormatter("execute-error", false) {
+  }
+
+  /**
+   * Example formatter to demonstrate initialization-time compilation and
+   * application of a partial template.
+   */
+  public static class DummyTemplateFormatter extends BaseFormatter {
+
+    private Instruction instruction;
+
+    public DummyTemplateFormatter() {
+      super("dummy-template", false);
+    }
+
+    @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      this.instruction = compiler.compile("<div>{bar}</div>").code();
+    }
+
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      return execute(ctx, instruction, node.path("foo"), true);
+    }
+  }
+
+  public static class ExecuteErrorFormatter extends BaseFormatter {
+
+    public ExecuteErrorFormatter() {
+      super("execute-error", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
-  };
 
-  public static final Formatter INVALID_ARGS = new BaseFormatter("invalid-args", false) {
+  }
+
+  public static class InvalidArgsFormatter extends BaseFormatter {
+
+    public InvalidArgsFormatter() {
+      super("invalid-args", false);
+    }
+
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       throw new ArgumentsException("Invalid arguments");
     }
-  };
 
-  public static final Formatter NPE = new BaseFormatter("npe", false) {
+  }
+
+  public static class NpeFormatter extends BaseFormatter {
+
+    public NpeFormatter() {
+      super("npe", false);
+    }
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       throw new NullPointerException("fake NPE thrown by the test npe formatter.");
     }
-  };
 
-  public static final Formatter REQUIRED_ARGS = new BaseFormatter("required-args", true) {
-  };
+  }
 
-  public static final Formatter RETURNS_MISSING = new BaseFormatter("returns-missing", false) {
+  public static class RequiredArgsFormatter extends BaseFormatter {
+
+    public RequiredArgsFormatter() {
+      super("required-args", true);
+    }
+
+  }
+
+  public static class ReturnsMissingFormatter extends BaseFormatter {
+
+    public ReturnsMissingFormatter() {
+      super("returns-missing", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       return Constants.MISSING_NODE;
     }
-  };
 
-  public static final Formatter UNSTABLE = new BaseFormatter("unstable", false) {
+  }
+
+  public static class UnstableFormatter extends BaseFormatter {
+
+    public UnstableFormatter() {
+      super("unstable", false);
+    }
+
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       throw new IllegalArgumentException("unexpected error!");
     }
-  };
+
+  }
 
 }

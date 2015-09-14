@@ -22,7 +22,7 @@ import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 @Test(groups = { "unit" })
-public class ErrorHandlingTest extends UnitTestBase {
+public class FormatterTest extends UnitTestBase {
 
   @Test
   public void testDummy() throws CodeException {
@@ -31,7 +31,13 @@ public class ErrorHandlingTest extends UnitTestBase {
   }
 
   @Test
-  public void testUnexpected() throws CodeException {
+  public void testDummyTemplate() throws CodeException {
+    Context ctx = execute("{foo|dummy-template}", "{\"foo\":{\"bar\":123}}");
+    System.err.println(ctx.buffer().toString());
+  }
+
+  @Test
+  public void testUnexpectedErrors() throws CodeException {
     assertErrors("{@|npe}", "1", ExecuteErrorType.UNEXPECTED_ERROR);
     assertErrors("{@|unstable}", "1", ExecuteErrorType.UNEXPECTED_ERROR);
   }

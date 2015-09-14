@@ -51,7 +51,9 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
+import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.SlugifyFormatter;
 
 
 /**
@@ -60,6 +62,12 @@ import com.squarespace.template.plugins.CoreFormatters;
  */
 @Test(groups = { "unit" })
 public class TokenizerCoreTest extends UnitTestBase {
+
+  private static final Formatter HTMLATTR = new HtmlAttrFormatter();
+
+  private static final Formatter PLURALIZE = new PluralizeFormatter();
+
+  private static final Formatter SLUGIFY = new SlugifyFormatter();
 
   private static final boolean VERBOSE = false;
 
@@ -162,12 +170,12 @@ public class TokenizerCoreTest extends UnitTestBase {
   public void testFormatter() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     Arguments args1 = mk.args(" a1 a2");
-    assertResult("{@|pluralize}", mk.var("@", CoreFormatters.PLURALIZE), mk.eof());
-    assertResult("{a.b.c|slugify}", mk.var("a.b.c", CoreFormatters.SLUGIFY), mk.eof());
-    assertResult("{foo|pluralize a1 a2}", mk.var("foo", mk.fmt(CoreFormatters.PLURALIZE, args1)), mk.eof());
+    assertResult("{@|pluralize}", mk.var("@", PLURALIZE), mk.eof());
+    assertResult("{a.b.c|slugify}", mk.var("a.b.c", SLUGIFY), mk.eof());
+    assertResult("{foo|pluralize a1 a2}", mk.var("foo", mk.fmt(PLURALIZE, args1)), mk.eof());
 
     Arguments args2 = mk.args("/b/c");
-    assertResult("{a|pluralize/b/c}", mk.var("a", mk.fmt(CoreFormatters.PLURALIZE, args2)), mk.eof());
+    assertResult("{a|pluralize/b/c}", mk.var("a", mk.fmt(PLURALIZE, args2)), mk.eof());
   }
 
   @Test

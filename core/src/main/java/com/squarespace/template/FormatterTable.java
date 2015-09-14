@@ -49,6 +49,17 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
     super(numBuckets);
   }
 
+  public void initialize(Compiler compiler) {
+    setInUse();
+    for (Formatter formatter : values()) {
+      try {
+        formatter.initialize(compiler);
+      } catch (CodeException e) {
+        throw new IllegalStateException(e.toString());
+      }
+    }
+  }
+
   /**
    * Returns the list of identifiers of the formatters that have been registered.
    */

@@ -42,11 +42,19 @@ import com.squarespace.template.Instructions.SectionInst;
 import com.squarespace.template.Instructions.SpaceInst;
 import com.squarespace.template.Instructions.TextInst;
 import com.squarespace.template.Instructions.VariableInst;
-import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
+import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.SlugifyFormatter;
 
 
 @Test(groups = { "unit" })
 public class InstructionEqualityTest extends UnitTestBase {
+
+  private static final Formatter JSON = new JsonFormatter();
+
+  private static final Formatter PLURALIZE = new PluralizeFormatter();
+
+  private static final Formatter SLUGIFY = new SlugifyFormatter();
 
   @Test
   public void testAlternatesWithEquals() throws CodeSyntaxException {
@@ -267,27 +275,27 @@ public class InstructionEqualityTest extends UnitTestBase {
     assertNotEquals(v1, mk.comment("foo.bar"));
     assertNotEquals(v1, mk.end());
 
-    v1 = mk.var("foo.bar", mk.formatters(CoreFormatters.JSON));
-    assertEquals(v1, mk.var("foo.bar", mk.formatters(CoreFormatters.JSON)));
+    v1 = mk.var("foo.bar", mk.formatters(JSON));
+    assertEquals(v1, mk.var("foo.bar", mk.formatters(JSON)));
     assertFalse(v1.equals(null));
 
-    assertNotEquals(v1, mk.var("@", CoreFormatters.JSON));
-    VariableInst x =  mk.var("foo.bar", CoreFormatters.PLURALIZE);
+    assertNotEquals(v1, mk.var("@", JSON));
+    VariableInst x =  mk.var("foo.bar", PLURALIZE);
     assertNotEquals(v1, x);
-    assertNotEquals(v1, mk.var("bar.foo", CoreFormatters.JSON));
+    assertNotEquals(v1, mk.var("bar.foo", JSON));
     assertNotEquals(v1, mk.var("foo.bar"));
     assertNotEquals(v1, mk.end());
 
     // With arguments
     Arguments args1 = mk.args(" a1 a2");
     Arguments args2 = mk.args(" a2 a1");
-    VariableInst v2 = mk.var("foo.bar", mk.formatters(mk.fmt(CoreFormatters.PLURALIZE, args1)));
+    VariableInst v2 = mk.var("foo.bar", mk.formatters(mk.fmt(PLURALIZE, args1)));
     assertNotEquals(v1, v2);
-    assertEquals(v2, mk.var("foo.bar", mk.fmt(CoreFormatters.PLURALIZE, args1)));
-    assertNotEquals(v2, mk.var("foo.bar", mk.fmt(CoreFormatters.PLURALIZE, args2)));
+    assertEquals(v2, mk.var("foo.bar", mk.fmt(PLURALIZE, args1)));
+    assertNotEquals(v2, mk.var("foo.bar", mk.fmt(PLURALIZE, args2)));
 
-    VariableInst v3 = mk.var("a.b.c", mk.fmt(CoreFormatters.SLUGIFY, args1));
-    assertEquals(v3, mk.var("a.b.c", mk.fmt(CoreFormatters.SLUGIFY, args1)));
+    VariableInst v3 = mk.var("a.b.c", mk.fmt(SLUGIFY, args1));
+    assertEquals(v3, mk.var("a.b.c", mk.fmt(SLUGIFY, args1)));
 
   }
 

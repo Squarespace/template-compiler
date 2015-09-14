@@ -39,54 +39,35 @@ import com.squarespace.template.plugins.CorePredicates;
  */
 public class UnitTestBase {
 
+  // Set this flag to emit extra info for debugging
   protected static final boolean DEBUG = false;
-
-  protected static final PredicateTable predicateTable = new PredicateTable();
-
-  protected static final FormatterTable formatterTable = new FormatterTable();
-
-  static {
-    predicateTable.register(new CorePredicates());
-    predicateTable.register(new UnitTestPredicates());
-    formatterTable.register(new CoreFormatters());
-    formatterTable.register(new UnitTestFormatters());
-
-    String instructions = InstructionTable.dump();
-    String predicates = predicateTable.dump();
-    String formatters = formatterTable.dump();
-
-    // Used to tune the symbol table sizes.
-    if (DEBUG) {
-      System.out.println("\nINSTRUCTION TABLE:");
-      System.out.println(instructions);
-      System.out.println("\nPREDICATE TABLE:");
-      System.out.println(predicates);
-      System.out.println("============================\n");
-      System.out.println("\nFORMATTER TABLE:");
-      System.out.println(formatters);
-      System.out.println("============================\n");
-    }
-  }
 
   /**
    * This instance is stateless so it can be reused across tests.
    */
   protected final CodeMaker maker = new CodeMaker();
 
-  public static Compiler compiler() {
-    return new Compiler(formatterTable, predicateTable);
+  public Compiler compiler() {
+    return new Compiler(formatterTable(), predicateTable());
+  }
+
+  public FormatterTable formatterTable() {
+    FormatterTable table = new FormatterTable();
+    table.register(new CoreFormatters());
+    table.register(new UnitTestFormatters());
+    return table;
+
+  }
+
+  public PredicateTable predicateTable() {
+    PredicateTable table = new PredicateTable();
+    table.register(new CorePredicates());
+    table.register(new UnitTestPredicates());
+    return table;
   }
 
   public CodeBuilder builder() {
     return new CodeBuilder();
-  }
-
-  public static PredicateTable predicateTable() {
-    return predicateTable;
-  }
-
-  public static FormatterTable formatterTable() {
-    return formatterTable;
   }
 
   public Context context(String raw) {
@@ -105,14 +86,6 @@ public class UnitTestBase {
     return maker;
   }
 
-  public Formatter formatter(String name) {
-    return formatterTable.get(new StringView(name));
-  }
-
-  public Predicate predicate(String name) {
-    return predicateTable.get(new StringView(name));
-  }
-
   public CodeList collector() {
     return new CodeList();
   }
@@ -122,7 +95,7 @@ public class UnitTestBase {
   }
 
   public Tokenizer tokenizer(String data, CodeSink sink) {
-    return new Tokenizer(data, sink, formatterTable, predicateTable);
+    return new Tokenizer(data, sink, formatterTable(), predicateTable());
   }
 
   public String repr(Instruction inst) {

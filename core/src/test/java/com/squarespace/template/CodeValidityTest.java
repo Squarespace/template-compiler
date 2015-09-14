@@ -21,8 +21,6 @@ import static com.squarespace.template.SyntaxErrorType.DEAD_CODE_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_BLOCK;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_AT_ROOT;
 import static com.squarespace.template.SyntaxErrorType.NOT_ALLOWED_IN_BLOCK;
-import static com.squarespace.template.plugins.CoreFormatters.SAFE;
-import static com.squarespace.template.plugins.CoreFormatters.TRUNCATE;
 import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
@@ -34,7 +32,8 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
-import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CoreFormatters.SafeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.TruncateFormatter;
 import com.squarespace.template.plugins.CorePredicates;
 
 
@@ -45,6 +44,10 @@ import com.squarespace.template.plugins.CorePredicates;
  */
 @Test(groups = { "unit" })
 public class CodeValidityTest extends UnitTestBase {
+
+  private static final Formatter SAFE = new SafeFormatter();
+
+  private static final Formatter TRUNCATE = new TruncateFormatter();
 
   /**
    * Sort of confusing to add sections to ALTERNATES_WITH block, since we're always pointing to the
@@ -279,7 +282,7 @@ public class CodeValidityTest extends UnitTestBase {
 
   @Test
   public void testVariableFormatters() throws CodeException {
-    RootInst root = builder().var("a", CoreFormatters.SAFE).eof().build();
+    RootInst root = builder().var("a", SAFE).eof().build();
     assertContext(execute("{\"a\": \"x <> y\"}", root), "x  y");
 
     // Chain formatters together.

@@ -21,15 +21,18 @@ import static com.squarespace.template.InstructionType.OR_PREDICATE;
 import static com.squarespace.template.InstructionType.PREDICATE;
 import static com.squarespace.template.InstructionType.TEXT;
 import static com.squarespace.template.InstructionType.VARIABLE;
-import static com.squarespace.template.UnitTestFormatters.INVALID_ARGS;
 import static com.squarespace.template.UnitTestPredicates.EXECUTE_ERROR;
 import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.template.UnitTestFormatters.InvalidArgsFormatter;
+
 
 @Test(groups = { "unit" })
 public class CodeStatsTest extends UnitTestBase {
+
+  private static final Formatter INVALID_ARGS = new InvalidArgsFormatter();
 
   @Test
   public void testBasics() throws CodeSyntaxException, ArgumentsException {

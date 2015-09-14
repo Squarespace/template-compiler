@@ -39,8 +39,10 @@ public class SymbolTableTest {
   public void testFormatterTable() {
     FormatterTable table = new FormatterTable(8);
     table.register(new UnitTestFormatters());
-    String[] expected = new String[] { "dummy", "execute-error", "invalid-args", "npe", "required-args",
-        "returns-missing", "unstable" };
+    String[] expected = new String[] {
+        "dummy", "dummy-template", "execute-error", "invalid-args",
+        "npe", "required-args", "returns-missing", "unstable"
+    };
     String[] symbols = table.getSymbols();
     Arrays.sort(symbols);
     Assert.assertEquals(symbols, expected);

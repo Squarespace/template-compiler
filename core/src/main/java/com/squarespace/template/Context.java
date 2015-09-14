@@ -93,8 +93,8 @@ public class Context {
     this.locale = locale == null ? Locale.getDefault() : locale;
   }
 
-  public static Context subContext(Context ctx, StringBuilder buf) {
-    return new SubContext(ctx, buf);
+  public static Context subContext(Context ctx, JsonNode node, StringBuilder buf) {
+    return new SubContext(ctx, node, buf);
   }
 
   public boolean safeExecutionEnabled() {
@@ -400,7 +400,7 @@ public class Context {
     }
   }
 
-  private void push(JsonNode node) {
+  public void push(JsonNode node) {
     stack.push(currentFrame);
     currentFrame = new Frame(node);
   }
@@ -502,8 +502,8 @@ public class Context {
 
     private final Context parent;
 
-    public SubContext(Context parent, StringBuilder buf) {
-      super(parent.node(), buf, parent.locale());
+    public SubContext(Context parent, JsonNode node, StringBuilder buf) {
+      super(node, buf, parent.locale());
       this.parent = parent;
       this.setLoggingHook(parent.loggingHook);
       this.setCodeLimiter(parent.codeLimiter);
