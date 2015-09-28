@@ -16,8 +16,6 @@
 
 package com.squarespace.template;
 
-import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
-
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
 import static com.squarespace.template.SyntaxErrorType.BINDVAR_EXPECTS_NAME;
@@ -33,11 +31,13 @@ import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_OPERATORS;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_VARS;
 import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
 import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
+import static com.squarespace.template.SyntaxErrorType.MISSING_VARIABLE_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_WITH_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
+import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
 import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;
@@ -112,13 +112,18 @@ public class TokenizerCoreTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertResult("{.var @name foo.bar}", mk.bindvar("@name", "foo.bar"), mk.eof());
     assertResult("{.var @outer-index @index}", mk.bindvar("@outer-index", "@index"), mk.eof());
-    assertResult("{.var @name foo|htmlattr}", mk.bindvar("@name",  "foo", mk.formatters(HTMLATTR)), mk.eof());
+    assertResult("{.var @name foo|htmlattr}", mk.bindvar("@name", "foo", mk.formatters(HTMLATTR)), mk.eof());
+    assertResult("{.var @a b?}", mk.text("{.var @a b?}"), mk.eof());
+
+    assertSoftFailure("{.var @name foo|?}", FORMATTER_INVALID);
+    assertSoftFailure("{.var @name foo|x}", FORMATTER_UNKNOWN);
 
     assertFailure("{.var=foo}", WHITESPACE_EXPECTED);
     assertFailure("{.var foo bar}", BINDVAR_EXPECTS_NAME);
     assertFailure("{.var @foo.bar baz}", WHITESPACE_EXPECTED);
     assertFailure("{.var.}", WHITESPACE_EXPECTED);
     assertFailure("{.varx}", INVALID_INSTRUCTION);
+    assertFailure("{.var @foo ?foo}", MISSING_VARIABLE_NAME);
   }
 
   @Test
@@ -238,6 +243,8 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.singular?}", mk.predicate(SINGULAR), mk.eof());
     assertResult("{.or}", mk.or(), mk.eof());
     assertResult("{.or plural?}", mk.or(PLURAL), mk.eof());
+    assertResult("{.equal?/1/2}", mk.predicate(EQUAL, mk.args("/1/2")), mk.eof());
+    assertResult("{.equal?|1|2}", mk.predicate(EQUAL, mk.args("|1|2")), mk.eof());
 
     assertFailure("{.or=}", EXTRA_CHARS);
     assertFailure("{.plrul?}", PREDICATE_UNKNOWN);

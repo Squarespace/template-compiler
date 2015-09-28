@@ -75,6 +75,8 @@ public class Patterns {
    */
   public static final Pattern PREDICATE = Pattern.compile(_WORD + "\\?");
 
+  public static final Pattern PREDICATE_ARGUMENTS = Pattern.compile("[^}]+");
+
   public static final Pattern VARIABLE = Pattern.compile("@*" + _DOTWORD + "|@");
 
   public static final Pattern WHITESPACE = Pattern.compile("\\s+");

@@ -397,7 +397,7 @@ public class Tokenizer {
    */
   private Arguments parsePredicateArguments(Predicate predicate) throws CodeSyntaxException {
     StringView rawArgs = null;
-    if (matcher.arguments()) {
+    if (matcher.predicateArgs()) {
       rawArgs = matcher.consume();
     }
 
@@ -600,7 +600,9 @@ public class Tokenizer {
         formatter.validateArgs(args);
       } catch (ArgumentsException e) {
         String identifier = formatter.identifier();
-        fail(error(FORMATTER_ARGS_INVALID, matcher.matchStart() - start, false).name(identifier).data(e.getMessage()));
+        fail(error(FORMATTER_ARGS_INVALID, matcher.matchStart() - start, false)
+            .name(identifier)
+            .data(e.getMessage()));
         return emitInvalid();
       }
 
@@ -610,6 +612,9 @@ public class Tokenizer {
       formatters.add(new FormatterCall(formatter, args));
     }
 
+    // If the initial matcher.pipe() fails to enter the loop, this
+    // indicates an invalid character exists after the predicate/variable
+    // instruction.
     if (!matcher.finished()) {
       return false;
     }
