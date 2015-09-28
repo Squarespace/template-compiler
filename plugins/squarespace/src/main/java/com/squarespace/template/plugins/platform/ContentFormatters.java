@@ -531,6 +531,9 @@ public class ContentFormatters implements FormatterRegistry {
         if (CommerceUtils.isOnSale(value)) {
           buf.append(" on-sale");
         }
+        if (CommerceUtils.isSoldOut(value)) {
+          buf.append(" sold-out");
+        }
       }
 
       return ctx.buildNode(buf.toString());

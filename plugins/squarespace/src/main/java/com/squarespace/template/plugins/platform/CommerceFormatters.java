@@ -287,8 +287,9 @@ public class CommerceFormatters implements FormatterRegistry {
         group = ctx.resolve(group).asText();
       }
 
-      return ctx.buildNode(String.format("<span class=\"sqs-product-quick-view-button "
-          + "sqs-editable-button\" data-id=\"%s\" data-group=\"%s\">Quick View</span>", id, group));
+      String value = "<span class=\"sqs-product-quick-view-button\" data-id=\""
+          + id + "\" data-group=\"" + group + "\">Quick View</span>";
+      return ctx.buildNode(value);
     }
   }
 

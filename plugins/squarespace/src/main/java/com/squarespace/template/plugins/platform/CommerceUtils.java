@@ -552,6 +552,7 @@ public class CommerceUtils {
 
       buf.append("<div class=\"variant-option\">");
       buf.append("<div class=\"variant-option-title\">").append(name).append(": </div>");
+      buf.append("<div class=\"variant-select-wrapper\">");
       buf.append("<select data-variant-option-name=\"");
       PluginUtils.escapeHtmlTag(name, buf);
       buf.append("\"><option value=\"\">Select ").append(name).append("</option>");
@@ -563,7 +564,7 @@ public class CommerceUtils {
         buf.append("\">").append(value).append("</option>");
       }
 
-      buf.append("</select></div>");
+      buf.append("</select></div></div>");
     }
 
     buf.append("</div>");
