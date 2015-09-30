@@ -52,6 +52,7 @@ public class CorePredicates implements PredicateRegistry {
     table.add(GREATER_THAN_OR_EQUAL);
     table.add(LESS_THAN);
     table.add(LESS_THAN_OR_EQUAL);
+    table.add(NOT_EQUAL);
     table.add(NTH);
     table.add(ODD);
     table.add(PLURAL);
@@ -256,6 +257,25 @@ public class CorePredicates implements PredicateRegistry {
 
   };
 
+
+  public static final Predicate NOT_EQUAL = new JsonPredicate("notEqual?") {
+
+    @Override
+    public void limitArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 2);
+    }
+
+    @Override
+    public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
+      JsonNode arg0 = resolve(ctx, args, 0);
+      if (args.count() == 1) {
+        return !ctx.node().equals(arg0);
+      } else {
+        return !arg0.equals(resolve(ctx, args, 1));
+      }
+    }
+
+  };
 
   public static final Predicate NTH = new JsonPredicate("nth?", false) {
 
