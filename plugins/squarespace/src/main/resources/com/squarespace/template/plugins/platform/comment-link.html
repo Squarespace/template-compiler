@@ -1,0 +1,8 @@
+{.if websiteSettings.disqusShortname}
+  <a href="{fullUrl}" class="sqs-comment-link sqs-disqus-comment-link" data-id="{id}"></a>
+{.or}
+  <a href="{fullUrl}#comments-{id}" class="sqs-comment-link" data-id="{id}">
+  {.equal? publicCommentCount 0}No{.or}{publicCommentCount}{.end}
+  Comment{.notEqual? publicCommentCount 1}s{.end}
+  </a>
+{.end}

@@ -137,30 +137,21 @@ public class SocialFormatters implements FormatterRegistry {
 
   public static class CommentLinkFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public CommentLinkFormatter() {
       super("comment-link", false);
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      JsonNode settings = ctx.resolve("websiteSettings");
-      JsonNode disqusName = settings.path("disqusShortname");
-      String itemId = item.path("id").asText();
-      String fullUrl = item.path("fullUrl").asText();
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(SocialFormatters.class, "comment-link.html");
+      this.template = compiler.compile(source).code();
+    }
 
-      if (settings.isMissingNode() || disqusName.isMissingNode()) {
-        buf.append("<a href=\"").append(fullUrl).append("#comments-");
-        buf.append(itemId).append("\" class=\"sqs-comment-link\" data-id=\"");
-        buf.append(itemId).append("\">");
-        addCommentCount(item, buf);
-        buf.append("</a>");
-      } else {
-        buf.append("<a href=\"");
-        buf.append(fullUrl).append("\" class=\"sqs-comment-link sqs-disqus-comment-link\" data-id=\"").append(itemId);
-        buf.append("\"></a>");
-      }
-      return ctx.buildNode(buf.toString());
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
+      return execute(ctx, template, item, false);
     }
   }
 
