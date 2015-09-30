@@ -39,7 +39,7 @@ public class SlidePredicates implements PredicateRegistry {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       int expected = ctx.node().path("currentType").asInt();
-      SliceType type = SliceType.valueForName(args.get(0));
+      SliceType type = SliceType.fromName(args.get(0));
       return type == null ? false : type.code() == expected;
     }
   };

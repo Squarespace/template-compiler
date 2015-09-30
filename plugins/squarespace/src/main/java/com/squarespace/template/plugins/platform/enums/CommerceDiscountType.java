@@ -23,6 +23,7 @@ import java.util.Map;
 
 public enum CommerceDiscountType implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   FLAT(1, "flat"),
   PERCENTAGE(2, "percentage"),
   FREE_SHIPPING(3, "free-shipping");
@@ -49,7 +50,7 @@ public enum CommerceDiscountType implements PlatformEnum {
   }
 
   public static CommerceDiscountType fromCode(int code) {
-    return CODE_MAP.get(code);
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }

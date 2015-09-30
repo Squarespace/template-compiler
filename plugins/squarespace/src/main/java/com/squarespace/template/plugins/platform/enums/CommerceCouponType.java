@@ -23,6 +23,7 @@ import java.util.Map;
 
 public enum CommerceCouponType implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   ALL_ORDERS(1, "all-orders"),
   ORDERS_OVER(2, "orders-over"),
   CATEGORIES(3, "categories"),
@@ -50,7 +51,7 @@ public enum CommerceCouponType implements PlatformEnum {
   }
 
   public static CommerceCouponType fromCode(int code) {
-    return CODE_MAP.get(code);
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }

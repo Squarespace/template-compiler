@@ -16,12 +16,19 @@
 
 package com.squarespace.template.plugins.platform.enums;
 
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
+
+import java.util.Map;
+
 
 public enum FolderBehavior implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   INDEX(1, "index"),
   REDIRECT(2, "redirect"),
   NONE(3, "none");
+
+  private static final Map<Integer, FolderBehavior> CODE_MAP = codeMap(FolderBehavior.class);
 
   private final int code;
 
@@ -40,6 +47,10 @@ public enum FolderBehavior implements PlatformEnum {
   @Override
   public String stringValue() {
     return stringValue;
+  }
+
+  public static FolderBehavior fromCode(int code) {
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }

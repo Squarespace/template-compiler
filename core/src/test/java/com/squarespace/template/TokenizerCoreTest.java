@@ -37,7 +37,6 @@ import static com.squarespace.template.SyntaxErrorType.OR_EXPECTED_PREDICATE;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_ARGS_INVALID;
 import static com.squarespace.template.SyntaxErrorType.PREDICATE_UNKNOWN;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
-import static com.squarespace.template.plugins.CoreFormatters.HTMLATTR;
 import static com.squarespace.template.plugins.CorePredicates.EQUAL;
 import static com.squarespace.template.plugins.CorePredicates.PLURAL;
 import static com.squarespace.template.plugins.CorePredicates.SINGULAR;

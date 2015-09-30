@@ -16,6 +16,7 @@
 
 package com.squarespace.template.plugins.platform.enums;
 
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.stringValueMap;
 
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 public enum SliceType implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   HEADING(1, "heading"),
   BODY(3, "body"),
   IMAGE(4, "image"),
@@ -41,6 +43,8 @@ public enum SliceType implements PlatformEnum {
   LOCK(17, "lock"),
   PASSWORD(18, "password"),
   TWITTER(19, "twitter");
+
+  private static final Map<Integer, SliceType> CODE_MAP = codeMap(SliceType.class);
 
   private static final Map<String, SliceType> NAME_MAP = stringValueMap(SliceType.class);
 
@@ -63,8 +67,12 @@ public enum SliceType implements PlatformEnum {
     return stringValue;
   }
 
-  public static SliceType valueForName(String name) {
-    return NAME_MAP.get(name);
+  public static SliceType fromName(String name) {
+    return NAME_MAP.getOrDefault(name, UNDEFINED);
+  }
+
+  public static SliceType fromCode(int code) {
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }

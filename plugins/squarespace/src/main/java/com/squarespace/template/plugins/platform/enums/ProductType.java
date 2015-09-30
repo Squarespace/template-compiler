@@ -16,16 +16,19 @@
 
 package com.squarespace.template.plugins.platform.enums;
 
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
+
 import java.util.Map;
 
 
 public enum ProductType implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   PHYSICAL(1, "physical"),
   DIGITAL(2, "digital"),
   SERVICE(3, "service");
 
-  private static final Map<Integer, ProductType> CODE_MAP = EnumUtils.codeMap(ProductType.class);
+  private static final Map<Integer, ProductType> CODE_MAP = codeMap(ProductType.class);
 
   private final int code;
 
@@ -47,7 +50,7 @@ public enum ProductType implements PlatformEnum {
   }
 
   public static ProductType fromCode(int code) {
-    return CODE_MAP.get(code);
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }

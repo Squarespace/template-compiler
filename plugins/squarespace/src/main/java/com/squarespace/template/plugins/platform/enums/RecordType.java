@@ -16,9 +16,14 @@
 
 package com.squarespace.template.plugins.platform.enums;
 
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
+
+import java.util.Map;
+
 
 public enum RecordType implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   TEXT(1, "text"),
   IMAGE(2, "image"),
   QUOTE(4, "quote"),
@@ -41,6 +46,8 @@ public enum RecordType implements PlatformEnum {
   CHECKIN(52, "checkin"),
   KBARTICLE(54, "kbarticle");
 
+  private static final Map<Integer, RecordType> CODE_MAP = codeMap(RecordType.class);
+
   private final int code;
 
   private final String stringValue;
@@ -58,6 +65,10 @@ public enum RecordType implements PlatformEnum {
   @Override
   public String stringValue() {
     return stringValue;
+  }
+
+  public static RecordType fromCode(int code) {
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }

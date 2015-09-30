@@ -23,6 +23,7 @@ import java.util.Map;
 
 public enum CollectionType implements PlatformEnum {
 
+  UNDEFINED(-1, "undefined"),
   COLLECTION_TYPE_GENERIC(1, "generic"),
   COLLECTION_TYPE_SUBSCRIPTION(2, "subscription"),
   TWITTER(3, "twitter"),
@@ -62,7 +63,7 @@ public enum CollectionType implements PlatformEnum {
   }
 
   public static CollectionType fromCode(int code) {
-    return CODE_MAP.get(code);
+    return CODE_MAP.getOrDefault(code, UNDEFINED);
   }
 
 }
