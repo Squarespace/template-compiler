@@ -55,7 +55,7 @@ public class FormatterTable extends SymbolTable<StringView, Formatter> {
       try {
         formatter.initialize(compiler);
       } catch (CodeException e) {
-        throw new IllegalStateException(e.toString());
+        throw new IllegalStateException(e.toString(), e);
       }
     }
   }

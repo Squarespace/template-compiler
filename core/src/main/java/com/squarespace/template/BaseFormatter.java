@@ -16,6 +16,11 @@
 
 package com.squarespace.template;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 
@@ -92,6 +97,28 @@ public abstract class BaseFormatter extends Plugin implements Formatter {
       }
     }
     return ctx.buildNode(buf.toString());
+  }
+
+  /**
+   * Loads a resource from the Java package relative to {@code cls), raising a
+   * CodeException if it fails.
+   */
+  protected String loadResource(Class<?> cls, String path) throws CodeException {
+    try (InputStream stream = cls.getResourceAsStream(path)) {
+      if (stream == null) {
+        throw new CodeExecuteException(resourceLoadError(path, "not found"));
+      }
+      return IOUtils.toString(stream, "UTF-8");
+    } catch (IOException e) {
+      throw new CodeExecuteException(resourceLoadError(path, e.toString()));
+    }
+  }
+
+  private ErrorInfo resourceLoadError(String path, String message) {
+    ErrorInfo info = new ErrorInfo(ExecuteErrorType.RESOURCE_LOAD);
+    info.name(path);
+    info.data(message);
+    return info;
   }
 
 }

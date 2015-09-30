@@ -41,6 +41,9 @@ public enum ExecuteErrorType implements ErrorType {
   GENERAL_ERROR
   ("Default error %(name)s: %(data)s"),
 
+  RESOURCE_LOAD
+  ("Failed to load resource %(name)s: %(data)s"),
+
   UNEXPECTED_ERROR
   ("Unexpected %(name)s when executing %(repr)s: %(data)s");
 
