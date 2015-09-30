@@ -28,6 +28,9 @@ import com.squarespace.template.plugins.platform.SocialFormatters.ActivateTwitte
 import com.squarespace.template.plugins.platform.SocialFormatters.GoogleCalendarUrlFormatter;
 
 
+/**
+ * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
+ */
 public class SocialFormattersTest extends TemplateUnitTestBase {
 
   private static final Formatter ACTIVATE_TWITTER_LINKS = new ActivateTwitterLinksFormatter();

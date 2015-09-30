@@ -32,7 +32,7 @@ import com.squarespace.template.plugins.PluginUtils;
 
 
 /**
- * Extracted from Commons library at commit ed6b7ee3b23839afe998a23544dd6b2188b60fca
+ * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
  */
 public class CommerceFormatters implements FormatterRegistry {
 

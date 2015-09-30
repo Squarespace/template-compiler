@@ -31,6 +31,9 @@ import com.squarespace.template.KnownDates;
 import com.squarespace.template.Predicate;
 
 
+/**
+ * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
+ */
 public class ContentPredicatesTest extends TemplateUnitTestBase {
 
   @Test
