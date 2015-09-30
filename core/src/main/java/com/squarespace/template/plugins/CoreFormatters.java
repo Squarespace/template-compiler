@@ -16,6 +16,8 @@
 
 package com.squarespace.template.plugins;
 
+import static com.squarespace.template.GeneralUtils.executeTemplate;
+
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
@@ -123,7 +125,7 @@ public class CoreFormatters implements FormatterRegistry {
         }
       }
 
-      return execute(ctx, inst, node, privateContext);
+      return executeTemplate(ctx, inst, node, privateContext);
     }
 
   }

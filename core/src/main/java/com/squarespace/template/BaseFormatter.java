@@ -16,11 +16,6 @@
 
 package com.squarespace.template;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 
@@ -67,58 +62,6 @@ public abstract class BaseFormatter extends Plugin implements Formatter {
   @Override
   public int hashCode() {
     return identifier().hashCode();
-  }
-
-  /**
-   * Executes a compiled instruction using the given context and JSON node.
-   * Optionally hides all context above the JSON node, treating it as a root.
-   * This is a helper method for formatters which need to execute templates to
-   * produce their output.
-   */
-  protected JsonNode execute(Context ctx, Instruction inst, JsonNode node, boolean privateContext)
-      throws CodeExecuteException {
-    // Temporarily swap the buffers to capture all output of the partial.
-    StringBuilder buf = new StringBuilder();
-    StringBuilder origBuf = ctx.swapBuffer(buf);
-    try {
-      // If we want to hide the parent context during execution, create a new
-      // temporary sub-context.
-      if (privateContext) {
-        Context.subContext(ctx, node, buf).execute(inst);
-      } else {
-        ctx.push(node);
-        ctx.execute(inst);
-      }
-
-    } finally {
-      ctx.swapBuffer(origBuf);
-      if (!privateContext) {
-        ctx.pop();
-      }
-    }
-    return ctx.buildNode(buf.toString());
-  }
-
-  /**
-   * Loads a resource from the Java package relative to {@code cls), raising a
-   * CodeException if it fails.
-   */
-  protected String loadResource(Class<?> cls, String path) throws CodeException {
-    try (InputStream stream = cls.getResourceAsStream(path)) {
-      if (stream == null) {
-        throw new CodeExecuteException(resourceLoadError(path, "not found"));
-      }
-      return IOUtils.toString(stream, "UTF-8");
-    } catch (IOException e) {
-      throw new CodeExecuteException(resourceLoadError(path, e.toString()));
-    }
-  }
-
-  private ErrorInfo resourceLoadError(String path, String message) {
-    ErrorInfo info = new ErrorInfo(ExecuteErrorType.RESOURCE_LOAD);
-    info.name(path);
-    info.data(message);
-    return info;
   }
 
 }

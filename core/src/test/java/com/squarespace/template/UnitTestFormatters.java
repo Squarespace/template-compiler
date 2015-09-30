@@ -16,6 +16,8 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.GeneralUtils.executeTemplate;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 
@@ -64,7 +66,7 @@ public class UnitTestFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return execute(ctx, instruction, node.path("foo"), true);
+      return executeTemplate(ctx, instruction, node.path("foo"), true);
     }
   }
 

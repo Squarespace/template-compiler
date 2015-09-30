@@ -16,6 +16,9 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static com.squarespace.template.GeneralUtils.executeTemplate;
+import static com.squarespace.template.GeneralUtils.loadResource;
+
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -117,7 +120,7 @@ public class SocialFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return execute(ctx, template, item, false);
+      return executeTemplate(ctx, template, item, false);
     }
   }
 
@@ -151,7 +154,7 @@ public class SocialFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return execute(ctx, template, item, false);
+      return executeTemplate(ctx, template, item, false);
     }
   }
 
@@ -236,7 +239,7 @@ public class SocialFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return this.execute(ctx, template, item, false);
+      return executeTemplate(ctx, template, item, false);
     }
   }
 
