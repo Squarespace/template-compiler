@@ -103,23 +103,21 @@ public class SocialFormatters implements FormatterRegistry {
 
   public static class CommentsFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public CommentsFormatter() {
       super("comments", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(SocialFormatters.class, "comments.html");
+      this.template = compiler.compile(source).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      JsonNode settings = ctx.resolve("websiteSettings");
-      JsonNode disqusName = settings.path("disqusShortname");
-      if (!settings.isMissingNode() && !disqusName.isMissingNode()) {
-        buf.append("<div class=\"squarespace-comments\" id=\"disqus_thread\"></div>");
-      } else {
-        buf.append("<div class=\"squarespace-comments\" id=\"comments-");
-        buf.append(item.path("id").asText());
-        buf.append("\"></div>");
-      }
-      return ctx.buildNode(buf.toString());
+      return execute(ctx, template, item, false);
     }
   }
 
