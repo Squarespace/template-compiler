@@ -21,6 +21,9 @@ import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
 import java.util.Map;
 
 
+/**
+ * This mirrors the Commons enum of the same name.
+ */
 public enum RecordType implements PlatformEnum {
 
   UNDEFINED(-1, "undefined"),

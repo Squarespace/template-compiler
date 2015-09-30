@@ -22,6 +22,9 @@ import static com.squarespace.template.plugins.platform.enums.EnumUtils.stringVa
 import java.util.Map;
 
 
+/**
+ * This mirrors the Commons enum of the same name.
+ */
 public enum SliceType implements PlatformEnum {
 
   UNDEFINED(-1, "undefined"),
