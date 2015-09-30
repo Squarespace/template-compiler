@@ -31,6 +31,9 @@ import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginUtils;
 
 
+/**
+ * Extracted from Commons library at commit ed6b7ee3b23839afe998a23544dd6b2188b60fca
+ */
 public class CommerceFormatters implements FormatterRegistry {
 
   @Override

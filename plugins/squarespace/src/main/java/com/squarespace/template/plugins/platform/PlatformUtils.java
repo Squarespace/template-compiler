@@ -26,6 +26,9 @@ import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.plugins.PluginUtils;
 
 
+/**
+ * Extracted from Commons library at commit ed6b7ee3b23839afe998a23544dd6b2188b60fca
+ */
 public class PlatformUtils {
 
   private PlatformUtils() {

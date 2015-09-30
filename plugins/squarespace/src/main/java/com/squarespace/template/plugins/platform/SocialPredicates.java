@@ -29,6 +29,9 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 
 
+/**
+ * Extracted from Commons library at commit ed6b7ee3b23839afe998a23544dd6b2188b60fca
+ */
 public class SocialPredicates implements PredicateRegistry {
 
   @Override

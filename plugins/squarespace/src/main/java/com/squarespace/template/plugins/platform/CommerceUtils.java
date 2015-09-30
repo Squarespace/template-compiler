@@ -37,6 +37,9 @@ import com.squarespace.template.plugins.platform.enums.CommerceDiscountType;
 import com.squarespace.template.plugins.platform.enums.ProductType;
 
 
+/**
+ * Extracted from Commons library at commit ed6b7ee3b23839afe998a23544dd6b2188b60fca
+ */
 public class CommerceUtils {
 
   private CommerceUtils() {

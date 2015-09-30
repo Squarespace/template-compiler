@@ -44,6 +44,9 @@ import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.RecordType;
 
 
+/**
+ * Extracted from Commons library at commit ed6b7ee3b23839afe998a23544dd6b2188b60fca
+ */
 public class ContentFormatters implements FormatterRegistry {
 
   @Override
