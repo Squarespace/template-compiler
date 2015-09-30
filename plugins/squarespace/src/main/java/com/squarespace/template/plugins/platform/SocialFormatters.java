@@ -25,11 +25,14 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
+import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
 import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.Instruction;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginDateUtils;
@@ -230,23 +233,21 @@ public class SocialFormatters implements FormatterRegistry {
 
   public static class LikeButtonFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public LikeButtonFormatter() {
       super("like-button", false);
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      JsonNode settings = ctx.resolve("websiteSettings");
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(SocialFormatters.class, "like-button.html");
+      this.template = compiler.compile(source).code();
+    }
 
-      StringBuilder buf = new StringBuilder();
-      if (settings.path("simpleLikingEnabled").asBoolean()) {
-        String itemId = item.path("id").asText();
-        int likeCount = item.path("likeCount").asInt();
-        buf.append("<span class=\"sqs-simple-like\" data-item-id=\"").append(itemId);
-        buf.append("\" data-like-count=\"").append(likeCount);
-        buf.append("\"><span class=\"like-icon\"></span><span class=\"like-count\"></span></span>");
-      }
-      return ctx.buildNode(buf.toString());
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
+      return this.execute(ctx, template, item, false);
     }
   }
 
