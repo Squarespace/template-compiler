@@ -43,6 +43,7 @@ import static com.squarespace.template.SyntaxErrorType.VARIABLE_EXPECTED;
 import static com.squarespace.template.SyntaxErrorType.WHITESPACE_EXPECTED;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.squarespace.template.Instructions.BindVarInst;
@@ -310,11 +311,14 @@ public class Tokenizer {
 
         String path = matcher.consume().repr();
         BindVarInst instruction = maker.bindvar(name, path);
-        boolean result = parseFormatters(instruction, start);
-        if (result) {
+        List<FormatterCall> formatters = parseFormatters(instruction, start);
+        if (formatters == null) {
+          emitInstruction(instruction);
+        } else if (!formatters.isEmpty()) {
+          instruction.setFormatters(formatters);
           emitInstruction(instruction);
         }
-        return result;
+        return true;
       }
 
       case END:
@@ -554,33 +558,42 @@ public class Tokenizer {
     StringView variable = matcher.consume();
 
     VariableInst instruction = maker.var(variable.repr());
-    boolean result = parseFormatters(instruction, start);
-    if (result) {
+    List<FormatterCall> formatters = parseFormatters(instruction, start);
+    if (formatters == null) {
+      emitInstruction(instruction);
+    } else if (!formatters.isEmpty()) {
+      instruction.setFormatters(formatters);
       emitInstruction(instruction);
     }
-    return result;
+    return true;
   }
 
   /**
    * Parse a formatter chain that may follow either a variable reference
    * or bind instruction.
+   *
+   * Returns:
+   *   null             - no PIPE character was seen, so no formatters exist.
+   *   <empty List>     - we saw a PIPE but encountered an error
+   *   <non-empty List> - we parsed a valid list of formatters.
    */
-  private boolean parseFormatters(Formattable inst, int start) throws CodeSyntaxException {
+  private List<FormatterCall> parseFormatters(Formattable formattable, int start) throws CodeSyntaxException {
     List<FormatterCall> formatters = null;
     while (matcher.pipe()) {
-
-      // We have one or more formatters plus optional arguments to parse.
       matcher.consume();
 
       if (!matcher.formatter()) {
         fail(error(FORMATTER_INVALID, matcher.pointer() - start, false).name(matcher.remainder()));
-        return emitInvalid();
+        emitInvalid();
+        return Collections.emptyList();
       }
+
       StringView name = matcher.consume();
       Formatter formatter = formatterTable.get(name);
       if (formatter == null) {
         fail(error(FORMATTER_UNKNOWN, matcher.matchStart() - start, false).name(name));
-        return emitInvalid();
+        emitInvalid();
+        return Collections.emptyList();
       }
 
       StringView rawArgs = null;
@@ -591,7 +604,8 @@ public class Tokenizer {
       Arguments args = Constants.EMPTY_ARGUMENTS;
       if (formatter.requiresArgs() && rawArgs == null) {
           fail(error(FORMATTER_NEEDS_ARGS, matcher.matchStart() - start, false).data(formatter));
-          return emitInvalid();
+          emitInvalid();
+          return Collections.emptyList();
       } else {
         args = new Arguments(rawArgs);
       }
@@ -603,7 +617,8 @@ public class Tokenizer {
         fail(error(FORMATTER_ARGS_INVALID, matcher.matchStart() - start, false)
             .name(identifier)
             .data(e.getMessage()));
-        return emitInvalid();
+        emitInvalid();
+        return Collections.emptyList();
       }
 
       if (formatters == null) {
@@ -612,15 +627,16 @@ public class Tokenizer {
       formatters.add(new FormatterCall(formatter, args));
     }
 
-    // If the initial matcher.pipe() fails to enter the loop, this
-    // indicates an invalid character exists after the predicate/variable
-    // instruction.
+    // If the initial matcher.pipe() fails to enter the loop, this indicates an
+    // unexpected character exists after the instruction.
     if (!matcher.finished()) {
-      return false;
+      emitInvalid();
+      return Collections.emptyList();
     }
 
-    inst.setFormatters(formatters);
-    return true;
+    // If we parsed all the way to the ending meta character, we can return
+    // a valid formatter list.
+    return formatters;
   }
 
   /**

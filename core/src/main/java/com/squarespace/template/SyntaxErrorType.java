@@ -56,6 +56,9 @@ public enum SyntaxErrorType implements ErrorType {
   FORMATTER_ARGS_INVALID
   ("Formatter '%(name)s' arguments are invalid: '%(data)s'"),
 
+  FORMATTER_EXTRA_CHARS
+  ("Formatter expression has extra trailing characters"),
+
   IF_EMPTY
   ("IF instruction requires at least one variable to test."),
 
