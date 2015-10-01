@@ -42,7 +42,7 @@ import com.squarespace.template.plugins.platform.ContentFormatters.WidthFormatte
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
  */
-public class ContentFormattersTest extends TemplateUnitTestBase {
+public class ContentFormattersTest extends PlatformUnitTestBase {
 
   private static final Formatter COLOR_WEIGHT = new ColorWeightFormatter();
 

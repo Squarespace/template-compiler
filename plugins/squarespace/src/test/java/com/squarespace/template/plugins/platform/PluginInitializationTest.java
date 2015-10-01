@@ -21,7 +21,7 @@ import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 
-public class PluginInitializationTest extends TemplateUnitTestBase {
+public class PluginInitializationTest extends PlatformUnitTestBase {
 
   @Test
   public void testInitialization() {

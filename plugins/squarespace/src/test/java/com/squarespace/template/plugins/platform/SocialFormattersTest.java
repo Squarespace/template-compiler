@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.KnownDates;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.plugins.platform.SocialFormatters.ActivateTwitterLinksFormatter;
 import com.squarespace.template.plugins.platform.SocialFormatters.GoogleCalendarUrlFormatter;
 
@@ -31,7 +32,7 @@ import com.squarespace.template.plugins.platform.SocialFormatters.GoogleCalendar
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
  */
-public class SocialFormattersTest extends TemplateUnitTestBase {
+public class SocialFormattersTest extends PlatformUnitTestBase {
 
   private static final Formatter ACTIVATE_TWITTER_LINKS = new ActivateTwitterLinksFormatter();
 
@@ -39,12 +40,39 @@ public class SocialFormattersTest extends TemplateUnitTestBase {
 
   private static final long ONE_DAY = 86400 * 1000;
 
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), SocialFormattersTest.class);
+
   @Test
   public void testActivateTwitterLinks() throws CodeException {
     String json = "\"#foo and #bar\"";
     String result = format(ACTIVATE_TWITTER_LINKS, json);
     assertTrue(result.contains("twitter.com/search/foo"));
     assertTrue(result.contains("twitter.com/search/bar"));
+  }
+
+  @Test
+  public void testCommentLink() throws CodeException {
+    runner.run(
+      "comment-link-1.html",
+      "comment-link-2.html",
+      "comment-link-3.html"
+    );
+  }
+
+  @Test
+  public void testComments() throws CodeException {
+    runner.run(
+      "comments-1.html",
+      "comments-2.html"
+    );
+  }
+
+  @Test
+  public void testLikeButton() throws CodeException {
+    runner.run(
+      "like-button-1.html",
+      "like-button-2.html"
+    );
   }
 
   @Test

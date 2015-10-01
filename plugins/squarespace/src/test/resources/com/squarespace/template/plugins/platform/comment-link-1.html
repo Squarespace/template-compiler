@@ -1,0 +1,17 @@
+:JSON
+{
+  "websiteSettings": {
+    "disqusShortname": "abc123"
+  },
+  "item": {
+    "id": "560c37c1a7c8465c4a71d99a",
+    "fullUrl": "http://example.com/bar"
+  }
+}
+
+:TEMPLATE
+{item|comment-link}
+
+:OUTPUT
+<a href="http://example.com/bar" class="sqs-comment-link sqs-disqus-comment-link" data-id="560c37c1a7c8465c4a71d99a"></a>
+
