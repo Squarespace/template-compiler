@@ -16,12 +16,10 @@
 
 package com.squarespace.template;
 
-import java.io.IOException;
-import java.io.InputStream;
+import static com.squarespace.template.GeneralUtils.loadResource;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
 
 import com.squarespace.template.TestCaseParser.TestCase;
 
@@ -72,24 +70,6 @@ public class TestSuiteRunner {
       }
       throw new AssertionError("Failed!");
     }
-  }
-
-  protected static String loadResource(Class<?> cls, String path) throws CodeException {
-    try (InputStream stream = cls.getResourceAsStream(path)) {
-      if (stream == null) {
-        throw new CodeExecuteException(resourceLoadError(path, "not found"));
-      }
-      return IOUtils.toString(stream, "UTF-8");
-    } catch (IOException e) {
-      throw new CodeExecuteException(resourceLoadError(path, e.toString()));
-    }
-  }
-
-  private static ErrorInfo resourceLoadError(String path, String message) {
-    ErrorInfo info = new ErrorInfo(ExecuteErrorType.RESOURCE_LOAD);
-    info.name(path);
-    info.data(message);
-    return info;
   }
 
 }
