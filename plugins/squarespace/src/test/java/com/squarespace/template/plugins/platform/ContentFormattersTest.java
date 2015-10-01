@@ -28,6 +28,7 @@ import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.plugins.platform.ContentFormatters.ColorWeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.HeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.ImageColorFormatter;
@@ -62,6 +63,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
 
   private static final Formatter WIDTH = new WidthFormatter();
 
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), ContentFormattersTest.class);
+
   @Test
   public void testAbsUrl() throws CodeException {
     String template = "{a|AbsUrl}";
@@ -70,6 +73,13 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     Context ctx = compiler().newExecutor().code(code).json(json).execute();
     String result = eval(ctx);
     assertEquals(result, "http://foobar.com/foo/abc");
+  }
+
+  @Test
+  public void testAudioPlayer() {
+    runner.run(
+      "audio-player-1.html"
+    );
   }
 
   @Test

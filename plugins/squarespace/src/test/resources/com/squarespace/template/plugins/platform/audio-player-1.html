@@ -1,0 +1,17 @@
+:JSON
+{
+  "item": {
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "audioAssetUrl": "http://example.com/foo.mp3"
+    }
+  }
+}
+
+:TEMPLATE
+{item|audio-player}
+
+:OUTPUT
+<script>Y.use('squarespace-audio-player-frontend');</script>
+<div class="squarespace-audio-player" data-audio-asset-url="http://example.com/foo.mp3" data-item-id="560c37c1a7c8465c4a71d99a" id="audio-player-560c37c1a7c8465c4a71d99a"></div>
+

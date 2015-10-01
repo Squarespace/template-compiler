@@ -51,7 +51,7 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testCommentLink() throws CodeException {
+  public void testCommentLink() {
     runner.run(
       "comment-link-1.html",
       "comment-link-2.html",
@@ -60,7 +60,7 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testComments() throws CodeException {
+  public void testComments() {
     runner.run(
       "comments-1.html",
       "comments-2.html"
@@ -68,7 +68,7 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testLikeButton() throws CodeException {
+  public void testLikeButton() {
     runner.run(
       "like-button-1.html",
       "like-button-2.html"

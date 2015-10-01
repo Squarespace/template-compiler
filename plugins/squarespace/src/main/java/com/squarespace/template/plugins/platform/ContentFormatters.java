@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins.platform;
 
 import static com.squarespace.template.GeneralUtils.isTruthy;
+import static com.squarespace.template.GeneralUtils.loadResource;
 import static com.squarespace.template.plugins.PluginUtils.slugify;
 
 import java.util.Arrays;
@@ -32,11 +33,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
+import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.Compiler;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
+import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.Instruction;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginDateUtils;
@@ -92,20 +97,21 @@ public class ContentFormatters implements FormatterRegistry {
 
   public static class AudioPlayerFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public AudioPlayerFormatter() {
       super("audio-player", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(ContentFormatters.class, "audio-player.html");
+      template = compiler.compile(source).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String assetUrl = node.path("structuredContent").path("audioAssetUrl").asText();
-      String id = node.path("id").asText();
-      StringBuilder buf = new StringBuilder();
-      buf.append("<script>Y.use('squarespace-audio-player-frontend');</script>");
-      buf.append("<div class=\"squarespace-audio-player\" data-audio-asset-url=\"");
-      buf.append(assetUrl).append("\" data-item-id=\"").append(id);
-      buf.append("\" id=\"audio-player-").append(id).append("\"></div>");
-      return ctx.buildNode(buf.toString());
+      return GeneralUtils.executeTemplate(ctx, template, node, true);
     }
   }
 
