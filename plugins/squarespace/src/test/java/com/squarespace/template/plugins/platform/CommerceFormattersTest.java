@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 
 import com.squarespace.template.CodeException;
 import com.squarespace.template.Formatter;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.plugins.platform.CommerceFormatters.MoneyDashFormatter;
 
 
@@ -29,6 +30,17 @@ import com.squarespace.template.plugins.platform.CommerceFormatters.MoneyDashFor
 public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   private static final Formatter MONEY_DASH_FORMAT = new MoneyDashFormatter();
+
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), CommerceFormattersTest.class);
+
+  @Test
+  public void testAddToCartButton() {
+    runner.run(
+      "add-to-cart-btn-1.html",
+      "add-to-cart-btn-2.html",
+      "add-to-cart-btn-3.html"
+    );
+  }
 
   @Test
   public void testMoneyFormat() throws CodeException {

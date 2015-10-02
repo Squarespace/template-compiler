@@ -1,0 +1,10 @@
+{.var @content structuredContent}
+{.var @fieldsFormId @content.additionalFieldsFormId}
+{.var @fieldsForm @content.additionalFieldsForm}
+{.var @useCustom @content.useCustomAddButtonText}
+{.var @customButton @content.customAddButtonText}
+
+<div class="sqs-add-to-cart-button-wrapper">
+<div class="sqs-add-to-cart-button sqs-suppress-edit-mode sqs-editable-button {.if @fieldsFormId && @fieldsForm}use-form{.end}" data-collection-id="{collectionId}" data-item-id="{id}" data-original-label="{.if @useCustom && @customButton}{@customButton}{.or}Add To Cart{.end}"{.if @fieldsFormId && @fieldsForm} data-form="{@fieldsForm|json|htmlattr}"{.end}>
+<div class="sqs-add-to-cart-button-inner">{.if @useCustom && @customButton}{@customButton}{.or}Add To Cart{.end}</div></div></div>
+

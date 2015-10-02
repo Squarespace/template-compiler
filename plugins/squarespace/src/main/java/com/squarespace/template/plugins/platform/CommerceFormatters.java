@@ -16,16 +16,22 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static com.squarespace.template.GeneralUtils.executeTemplate;
+import static com.squarespace.template.GeneralUtils.loadResource;
+
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
+import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.Compiler;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
+import com.squarespace.template.Instruction;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginUtils;
@@ -63,15 +69,21 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class AddToCartButtonFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public AddToCartButtonFormatter() {
       super("add-to-cart-btn", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "add-to-cart-btn.html");
+      this.template = compiler.compile(source).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeAddToCartBtnString(node, buf);
-      return ctx.buildNode(buf.toString());
+      return executeTemplate(ctx, template, node, true);
     }
   }
 
@@ -242,12 +254,21 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class ProductCheckoutFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public ProductCheckoutFormatter() {
       super("product-checkout", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "product-checkout.html");
+      this.template = compiler.compile(source).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
+// TBD:     return executeTemplate(ctx, template, item, true);
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeVariantSelectString(item, buf);
       CommerceUtils.writeQuantityInputString(item, buf);
