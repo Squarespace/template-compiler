@@ -72,7 +72,7 @@ public class GeneralUtils {
   }
 
   /**
-   * Loads a resource from the Java package relative to {@code cls), raising a
+   * Loads a resource from the Java package relative to {@code cls}, raising a
    * CodeException if it fails.
    */
   public static String loadResource(Class<?> cls, String path) throws CodeException {

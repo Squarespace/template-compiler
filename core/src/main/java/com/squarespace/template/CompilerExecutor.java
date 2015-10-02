@@ -20,8 +20,6 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.template.plugins.CoreFormatters;
-
 
 /**
  * Helper class for the compiler to execute a template.
@@ -119,8 +117,7 @@ public class CompilerExecutor {
   }
 
   /**
-   * Sets the partials map, which is a map from name to template, used
-   * by the {@link CoreFormatters#APPLY} formatter.
+   * Sets the partials map, which is a map from name to template.
    */
   public CompilerExecutor partialsMap(ObjectNode node) {
     this.partialsMap = node;

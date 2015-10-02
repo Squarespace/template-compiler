@@ -19,8 +19,7 @@ package com.squarespace.template;
 
 /**
  * Enforces both a soft and hard limit on the number of instructions
- * executed, and calls the {@link Handler#onLimit(Limit, HardSoftCodeLimiter)}
- * method when a limit is reached.
+ * executed, and calls the Handler.onLimit() method when a limit is reached.
  */
 public class HardSoftCodeLimiter implements CodeLimiter {
 
