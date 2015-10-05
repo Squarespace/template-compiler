@@ -263,18 +263,22 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class ProductCheckoutFormatter extends BaseFormatter {
 
+    private static final String SOURCE = "{@|variants-select}{@|quantity-input}{@|add-to-cart-btn}";
+
+    private Instruction template;
+
     public ProductCheckoutFormatter() {
       super("product-checkout", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      this.template = compiler.compile(SOURCE).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      ArrayNode variantOptions = CommerceUtils.getItemVariantOptions(item);
-      CommerceUtils.writeVariantSelectString(item, variantOptions, buf);
-      CommerceUtils.writeQuantityInputString(item, buf);
-      CommerceUtils.writeAddToCartBtnString(item, buf);
-      return ctx.buildNode(buf.toString());
+      return executeTemplate(ctx, template, item, false);
     }
   }
 

@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -269,44 +267,6 @@ public class CommerceUtils {
     }
   }
 
-  public static void writeAddToCartBtnString(JsonNode item, StringBuilder buf) {
-    JsonNode structuredContent = item.path("structuredContent");
-
-    String formId = structuredContent.path("additionalFieldsFormId").asText();
-    boolean useForm = !StringUtils.isEmpty(formId) && structuredContent.has("additionalFieldsForm");
-
-    HtmlElementBuilder buttonNode = new HtmlElementBuilder("div");
-
-    buttonNode.addClass("sqs-add-to-cart-button sqs-suppress-edit-mode sqs-editable-button");
-
-    if (useForm) {
-      buttonNode.addClass("use-form");
-    }
-
-    boolean useCustom = structuredContent.path("useCustomAddButtonText").asBoolean();
-    String buttonText = useCustom ? structuredContent.path("customAddButtonText").asText() : "Add To Cart";
-
-    buttonNode.set("data-item-id", item.path("id").asText());
-    buttonNode.set("data-original-label", buttonText);
-    buttonNode.set("data-collection-id", item.path("collectionId").asText());
-
-    HtmlElementBuilder buttonNodeInner = new HtmlElementBuilder("div");
-    buttonNodeInner.addClass("sqs-add-to-cart-button-inner");
-    buttonNodeInner.setContent(buttonText);
-
-    buttonNode.appendChild(buttonNodeInner);
-
-    if (useForm) {
-      buttonNode.set("data-form", structuredContent.path("additionalFieldsForm").toString());
-    }
-
-    HtmlElementBuilder builder = new HtmlElementBuilder("div");
-    builder.addClass("sqs-add-to-cart-button-wrapper");
-    builder.appendChild(buttonNode);
-
-    builder.render(buf);
-  }
-
   private static final MapFormat ALL_ORDERS_AMT = new MapFormat("Save %(discountAmt)s on any order.");
 
   private static final MapFormat ALL_ORDERS_SHP = new MapFormat("Free shipping on any order.");
@@ -432,24 +392,6 @@ public class CommerceUtils {
     }
   }
 
-  public static void writeQuantityInputString(JsonNode item, StringBuilder buf) {
-    ProductType type = getProductType(item);
-    if (!ProductType.PHYSICAL.equals(type)) {
-      return;
-    }
-
-    if (getTotalStockRemaining(item) <= 1) {
-      return;
-    }
-
-    String itemId = item.path("id").asText();
-    buf.append("<div class=\"product-quantity-input\" data-item-id=\"");
-    buf.append(itemId).append("\">");
-    buf.append("<div class=\"quantity-label\">Quantity:</div>");
-    buf.append("<input size=\"4\" max=\"9999\" min=\"1\" value=\"1\" type=\"number\" step=\"1\"></input>");
-    buf.append("</div>");
-  }
-
   public static void writeVariantFormat(JsonNode variant, StringBuilder buf) {
     if (variant == null) {
       return;
@@ -535,45 +477,6 @@ public class CommerceUtils {
       }
     }
     return userDefinedOptions;
-  }
-
-  public static void writeVariantSelectString(JsonNode item, ArrayNode options, StringBuilder buf) {
-    if (options.size() == 0) {
-      return;
-    }
-    JsonNode structuredContent = item.path("structuredContent");
-    JsonNode variants = structuredContent.path("variants");
-
-    String itemId = item.path("id").asText();
-    buf.append("<div class=\"product-variants\" data-item-id=\"").append(itemId);
-    buf.append("\" data-variants=\"");
-    PluginUtils.escapeHtmlTag(variants.toString(), buf);
-    buf.append("\">");
-
-    // Assemble the select block.
-    for (int i = 0; i < options.size(); i++) {
-      ObjectNode userDefinedOption = (ObjectNode)options.get(i);
-      String name = userDefinedOption.get("name").asText();
-      ArrayNode values = (ArrayNode)userDefinedOption.get("values");
-
-      buf.append("<div class=\"variant-option\">");
-      buf.append("<div class=\"variant-option-title\">").append(name).append(": </div>");
-      buf.append("<div class=\"variant-select-wrapper\">");
-      buf.append("<select data-variant-option-name=\"");
-      PluginUtils.escapeHtmlTag(name, buf);
-      buf.append("\"><option value=\"\">Select ").append(name).append("</option>");
-
-      for (int j = 0; j < values.size(); j++) {
-        String value = values.get(j).asText();
-        buf.append("<option value=\"");
-        PluginUtils.escapeHtmlTag(value, buf);
-        buf.append("\">").append(value).append("</option>");
-      }
-
-      buf.append("</select></div></div>");
-    }
-
-    buf.append("</div>");
   }
 
 }
