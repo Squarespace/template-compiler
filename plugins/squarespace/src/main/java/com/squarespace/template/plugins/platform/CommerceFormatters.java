@@ -43,6 +43,7 @@ import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginUtils;
+import com.squarespace.template.plugins.platform.enums.ProductType;
 
 
 /**
@@ -336,15 +337,25 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class QuantityInputFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public QuantityInputFormatter() {
       super("quantity-input", false);
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeQuantityInputString(node, buf);
-      return ctx.buildNode(buf.toString());
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "quantity-input.html");
+      this.template = compiler.compile(source).code();
+    }
+
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
+      ProductType type = CommerceUtils.getProductType(item);
+      if (!ProductType.PHYSICAL.equals(type) || CommerceUtils.getTotalStockRemaining(item) <= 1) {
+        return MissingNode.getInstance();
+      }
+      return executeTemplate(ctx, template, item, true);
     }
   }
 
