@@ -1,0 +1,55 @@
+:getTotalStock-unlimited-physical
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [
+            {"unlimited": true}
+        ]
+    }
+}
+
+:getTotalStock-digital
+{
+    "structuredContent": {
+        "productType": 2,
+        "variants": []
+    }
+}
+
+:getTotalStock-six-service
+{
+    "structuredContent": {
+        "productType": 3,
+        "variants": [
+            {"qtyInStock": 2},
+            {"qtyInStock": 1},
+            {"qtyInStock": 3}
+        ]
+    }
+}
+
+:getTotalStock-0-physical
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [
+            {"qtyInStock": 0}
+        ]
+    }
+}
+
+:getTotalStock-0-physical-2
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": []
+    }
+}
+
+:getTotalStock-unknown
+{
+    "structuredContent": {
+        "productType": -1
+    }
+}
+

@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins.platform;
 
 import static com.squarespace.template.JsonLoader.loadJson;
+import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,35 @@ public class CommerceUtilsTest extends UnitTestBase {
 
   @Test
   public void testGetItemVariantOptions() {
-    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "commerce-utils-item-variant.json");
+    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "get-item-variant-options.json");
     for (String testKey : extractTests(jsonMap)) {
       JsonNode item = jsonMap.get(testKey);
       JsonNode actual = CommerceUtils.getItemVariantOptions(item);
       JsonNode expected = jsonMap.get(testKey + "-expected");
       JsonAssert.assertJsonEquals(actual.toString(), expected.toString());
     }
+  }
+
+  @Test
+  public void testGetTotalStockRemaining() {
+    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "get-total-stock-remaining.json");
+    JsonNode item = jsonMap.get("getTotalStock-unlimited-physical");
+    assertEquals(CommerceUtils.getTotalStockRemaining(item), Double.POSITIVE_INFINITY);
+
+    item = jsonMap.get("getTotalStock-digital");
+    assertEquals(CommerceUtils.getTotalStockRemaining(item), Double.POSITIVE_INFINITY);
+
+    item = jsonMap.get("getTotalStock-six-service");
+    assertEquals(CommerceUtils.getTotalStockRemaining(item), 6.0);
+
+    item = jsonMap.get("getTotalStock-0-physical");
+    assertEquals(CommerceUtils.getTotalStockRemaining(item), 0.0);
+
+    item = jsonMap.get("getTotalStock-0-physical-2");
+    assertEquals(CommerceUtils.getTotalStockRemaining(item), 0.0);
+
+    item = jsonMap.get("getTotalStock-unknown");
+    assertEquals(CommerceUtils.getTotalStockRemaining(item), 0.0);
   }
 
   private static List<String> extractTests(Map<String, JsonNode> jsonMap) {
