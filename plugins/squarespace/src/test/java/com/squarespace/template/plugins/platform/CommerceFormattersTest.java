@@ -54,4 +54,12 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     assertFormatter(MONEY_DASH_FORMAT, "1241313", "12,413.13");
   }
 
+  @Test
+  public void testVariantsSelect() {
+    runner.run(
+      "variants-select-1.html",
+      "variants-select-2.html"
+    );
+  }
+
 }

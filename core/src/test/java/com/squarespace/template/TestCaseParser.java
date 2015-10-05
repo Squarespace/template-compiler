@@ -46,7 +46,7 @@ public class TestCaseParser extends UnitTestBase {
 
   private static final Pattern RE_LINES = Pattern.compile("\n");
 
-  private static final Pattern RE_SECTION = Pattern.compile("^:(\\w+)\\s*$");
+  private static final Pattern RE_SECTION = Pattern.compile("^:([\\w-_]+)\\s*$");
 
   /**
    * Parses a source file into a valid test case instance.
@@ -125,7 +125,7 @@ public class TestCaseParser extends UnitTestBase {
    *   :<KEY-n>
    *   [ one or more lines ]
    */
-  private static Map<String, String> parseSections(String source) {
+  public static Map<String, String> parseSections(String source) {
     Matcher matcher = RE_SECTION.matcher("");
     String[] lines = RE_LINES.split(source);
 

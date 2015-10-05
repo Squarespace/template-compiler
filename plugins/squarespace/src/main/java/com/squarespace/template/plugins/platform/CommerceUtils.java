@@ -28,7 +28,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.MapBuilder;
 import com.squarespace.template.MapFormat;
 import com.squarespace.template.plugins.PluginUtils;
@@ -41,6 +43,8 @@ import com.squarespace.template.plugins.platform.enums.ProductType;
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
  */
 public class CommerceUtils {
+
+  private static final ArrayNode EMPTY_ARRAY = JsonUtils.createArrayNode();
 
   private CommerceUtils() {
   }
@@ -486,24 +490,25 @@ public class CommerceUtils {
     }
   }
 
-  public static void writeVariantSelectString(JsonNode item, StringBuilder buf) {
+  public static ArrayNode getItemVariantOptions(JsonNode item) {
     JsonNode structuredContent = item.path("structuredContent");
     JsonNode variants = structuredContent.path("variants");
     if (variants.size() <= 1) {
-      return;
+      return EMPTY_ARRAY;
     }
-    List<VariantOption> userDefinedOptions = new ArrayList<>();
+
+    ArrayNode userDefinedOptions = JsonUtils.createArrayNode();
     JsonNode ordering = structuredContent.path("variantOptionOrdering");
     for (int i = 0; i < ordering.size(); i++) {
       String optionName = ordering.path(i).asText();
-      userDefinedOptions.add(new VariantOption(optionName));
+      ObjectNode option = JsonUtils.createObjectNode();
+      option.put("name", optionName);
+      option.put("values", JsonUtils.createArrayNode());
+      userDefinedOptions.add(option);
     }
 
     for (int i = 0; i < variants.size(); i++) {
       JsonNode variant = variants.path(i);
-      if (variant == null) {
-        continue;
-      }
       JsonNode attributes = variant.get("attributes");
       if (attributes == null) {
         continue;
@@ -513,21 +518,21 @@ public class CommerceUtils {
       while (fields.hasNext()) {
         String field = fields.next();
 
-        String variantOptionValue = variant.get("attributes").get(field).asText();
-        VariantOption userDefinedOption = null;
+        String variantOptionValue = attributes.get(field).asText();
+        ObjectNode userDefinedOption = null;
 
         for (int j = 0; j < userDefinedOptions.size(); j++) {
-          VariantOption current = userDefinedOptions.get(j);
-          if (current.name.equals(field)) {
+          ObjectNode current = (ObjectNode)userDefinedOptions.get(j);
+          if (current.get("name").asText().equals(field)) {
             userDefinedOption = current;
           }
         }
 
         if (userDefinedOption != null) {
           boolean hasOptionValue = false;
-          List<String> optionValues = userDefinedOption.values;
+          ArrayNode optionValues = (ArrayNode)userDefinedOption.get("values");
           for (int k = 0; k < optionValues.size(); k++) {
-            String optionValue = optionValues.get(k);
+            String optionValue = optionValues.get(k).asText();
             if (optionValue.equals(variantOptionValue)) {
               hasOptionValue = true;
               break;
@@ -540,6 +545,15 @@ public class CommerceUtils {
         }
       }
     }
+    return userDefinedOptions;
+  }
+
+  public static void writeVariantSelectString(JsonNode item, ArrayNode options, StringBuilder buf) {
+    if (options.size() == 0) {
+      return;
+    }
+    JsonNode structuredContent = item.path("structuredContent");
+    JsonNode variants = structuredContent.path("variants");
 
     String itemId = item.path("id").asText();
     buf.append("<div class=\"product-variants\" data-item-id=\"").append(itemId);
@@ -548,10 +562,10 @@ public class CommerceUtils {
     buf.append("\">");
 
     // Assemble the select block.
-    for (int i = 0; i < userDefinedOptions.size(); i++) {
-      VariantOption userDefinedOption = userDefinedOptions.get(i);
-      String name = userDefinedOption.name;
-      List<String> values = userDefinedOption.values;
+    for (int i = 0; i < options.size(); i++) {
+      ObjectNode userDefinedOption = (ObjectNode)options.get(i);
+      String name = userDefinedOption.get("name").asText();
+      ArrayNode values = (ArrayNode)userDefinedOption.get("values");
 
       buf.append("<div class=\"variant-option\">");
       buf.append("<div class=\"variant-option-title\">").append(name).append(": </div>");
@@ -561,7 +575,7 @@ public class CommerceUtils {
       buf.append("\"><option value=\"\">Select ").append(name).append("</option>");
 
       for (int j = 0; j < values.size(); j++) {
-        String value = values.get(j);
+        String value = values.get(j).asText();
         buf.append("<option value=\"");
         PluginUtils.escapeHtmlTag(value, buf);
         buf.append("\">").append(value).append("</option>");
@@ -735,17 +749,6 @@ public class CommerceUtils {
     }
 
     return string;
-  }
-
-  private static class VariantOption {
-
-    public String name;
-
-    public List<String> values = new ArrayList<>();
-
-    public VariantOption(String name) {
-      this.name = name;
-    }
   }
 
 }

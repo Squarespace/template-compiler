@@ -22,6 +22,7 @@ import static com.squarespace.template.GeneralUtils.loadResource;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeException;
@@ -254,23 +255,15 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class ProductCheckoutFormatter extends BaseFormatter {
 
-    private Instruction template;
-
     public ProductCheckoutFormatter() {
       super("product-checkout", false);
     }
 
     @Override
-    public void initialize(Compiler compiler) throws CodeException {
-      String source = loadResource(CommerceFormatters.class, "product-checkout.html");
-      this.template = compiler.compile(source).code();
-    }
-
-    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-// TBD:     return executeTemplate(ctx, template, item, true);
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeVariantSelectString(item, buf);
+      ArrayNode variantOptions = CommerceUtils.getItemVariantOptions(item);
+      CommerceUtils.writeVariantSelectString(item, variantOptions, buf);
       CommerceUtils.writeQuantityInputString(item, buf);
       CommerceUtils.writeAddToCartBtnString(item, buf);
       return ctx.buildNode(buf.toString());
@@ -381,9 +374,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeVariantSelectString(node, buf);
+      ArrayNode variantOptions = CommerceUtils.getItemVariantOptions(item);
+      CommerceUtils.writeVariantSelectString(item, variantOptions, buf);
       return ctx.buildNode(buf.toString());
     }
   }
