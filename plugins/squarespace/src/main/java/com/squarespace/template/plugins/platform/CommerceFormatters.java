@@ -19,7 +19,11 @@ package com.squarespace.template.plugins.platform;
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -401,15 +405,75 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class SummaryFormFieldFormatter extends BaseFormatter {
 
+    private static final Map<String, String> ANSWER_MAP = buildAnswerMap();
+
+    private static final String[] TYPES = new String[] {
+      "address", "checkbox", "date", "likert", "name", "phone", "time"
+    };
+
+    private final Map<String, Instruction> templateMap = new HashMap<>();
+
+    private Instruction formTemplate;
+
     public SummaryFormFieldFormatter() {
       super("summary-form-field", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      for (String type : TYPES) {
+        String source = loadResource(CommerceFormatters.class, "summary-form-field-" + type + ".html");
+        Instruction code = compiler.compile(source.trim()).code();
+        templateMap.put(type, code);
+      }
+      String formSource = loadResource(CommerceFormatters.class, "summary-form-field-form.html").trim();
+      this.formTemplate = compiler.compile(formSource).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode field) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeSummaryFormFieldString(field, buf);
-      return ctx.buildNode(buf.toString());
+      String type = field.path("type").asText();
+      Instruction code = templateMap.get(type);
+      JsonNode value = null;
+      if (code == null) {
+        value = field.path("value");
+      } else {
+        JsonNode node = field;
+        if (type.equals("likert")) {
+          node = convertLikert(field.path("values"));
+        }
+        value = executeTemplate(ctx, code, node, true);
+      }
+
+      ObjectNode form = JsonUtils.createObjectNode();
+      form.put("title", field.path("rawTitle"));
+      form.put("value", value);
+      return executeTemplate(ctx, formTemplate, form, true);
+    }
+
+    private JsonNode convertLikert(JsonNode values) {
+      ArrayNode result = JsonUtils.createArrayNode();
+      Iterator<Entry<String, JsonNode>> likertFields = values.fields();
+      while (likertFields.hasNext()) {
+        Entry<String, JsonNode> likertField = likertFields.next();
+        String answer = likertField.getValue().asText();
+        ObjectNode node = JsonUtils.createObjectNode();
+        node.put("question", likertField.getKey());
+        node.put("answer", ANSWER_MAP.getOrDefault(answer, "Neutral"));
+        result.add(node);
+      }
+      return result;
+    }
+
+    private static Map<String, String> buildAnswerMap() {
+      Map<String, String> map = new HashMap<>();
+      map.put("-2", "Strongly Disagree");
+      map.put("-1", "Disagree");
+      map.put("0", "Neutral");
+      map.put("1", "Agree");
+      map.put("2", "Strongly Agree");
+      return map;
     }
   }
+
 }
