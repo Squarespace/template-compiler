@@ -55,6 +55,15 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testQuantityInput() {
+    runner.run(
+        "quantity-input-1.html",
+        "quantity-input-2.html",
+        "quantity-input-3.html"
+        );
+  }
+
+  @Test
   public void testSummaryFormField() {
     runner.run(
         "summary-form-field-address-1.html",
