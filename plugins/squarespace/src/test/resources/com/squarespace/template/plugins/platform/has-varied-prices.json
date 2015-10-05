@@ -1,0 +1,69 @@
+:hasVariedPrices-1-true
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [
+            {"onSale": false},
+            {"onSale": true, "price": 200, "salePrice": 124}
+        ]
+    }
+}
+
+:hasVariedPrices-2-true
+{
+    "structuredContent": {
+        "productType": 3,
+        "variants": [
+            {"price": 200},
+            {"price": 100}
+        ]
+    }
+}
+
+:hasVariedPrices-3-true
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [
+            {"onSale": true, "salePrice": 100},
+            {"onSale": true, "salePrice": 200}
+        ]
+    }
+}
+
+:hasVariedPrices-4-false
+{
+    "structuredContent": {
+        "productType": 2
+    }
+}
+
+:hasVariedPrices-5-false
+{
+    "structuredContent": {
+        "productType": -1
+    }
+}
+
+:hasVariedPrices-6-false
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [
+            {"price": 100}, {"price": 100}
+        ]
+    }
+}
+
+:hasVariaedPrices-7-false
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [
+            {"onSale": true, "salePrice": 100},
+            {"onSale": true, "salePrice": 100}
+        ]
+    }
+}
+
+

@@ -1,0 +1,33 @@
+:hasVariedPrices-1-true
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [{}, {}, {}]
+    }
+}
+
+:hasVariedPrices-2-false
+{
+    "structuredContent": {
+        "productType": 3,
+        "variants": []
+    }
+}
+
+:hasVariedPrices-3-false
+{
+    "structuredContent": {
+        "productType": 1,
+        "variants": [{}]
+    }
+}
+
+:hasVariedPrices-4-false
+{
+    "structuredContent": {
+        "productType": 2
+    }
+}
+
+
+

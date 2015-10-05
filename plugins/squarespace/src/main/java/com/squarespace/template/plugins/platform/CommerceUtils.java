@@ -58,9 +58,6 @@ public class CommerceUtils {
   public static double getFromPrice(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
-    if (type == null) {
-      return 0.0;
-    }
     switch (type) {
 
       case PHYSICAL:
@@ -185,9 +182,6 @@ public class CommerceUtils {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
-    if (type == null) {
-      return false;
-    }
     switch (type) {
       case PHYSICAL:
       case SERVICE:
@@ -214,10 +208,6 @@ public class CommerceUtils {
     JsonNode structuredContent = item.path("structuredContent");
     JsonNode variants = structuredContent.path("variants");
     ProductType type = getProductType(item);
-
-    if (type == null) {
-      return false;
-    }
     return type.equals(ProductType.DIGITAL) ? false : variants.size() > 1;
   }
 
