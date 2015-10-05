@@ -23,6 +23,8 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeException;
@@ -33,6 +35,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginUtils;
@@ -369,16 +372,30 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class VariantsSelectFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public VariantsSelectFormatter() {
       super("variants-select", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "variants-select.html");
+      this.template = compiler.compile(source).code();
+    }
+
+    @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      ArrayNode variantOptions = CommerceUtils.getItemVariantOptions(item);
-      CommerceUtils.writeVariantSelectString(item, variantOptions, buf);
-      return ctx.buildNode(buf.toString());
+      ArrayNode options = CommerceUtils.getItemVariantOptions(item);
+      if (options.size() == 0) {
+        // Don't bother executing the template of nothing would be emitted.
+        return MissingNode.getInstance();
+      }
+
+      ObjectNode node = JsonUtils.createObjectNode();
+      node.put("item", item);
+      node.put("options", options);
+      return executeTemplate(ctx, template, node, false);
     }
   }
 
