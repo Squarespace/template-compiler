@@ -55,6 +55,40 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testSummaryFormField() {
+    runner.run(
+      "summary-form-field-name-1.html"
+    );
+    runner.run(
+      "summary-form-field-phone-1.html",
+      "summary-form-field-phone-2.html"
+    );
+    runner.run(
+      "summary-form-field-likert-1.html"
+    );
+    runner.run(
+      "summary-form-field-address-1.html",
+      "summary-form-field-address-2.html"
+    );
+    runner.run(
+      "summary-form-field-date-1.html"
+    );
+    runner.run(
+      "summary-form-field-time-1.html",
+      "summary-form-field-time-2.html",
+      "summary-form-field-time-3.html"
+    );
+    runner.run(
+      "summary-form-field-checkbox-1.html",
+      "summary-form-field-checkbox-2.html",
+      "summary-form-field-checkbox-3.html"
+    );
+    runner.run(
+      "summary-form-field-default-1.html"
+      );
+  }
+
+  @Test
   public void testVariantsSelect() {
     runner.run(
       "variants-select-1.html",

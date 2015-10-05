@@ -705,7 +705,7 @@ public class CommerceUtils {
     }
 
     String rawTitle = field.path("rawTitle").asText();
-    buf.append("<div class=\"foobar\" style=\"font-size:11px; margin-top:3px\">");
+    buf.append("<div style=\"font-size:11px; margin-top:3px\">");
     buf.append(String.format("<span style=\"font-weight:bold;\">%s:</span> %s", rawTitle, valueString));
     buf.append("</div>");
   }

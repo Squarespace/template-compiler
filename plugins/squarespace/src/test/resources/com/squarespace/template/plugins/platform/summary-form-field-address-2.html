@@ -1,0 +1,21 @@
+:JSON
+{
+  "field": {
+    "type": "address",
+    "rawTitle": "Address",
+    "values": {
+      "Line1": "123 Main St",
+      "City": "New York",
+      "State": "New York",
+      "Zip": "10013",
+      "Country": "US"
+    }
+  }
+}
+
+:TEMPLATE
+{field|summary-form-field}
+
+:OUTPUT
+<div style="font-size:11px; margin-top:3px"><span style="font-weight:bold;">Address:</span> <div style="padding-left:5px;"><div>123 Main St</div><div>New York, New York 10013 US</div></div></div>
+

@@ -406,9 +406,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public JsonNode apply(Context ctx, Arguments args, JsonNode field) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeSummaryFormFieldString(node, buf);
+      CommerceUtils.writeSummaryFormFieldString(field, buf);
       return ctx.buildNode(buf.toString());
     }
   }
