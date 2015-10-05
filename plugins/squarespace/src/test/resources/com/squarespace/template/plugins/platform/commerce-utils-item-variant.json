@@ -1,0 +1,83 @@
+:getItemVariant-1
+{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [
+        {"attributes": { "fit": "loose", "color": "blue" }},
+        {"attributes": { "fit": "slim", "color": "red" }}
+      ],
+      "variantOptionOrdering": ["color", "fit"]
+    }
+}
+
+:getItemVariant-1-expected
+[
+    {"name": "color", "values": ["blue", "red"]},
+    {"name": "fit", "values": ["loose", "slim"]}
+]
+
+:getItemVariant-2
+{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [
+        {"attributes": { "fit": "loose", "color": "blue" }},
+        {"attributes": { "fit": "loose", "color": "green" }},
+        {"attributes": { "fit": "slim", "color": "red" }}
+      ],
+      "variantOptionOrdering": ["fit", "color"]
+    }
+}
+
+:getItemVariant-2-expected
+[
+    {"name": "fit", "values": ["loose", "slim"]},
+    {"name": "color", "values": ["blue", "green", "red"]}
+]
+
+:getItemVariant-3
+{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [
+        {"attributes": { "fit": "loose"}}
+      ],
+      "variantOptionOrdering": ["fit"]
+    }
+}
+
+:getItemVariant-3-expected
+[]
+
+:getItemVariant-4
+{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [],
+      "variantOptionOrdering": []
+    }
+}
+
+:getItemVariant-4-expected
+[]
+
+:getItemVariant-5
+{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [
+        {"attributes": { "fit": "loose", "color": "blue" }},
+        {"attributes": { "fit": "slim", "color": "red" }},
+        {}
+      ],
+      "variantOptionOrdering": ["fit", "color"]
+    }
+}
+
+:getItemVariant-5-expected
+[
+    {"name": "fit", "values": ["loose", "slim"]},
+    {"name": "color", "values": ["blue", "red"]}
+]
+
+
