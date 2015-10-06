@@ -1,4 +1,8 @@
 
+plugins {
+  id 'me.champeau.gradle.jmh' version '0.2.0'
+}
+
 description = 'Template compiler core'
 
 dependencies {
@@ -25,4 +29,12 @@ artifacts {
   tests testJar
 }
 
+jmh {
+  jmhVersion = '1.11.1'
+  forceGC = true
+}
+
+plugins.withType(EclipsePlugin) {
+  project.eclipse.classpath.plusConfigurations += [ configurations.jmh ]
+}
 

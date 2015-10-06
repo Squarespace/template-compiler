@@ -1,0 +1,6 @@
+<span class="foo">
+{.if enterBlock}<div id="in-block" data-name="{name|htmlattr}">{name} is {age} years old.</div>{.end}
+{.if iterate}<div>
+Values: {.repeated section values}{.greaterThan? @index 1}, {.end}{@}{.end}</div>{.end}
+</span>
+
