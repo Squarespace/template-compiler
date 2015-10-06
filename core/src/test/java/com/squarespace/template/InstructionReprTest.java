@@ -186,7 +186,8 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(r1.repr(), "");
     r1.getConsequent().add(mk.text("A"));
     assertEquals(r1.repr(), "A");
-    r1.getConsequent().add(mk.text("B"), mk.text("C"));
+    r1.getConsequent().add(mk.text("B"));
+    r1.getConsequent().add(mk.text("C"));
     assertEquals(r1.repr(), "ABC");
 
     assertEquals(ReprEmitter.get(r1, false), "");

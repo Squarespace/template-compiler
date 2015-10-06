@@ -86,16 +86,4 @@ public class FormatterBenchmark {
 
   }
 
-  public static void main(String[] args) throws Exception {
-    BenchmarkState state = new BenchmarkState();
-    state.setupCompiler();
-    int count = Integer.parseInt(args[0]);
-    for (int i = 0; i < count; i++) {
-      state.executeEmbedded();
-//      if (i % 1000 == 0) {
-//        System.out.println(i);
-//      }
-    }
-  }
-
 }

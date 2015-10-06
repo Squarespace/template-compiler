@@ -27,13 +27,20 @@ public class BlockTest extends UnitTestBase {
   public void testEquality() {
     CodeMaker maker = maker();
     Block b1 = new Block(2);
-    b1.add(maker.text("foo"), maker.end(), maker.eof());
+    b1.add(maker.text("foo"));
+    b1.add(maker.end());
+    b1.add(maker.eof());
+
     Block b2 = new Block(2);
-    b2.add(maker.text("foo"), maker.end(), maker.eof());
+    b2.add(maker.text("foo"));
+    b2.add(maker.end());
+    b2.add(maker.eof());
     Assert.assertEquals(b1, b2);
 
     Block b3 = new Block(2);
-    b3.add(maker.text("foo"), maker.eof(), maker.end());
+    b3.add(maker.text("foo"));
+    b3.add(maker.eof());
+    b3.add(maker.end());
     Assert.assertNotEquals(b1, b3);
 
     Block b4 = new Block(2);

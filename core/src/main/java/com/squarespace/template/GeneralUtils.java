@@ -55,18 +55,13 @@ public class GeneralUtils {
     try {
       // If we want to hide the parent context during execution, create a new
       // temporary sub-context.
-      if (privateContext) {
-        Context.subContext(ctx, node, buf).execute(inst);
-      } else {
-        ctx.push(node);
-        ctx.execute(inst);
-      }
+      ctx.push(node);
+      ctx.frame().stopResolution(privateContext);
+      ctx.execute(inst);
 
     } finally {
       ctx.swapBuffer(origBuf);
-      if (!privateContext) {
-        ctx.pop();
-      }
+      ctx.pop();
     }
     return ctx.buildNode(buf.toString());
   }
@@ -91,6 +86,45 @@ public class GeneralUtils {
     info.name(path);
     info.data(message);
     return info;
+  }
+
+  /**
+   * Returns true if the first non-whitespace character is one of the
+   * valid starting characters for a JSON value; else false.
+   */
+  public static boolean isJsonStart(String raw) {
+    int size = raw.length();
+    int index = 0;
+    while (index < size) {
+      char ch = raw.charAt(index);
+      if (ch != ' ') {
+        switch (ch) {
+          case '"':
+          case '-':
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+          case 'f':
+          case 'n':
+          case 't':
+          case '[':
+          case '{':
+            return true;
+
+          default:
+            return false;
+        }
+      }
+      index++;
+    }
+    return false;
   }
 
 

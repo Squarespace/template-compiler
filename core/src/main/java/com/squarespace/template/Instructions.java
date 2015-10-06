@@ -935,13 +935,15 @@ public class Instructions {
       throws CodeExecuteException {
 
     CodeLimiter limiter = ctx.getCodeLimiter();
-    for (FormatterCall formatter : formatters) {
+    int size = formatters.size();
+    for (int i = 0; i < size; i++) {
       if (value.isMissingNode()) {
         break;
       }
+      FormatterCall call = formatters.get(i);
       limiter.check();
-      Formatter impl = formatter.getFormatter();
-      value = impl.apply(ctx, formatter.getArguments(), value);
+      Formatter impl = call.getFormatter();
+      value = impl.apply(ctx, call.getArguments(), value);
     }
     return value;
   }

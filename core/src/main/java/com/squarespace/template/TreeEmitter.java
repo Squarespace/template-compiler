@@ -107,8 +107,9 @@ public class TreeEmitter {
       buf.append("null\n");
       return;
     }
-    for (Instruction inst : instructions) {
-      emit(inst, depth, buf);
+    int size = instructions.size();
+    for (int i = 0; i < size; i++) {
+      emit(instructions.get(i), depth, buf);
     }
   }
 

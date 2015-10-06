@@ -18,11 +18,9 @@ package com.squarespace.template;
 
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -51,8 +49,6 @@ public class Context {
   private static final String META_LEFT = "{";
 
   private static final String META_RIGHT = "}";
-
-  private final ArrayDeque<Frame> stack = new ArrayDeque<>();
 
   private final Locale locale;
 
@@ -88,13 +84,9 @@ public class Context {
   }
 
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
-    this.currentFrame = new Frame(node == null ? JsonUtils.createObjectNode() : node);
+    this.currentFrame = new Frame(null, node == null ? MissingNode.getInstance() : node);
     this.buf = buf == null ? new StringBuilder() : buf;
     this.locale = locale == null ? Locale.getDefault() : locale;
-  }
-
-  public static Context subContext(Context ctx, JsonNode node, StringBuilder buf) {
-    return new SubContext(ctx, node, buf);
   }
 
   public boolean safeExecutionEnabled() {
@@ -201,8 +193,9 @@ public class Context {
    */
   public void execute(List<Instruction> instructions) throws CodeExecuteException {
     if (instructions != null) {
-      for (Instruction inst : instructions) {
-        execute(inst);
+      int size = instructions.size();
+      for (int i = 0; i < size; i++) {
+        execute(instructions.get(i));
       }
     }
   }
@@ -273,7 +266,7 @@ public class Context {
   }
 
   public JsonNode node() {
-    return currentFrame.node;
+    return currentFrame.node();
   }
 
   public JsonNode buildNode(String value) {
@@ -309,14 +302,14 @@ public class Context {
   }
 
   public boolean hasNext() {
-    return currentFrame.currentIndex < currentFrame.node.size();
+    return currentFrame.currentIndex < currentFrame.node().size();
   }
 
   /**
    * Return the current frame's array size.
    */
   public int arraySize() {
-    return currentFrame.node.size();
+    return currentFrame.node().size();
   }
 
   /**
@@ -340,7 +333,7 @@ public class Context {
   public void pushSection(Object[] names) {
     JsonNode node;
     if (names == null) {
-      node = currentFrame.node;
+      node = currentFrame.node();
     } else {
       node = resolve(names[0], currentFrame);
       for (int i = 1, len = names.length; i < len; i++) {
@@ -357,7 +350,7 @@ public class Context {
    * Pushes the next element from the current array node onto the stack.
    */
   public void pushNext() {
-    JsonNode node = currentFrame.node.path(currentFrame.currentIndex);
+    JsonNode node = currentFrame.node().path(currentFrame.currentIndex);
     if (node.isNull()) {
       node = undefined;
     }
@@ -377,7 +370,7 @@ public class Context {
    */
   public JsonNode resolve(Object[] names) {
     if (names == null) {
-      return currentFrame.node;
+      return currentFrame.node();
     }
 
     // Find the starting point.
@@ -400,9 +393,16 @@ public class Context {
     }
   }
 
+  public Frame frame() {
+    return currentFrame;
+  }
+
   public void push(JsonNode node) {
-    stack.push(currentFrame);
-    currentFrame = new Frame(node);
+    currentFrame = new Frame(currentFrame, node);
+  }
+
+  public void pop() {
+    currentFrame = currentFrame.parent();
   }
 
   /**
@@ -415,12 +415,14 @@ public class Context {
     if (!node.isMissingNode()) {
       return node;
     }
-    Iterator<Frame> iter = stack.iterator();
-    while (iter.hasNext()) {
-      node = resolve(name, iter.next());
+
+    Frame frame = currentFrame;
+    while (frame != null && !frame.stopResolution) {
+      node = resolve(name, frame);
       if (!node.isMissingNode()) {
         return node;
       }
+      frame = frame.parent();
     }
     return undefined;
   }
@@ -448,7 +450,7 @@ public class Context {
 
       // Fall through
     }
-    return nodePath(frame.node, name);
+    return nodePath(frame.node(), name);
   }
 
   private JsonNode nodePath(JsonNode node, Object key) {
@@ -463,60 +465,6 @@ public class Context {
       errors = new ArrayList<>();
     }
     errors.add(error);
-  }
-
-  /**
-   * Pop a frame off the stack.
-   */
-  public void pop() {
-    currentFrame = stack.pop();
-  }
-
-  static class Frame {
-
-    private Map<String, JsonNode> variables;
-
-    private JsonNode node;
-
-    int currentIndex;
-
-    public Frame(JsonNode node) {
-      this.node = node;
-      this.currentIndex = -1;
-    }
-
-    public void setVar(String name, JsonNode node) {
-      if (variables == null) {
-        variables = new HashMap<>(4);
-      }
-      variables.put(name, node);
-    }
-
-    public JsonNode getVar(String name) {
-      return (variables == null) ? null : variables.get(name);
-    }
-
-  }
-
-  static class SubContext extends Context {
-
-    private final Context parent;
-
-    public SubContext(Context parent, JsonNode node, StringBuilder buf) {
-      super(node, buf, parent.locale());
-      this.parent = parent;
-      this.setLoggingHook(parent.loggingHook);
-      this.setCodeLimiter(parent.codeLimiter);
-      if (parent.safeExecutionEnabled()) {
-        this.setSafeExecution();
-      }
-    }
-
-    @Override
-    public void addError(ErrorInfo error) {
-      parent.addError(error);
-    }
-
   }
 
 }

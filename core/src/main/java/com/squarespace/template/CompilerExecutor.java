@@ -125,6 +125,14 @@ public class CompilerExecutor {
   }
 
   /**
+   * Sets the partials map by parsing the given text as a JSON object.
+   */
+  public CompilerExecutor partialsMap(String jsonText) {
+    this.partialsMap = (ObjectNode)JsonUtils.decode(jsonText);
+    return this;
+  }
+
+  /**
    * Buffer to which we append the rendered output.
    */
   public CompilerExecutor buffer(StringBuilder buffer) {

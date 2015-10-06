@@ -46,13 +46,11 @@ class Block {
   /**
    * Adds an instruction to the list.
    */
-  public void add(Instruction ... instrs) {
+  public void add(Instruction inst) {
     if (instructions == null) {
       instructions = new ArrayList<>(initialSize);
     }
-    for (Instruction inst : instrs) {
-      instructions.add(inst);
-    }
+    instructions.add(inst);
   }
 
   /**

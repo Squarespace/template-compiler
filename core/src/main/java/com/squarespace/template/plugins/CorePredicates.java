@@ -27,6 +27,7 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BasePredicate;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.Predicate;
@@ -101,10 +102,13 @@ public class CorePredicates implements PredicateRegistry {
 
     private Object parse(Arguments args, int index) throws ArgumentsException {
       String raw = args.get(index);
-      // Attempt to decode as JSON.
-      JsonNode result = JsonUtils.decode(raw, true);
-      if (!result.isMissingNode()) {
-        return result;
+      // Peek at content to see if its JSON-like. This will cut down on the
+      // number of failed JSON parse attempts.
+      if (GeneralUtils.isJsonStart(raw)) {
+        JsonNode result = JsonUtils.decode(raw, true);
+        if (!result.isMissingNode()) {
+          return result;
+        }
       }
 
       // Attempt to parse variable name.
@@ -138,7 +142,6 @@ public class CorePredicates implements PredicateRegistry {
     }
 
   }
-
 
   public static final Predicate EQUAL = new JsonPredicate("equal?") {
 

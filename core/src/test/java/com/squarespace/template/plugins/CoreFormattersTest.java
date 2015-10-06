@@ -190,11 +190,12 @@ public class CoreFormattersTest extends UnitTestBase {
     String input = "{}";
     String partials = "{\"block\": \"{.section foo}{@}\"}";
     Instruction inst = compiler().compile(template).code();
-    Context ctx = new Context(JsonUtils.decode(input));
-    ctx.setCompiler(compiler());
-    ctx.setSafeExecution();
-    ctx.setPartials(JsonUtils.decode(partials));
-    ctx.execute(inst);
+    Context ctx = compiler().newExecutor()
+        .json(input)
+        .code(inst)
+        .partialsMap(partials)
+        .safeExecution(true)
+        .execute();
     assertContext(ctx, "");
     assertEquals(ctx.getErrors().size(), 1);
     assertEquals(ctx.getErrors().get(0).getType(), COMPILE_PARTIAL_SYNTAX);
@@ -207,11 +208,12 @@ public class CoreFormattersTest extends UnitTestBase {
     String partials = "{\"block\": \"hello {name}\"}";
     String input = "{\"name\": \"bob\", \"child\": {}}";
     Instruction inst = compiler().compile(template).code();
-    Context ctx = new Context(JsonUtils.decode(input));
-    ctx.setCompiler(compiler());
-    ctx.setSafeExecution();
-    ctx.setPartials(JsonUtils.decode(partials));
-    ctx.execute(inst);
+    Context ctx = compiler().newExecutor()
+        .json(input)
+        .code(inst)
+        .partialsMap(partials)
+        .safeExecution(true)
+        .execute();
     assertContext(ctx, "hello hello bob");
   }
 

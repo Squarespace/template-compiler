@@ -216,11 +216,13 @@ public class ReprEmitter {
   public static void emit(VariableInst inst, StringBuilder buf) {
     buf.append('{');
     emitNames(inst.getVariable(), buf);
-    List<FormatterCall> formatters = inst.getFormatters();
-    for (FormatterCall formatter : formatters) {
+    List<FormatterCall> formatterCalls = inst.getFormatters();
+    int size = formatterCalls.size();
+    for (int i = 0; i < size; i++) {
+      FormatterCall call = formatterCalls.get(i);
       buf.append('|');
-      buf.append(formatter.getFormatter().identifier());
-      emit(formatter.getArguments(), buf);
+      buf.append(call.getFormatter().identifier());
+      emit(call.getArguments(), buf);
     }
     buf.append('}');
   }
@@ -256,8 +258,9 @@ public class ReprEmitter {
     if (instructions == null) {
       return;
     }
-    for (Instruction inst : instructions) {
-      inst.repr(buf, recurse);
+    int size = instructions.size();
+    for (int i = 0; i < size; i++) {
+      instructions.get(i).repr(buf, recurse);
     }
   }
 
