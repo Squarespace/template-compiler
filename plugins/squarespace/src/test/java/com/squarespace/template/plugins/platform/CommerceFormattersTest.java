@@ -250,7 +250,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   public void testVariantsSelect() {
     runner.run(
         "variants-select-1.html",
-        "variants-select-2.html"
+        "variants-select-2.html",
+        "variants-select-3.html"
         );
   }
 
