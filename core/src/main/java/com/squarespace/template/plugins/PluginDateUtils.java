@@ -234,7 +234,13 @@ public class PluginDateUtils {
         case 'x': formatAggregate(DateTimeAggregate.MMDDYYYY, locale, date, buf); break;
         case 'Y': buf.append(date.getYear()); break;
         case 'y': leftPad(date.getYearOfCentury(), '0', 2, buf); break;
-        case 'Z': buf.append(zone.getShortName(date.getMillis())); break;
+
+        case 'Z':
+          // Note: Joda's nameKey happens to be the same as the shortName. Making
+          // this change to workaround Joda https://github.com/JodaOrg/joda-time/issues/288
+          buf.append(zone.getNameKey(date.getMillis()));
+          break;
+
         case 'z':
           int offset = date.getZone().getOffset(instant) / 60000;
           int hours = (int)Math.floor(offset / 60);
@@ -273,7 +279,7 @@ public class PluginDateUtils {
         buf.append(' ');
         buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
         buf.append(' ');
-        buf.append(date.getZone().getShortName(date.getMillis()));
+        buf.append(date.getZone().getNameKey(date.getMillis()));
         break;
 
       case H240_M0:
