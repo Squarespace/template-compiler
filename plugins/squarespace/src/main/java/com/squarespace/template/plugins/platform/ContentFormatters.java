@@ -255,29 +255,24 @@ public class ContentFormatters implements FormatterRegistry {
 
   private static String getAltTextFromContentItem(JsonNode contentItemNode) {
     JsonNode title = contentItemNode.path("title");
-    JsonNode body = contentItemNode.path("body");
-    JsonNode filename = contentItemNode.path("filename");
-    String altText = "";
-
     if (isTruthy(title)) {
-      String text = title.asText();
-      if (text.length() > 0) {
-        altText = text;
-      }
+      return title.asText();
     }
-    if (!(altText.length() > 0) && isTruthy(body)) {
+
+    JsonNode body = contentItemNode.path("body");
+    if (isTruthy(body)) {
       String text = PluginUtils.removeTags(body.asText());
       if (text.length() > 0) {
-        altText = text;
+        return text;
       }
     }
-    if (!(altText.length() > 0) && isTruthy(filename)) {
-      String text = filename.asText();
-      if (text.length() > 0) {
-        altText = text;
-      }
+
+    JsonNode filename = contentItemNode.path("filename");
+    if (isTruthy(filename)) {
+      return filename.asText();
     }
-    return altText;
+
+    return "";
   }
 
   public static class HeightFormatter extends BaseFormatter {

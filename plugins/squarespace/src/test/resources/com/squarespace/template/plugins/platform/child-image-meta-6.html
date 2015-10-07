@@ -1,0 +1,21 @@
+:JSON
+{
+  "items": [
+    {},
+    {},
+    {
+      "title": "",
+      "body": "",
+      "filename": "",
+      "originalSize": 1000,
+      "assetUrl": "/foo/bar.jpg"
+    }
+  ]
+}
+
+:TEMPLATE
+{@|child-image-meta 2}
+
+:OUTPUT
+data-src="/foo/bar.jpg" data-image="/foo/bar.jpg" data-image-dimensions="1000" data-image-focal-point="0.5,0.5" alt=""
+

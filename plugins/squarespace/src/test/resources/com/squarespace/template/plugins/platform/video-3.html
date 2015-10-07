@@ -1,0 +1,19 @@
+:JSON
+{
+  "oembed": {
+    "html": "<script></script>",
+    "providerName": "youtube"
+  },
+  "originalSize": 1000,
+  "assetUrl": "/foo/bar.mp4",
+  "mediaFocalPoint": {"x": 0.3, "y": 0.7},
+  "overlay": true,
+  "colorData": {
+  }
+}
+
+:TEMPLATE
+{@|video color-data}
+
+:OUTPUT
+<div class="sqs-video-wrapper" data-html="&lt;script&gt;&lt;/script&gt;" data-provider-name="youtube"><div class="sqs-video-overlay no-thumb" style="opacity: 0;"><div class="sqs-video-opaque"> </div><div class="sqs-video-icon"></div></div></div>

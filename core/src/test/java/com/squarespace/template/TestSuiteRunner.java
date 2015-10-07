@@ -74,7 +74,7 @@ public class TestSuiteRunner {
     if (!errors.isEmpty()) {
       for (Map.Entry<String, AssertionError> entry : errors.entrySet()) {
         System.err.println("Case: " + entry.getKey());
-        System.err.println(entry.getValue());
+        entry.getValue().printStackTrace();
       }
       throw new AssertionError("Failed!");
     }

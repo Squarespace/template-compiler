@@ -1,0 +1,29 @@
+:JSON
+{
+  "items": [
+    {
+      "structuredContent": {
+        "productType": 1,
+        "variants": [
+          {"onSale": true, "qtyInStock": 0}
+        ]
+      },
+      "promotedBlockType": "block type",
+      "categories": ["foo", "bar baz"],
+      "tags": ["foo 2", "bar baz 2"],
+      "author": {
+        "displayName": "John Doe"
+      },
+      "recordTypeLabel": "record-type",
+      "starred": true,
+      "recordType": 11
+    }
+  ]
+}
+
+:TEMPLATE
+{.repeated section items}{@|item-classes}{.end}
+
+:OUTPUT
+hentry promoted promoted-block-block-type category-foo category-bar-baz tag-foo-2 tag-bar-baz-2 author-john-doe post-type-record-type article-index-1 featured on-sale sold-out
+
