@@ -100,8 +100,7 @@ public class TestCaseParser extends UnitTestBase {
         if (!output.equals(result)) {
           throw new AssertionError("Output does not match:\n" + diff(output, result));
         }
-
-      } catch (CodeException e) {
+      } catch (Exception e) {
         throw new AssertionError("Error running test case: " + e.toString());
       }
     }

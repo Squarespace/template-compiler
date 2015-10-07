@@ -1,14 +1,17 @@
 /**
  * Copyright (c) 2015 SQUARESPACE, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.squarespace.template.plugins.platform;
@@ -143,11 +146,61 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testProductPrice() {
+    runner.run(
+        "product-price-1.html",
+        "product-price-2.html",
+        "product-price-3.html",
+        "product-price-4.html",
+        "product-price-5.html",
+        "product-price-6.html",
+        "product-price-7.html"
+        );
+  }
+
+  @Test
+  public void testProductQuickView() {
+    runner.run(
+        "product-quick-view-1.html",
+        "product-quick-view-2.html",
+        "product-quick-view-3.html",
+        "product-quick-view-4.html"
+        );
+  }
+
+  @Test
+  public void testProductStatus() {
+    runner.run(
+        "product-status-1.html",
+        "product-status-2.html",
+        "product-status-3.html",
+        "product-status-4.html",
+        "product-status-5.html",
+        "product-status-6.html",
+        "product-status-7.html",
+        "product-status-8.html"
+        );
+  }
+
+  @Test
   public void testQuantityInput() {
     runner.run(
         "quantity-input-1.html",
         "quantity-input-2.html",
         "quantity-input-3.html"
+        );
+  }
+
+  @Test
+  public void testSalePrice() {
+    runner.run(
+        "sale-price-1.html",
+        "sale-price-2.html",
+        "sale-price-3.html",
+        "sale-price-4.html",
+        "sale-price-5.html",
+        "sale-price-6.html",
+        "sale-price-7.html"
         );
   }
 
@@ -182,6 +235,14 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         );
     runner.run(
         "summary-form-field-default-1.html"
+        );
+  }
+
+  @Test
+  public void testVariantDescriptor() {
+    runner.run(
+        "variant-descriptor-1.html",
+        "variant-descriptor-2.html"
         );
   }
 

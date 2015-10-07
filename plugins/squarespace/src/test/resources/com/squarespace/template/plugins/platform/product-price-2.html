@@ -1,0 +1,16 @@
+:JSON
+{
+  "structuredContent": {
+    "productType": 1,
+    "variants": [
+      {"price": 10000},
+      {"onSale": true, "salePrice": 5000}
+    ]
+  }
+}
+
+:TEMPLATE
+{@|product-price}
+
+:OUTPUT
+<div class="product-price">from <span class="sqs-money-native">50.00</span></div>

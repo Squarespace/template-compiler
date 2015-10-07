@@ -311,10 +311,14 @@ public class CommerceFormatters implements FormatterRegistry {
       String group = args.isEmpty() ? "" : args.first();
 
       // check to see if the group is a key that lives in the context or higher up
-      if (!node.path(group).isMissingNode()) {
-        group = node.path(group).asText();
-      } else if (!ctx.resolve(group).isMissingNode()) {
-        group = ctx.resolve(group).asText();
+      JsonNode groupNode = node.path(group);
+      if (!groupNode.isMissingNode()) {
+        group = groupNode.asText();
+      } else {
+        groupNode = ctx.resolve(group);
+        if (!groupNode.isMissingNode()) {
+          group = groupNode.asText();
+        }
       }
 
       String value = "<span class=\"sqs-product-quick-view-button\" data-id=\""

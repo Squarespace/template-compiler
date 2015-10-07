@@ -19,7 +19,9 @@ package com.squarespace.template;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.squarespace.template.TestCaseParser.TestCase;
 
@@ -29,6 +31,8 @@ import com.squarespace.template.TestCaseParser.TestCase;
  * resource files using a {@link TestCaseParser}.
  */
 public class TestSuiteRunner {
+
+  private final Set<String> filesSeen = new HashSet<>();
 
   private final TestCaseParser parser = new TestCaseParser();
 
@@ -44,7 +48,11 @@ public class TestSuiteRunner {
   public void run(String ... paths) {
     Map<String, AssertionError> errors = new HashMap<>();
     for (String path : paths) {
+      if (filesSeen.contains(path)) {
+        throw new AssertionError("Already processed file " + path);
+      }
       runOne(path, errors);
+      filesSeen.add(path);
     }
     assertPass(errors);
   }

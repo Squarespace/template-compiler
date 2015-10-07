@@ -120,9 +120,6 @@ public class CommerceUtils {
   public static double getSalePrice(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
-    if (type == null) {
-      return 0.0;
-    }
     switch (type) {
       case PHYSICAL:
       case SERVICE:
@@ -206,49 +203,41 @@ public class CommerceUtils {
   }
 
   public static boolean isOnSale(JsonNode item) {
-    boolean onSale = false;
-
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
-    if (type == null) {
-      return onSale;
-    }
     switch (type) {
       case PHYSICAL:
       case SERVICE:
         JsonNode variants = structuredContent.path("variants");
-        for (int i = 0; i < variants.size(); i++) {
+        int size = variants.size();
+        for (int i = 0; i < size; i++) {
           JsonNode variant = variants.get(i);
           if (isTruthy(variant.path("onSale"))) {
-            onSale = true;
-            break;
+            return true;
           }
         }
         break;
 
       case DIGITAL:
-        onSale = isTruthy(structuredContent.path("onSale"));
-        break;
+        return isTruthy(structuredContent.path("onSale"));
 
       default:
         break;
     }
-    return onSale;
+    return false;
   }
 
   public static boolean isSoldOut(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
-    if (type == null) {
-      return true;
-    }
     switch (type) {
       case PHYSICAL:
       case SERVICE:
         JsonNode variants = structuredContent.path("variants");
-        for (int i = 0; i < variants.size(); i++) {
+        int size = variants.size();
+        for (int i = 0; i < size; i++) {
           JsonNode variant = variants.get(i);
           if (isTruthy(variant.path("unlimited")) || variant.path("qtyInStock").asInt() > 0) {
             return false;
@@ -342,9 +331,6 @@ public class CommerceUtils {
 
   public static void writePriceString(JsonNode item, StringBuilder buf) {
     ProductType type = getProductType(item);
-    if (type == null) {
-      return;
-    }
     double normalPrice = getNormalPrice(item);
     switch (type) {
       case PHYSICAL:
@@ -384,31 +370,25 @@ public class CommerceUtils {
   }
 
   public static void writeVariantFormat(JsonNode variant, StringBuilder buf) {
-    if (variant == null) {
+    ArrayNode optionValues = (ArrayNode) variant.get("optionValues");
+    if (optionValues == null) {
       return;
     }
 
-    ArrayNode optionValuesJson = (ArrayNode) variant.get("optionValues");
+    Iterator<JsonNode> iterator = optionValues.elements();
+    List<String> values = new ArrayList<>();
 
-    if (optionValuesJson == null) {
-      return;
+    while (iterator.hasNext()) {
+      JsonNode option = iterator.next();
+      values.add(option.get("value").asText());
     }
 
-    Iterator<JsonNode> optionValuesIterator = optionValuesJson.elements();
-    List<String> variantValues = new ArrayList<>();
-
-    while (optionValuesIterator.hasNext()) {
-      JsonNode optionValueJson = optionValuesIterator.next();
-      variantValues.add(optionValueJson.get("value").asText());
-    }
-
-    for (int i = 0; i < variantValues.size(); i++) {
-
+    int size = values.size();
+    for (int i = 0; i < size; i++) {
       if (i > 0) {
         buf.append(" / ");
       }
-
-      buf.append(variantValues.get(i));
+      buf.append(values.get(i));
     }
   }
 
