@@ -80,7 +80,7 @@ public class PlatformUtils {
     buf.append("\" data-full-url=\"");
     buf.append(item.path("fullUrl").asText());
     buf.append("\" data-title=\"");
-    PluginUtils.escapeHtmlTag(item.path("title").asText(), buf);
+    PluginUtils.escapeHtmlAttribute(item.path("title").asText(), buf);
     buf.append("\">");
     if (inline) {
       buf.append("</span>");

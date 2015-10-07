@@ -265,7 +265,7 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtmlTag(eatNull(node), buf);
+      PluginUtils.escapeHtmlAttribute(eatNull(node), buf);
       return ctx.buildNode(buf.toString());
     }
 
@@ -284,7 +284,7 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtmlTag(eatNull(node), buf);
+      PluginUtils.escapeHtmlAttribute(eatNull(node), buf);
       return ctx.buildNode(buf.toString());
     }
 

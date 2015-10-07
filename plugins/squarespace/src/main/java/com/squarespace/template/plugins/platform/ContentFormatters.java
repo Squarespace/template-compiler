@@ -157,7 +157,7 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("\" data-image-focal-point=\"");
       buf.append(focalPoint);
       buf.append("\" alt=\"");
-      PluginUtils.escapeHtmlTag(altText, buf);
+      PluginUtils.escapeHtmlAttribute(altText, buf);
       buf.append("\" ");
     }
   }
@@ -351,7 +351,7 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append(" src=\"").append(assetUrl).append("\" ");
       if (!altText.isEmpty()) {
         buf.append(" alt=\"");
-        PluginUtils.escapeHtmlTag(altText, buf);
+        PluginUtils.escapeHtmlAttribute(altText, buf);
         buf.append("\" ");
       }
       buf.append(" />");
@@ -360,7 +360,7 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("<img class=\"").append(cls).append("\" ");
       if (!altText.isEmpty()) {
         buf.append("alt=\"");
-        PluginUtils.escapeHtmlTag(altText, buf);
+        PluginUtils.escapeHtmlAttribute(altText, buf);
         buf.append("\" ");
       }
 
@@ -735,7 +735,7 @@ public class ContentFormatters implements FormatterRegistry {
         buf.append(" data-load=\"false\" ");
       }
       buf.append("data-html=\"");
-      PluginUtils.escapeHtmlTag(oEmbed.path("html").asText(), buf);
+      PluginUtils.escapeHtmlAttribute(oEmbed.path("html").asText(), buf);
       buf.append("\" data-provider-name=\"").append(oEmbed.path("providerName").asText()).append("\">");
 
       if (isTruthy(node.path("overlay"))) {
