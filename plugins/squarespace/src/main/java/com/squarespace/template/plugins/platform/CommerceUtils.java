@@ -92,9 +92,6 @@ public class CommerceUtils {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
-    if (type == null) {
-      return 0.0;
-    }
     switch (type) {
       case PHYSICAL:
       case SERVICE:
@@ -290,9 +287,6 @@ public class CommerceUtils {
     tplData.put("minPrice", minPrice).put("productTitle", productTitle).put("discountAmt", discountAmtStr);
 
     CommerceCouponType type = CommerceCouponType.fromCode(coupon.path("type").asInt());
-    if (type == null) {
-      return;
-    }
     MapFormat amountTpl = null;
     MapFormat freeShipTpl = null;
 
@@ -301,6 +295,7 @@ public class CommerceUtils {
         amountTpl = ALL_ORDERS_AMT;
         freeShipTpl = ALL_ORDERS_SHP;
         break;
+
       case ORDERS_OVER:
         amountTpl = ORDERS_OVER_AMT;
         freeShipTpl = ORDERS_OVER_SHP;
@@ -319,10 +314,6 @@ public class CommerceUtils {
     }
 
     CommerceDiscountType discountType = CommerceDiscountType.fromCode(coupon.path("discountType").asInt());
-    if (discountType == null) {
-      return;
-    }
-
     switch (discountType) {
       case FLAT:
         tplData.put("discountAmt", PluginUtils.formatMoney(discountAmt, Locale.US));

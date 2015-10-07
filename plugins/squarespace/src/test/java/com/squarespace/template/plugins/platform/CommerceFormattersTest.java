@@ -1,17 +1,14 @@
 /**
  * Copyright (c) 2015 SQUARESPACE, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.squarespace.template.plugins.platform;
@@ -36,10 +33,70 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testAddToCartButton() {
     runner.run(
-      "add-to-cart-btn-1.html",
-      "add-to-cart-btn-2.html",
-      "add-to-cart-btn-3.html"
-    );
+        "add-to-cart-btn-1.html",
+        "add-to-cart-btn-2.html",
+        "add-to-cart-btn-3.html"
+        );
+  }
+
+  @Test
+  public void testBookkeeperMoneyFormat() {
+    runner.run(
+        "bookkeeper-money-format-1.html"
+        );
+  }
+
+  @Test
+  public void testCartQuantity() {
+    runner.run(
+        "cart-quantity-1.html",
+        "cart-quantity-2.html"
+        );
+  }
+
+  @Test
+  public void testCartSubtotal() {
+    runner.run(
+        "cart-subtotal-1.html"
+        );
+  }
+
+  @Test
+  public void testCartUrl() {
+    runner.run(
+        "cart-url-1.html"
+        );
+  }
+
+  @Test
+  public void testCouponDescriptor() {
+    runner.run(
+        "coupon-descriptor-1.html",
+        "coupon-descriptor-2.html",
+        "coupon-descriptor-3.html",
+        "coupon-descriptor-4.html",
+        "coupon-descriptor-5.html",
+        "coupon-descriptor-6.html",
+        "coupon-descriptor-7.html",
+        "coupon-descriptor-8.html"
+        );
+  }
+
+  @Test
+  public void testFromPrice() {
+    runner.run(
+        "from-price-1.html",
+        "from-price-2.html",
+        "from-price-3.html",
+        "from-price-4.html",
+        "from-price-5.html",
+        "from-price-6.html",
+        "from-price-7.html"
+        );
+  }
+
+  @Test
+  public void testMoneyFormatCamel() {
   }
 
   @Test
@@ -52,6 +109,37 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     assertFormatter(MONEY_DASH_FORMAT, "100000", "1,000.00");
     assertFormatter(MONEY_DASH_FORMAT, "100003", "1,000.03");
     assertFormatter(MONEY_DASH_FORMAT, "1241313", "12,413.13");
+    runner.run(
+        "money-format-1.html",
+        "money-format-2.html"
+        );
+  }
+
+  @Test
+  public void testMoneyString() {
+    runner.run(
+        "money-string-1.html"
+        );
+  }
+
+  @Test
+  public void testPercentageFormat() {
+    runner.run(
+        "percentage-format-1.html"
+        );
+  }
+
+  @Test
+  public void testNormalPrice() {
+    runner.run(
+        "normal-price-1.html",
+        "normal-price-2.html",
+        "normal-price-3.html",
+        "normal-price-4.html",
+        "normal-price-5.html",
+        "normal-price-6.html",
+        "normal-price-7.html"
+        );
   }
 
   @Test
@@ -100,9 +188,9 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testVariantsSelect() {
     runner.run(
-      "variants-select-1.html",
-      "variants-select-2.html"
-    );
+        "variants-select-1.html",
+        "variants-select-2.html"
+        );
   }
 
 }

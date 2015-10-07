@@ -90,7 +90,7 @@ public class TestCaseParser extends UnitTestBase {
     @Override
     public void run(Compiler compiler) {
       try {
-        Instruction code = compiler.compile(template, true).code();
+        Instruction code = compiler.compile(template, false).code();
         Context ctx = compiler.newExecutor()
             .code(code)
             .json(json)

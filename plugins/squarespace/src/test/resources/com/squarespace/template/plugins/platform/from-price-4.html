@@ -1,0 +1,18 @@
+:JSON
+{
+  "structuredContent": {
+    "productType": 1,
+    "variants": [
+      {"price": 100.0},
+      {"onSale": true, "salePrice": 10.0},
+      {"price": 75.0},
+      {"onSale": true, "salePrice": 50.0}
+    ]
+  }
+}
+
+:TEMPLATE
+{@|from-price}
+
+:OUTPUT
+10.0
