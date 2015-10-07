@@ -38,6 +38,7 @@ import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
+import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
@@ -422,13 +423,11 @@ public class CommerceFormatters implements FormatterRegistry {
 
     private static final Map<String, String> ANSWER_MAP = buildAnswerMap();
 
-    private static final String[] TYPES = new String[] {
+    private static final String[] TEMPLATES = new String[] {
       "address", "checkbox", "date", "likert", "name", "phone", "time"
     };
 
     private final Map<String, Instruction> templateMap = new HashMap<>();
-
-    private Instruction formTemplate;
 
     public SummaryFormFieldFormatter() {
       super("summary-form-field", false);
@@ -436,13 +435,11 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public void initialize(Compiler compiler) throws CodeException {
-      for (String type : TYPES) {
+      for (String type : TEMPLATES) {
         String source = loadResource(CommerceFormatters.class, "summary-form-field-" + type + ".html");
         Instruction code = compiler.compile(source.trim()).code();
         templateMap.put(type, code);
       }
-      String formSource = loadResource(CommerceFormatters.class, "summary-form-field-form.html").trim();
-      this.formTemplate = compiler.compile(formSource).code();
     }
 
     @Override
@@ -460,13 +457,22 @@ public class CommerceFormatters implements FormatterRegistry {
         value = executeTemplate(ctx, code, node, true);
       }
 
-      ObjectNode form = JsonUtils.createObjectNode();
-      form.put("title", field.path("rawTitle"));
-      form.put("value", value);
-      return executeTemplate(ctx, formTemplate, form, true);
+      // Assemble the HTML form wrapper containing the rendered value.
+      StringBuilder buf = new StringBuilder();
+      buf.append("<div style=\"font-size:11px; margin-top:3px\">\n");
+      buf.append("  <span style=\"font-weight:bold;\">");
+      buf.append(field.path("rawTitle").asText());
+      buf.append(":</span> ");
+      if (GeneralUtils.isTruthy(value)) {
+        buf.append(value.asText());
+      } else {
+        buf.append("N/A");
+      }
+      buf.append("\n</div>");
+      return ctx.buildNode(buf.toString());
     }
 
-    private JsonNode convertLikert(JsonNode values) {
+    private static JsonNode convertLikert(JsonNode values) {
       ArrayNode result = JsonUtils.createArrayNode();
       Iterator<Entry<String, JsonNode>> likertFields = values.fields();
       while (likertFields.hasNext()) {
