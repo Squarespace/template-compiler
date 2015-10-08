@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"folderBehavior": 2},
+    {"folderBehavior": 1},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.redirect?}0{.end}{.end}
+{.section items.1}{.redirect?}x{.or}1{.end}{.end}
+{.section items.2}{.redirect?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

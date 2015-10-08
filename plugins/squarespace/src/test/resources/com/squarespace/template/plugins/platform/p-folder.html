@@ -1,0 +1,22 @@
+:JSON
+{
+  "items": [
+    {"collection": {"folder": true}},
+    {"collection": {"folder": false}},
+    {"collection": {"foo": 0}},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.folder?}0{.end}{.end}
+{.section items.1}{.folder?}x{.or}1{.end}{.end}
+{.section items.2}{.folder?}x{.or}2{.end}{.end}
+{.section items.3}{.folder?}x{.or}3{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+

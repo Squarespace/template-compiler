@@ -1,0 +1,22 @@
+:JSON
+{
+  "items": [
+    {"location": {"mapLat": 33.448377, "mapLng": -112.074037}},
+    {"location": {"mapLat": 33.448377}},
+    {"location": {"foo": 0}},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.location?}0{.end}{.end}
+{.section items.1}{.location?}x{.or}1{.end}{.end}
+{.section items.2}{.location?}x{.or}2{.end}{.end}
+{.section items.3}{.location?}x{.or}3{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+

@@ -1,0 +1,16 @@
+:JSON
+{
+  "items": [
+    {"options": {"autoplay": true}},
+    {"options": {}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.gallery-autoplay?}0{.end}{.end}
+{.section items.1}{.gallery-autoplay?}x{.or}1{.end}{.end}
+
+:OUTPUT
+0
+1
+

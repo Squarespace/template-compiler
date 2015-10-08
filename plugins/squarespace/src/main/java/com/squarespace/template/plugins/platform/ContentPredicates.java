@@ -48,6 +48,38 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
  */
 public class ContentPredicates implements PredicateRegistry {
 
+  private static final String[] GALLERY_DESIGN_SELECT = new String[] {
+    "grid", "slideshow", "slider", "stacked"
+  };
+
+  private static final String[] META_POSITION_SELECT = new String[] {
+    "top", "top-left", "top-right", "center", "bottom", "bottom-left", "bottom-right"
+  };
+
+  private static final String[] ACTIVE_ALIGNMENT_SELECT = new String[] {
+    "center", "left", "right"
+  };
+
+  private static final String[] GALLERY_BOOLEAN = new String[] {
+    "autoplay", "auto-crop", "controls", "lightbox", "square-thumbs", "show-meta",
+    "show-meta-on-hover", "thumbnails"
+  };
+
+  // This list of record type checks are special-cased to also perform a promotedBlockType check.
+  // Just going by how the JavaScript predicates are defined.
+  private static final Set<RecordType> PROMOTED_RECORD_PREDICATES = new HashSet<>(Arrays.asList(
+    RecordType.VIDEO,
+    RecordType.IMAGE,
+    RecordType.QUOTE,
+    RecordType.LINK,
+    RecordType.GALLERY
+  ));
+
+  private static final String[] PROMOTED_BLOCK_TYPES = new String[] {
+    "map", "embed", "image", "code", "quote", "twitter", "link",
+    "video", "foursquare", "instagram", "form"
+  };
+
   @Override
   public void registerPredicates(SymbolTable<StringView, Predicate> table) {
     table.add(CALENDAR_VIEW);
@@ -164,7 +196,7 @@ public class ContentPredicates implements PredicateRegistry {
       JsonNode type = collection.path("type");
       if (!type.isMissingNode()) {
         CollectionType collType = CollectionType.fromCode(type.asInt());
-        return isTruthy(collection) && CollectionType.COLLECTION_TYPE_PAGE.equals(collType);
+        return CollectionType.COLLECTION_TYPE_PAGE.equals(collType);
       }
       return false;
     }
@@ -174,18 +206,17 @@ public class ContentPredicates implements PredicateRegistry {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode collection = ctx.node().path("collection");
-
       if (collection.isMissingNode()) {
         JsonNode type = ctx.node().path("type");
         if (!type.isMissingNode()) {
           CollectionType collType = CollectionType.fromCode(type.asInt());
-          return isTruthy(type) && CollectionType.TEMPLATE_PAGE.equals(collType);
+          return CollectionType.TEMPLATE_PAGE.equals(collType);
         }
       } else {
         JsonNode type = collection.path("type");
         if (!type.isMissingNode()) {
           CollectionType collType = CollectionType.fromCode(type.asInt());
-          return isTruthy(collection) && CollectionType.TEMPLATE_PAGE.equals(collType);
+          return CollectionType.TEMPLATE_PAGE.equals(collType);
         }
       }
 
@@ -345,24 +376,6 @@ public class ContentPredicates implements PredicateRegistry {
   };
 
 
-  private static final String[] GALLERY_DESIGN_SELECT = new String[] {
-    "grid", "slideshow", "slider", "stacked"
-  };
-
-  private static final String[] META_POSITION_SELECT = new String[] {
-    "top", "top-left", "top-right", "center", "bottom", "bottom-left", "bottom-right"
-  };
-
-  private static final String[] ACTIVE_ALIGNMENT_SELECT = new String[] {
-    "center", "left", "right"
-  };
-
-  private static final String[] GALLERY_BOOLEAN = new String[] {
-    "autoplay", "auto-crop", "controls", "lightbox", "square-thumbs", "show-meta",
-    "show-meta-on-hover", "thumbnails"
-  };
-
-
   static class GallerySelectPredicate extends BasePredicate {
 
     private final String option;
@@ -457,20 +470,5 @@ public class ContentPredicates implements PredicateRegistry {
       return ctx.node().path("promotedBlockType").asText().equals(promotedBlockType);
     }
   }
-
-  // This list of record type checks are special-cased to also perform a promotedBlockType check.
-  // Just going by how the JavaScript predicates are defined.
-  private static final Set<RecordType> PROMOTED_RECORD_PREDICATES = new HashSet<>(Arrays.asList(
-    RecordType.VIDEO,
-    RecordType.IMAGE,
-    RecordType.QUOTE,
-    RecordType.LINK,
-    RecordType.GALLERY
-  ));
-
-  private static final String[] PROMOTED_BLOCK_TYPES = new String[] {
-    "map", "embed", "image", "code", "quote", "twitter", "link",
-    "video", "foursquare", "instagram", "form"
-  };
 
 }

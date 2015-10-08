@@ -1,0 +1,25 @@
+:JSON
+{
+  "items": [
+    {"options": {"design": "grid"}},
+    {"options": {"design": "slideshow"}},
+    {"options": {"design": "slider"}},
+    {"options": {"design": "unknown"}},
+    {"options": {}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.gallery-design-grid?}0{.end}{.end}
+{.section items.1}{.gallery-design-slideshow?}1{.end}{.end}
+{.section items.2}{.gallery-design-slider?}2{.end}{.end}
+{.section items.3}{.gallery-design-slider?}x{.or}3{.end}{.end}
+{.section items.4}{.gallery-design-slider?}x{.or}4{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+

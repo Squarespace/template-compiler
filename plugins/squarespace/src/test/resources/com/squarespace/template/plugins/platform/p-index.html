@@ -1,0 +1,31 @@
+:JSON
+{
+  "items": [
+    {"collection": {"folder": true, "folderBehavior": 1}},
+    {"collection": {"folder": true, "folderBehavior": 2}},
+    {"collection": {"folder": false, "folderBehavior": 1}},
+    {"collection": {"folder": true, "folderBehavior": "bar"}},
+    {"collection": {"folder": false}},
+    {"collection": {"foo": 0}},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.index?}0{.end}{.end}
+{.section items.1}{.index?}x{.or}1{.end}{.end}
+{.section items.2}{.index?}x{.or}2{.end}{.end}
+{.section items.3}{.index?}x{.or}3{.end}{.end}
+{.section items.4}{.index?}x{.or}4{.end}{.end}
+{.section items.5}{.index?}x{.or}5{.end}{.end}
+{.section items.6}{.index?}x{.or}6{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+5
+6
+

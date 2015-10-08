@@ -1,0 +1,21 @@
+:JSON
+{
+  "items": [
+    {"folderBehavior": 1},
+    {"folderBehavior": 2},
+    {"folderBehavior": -1},
+    {"foo": 0}
+  ]
+}
+:TEMPLATE
+{.section items.0}{.clickable?}0{.end}{.end}
+{.section items.1}{.clickable?}1{.end}{.end}
+{.section items.2}{.clickable?}x{.or}2{.end}{.end}
+{.section items.3}{.clickable?}3{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+

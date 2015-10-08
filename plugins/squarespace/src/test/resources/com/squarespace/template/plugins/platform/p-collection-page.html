@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"collection": {"type": 10}},
+    {"collection": {"type": 3}},
+    {"collection": {"foo": 0}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.collection-page?}0{.end}{.end}
+{.section items.1}{.collection-page?}x{.or}1{.end}{.end}
+{.section items.2}{.collection-page?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

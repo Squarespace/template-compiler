@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"calendarView": true},
+    {"foo": 0},
+    {"calendarView": false}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.calendar-view?}0{.end}{.end}
+{.section items.1}{.calendar-view?}x{.or}1{.end}{.end}
+{.section items.2}{.calendar-view?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

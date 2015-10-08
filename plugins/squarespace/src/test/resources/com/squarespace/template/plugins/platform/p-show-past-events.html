@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"showPastOrUpcomingEvents": "past"},
+    {"showPastOrUpcomingEvents": "upcoming"},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.show-past-events?}0{.end}{.end}
+{.section items.1}{.show-past-events?}x{.or}1{.end}{.end}
+{.section items.2}{.show-past-events?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

@@ -1,0 +1,25 @@
+:JSON
+{
+  "items": [
+    {"options": {"controls": true}},
+    {"options": {"indicators": true}},
+    {"options": {"controls": false}},
+    {"options": {"indicators": false}},
+    {"options": {"foo": 0}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.gallery-meta?}0{.end}{.end}
+{.section items.1}{.gallery-meta?}1{.end}{.end}
+{.section items.2}{.gallery-meta?}x{.or}2{.end}{.end}
+{.section items.3}{.gallery-meta?}x{.or}3{.end}{.end}
+{.section items.4}{.gallery-meta?}x{.or}4{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+

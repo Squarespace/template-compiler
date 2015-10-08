@@ -1,0 +1,22 @@
+:JSON
+{
+  "items": [
+    {"passthrough": true, "sourceUrl": "http://foo.com/bar"},
+    {"passthrough": true, "sourceUrl": ""},
+    {"passthrough": false, "sourceUrl": "http://foo.com/bar"},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.passthrough?}0{.end}{.end}
+{.section items.1}{.passthrough?}x{.or}1{.end}{.end}
+{.section items.2}{.passthrough?}x{.or}2{.end}{.end}
+{.section items.3}{.passthrough?}x{.or}3{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+

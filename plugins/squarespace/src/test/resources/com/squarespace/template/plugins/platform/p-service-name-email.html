@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"serviceName": "email"},
+    {"serviceName": "other"},
+    {"foo": "0"}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.serviceNameEmail?}0{.end}{.end}
+{.section items.1}{.serviceNameEmail?}x{.or}1{.end}{.end}
+{.section items.2}{.serviceNameEmail?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

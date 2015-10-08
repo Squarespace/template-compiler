@@ -29,12 +29,120 @@ import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.KnownDates;
 import com.squarespace.template.Predicate;
+import com.squarespace.template.TestSuiteRunner;
 
 
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
  */
 public class ContentPredicatesTest extends PlatformUnitTestBase {
+
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), ContentPredicatesTest.class);
+
+  @Test
+  public void testCalendarView() {
+    runner.run("p-calendar-view.html");
+  }
+
+  @Test
+  public void testChildImages() {
+    runner.run(
+        "p-child-images-1.html",
+        "p-child-images-2.html",
+        "p-child-images-3.html",
+        "p-child-images-4.html"
+        );
+  }
+
+  @Test
+  public void testClickable() {
+    runner.run("p-clickable.html");
+  }
+
+  @Test
+  public void testCollection() {
+    runner.run("p-collection.html");
+  }
+
+  @Test
+  public void testCollectionPage() {
+    runner.run("p-collection-page.html");
+  }
+
+  @Test
+  public void testCollectionTemplatePage() {
+    runner.run("p-collection-template-page.html");
+  }
+
+  @Test
+  public void testCollectionTypeNameEquals() {
+    runner.run("p-collection-type-name-equals.html");
+  }
+
+  @Test
+  public void testExcerpt() {
+    runner.run("p-excerpt.html");
+  }
+
+  @Test
+  public void testExternalLink() {
+    runner.run("p-external-link.html");
+  }
+
+  @Test
+  public void testFolder() {
+    runner.run("p-folder.html");
+  }
+
+  @Test
+  public void testGalleryMeta() {
+    runner.run("p-gallery-meta.html");
+  }
+
+  @Test
+  public void testGallerySelect() {
+    runner.run("p-gallery-select.html");
+  }
+
+  @Test
+  public void testGalleryBoolean() {
+    runner.run("p-gallery-boolean.html");
+  }
+
+  @Test
+  public void testHasMultiple() {
+    runner.run("p-has-multiple.html");
+  }
+
+  @Test
+  public void testIndex() {
+    runner.run("p-index.html");
+  }
+
+  @Test
+  public void testLocation() {
+    runner.run("p-location.html");
+  }
+
+  @Test
+  public void testMainImage() {
+    runner.run("p-main-image.html");
+  }
+
+  @Test
+  public void testRecordType() {
+    runner.run("p-record-type.html");
+  }
+
+  @Test
+  public void testPassthrough() {
+    runner.run("p-passthrough.html");
+  }
+
+  @Test
+  public void testRedirect() {
+    runner.run("p-redirect.html");
+  }
 
   @Test
   public void testSameDay() throws CodeException {
@@ -56,6 +164,16 @@ public class ContentPredicatesTest extends PlatformUnitTestBase {
     ctx = new Context(node);
     ctx.pushSection(key);
     assertFalse(ContentPredicates.SAME_DAY, ctx);
+  }
+
+  @Test
+  public void testServiceNameEmail() {
+    runner.run("p-service-name-email.html");
+  }
+
+  @Test
+  public void testShowPastEvents() {
+    runner.run("p-show-past-events.html");
   }
 
   private void assertTrue(Predicate predicate, Context ctx) throws CodeException {

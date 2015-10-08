@@ -1,0 +1,16 @@
+:JSON
+{
+  "items": [
+    [1, 2, 3],
+    [1]
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.has-multiple?}0{.end}{.end}
+{.section items.1}{.has-multiple?}x{.or}1{.end}{.end}
+
+:OUTPUT
+0
+1
+

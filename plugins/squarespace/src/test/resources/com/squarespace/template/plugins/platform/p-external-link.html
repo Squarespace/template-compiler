@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"externalLink": "http://foo.com/bar"},
+    {"externalLink": ""},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.external-link?}0{.end}{.end}
+{.section items.1}{.external-link?}x{.or}1{.end}{.end}
+{.section items.2}{.external-link?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

@@ -1,0 +1,28 @@
+:JSON
+{
+  "items": [
+    {"recordType": 8},
+    {"recordType": 2},
+    {"recordType": -1},
+    {"promotedBlockType": "video"},
+    {"recordType": 16},
+    {"recordType": 17}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.video?}0{.end}{.end}
+{.section items.1}{.image?}1{.end}{.end}
+{.section items.2}{.image?}x{.or}2{.end}{.end}
+{.section items.3}{.video?}3{.end}{.promotedVIDEO?}3{.end}{.end}
+{.section items.4}{.css-asset?}4{.end}{.end}
+{.section items.5}{.css-asset?}x{.or}5{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+33
+4
+5
+

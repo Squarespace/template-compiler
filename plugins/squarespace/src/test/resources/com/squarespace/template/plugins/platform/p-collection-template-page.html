@@ -1,0 +1,28 @@
+:JSON
+{
+  "items": [
+    {"collection": {"type": 7}},
+    {"collection": {"type": 6}},
+    {"collection": {"foo": 0}},
+    {"type": 7},
+    {"type": 6},
+    {"foo": 0}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.collection-template-page?}0{.end}{.end}
+{.section items.1}{.collection-template-page?}x{.or}1{.end}{.end}
+{.section items.2}{.collection-template-page?}x{.or}2{.end}{.end}
+{.section items.3}{.collection-template-page?}3{.end}{.end}
+{.section items.4}{.collection-template-page?}x{.or}4{.end}{.end}
+{.section items.5}{.collection-template-page?}x{.or}5{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+5
+

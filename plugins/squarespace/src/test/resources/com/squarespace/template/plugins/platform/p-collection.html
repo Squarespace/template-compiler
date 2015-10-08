@@ -1,0 +1,17 @@
+:JSON
+{
+  "items": [
+    {"collection": {"foo": 0}},
+    {"collection": {}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.collection?}0{.end}{.end}
+{.section items.1}{.collection?}x{.or}1{.end}{.end}
+
+:OUTPUT
+0
+1
+
+

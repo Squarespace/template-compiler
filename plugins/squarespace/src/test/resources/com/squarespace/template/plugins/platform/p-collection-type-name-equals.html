@@ -1,0 +1,13 @@
+:JSON
+{
+  "typeName": "foo"
+}
+
+:TEMPLATE
+{.collectionTypeNameEquals? foo}0{.end}
+{.collectionTypeNameEquals? bar}x{.or}1{.end}
+
+:OUTPUT
+0
+1
+

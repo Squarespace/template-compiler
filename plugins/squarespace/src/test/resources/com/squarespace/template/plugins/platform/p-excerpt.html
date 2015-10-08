@@ -1,0 +1,25 @@
+:JSON
+{
+  "items": [
+    {"excerpt": {"html": "foo bar baz"}},
+    {"excerpt": {"html": "    "}},
+    {"excerpt": "abc def ghi"},
+    {"excerpt": "   "},
+    {"excerpt": 123}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.excerpt?}0{.end}{.end}
+{.section items.1}{.excerpt?}x{.or}1{.end}{.end}
+{.section items.2}{.excerpt?}2{.end}{.end}
+{.section items.3}{.excerpt?}x{.or}3{.end}{.end}
+{.section items.4}{.excerpt?}x{.or}4{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+
