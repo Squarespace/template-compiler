@@ -53,25 +53,25 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testCommentLink() {
     runner.run(
-      "comment-link-1.html",
-      "comment-link-2.html",
-      "comment-link-3.html"
+      "f-comment-link-1.html",
+      "f-comment-link-2.html",
+      "f-comment-link-3.html"
     );
   }
 
   @Test
   public void testComments() {
     runner.run(
-      "comments-1.html",
-      "comments-2.html"
+      "f-comments-1.html",
+      "f-comments-2.html"
     );
   }
 
   @Test
   public void testLikeButton() {
     runner.run(
-      "like-button-1.html",
-      "like-button-2.html"
+      "f-like-button-1.html",
+      "f-like-button-2.html"
     );
   }
 

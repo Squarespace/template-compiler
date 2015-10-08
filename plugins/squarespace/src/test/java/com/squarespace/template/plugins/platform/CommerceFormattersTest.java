@@ -36,65 +36,65 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testAddToCartButton() {
     runner.run(
-        "add-to-cart-btn-1.html",
-        "add-to-cart-btn-2.html",
-        "add-to-cart-btn-3.html"
+        "f-add-to-cart-btn-1.html",
+        "f-add-to-cart-btn-2.html",
+        "f-add-to-cart-btn-3.html"
         );
   }
 
   @Test
   public void testBookkeeperMoneyFormat() {
     runner.run(
-        "bookkeeper-money-format-1.html"
+        "f-bookkeeper-money-format-1.html"
         );
   }
 
   @Test
   public void testCartQuantity() {
     runner.run(
-        "cart-quantity-1.html",
-        "cart-quantity-2.html"
+        "f-cart-quantity-1.html",
+        "f-cart-quantity-2.html"
         );
   }
 
   @Test
   public void testCartSubtotal() {
     runner.run(
-        "cart-subtotal-1.html"
+        "f-cart-subtotal-1.html"
         );
   }
 
   @Test
   public void testCartUrl() {
     runner.run(
-        "cart-url-1.html"
+        "f-cart-url-1.html"
         );
   }
 
   @Test
   public void testCouponDescriptor() {
     runner.run(
-        "coupon-descriptor-1.html",
-        "coupon-descriptor-2.html",
-        "coupon-descriptor-3.html",
-        "coupon-descriptor-4.html",
-        "coupon-descriptor-5.html",
-        "coupon-descriptor-6.html",
-        "coupon-descriptor-7.html",
-        "coupon-descriptor-8.html"
+        "f-coupon-descriptor-1.html",
+        "f-coupon-descriptor-2.html",
+        "f-coupon-descriptor-3.html",
+        "f-coupon-descriptor-4.html",
+        "f-coupon-descriptor-5.html",
+        "f-coupon-descriptor-6.html",
+        "f-coupon-descriptor-7.html",
+        "f-coupon-descriptor-8.html"
         );
   }
 
   @Test
   public void testFromPrice() {
     runner.run(
-        "from-price-1.html",
-        "from-price-2.html",
-        "from-price-3.html",
-        "from-price-4.html",
-        "from-price-5.html",
-        "from-price-6.html",
-        "from-price-7.html"
+        "f-from-price-1.html",
+        "f-from-price-2.html",
+        "f-from-price-3.html",
+        "f-from-price-4.html",
+        "f-from-price-5.html",
+        "f-from-price-6.html",
+        "f-from-price-7.html"
         );
   }
 
@@ -113,145 +113,145 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     assertFormatter(MONEY_DASH_FORMAT, "100003", "1,000.03");
     assertFormatter(MONEY_DASH_FORMAT, "1241313", "12,413.13");
     runner.run(
-        "money-format-1.html",
-        "money-format-2.html"
+        "f-money-format-1.html",
+        "f-money-format-2.html"
         );
   }
 
   @Test
   public void testMoneyString() {
     runner.run(
-        "money-string-1.html"
+        "f-money-string-1.html"
         );
   }
 
   @Test
   public void testPercentageFormat() {
     runner.run(
-        "percentage-format-1.html"
+        "f-percentage-format-1.html"
         );
   }
 
   @Test
   public void testNormalPrice() {
     runner.run(
-        "normal-price-1.html",
-        "normal-price-2.html",
-        "normal-price-3.html",
-        "normal-price-4.html",
-        "normal-price-5.html",
-        "normal-price-6.html",
-        "normal-price-7.html"
+        "f-normal-price-1.html",
+        "f-normal-price-2.html",
+        "f-normal-price-3.html",
+        "f-normal-price-4.html",
+        "f-normal-price-5.html",
+        "f-normal-price-6.html",
+        "f-normal-price-7.html"
         );
   }
 
   @Test
   public void testProductPrice() {
     runner.run(
-        "product-price-1.html",
-        "product-price-2.html",
-        "product-price-3.html",
-        "product-price-4.html",
-        "product-price-5.html",
-        "product-price-6.html",
-        "product-price-7.html"
+        "f-product-price-1.html",
+        "f-product-price-2.html",
+        "f-product-price-3.html",
+        "f-product-price-4.html",
+        "f-product-price-5.html",
+        "f-product-price-6.html",
+        "f-product-price-7.html"
         );
   }
 
   @Test
   public void testProductQuickView() {
     runner.run(
-        "product-quick-view-1.html",
-        "product-quick-view-2.html",
-        "product-quick-view-3.html",
-        "product-quick-view-4.html"
+        "f-product-quick-view-1.html",
+        "f-product-quick-view-2.html",
+        "f-product-quick-view-3.html",
+        "f-product-quick-view-4.html"
         );
   }
 
   @Test
   public void testProductStatus() {
     runner.run(
-        "product-status-1.html",
-        "product-status-2.html",
-        "product-status-3.html",
-        "product-status-4.html",
-        "product-status-5.html",
-        "product-status-6.html",
-        "product-status-7.html",
-        "product-status-8.html"
+        "f-product-status-1.html",
+        "f-product-status-2.html",
+        "f-product-status-3.html",
+        "f-product-status-4.html",
+        "f-product-status-5.html",
+        "f-product-status-6.html",
+        "f-product-status-7.html",
+        "f-product-status-8.html"
         );
   }
 
   @Test
   public void testQuantityInput() {
     runner.run(
-        "quantity-input-1.html",
-        "quantity-input-2.html",
-        "quantity-input-3.html"
+        "f-quantity-input-1.html",
+        "f-quantity-input-2.html",
+        "f-quantity-input-3.html"
         );
   }
 
   @Test
   public void testSalePrice() {
     runner.run(
-        "sale-price-1.html",
-        "sale-price-2.html",
-        "sale-price-3.html",
-        "sale-price-4.html",
-        "sale-price-5.html",
-        "sale-price-6.html",
-        "sale-price-7.html"
+        "f-sale-price-1.html",
+        "f-sale-price-2.html",
+        "f-sale-price-3.html",
+        "f-sale-price-4.html",
+        "f-sale-price-5.html",
+        "f-sale-price-6.html",
+        "f-sale-price-7.html"
         );
   }
 
   @Test
   public void testSummaryFormField() {
     runner.run(
-        "summary-form-field-address-1.html",
-        "summary-form-field-address-2.html"
+        "f-summary-form-field-address-1.html",
+        "f-summary-form-field-address-2.html"
         );
     runner.run(
-        "summary-form-field-checkbox-1.html",
-        "summary-form-field-checkbox-2.html",
-        "summary-form-field-checkbox-3.html"
+        "f-summary-form-field-checkbox-1.html",
+        "f-summary-form-field-checkbox-2.html",
+        "f-summary-form-field-checkbox-3.html"
         );
     runner.run(
-        "summary-form-field-date-1.html"
+        "f-summary-form-field-date-1.html"
         );
     runner.run(
-        "summary-form-field-likert-1.html"
+        "f-summary-form-field-likert-1.html"
         );
     runner.run(
-        "summary-form-field-name-1.html"
+        "f-summary-form-field-name-1.html"
         );
     runner.run(
-        "summary-form-field-phone-1.html",
-        "summary-form-field-phone-2.html"
+        "f-summary-form-field-phone-1.html",
+        "f-summary-form-field-phone-2.html"
         );
     runner.run(
-        "summary-form-field-time-1.html",
-        "summary-form-field-time-2.html",
-        "summary-form-field-time-3.html"
+        "f-summary-form-field-time-1.html",
+        "f-summary-form-field-time-2.html",
+        "f-summary-form-field-time-3.html"
         );
     runner.run(
-        "summary-form-field-default-1.html"
+        "f-summary-form-field-default-1.html"
         );
   }
 
   @Test
   public void testVariantDescriptor() {
     runner.run(
-        "variant-descriptor-1.html",
-        "variant-descriptor-2.html"
+        "f-variant-descriptor-1.html",
+        "f-variant-descriptor-2.html"
         );
   }
 
   @Test
   public void testVariantsSelect() {
     runner.run(
-        "variants-select-1.html",
-        "variants-select-2.html",
-        "variants-select-3.html"
+        "f-variants-select-1.html",
+        "f-variants-select-2.html",
+        "f-variants-select-3.html"
         );
   }
 

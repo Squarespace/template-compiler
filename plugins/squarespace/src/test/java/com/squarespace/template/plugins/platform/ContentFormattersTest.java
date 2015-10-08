@@ -78,7 +78,7 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testAudioPlayer() {
     runner.run(
-      "audio-player-1.html"
+      "f-audio-player-1.html"
     );
   }
 
@@ -95,27 +95,27 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testImage() {
     runner.run(
-        "image-1.html",
-        "image-2.html"
+        "f-image-1.html",
+        "f-image-2.html"
         );
   }
 
   @Test
   public void testChildImageMeta() {
     runner.run(
-        "child-image-meta-1.html",
-        "child-image-meta-2.html",
-        "child-image-meta-3.html",
-        "child-image-meta-4.html",
-        "child-image-meta-5.html",
-        "child-image-meta-6.html"
+        "f-child-image-meta-1.html",
+        "f-child-image-meta-2.html",
+        "f-child-image-meta-3.html",
+        "f-child-image-meta-4.html",
+        "f-child-image-meta-5.html",
+        "f-child-image-meta-6.html"
         );
   }
 
   @Test
   public void testCoverImageMeta() {
     runner.run(
-        "cover-image-meta-1.html"
+        "f-cover-image-meta-1.html"
         );
   }
 
@@ -145,9 +145,9 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testItemClasses() {
     runner.run(
-        "item-classes-1.html",
-        "item-classes-2.html",
-        "item-classes-3.html"
+        "f-item-classes-1.html",
+        "f-item-classes-2.html",
+        "f-item-classes-3.html"
         );
   }
 
@@ -192,9 +192,9 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testVideo() {
     runner.run(
-        "video-1.html",
-        "video-2.html",
-        "video-3.html"
+        "f-video-1.html",
+        "f-video-2.html",
+        "f-video-3.html"
         );
   }
 
