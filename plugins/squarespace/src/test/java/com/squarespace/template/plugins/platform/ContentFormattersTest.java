@@ -31,7 +31,6 @@ import com.squarespace.template.Instruction;
 import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.plugins.platform.ContentFormatters.ColorWeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.HeightFormatter;
-import com.squarespace.template.plugins.platform.ContentFormatters.ImageColorFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.ResizedHeightForWidthFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.ResizedWidthForHeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForHeightFormatter;
@@ -48,8 +47,6 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   private static final Formatter COLOR_WEIGHT = new ColorWeightFormatter();
 
   private static final Formatter HEIGHT = new HeightFormatter();
-
-  private static final Formatter IMAGE_COLOR = new ImageColorFormatter();
 
   private static final Formatter RESIZED_WIDTH_FOR_HEIGHT = new ResizedWidthForHeightFormatter();
 
@@ -101,6 +98,24 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testImageColor() {
+    runner.run(
+        "f-image-color-1.html",
+        "f-image-color-2.html",
+        "f-image-color-3.html",
+        "f-image-color-4.html",
+        "f-image-color-5.html"
+        );
+  }
+
+  @Test
+  public void testImageMeta() {
+    runner.run(
+        "f-image-meta-1.html"
+        );
+  }
+
+  @Test
   public void testChildImageMeta() {
     runner.run(
         "f-child-image-meta-1.html",
@@ -132,14 +147,10 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testImageColor() throws CodeException {
-    CodeMaker mk = maker();
-    String json = "{\"colorData\": {\"topLeftAverage\": \"cfcfcf\"}}";
-    Arguments args = mk.args(" topLeft");
-    assertFormatter(IMAGE_COLOR, args, json, "#cfcfcf");
-
-    args = mk.args(" topLeft background-color");
-    assertFormatter(IMAGE_COLOR, args, json, "background-color: #cfcfcf");
+  public void testHumanizeDuration() {
+    runner.run(
+        "f-humanize-duration-1.html"
+        );
   }
 
   @Test

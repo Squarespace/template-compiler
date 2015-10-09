@@ -1,0 +1,17 @@
+:JSON
+{
+  "startDate": 1384518630000,
+  "endDate": 1384518716400,
+  "location": {
+    "addressLine1": "123 Main St.",
+    "addressLine2": "Apt 5",
+    "addressCountry": "US"
+  }
+}
+
+:TEMPLATE
+{@|google-calendar-url}
+
+:OUTPUT
+http://www.google.com/calendar/event?action=TEMPLATE&text=&dates=20131115T123030Z/20131115T123156Z&location=123+Main+St.%2C+Apt+5%2C+US
+

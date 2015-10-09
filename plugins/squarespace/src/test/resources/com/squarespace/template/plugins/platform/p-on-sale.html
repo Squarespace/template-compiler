@@ -1,0 +1,28 @@
+:JSON
+{
+  "items": [
+    {"structuredContent": {"productType": 1, "variants": [{"onSale": true}]}},
+    {"structuredContent": {"productType": 2, "onSale": true}},
+    {"structuredContent": {"productType": 1, "variants": [{"onSale": false}]}},
+    {"structuredContent": {"productType": 2, "onSale": false}},
+    {"structuredContent": {"productType": -1}},
+    {"structuredContent": {"productType": 1, "variants": []}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.on-sale?}0{.end}{.end}
+{.section items.1}{.on-sale?}1{.end}{.end}
+{.section items.2}{.on-sale?}x{.or}2{.end}{.end}
+{.section items.3}{.on-sale?}x{.or}3{.end}{.end}
+{.section items.4}{.on-sale?}x{.or}4{.end}{.end}
+{.section items.5}{.on-sale?}x{.or}5{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+5
+

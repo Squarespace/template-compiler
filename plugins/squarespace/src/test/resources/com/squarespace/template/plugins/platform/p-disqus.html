@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"websiteSettings": {"disqusShortName": "abc"}},
+    {"websiteSettings": {"disqusShortName": ""}},
+    {"websiteSettings": {}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.disqus?}0{.end}{.end}
+{.section items.1}{.disqus?}x{.or}1{.end}{.end}
+{.section items.2}{.disqus?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

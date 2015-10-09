@@ -1,0 +1,11 @@
+:JSON
+{
+  "userName": "foobar"
+}
+
+:TEMPLATE
+{@|twitter-follow-button}
+
+:OUTPUT
+<script>Y.use('squarespace-follow-buttons', function(Y) { Y.on('domready', function() { Y.Squarespace.FollowButtonUtils.renderAll(); }); });</script><div class="squarespace-follow-button" data-username="foobar"></div>
+

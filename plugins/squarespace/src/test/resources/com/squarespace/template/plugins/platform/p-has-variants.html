@@ -1,0 +1,19 @@
+:JSON
+{
+  "items": [
+    {"structuredContent": {"productType": 1, "variants": [{}, {}]}},
+    {"structuredContent": {"productType": 2}},
+    {"structuredContent": {"variants": [{}]}}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.has-variants?}0{.end}{.end}
+{.section items.1}{.has-variants?}x{.or}1{.end}{.end}
+{.section items.2}{.has-variants?}x{.or}2{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+

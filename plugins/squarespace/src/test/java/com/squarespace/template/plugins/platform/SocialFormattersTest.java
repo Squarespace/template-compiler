@@ -53,26 +53,35 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testCommentLink() {
     runner.run(
-      "f-comment-link-1.html",
-      "f-comment-link-2.html",
-      "f-comment-link-3.html"
-    );
+        "f-comment-link-1.html",
+        "f-comment-link-2.html",
+        "f-comment-link-3.html"
+        );
   }
 
   @Test
   public void testComments() {
     runner.run(
-      "f-comments-1.html",
-      "f-comments-2.html"
-    );
+        "f-comments-1.html",
+        "f-comments-2.html"
+        );
+  }
+
+  @Test
+  public void testCommentCount() {
+    runner.run(
+        "f-comment-count-1.html",
+        "f-comment-count-2.html",
+        "f-comment-count-3.html"
+        );
   }
 
   @Test
   public void testLikeButton() {
     runner.run(
-      "f-like-button-1.html",
-      "f-like-button-2.html"
-    );
+        "f-like-button-1.html",
+        "f-like-button-2.html"
+        );
   }
 
   @Test
@@ -82,6 +91,31 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
     String json = "{\"startDate\": " + start + ", \"endDate\": " + end + ", \"title\": \"foo\"}";
     String result = format(GOOGLE_CALENDAR_URL, json);
     assertTrue(result.contains("dates=20131114T123030Z/20131115T123030Z"));
+
+    runner.run(
+        "f-google-calendar-url-1.html"
+        );
   }
 
+  @Test
+  public void testSocialButton() {
+    runner.run(
+        "f-social-button-1.html"
+        );
+  }
+
+  @Test
+  public void testSocialButtonInline() {
+    runner.run(
+        "f-social-button-inline-1.html"
+        );
+  }
+
+  @Test
+  public void testTwitterFollowButton() {
+    runner.run(
+        "f-twitter-follow-button-1.html",
+        "f-twitter-follow-button-2.html"
+        );
+  }
 }

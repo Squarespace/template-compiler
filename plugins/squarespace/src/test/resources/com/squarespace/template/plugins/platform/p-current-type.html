@@ -1,0 +1,17 @@
+:JSON
+{
+  "items": [
+    {"currentType": 5},
+    {"currentType": -1}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.current-type? gallery}0{.end}{.end}
+{.section items.1}{.current-type? gallery}x{.or}1{.end}{.end}
+
+:OUTPUT
+0
+1
+
+

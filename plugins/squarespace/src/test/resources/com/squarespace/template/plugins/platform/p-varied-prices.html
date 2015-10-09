@@ -1,0 +1,71 @@
+:JSON
+{
+  "items": [
+    {
+      "structuredContent": {
+        "productType": 1, "variants": [
+          {"onSale": true, "salePrice": 100},
+          {"price": 200}
+        ]}
+    }, 
+    
+    {
+      "structuredContent": {"productType": 2}
+    }, 
+    
+    {
+      "structuredContent": {
+        "productType": 1, "variants": [
+          {"price": 100},
+          {"price": 200}
+        ]}
+    }, 
+    
+    {
+      "structuredContent": {"productType": -1}
+    }, 
+    
+    {
+      "structuredContent": {
+        "productType": 3, "variants": [
+          {"price": 100},
+          {"price": 100}
+        ]}
+    }, 
+    
+    {
+      "structuredContent": {
+        "productType": 1, "variants": []
+      }
+    }, 
+    
+    {
+      "structuredContent": {
+        "productType": 1, "variants": [
+          {"onSale": true, "salePrice": 100},
+          {"onSale": true, "salePrice": 100},
+          {"onSale": true, "salePrice": 200}
+        ]
+      }
+    }
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.varied-prices?}0{.end}{.end}
+{.section items.1}{.varied-prices?}x{.or}1{.end}{.end}
+{.section items.2}{.varied-prices?}2{.end}{.end}
+{.section items.3}{.varied-prices?}x{.or}3{.end}{.end}
+{.section items.4}{.varied-prices?}x{.or}4{.end}{.end}
+{.section items.5}{.varied-prices?}x{.or}5{.end}{.end}
+{.section items.6}{.varied-prices?}6{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+4
+5
+6
+

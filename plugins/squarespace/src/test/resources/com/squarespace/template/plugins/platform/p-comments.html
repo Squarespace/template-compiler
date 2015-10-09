@@ -1,0 +1,38 @@
+:JSON
+{
+  "items": [
+    {
+      "websiteSettings": {"commentsEnabled": true},
+      "publicCommentCount": 20,
+      "commentState": 2
+    },
+
+    {
+      "websiteSettings": {"commentsEnabled": false},
+      "publicCommentCount": 20,
+      "commentState": 2
+    },
+
+    {
+      "commentState": 0
+    },
+
+    {
+      "commentState": 1,
+      "publicCommentCount": 0
+    }
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.comments?}0{.end}{.end}
+{.section items.1}{.comments?}x{.or}1{.end}{.end}
+{.section items.2}{.comments?}x{.or}2{.end}{.end}
+{.section items.3}{.comments?}3{.end}{.end}
+
+:OUTPUT
+0
+1
+2
+3
+
