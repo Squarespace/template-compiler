@@ -106,7 +106,6 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-
       int count = 0;
       JsonNode entriesNode = node.path("entries");
       for (int i = 0; i < entriesNode.size(); i++) {

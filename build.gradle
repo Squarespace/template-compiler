@@ -93,7 +93,6 @@ allprojects {
   repositories {
     mavenCentral()
   }
-
 }
 
 subprojects {

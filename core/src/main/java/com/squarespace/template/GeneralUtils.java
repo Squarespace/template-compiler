@@ -93,8 +93,8 @@ public class GeneralUtils {
   /**
    * Map.getOrDefault only available in JDK 8, for now we support JDK 7.
    */
-  public static <K, V> V getOrDefault(Map<K, V> map, K code, V defaultValue) {
-    V value = map.get(code);
+  public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
+    V value = map.get(key);
     return value == null ? defaultValue : value;
   }
 

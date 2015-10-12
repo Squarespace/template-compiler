@@ -99,7 +99,6 @@ public class TemplateC {
       parser.handleError(e);
       System.exit(1);
     }
-
   }
 
   /**
