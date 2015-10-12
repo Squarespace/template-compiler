@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins.platform.enums;
 
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.getOrDefault;
 
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public enum RecordType implements PlatformEnum {
   }
 
   public static RecordType fromCode(int code) {
-    return CODE_MAP.getOrDefault(code, UNDEFINED);
+    return getOrDefault(CODE_MAP, code, UNDEFINED);
   }
 
 }

@@ -16,6 +16,8 @@
 
 package com.squarespace.template.plugins.platform.enums;
 
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.getOrDefault;
+
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.stringValueMap;
 
@@ -71,11 +73,11 @@ public enum SliceType implements PlatformEnum {
   }
 
   public static SliceType fromName(String name) {
-    return NAME_MAP.getOrDefault(name, UNDEFINED);
+    return getOrDefault(NAME_MAP, name, UNDEFINED);
   }
 
   public static SliceType fromCode(int code) {
-    return CODE_MAP.getOrDefault(code, UNDEFINED);
+    return getOrDefault(CODE_MAP, code, UNDEFINED);
   }
 
 }

@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins.platform.enums;
 
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
+import static com.squarespace.template.plugins.platform.enums.EnumUtils.getOrDefault;
 
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public enum CommerceDiscountType implements PlatformEnum {
   }
 
   public static CommerceDiscountType fromCode(int code) {
-    return CODE_MAP.getOrDefault(code, UNDEFINED);
+    return getOrDefault(CODE_MAP, code, UNDEFINED);
   }
 
 }

@@ -41,4 +41,12 @@ public class EnumUtils {
     return map;
   }
 
+  /**
+   * Map.getOrDefault only available in JDK 8, for now we support JDK 7.
+   */
+  public static <K, V extends PlatformEnum> V getOrDefault(Map<K, V> map, K code, V defaultValue) {
+    V value = map.get(code);
+    return value == null ? defaultValue : value;
+  }
+
 }
