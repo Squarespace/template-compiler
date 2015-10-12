@@ -105,8 +105,6 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      StringBuilder buf = new StringBuilder();
-      buf.append("<span class=\"sqs-cart-quantity\">");
 
       int count = 0;
       JsonNode entriesNode = node.path("entries");
@@ -114,8 +112,8 @@ public class CommerceFormatters implements FormatterRegistry {
         count += entriesNode.get(i).get("quantity").intValue();
       }
 
-      buf.append(count + "");
-      buf.append("</span>");
+      StringBuilder buf = new StringBuilder();
+      buf.append("<span class=\"sqs-cart-quantity\">").append(count).append("</span>");
       return ctx.buildNode(buf.toString());
     }
   }
@@ -128,12 +126,11 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      double subtotalCents = node.path("subtotalCents").doubleValue();
+
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-subtotal\">");
-
-      double subtotalCents = node.path("subtotalCents").doubleValue();
       CommerceUtils.writeMoneyString(subtotalCents, buf);
-
       buf.append("</span>");
       return ctx.buildNode(buf.toString());
     }
@@ -321,9 +318,11 @@ public class CommerceFormatters implements FormatterRegistry {
         }
       }
 
-      String value = "<span class=\"sqs-product-quick-view-button\" data-id=\""
-          + id + "\" data-group=\"" + group + "\">Quick View</span>";
-      return ctx.buildNode(value);
+      StringBuilder buf = new StringBuilder();
+      buf.append("<span class=\"sqs-product-quick-view-button\" data-id=\"").append(id);
+      buf.append("\" data-group=\"").append(group);
+      buf.append("\">Quick View</span>");
+      return ctx.buildNode(buf.toString());
     }
   }
 

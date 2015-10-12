@@ -332,12 +332,14 @@ public class ContentFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String focalPoint = getFocalPoint(node);
-      String assetUrl = node.path("assetUrl").asText();
-
-      String altText = getAltText(ctx);
 
       String cls = (args.count() == 1) ? args.first() : "thumb-image";
+
+      String id = node.path("id").asText();
+      String altText = getAltText(ctx);
+      String assetUrl = node.path("assetUrl").asText();
+      String focalPoint = getFocalPoint(node);
+      String originalSize = node.path("originalSize").asText();
 
       StringBuilder buf = new StringBuilder();
 
@@ -365,10 +367,10 @@ public class ContentFormatters implements FormatterRegistry {
 
       buf.append("data-src=\"").append(assetUrl).append("\" ");
       buf.append("data-image=\"").append(assetUrl).append("\" ");
-      buf.append("data-image-dimensions=\"").append(node.path("originalSize").asText()).append("\" ");
+      buf.append("data-image-dimensions=\"").append(originalSize).append("\" ");
       buf.append("data-image-focal-point=\"").append(focalPoint).append("\" ");
       buf.append("data-load=\"false\"").append(" ");
-      buf.append("data-image-id=\"").append(node.path("id").asText()).append("\" ");
+      buf.append("data-image-id=\"").append(id).append("\" ");
       buf.append("data-type=\"image\" ");
       buf.append("/>");
       return ctx.buildNode(buf.toString());
@@ -710,8 +712,8 @@ public class ContentFormatters implements FormatterRegistry {
       JsonNode oEmbed = node.path("oembed");
       JsonNode colorData = node.path("colorData");
       String assetUrl = node.path("assetUrl").asText();
-      String originalSize = node.path("originalSize").asText();
       String focalPoint = getFocalPoint(node);
+      String originalSize = node.path("originalSize").asText();
 
       boolean loadFalse = false;
       boolean useColorData = false;
