@@ -1,0 +1,49 @@
+
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+
+task mergeCodeCoverage(type: JacocoMerge) {
+  destinationFile = file("$buildDir/jacoco/merged.exec")
+  doFirst {
+    executionData -= executionData.filter { !it.exists() }
+  }
+}
+
+task rootCoverageReport(type: JacocoReport) {
+  jacocoClasspath = configurations.jacocoAnt
+
+  dependsOn mergeCodeCoverage
+  executionData mergeCodeCoverage.destinationFile
+  subprojects.each { sub -> 
+    sourceSets sub.sourceSets.main
+  }
+  reports {
+    html {
+      enabled true
+    }
+    xml {
+      enabled true
+    }
+  }
+}
+
+task rootTestReport(type: TestReport) {
+  destinationDir = file("$buildDir/reports/tests")
+}
+
+subprojects.each { sub ->
+  sub.tasks.withType(Test) { task ->
+    mergeCodeCoverage.executionData task
+    rootTestReport.reportOn task
+  }
+}
+
+def checkTask = tasks.findByName('check') ?: tasks.create('check')
+
+checkTask.dependsOn rootCoverageReport, rootTestReport
+
+coveralls {
+  sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+  jacocoReportPath = "${buildDir}/reports/jacoco/rootCoverageReport/rootCoverageReport.xml"
+}
+

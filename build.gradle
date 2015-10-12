@@ -17,7 +17,7 @@ plugins {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.4'
+  gradleVersion = '2.7'
 }
 
 project.ext {
@@ -85,6 +85,13 @@ clean {
 task makeCli(dependsOn: ':template-cli:makeCli') {
 }
 
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+
+}
+
 subprojects {
   apply plugin: 'java'
   apply plugin: 'eclipse'
@@ -94,7 +101,6 @@ subprojects {
   apply plugin: 'jacoco'
   apply plugin: 'signing'
   apply plugin: 'maven'
-  apply plugin: 'com.github.kt3k.coveralls'
 
   group 'com.squarespace.template'
 
@@ -108,10 +114,6 @@ subprojects {
     include '**/*.java'
   }
 
-  repositories {
-    mavenCentral()
-  }
-
   checkstyle {
     toolVersion = '5.7'
     ignoreFailures = false
@@ -123,10 +125,6 @@ subprojects {
     jacoco {
       append = false
     }
-  }
-
-  jacoco {
-    toolVersion = '0.7.5.201505241946'
   }
 
   jacocoTestReport {
@@ -219,4 +217,7 @@ subprojects {
   }
 
 }
+
+apply from: 'gradle/coverage.gradle'
+
 
