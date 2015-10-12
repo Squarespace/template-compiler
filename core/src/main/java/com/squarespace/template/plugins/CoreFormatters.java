@@ -319,7 +319,7 @@ public class CoreFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      // NOTE: this is </script> replacement is copied verbatim from the JavaScript
+      // NOTE: this </script> replacement is copied verbatim from the JavaScript
       // version of JSONT, but it seems quite error-prone to me.
       return ctx.buildNode(node.toString().replace("</script>", "</scr\"+\"ipt>"));
     }
@@ -340,7 +340,7 @@ public class CoreFormatters implements FormatterRegistry {
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       try {
         String result = GeneralUtils.jsonPretty(node);
-        // NOTE: this is </script> replacement is copied verbatim from the JavaScript
+        // NOTE: this </script> replacement is copied verbatim from the JavaScript
         // version of JSONT, but it seems quite error-prone to me.
         return ctx.buildNode(result.replace("</script>", "</scr\"+\"ipt>"));
 

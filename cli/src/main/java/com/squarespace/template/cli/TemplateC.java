@@ -48,8 +48,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 /**
  * Command line template compiler.
- *
- * TODO: move to separate gradle subproject
  */
 public class TemplateC {
 
