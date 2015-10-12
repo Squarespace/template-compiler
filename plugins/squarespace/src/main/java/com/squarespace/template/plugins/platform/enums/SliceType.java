@@ -16,8 +16,7 @@
 
 package com.squarespace.template.plugins.platform.enums;
 
-import static com.squarespace.template.plugins.platform.enums.EnumUtils.getOrDefault;
-
+import static com.squarespace.template.GeneralUtils.getOrDefault;
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.codeMap;
 import static com.squarespace.template.plugins.platform.enums.EnumUtils.stringValueMap;
 

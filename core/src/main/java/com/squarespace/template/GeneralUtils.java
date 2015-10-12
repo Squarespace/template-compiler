@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -86,6 +87,15 @@ public class GeneralUtils {
     info.name(path);
     info.data(message);
     return info;
+  }
+
+
+  /**
+   * Map.getOrDefault only available in JDK 8, for now we support JDK 7.
+   */
+  public static <K, V> V getOrDefault(Map<K, V> map, K code, V defaultValue) {
+    V value = map.get(code);
+    return value == null ? defaultValue : value;
   }
 
   /**

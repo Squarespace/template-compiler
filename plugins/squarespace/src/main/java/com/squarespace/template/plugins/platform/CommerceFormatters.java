@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins.platform;
 
 import static com.squarespace.template.GeneralUtils.executeTemplate;
+import static com.squarespace.template.GeneralUtils.getOrDefault;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
 import java.util.HashMap;
@@ -483,7 +484,7 @@ public class CommerceFormatters implements FormatterRegistry {
         String answer = likertField.getValue().asText();
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("question", likertField.getKey());
-        node.put("answer", ANSWER_MAP.getOrDefault(answer, "Neutral"));
+        node.put("answer", getOrDefault(ANSWER_MAP, answer, "Neutral"));
         result.add(node);
       }
       return result;
