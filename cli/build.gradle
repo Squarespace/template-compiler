@@ -6,7 +6,7 @@ apply plugin: 'application'
 
 dependencies {
   compile project(':template-core')
-  compile 'net.sourceforge.argparse4j:argparse4j:0.4.4'
+  compile "net.sourceforge.argparse4j:argparse4j:${argparseVersion}"
 
   testCompile project(path: ':template-core', configuration: 'tests')
   testCompile "org.testng:testng:${testngVersion}"

@@ -43,34 +43,44 @@ public class PluginDateUtilsTest {
 
   private static final Locale MEXICO = new Locale("es", "MX");
 
+  private static final long ONE_MINUTE_MS = 60 * 1000;
+
+  private static final long ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
+
+  private static final long ONE_DAY_MS = 24 * ONE_HOUR_MS;
+
+  private static final long ONE_MONTH_MS = (long)(30.41 * ONE_DAY_MS);
+
+  private static final long ONE_YEAR_MS = 365 * ONE_DAY_MS;
+
   @Test
   public void testHumanizeDate() {
     long baseMs = MAY_13_2013_010000_UTC + 30000;
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about 30 seconds ago");
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, false), "less than a minute ago");
 
-    baseMs += 60000;
+    baseMs += ONE_MINUTE_MS;
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about a minute ago");
 
-    baseMs += 60000;
+    baseMs += ONE_MINUTE_MS;
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about 2 minutes ago");
 
-    baseMs += (5 * 60000);
+    baseMs += (5 * ONE_MINUTE_MS);
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about 7 minutes ago");
 
-    baseMs += (60 * 60000);
+    baseMs += (60 * ONE_MINUTE_MS);
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about an hour ago");
 
-    baseMs += (60 * 60000);
+    baseMs += (60 * ONE_MINUTE_MS);
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about 2 hours ago");
 
     baseMs = MAY_13_2013_010000_UTC + (long)(83600000 * 2.5);
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about 2 days ago");
 
-    baseMs += (83600000 * 5);
+    baseMs += (ONE_DAY_MS * 5);
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about a week ago");
 
-    baseMs += (83600000 * 10);
+    baseMs += (ONE_DAY_MS * 10);
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, baseMs, true), "about 2 weeks ago");
 
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, NOV_15_2013_123030_UTC, true), "about 6 months ago");
@@ -79,11 +89,19 @@ public class PluginDateUtilsTest {
 
   @Test
   public void testSameDay() {
-    long baseMs = MAY_13_2013_010000_UTC + (60000 * 5);
-    assertTrue(sameDay(MAY_13_2013_010000_UTC, baseMs, TZ_UTC));
+    long baseMs = MAY_13_2013_010000_UTC;
 
-    baseMs += (83600000 * 2);
-    assertFalse(sameDay(MAY_13_2013_010000_UTC, baseMs, TZ_UTC));
+    // 5 minutes after
+    assertTrue(sameDay(baseMs, baseMs + (ONE_MINUTE_MS * 5), TZ_UTC));
+
+    // 2 days after
+    assertFalse(sameDay(baseMs, baseMs + (ONE_DAY_MS * 2), TZ_UTC));
+
+    // 2 months after
+    assertFalse(sameDay(baseMs, baseMs + (ONE_MONTH_MS * 2), TZ_UTC));
+
+    // 2 years after
+    assertFalse(sameDay(baseMs, baseMs + (ONE_YEAR_MS * 2), TZ_UTC));
   }
 
   @Test
