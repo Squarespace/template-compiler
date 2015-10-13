@@ -43,9 +43,16 @@ public class PlatformUtils {
     return formatter.format(cents / 100);
   }
 
-  public static String formatPercentage(double percentage, Locale locale) {
+  public static String formatPercentage(double percentage, boolean trim, Locale locale) {
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-    DecimalFormat format = new DecimalFormat("#,##0.00#", symbols);
+    String pattern = trim ? "#,##0.###" :"#,##0.00#" ;
+    DecimalFormat format = new DecimalFormat(pattern, symbols);
+    return format.format(percentage);
+  }
+
+  public static String formatPercentageTrimmed(double percentage, Locale locale) {
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+    DecimalFormat format = new DecimalFormat("#,##0.###", symbols);
     return format.format(percentage);
   }
 

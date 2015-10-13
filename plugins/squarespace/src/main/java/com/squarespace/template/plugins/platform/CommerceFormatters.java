@@ -241,7 +241,8 @@ public class CommerceFormatters implements FormatterRegistry {
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       double value = node.asDouble();
       StringBuilder buf = new StringBuilder();
-      String formatted = PlatformUtils.formatPercentage(value, Locale.US);
+      boolean trim = args.count() > 0 && args.first().equals("trim");
+      String formatted = PlatformUtils.formatPercentage(value, trim, Locale.US);
       buf.append(formatted);
       return ctx.buildNode(buf.toString());
     }
