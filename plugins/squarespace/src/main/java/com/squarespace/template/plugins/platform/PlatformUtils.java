@@ -45,7 +45,7 @@ public class PlatformUtils {
 
   public static String formatPercentage(double percentage, boolean trim, Locale locale) {
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-    String pattern = trim ? "#,##0.###" :"#,##0.00#" ;
+    String pattern = trim ? "#,##0.###" : "#,##0.00#";
     DecimalFormat format = new DecimalFormat(pattern, symbols);
     return format.format(percentage);
   }
