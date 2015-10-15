@@ -1,0 +1,24 @@
+:JSON
+{
+  "root-1": "root-1",
+  "root-2": "root-2",
+  "object": {
+    "sub": {
+      "id": "123"
+    },
+    "peer-1": "peer-1",
+    "peer-2": "peer-2"
+  }
+}
+
+:PARTIALS
+{
+  "foo": "{.section sub}{id}:{root-1}:{peer-1}{.end}:{root-2}:{peer-2}"
+}
+
+:TEMPLATE
+{object|apply foo private}
+
+:OUTPUT
+123::peer-1::peer-2
+

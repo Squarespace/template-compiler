@@ -417,10 +417,13 @@ public class Context {
     }
 
     Frame frame = currentFrame;
-    while (frame != null && !frame.stopResolution) {
+    while (frame != null) {
       node = resolve(name, frame);
       if (!node.isMissingNode()) {
         return node;
+      }
+      if (frame.stopResolution) {
+        break;
       }
       frame = frame.parent();
     }

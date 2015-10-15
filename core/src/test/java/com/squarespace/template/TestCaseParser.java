@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
@@ -42,6 +44,8 @@ public class TestCaseParser extends UnitTestBase {
 
   private static final String TYPE_OUTPUT = "OUTPUT";
 
+  private static final String TYPE_PARTIALS = "PARTIALS";
+
   private static final String TYPE_TEMPLATE = "TEMPLATE";
 
   private static final Pattern RE_LINES = Pattern.compile("\n");
@@ -55,8 +59,9 @@ public class TestCaseParser extends UnitTestBase {
     Map<String, String> sections = parseSections(source);
     String json = sections.get(TYPE_JSON);
     String template = sections.get(TYPE_TEMPLATE);
+    String partials = sections.get(TYPE_PARTIALS);
     if (sections.containsKey(TYPE_OUTPUT)) {
-      return new OutputTestCase(json, template, sections.get(TYPE_OUTPUT));
+      return new OutputTestCase(json, template, partials, sections.get(TYPE_OUTPUT));
     } else if (sections.containsKey(TYPE_ERROR)) {
 // TBD:     return new ErrorCase(json, template, sections.get(TYPE_ERROR));
     }
@@ -77,23 +82,31 @@ public class TestCaseParser extends UnitTestBase {
 
     private final String template;
 
+    private final String partials;
+
     private final String output;
 
-    public OutputTestCase(String json, String template, String output) {
+    public OutputTestCase(String json, String template, String partials, String output) {
       assertSection(json, TYPE_JSON, TYPE_OUTPUT);
       assertSection(template, TYPE_TEMPLATE, TYPE_OUTPUT);
       this.json = json;
       this.template = template;
+      this.partials = partials;
       this.output = output.trim();
     }
 
     @Override
     public void run(Compiler compiler) {
       try {
+        ObjectNode partialsMap = null;
+        if (partials != null) {
+          partialsMap = (ObjectNode) JsonUtils.decode(partials);
+        }
         Instruction code = compiler.compile(template, false).code();
         Context ctx = compiler.newExecutor()
             .code(code)
             .json(json)
+            .partialsMap(partialsMap)
             .safeExecution(true)
             .execute();
         String result = ctx.buffer().toString().trim();

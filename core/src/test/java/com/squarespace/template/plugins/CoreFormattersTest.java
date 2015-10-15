@@ -41,6 +41,7 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.SyntaxErrorType;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.UnitTestBase;
 import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.CountFormatter;
@@ -103,6 +104,13 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter TRUNCATE = new TruncateFormatter();
 
   private static final Formatter URL_ENCODE = new UrlEncodeFormatter();
+
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), CoreFormattersTest.class);
+
+  @Test
+  public void testApply() {
+    runner.run("f-apply-1.html");
+  }
 
   @Test
   public void testApplyPartial() throws CodeException {
