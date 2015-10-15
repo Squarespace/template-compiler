@@ -50,12 +50,6 @@ public class PlatformUtils {
     return format.format(percentage);
   }
 
-  public static String formatPercentageTrimmed(double percentage, Locale locale) {
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-    DecimalFormat format = new DecimalFormat("#,##0.###", symbols);
-    return format.format(percentage);
-  }
-
   public static void makeSocialButton(JsonNode website, JsonNode item, boolean inline, StringBuilder buf) {
     JsonNode options = website.path("shareButtonOptions");
     if (website.isMissingNode() || options.isMissingNode() || options.size() == 0) {

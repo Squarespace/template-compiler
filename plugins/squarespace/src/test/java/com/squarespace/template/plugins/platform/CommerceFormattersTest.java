@@ -128,7 +128,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testPercentageFormat() {
     runner.run(
-        "f-percentage-format-1.html"
+        "f-percentage-format-1.html",
+        "f-percentage-format-2.html"
         );
   }
 
