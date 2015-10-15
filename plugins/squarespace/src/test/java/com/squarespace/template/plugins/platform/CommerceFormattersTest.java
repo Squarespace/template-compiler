@@ -100,6 +100,7 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testMoneyFormatCamel() {
+    runner.run("f-money-format-camel-1.html");
   }
 
   @Test
