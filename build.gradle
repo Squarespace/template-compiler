@@ -59,7 +59,7 @@ def configurePom(def pom) {
   pom.project {
     name "template-compiler"
     description "Template compiler based on JSON-Template"
-    url 'https://github.com/squarespace/squarespace-template'
+    url 'https://github.com/squarespace/template-compiler'
 
     licenses {
       license {
@@ -70,14 +70,14 @@ def configurePom(def pom) {
     }
 
     scm {
-      connection 'scm:git:git@github.com:squarespace/squarespace-template.git'
-      url 'scm:git:git@github.com:squarespace/squarespace-template.git'
-      developerConnection 'scm:git:git@github.com:squarespace/squarespace-template.git'
+      connection 'scm:git:git@github.com:squarespace/template-compiler.git'
+      url 'scm:git:git@github.com:squarespace/template-compiler.git'
+      developerConnection 'scm:git:git@github.com:squarespace/template-compiler.git'
     }
 
     issueManagement {
       system 'github'
-      url 'https://github.com/squarespace/squarespace-template/issues'
+      url 'https://github.com/squarespace/template-compiler/issues'
     }
   }
 }
