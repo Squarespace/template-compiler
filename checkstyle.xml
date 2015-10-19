@@ -10,7 +10,7 @@
     <module name="FileTabCharacter"/>
 
     <module name="SuppressionFilter">
-        <property name="file" value="${samedir}/suppressions.xml" default="./suppressions.xml"/>
+        <property name="file" value="${samedir}/suppressions.xml"/>
     </module>
 
     <!-- Trailing spaces -->
