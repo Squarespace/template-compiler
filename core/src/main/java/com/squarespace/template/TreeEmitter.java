@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 SQUARESPACE, Inc.
+ * Copyright (c) 2015 SQUARESPACE, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,21 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.ReprEmitter.emitNames;
+
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import com.squarespace.template.Instructions.AlternatesWithInst;
+import com.squarespace.template.Instructions.BindVarInst;
+import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
+import com.squarespace.template.Instructions.SectionInst;
+import com.squarespace.template.Instructions.TextInst;
+import com.squarespace.template.Instructions.VariableInst;
 
 
 /**
@@ -26,6 +38,8 @@ import com.squarespace.template.Instructions.RepeatedInst;
  * purposes.
  */
 public class TreeEmitter {
+
+  private static final int INCR = 2;
 
   private TreeEmitter() {
   }
@@ -38,31 +52,24 @@ public class TreeEmitter {
 
   public static void emit(Instruction inst, int depth, StringBuilder buf) {
     if (inst == null) {
-      indent(depth, buf);
-      buf.append("null\n");
       return;
     }
     InstructionType type = inst.getType();
-    if (!type.equals(InstructionType.ROOT)) {
-      indent(depth, buf);
-      buf.append(type.toString());
-      buf.append('\n');
-    }
-
-    switch (inst.getType()) {
+    emitHeader(type, inst, depth, buf);
+    switch (type) {
       case ALTERNATES_WITH:
       case IF:
       case OR_PREDICATE:
       case PREDICATE:
       case SECTION:
-        emitConsequent((BlockInstruction) inst, depth + 2, buf);
-        emitAlternative((BlockInstruction) inst, depth + 2, buf);
+        emitConsequent((BlockInstruction) inst, depth, buf);
+        emitAlternative((BlockInstruction) inst, depth, buf);
         break;
 
       case REPEATED:
-        emitConsequent((BlockInstruction) inst, depth + 2, buf);
-        emitAlternatesWith((RepeatedInst) inst, depth + 2, buf);
-        emitAlternative((BlockInstruction) inst, depth + 2, buf);
+        emitConsequent((BlockInstruction) inst, depth, buf);
+        emitAlternatesWith((RepeatedInst) inst, depth, buf);
+        emitAlternative((BlockInstruction) inst, depth, buf);
         break;
 
       case ROOT:
@@ -74,39 +81,122 @@ public class TreeEmitter {
     }
   }
 
-  private static void emitConsequent(BlockInstruction block, int depth, StringBuilder buf) {
+  private static void emitHeader(InstructionType type, Instruction inst, int depth, StringBuilder buf) {
+    if (type.equals(InstructionType.ROOT)) {
+      return;
+    }
+
     indent(depth, buf);
-    buf.append("true:\n");
-    emitBlock(block.getConsequent(), depth + 2, buf);
+    buf.append(type.toString());
+    buf.append(" {").append(inst.getLineNumber()).append(',').append(inst.getCharOffset()).append("} ");
+    switch (type) {
+
+      case BINDVAR:
+        BindVarInst bindvar = (BindVarInst)inst;
+        buf.append(bindvar.getName()).append(" = ");
+        emitNames(bindvar.getVariable(), buf);
+        break;
+
+      case COMMENT:
+        CommentInst comment = (CommentInst)inst;
+        emitEscapedString(comment.getView(), buf);
+        break;
+
+      case IF:
+        ReprEmitter.emitIfExpression((IfInst)inst, buf);
+        break;
+
+      case OR_PREDICATE:
+      case PREDICATE:
+        PredicateInst predicateInst = (PredicateInst)inst;
+        Predicate predicate = predicateInst.getPredicate();
+        if (predicate != null) {
+          buf.append(predicate).append(' ');
+          emitArgs(predicateInst.getArguments(), buf);
+        }
+        break;
+
+      case REPEATED:
+        RepeatedInst repeated = (RepeatedInst)inst;
+        emitNames(repeated.getVariable(), buf);
+        break;
+
+      case SECTION:
+        SectionInst section = (SectionInst)inst;
+        emitNames(section.getVariable(), buf);
+        break;
+
+      case TEXT:
+        TextInst text = (TextInst)inst;
+        emitEscapedString(text.getView(), buf);
+        break;
+
+      case VARIABLE:
+        VariableInst variable = (VariableInst)inst;
+        emitNames(variable.getVariable(), buf);
+        for (FormatterCall formatterCall : variable.getFormatters()) {
+          buf.append('\n');
+          indent(depth + INCR, buf);
+          buf.append("| ");
+          buf.append(formatterCall.getFormatter().identifier()).append(" ");
+          emitArgs(formatterCall.getArguments(), buf);
+        }
+        indent(depth, buf);
+        break;
+
+      default:
+        break;
+    }
+    buf.append('\n');
+  }
+
+  private static void emitArgs(Arguments args, StringBuilder buf) {
+    List<String> rawArgs = args.getArgs();
+    if (!rawArgs.isEmpty()) {
+      buf.append("delim='");
+      buf.append(StringEscapeUtils.escapeJava("" + args.getDelimiter()));
+      buf.append("' parsed=").append(args.getArgs());
+    }
+  }
+
+  private static void emitEscapedString(StringView view, StringBuilder buf) {
+    String raw = view.toString();
+    int length = raw.length();
+    int maxLen = Math.min(40, length);
+    buf.append("(len=").append(length).append(") ");
+    buf.append('"').append(StringEscapeUtils.escapeJava(raw.substring(0, maxLen)));
+    if (maxLen != raw.length()) {
+      buf.append(" ...");
+    }
+    buf.append('"');
+  }
+
+  private static void emitConsequent(BlockInstruction inst, int depth, StringBuilder buf) {
+    Block block = inst.getConsequent();
+    if (block != null) {
+      emitBlock(block, depth + INCR, buf);
+    }
   }
 
   private static void emitAlternatesWith(RepeatedInst inst, int depth, StringBuilder buf) {
-    indent(depth, buf);
-    buf.append("alternates:\n");
-    emit(inst.getAlternatesWith(), depth + 2, buf);
+    AlternatesWithInst alternatesWith = inst.getAlternatesWith();
+    if (alternatesWith != null) {
+      emit(alternatesWith, depth + INCR, buf);
+    }
   }
 
-  private static void emitAlternative(BlockInstruction block, int depth, StringBuilder buf) {
-    indent(depth, buf);
-    buf.append("false:\n");
-    emit(block.getAlternative(), depth + 2, buf);
+  private static void emitAlternative(BlockInstruction inst, int depth, StringBuilder buf) {
+    Instruction alternative = inst.getAlternative();
+    if (alternative != null) {
+      emit(alternative, depth, buf);
+    }
   }
 
   private static void emitBlock(Block block, int depth, StringBuilder buf) {
-    if (block == null) {
-      indent(depth, buf);
-      buf.append("null\n");
-      return;
-    }
     emit(block.getInstructions(), depth, buf);
   }
 
   private static void emit(List<Instruction> instructions, int depth, StringBuilder buf) {
-    if (instructions == null) {
-      indent(depth, buf);
-      buf.append("null\n");
-      return;
-    }
     int size = instructions.size();
     for (int i = 0; i < size; i++) {
       emit(instructions.get(i), depth, buf);

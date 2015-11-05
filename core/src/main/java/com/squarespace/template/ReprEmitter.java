@@ -106,6 +106,11 @@ public class ReprEmitter {
 
   public static void emit(IfInst inst, StringBuilder buf, boolean recurse) {
     buf.append("{.if ");
+    emitIfExpression(inst, buf);
+    buf.append('}');
+  }
+
+  public static void emitIfExpression(IfInst inst, StringBuilder buf) {
     List<Object[]> variables = inst.getVariables();
     List<Operator> operators = inst.getOperators();
 
@@ -120,7 +125,6 @@ public class ReprEmitter {
       }
       emitNames(variables.get(i), buf);
     }
-    buf.append('}');
   }
 
   public static void emit(IfPredicateInst inst, StringBuilder buf, boolean recurse) {

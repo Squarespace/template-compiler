@@ -36,6 +36,7 @@ import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.PredicateTable;
 import com.squarespace.template.ReferenceScanner;
+import com.squarespace.template.TreeEmitter;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -74,6 +75,10 @@ public class TemplateC {
       .action(Arguments.storeTrue())
       .help("Dump stats for the template");
 
+    parser.addArgument("--tree", "-t")
+      .action(Arguments.storeTrue())
+      .help("Dump the syntax tree for the template");
+
     parser.addArgument("--json", "-j")
       .type(String.class)
       .help("JSON tree");
@@ -86,111 +91,113 @@ public class TemplateC {
     .type(String.class)
     .help("Template source");
 
+    int exitCode = 1;
     try {
       Namespace res = parser.parseArgs(args);
       if (res.getBoolean("stats")) {
-        stats(res.getString("template"));
+        exitCode = stats(res.getString("template"));
+
+      } else if (res.getBoolean("tree")) {
+        exitCode = tree(res.getString("template"));
 
       } else {
-        compile(res.getString("template"), res.getString("json"), res.getString("partials"));
+        exitCode = compile(res.getString("template"), res.getString("json"), res.getString("partials"));
       }
+
+    } catch (CodeException | IOException e) {
+      System.err.println(e.getMessage());
 
     } catch (ArgumentParserException e) {
       parser.handleError(e);
       System.exit(1);
+
+    } finally {
+      System.exit(exitCode);
     }
   }
 
   /**
    * Compile a template against a given json tree and emit the result.
    */
-  protected void compile(String templatePath, String jsonPath, String partialsPath) {
-    int exitCode = 1;
-    try {
-      String template = readFile(templatePath);
-      String json = "{}";
-      if (jsonPath != null) {
-        json = readFile(jsonPath);
-      }
+  protected int compile(String templatePath, String jsonPath, String partialsPath)
+      throws CodeException, IOException {
 
-      String partials = null;
-      if (partialsPath != null) {
-        partials = readFile(partialsPath);
-      }
-
-      CompiledTemplate compiled = compiler().compile(template, false);
-      Instruction code = compiled.code();
-
-      // Parse the JSON context
-      JsonNode jsonTree = null;
-      try {
-        jsonTree = JsonUtils.decode(json);
-      } catch (IllegalArgumentException e) {
-        System.err.println("Caught error trying to parse JSON: " + e.getCause().getMessage());
-        return;
-      }
-
-      // Parse the optional JSON partials dictionary.
-      JsonNode partialsTree = null;
-      if (partials != null) {
-        try {
-          partialsTree = JsonUtils.decode(partials);
-          if (!(partialsTree instanceof ObjectNode)) {
-            System.err.println("Partials map JSON must be an object. Found " + partialsTree.getNodeType());
-            return;
-          }
-        } catch (IllegalArgumentException e) {
-          System.err.println("Caught error trying to parse partials: " + e.getCause().getMessage());
-          return;
-        }
-      }
-
-      // Perform the compile.
-      Context context = compiler().newExecutor()
-          .code(code)
-          .json(jsonTree)
-          .partialsMap((ObjectNode)partialsTree)
-          .execute();
-
-      // If compile was successful, print the output.
-      System.out.print(context.buffer().toString());
-      exitCode = 0;
-
-    } catch (CodeException e) {
-      System.err.println(e.getMessage());
-
-    } catch (Exception e) {
-      e.printStackTrace();
-
-    } finally {
-      System.exit(exitCode);
+    String template = readFile(templatePath);
+    String json = "{}";
+    if (jsonPath != null) {
+      json = readFile(jsonPath);
     }
+
+    String partials = null;
+    if (partialsPath != null) {
+      partials = readFile(partialsPath);
+    }
+
+    CompiledTemplate compiled = compiler().compile(template, false);
+    Instruction code = compiled.code();
+
+    // Parse the JSON context
+    JsonNode jsonTree = null;
+    try {
+      jsonTree = JsonUtils.decode(json);
+    } catch (IllegalArgumentException e) {
+      System.err.println("Caught error trying to parse JSON: " + e.getCause().getMessage());
+      return 1;
+    }
+
+    // Parse the optional JSON partials dictionary.
+    JsonNode partialsTree = null;
+    if (partials != null) {
+      try {
+        partialsTree = JsonUtils.decode(partials);
+        if (!(partialsTree instanceof ObjectNode)) {
+          System.err.println("Partials map JSON must be an object. Found " + partialsTree.getNodeType());
+          return 1;
+        }
+      } catch (IllegalArgumentException e) {
+        System.err.println("Caught error trying to parse partials: " + e.getCause().getMessage());
+        return 1;
+      }
+    }
+
+    // Perform the compile.
+    Context context = compiler().newExecutor()
+        .code(code)
+        .json(jsonTree)
+        .partialsMap((ObjectNode)partialsTree)
+        .execute();
+
+    // If compile was successful, print the output.
+    System.out.print(context.buffer().toString());
+    return 0;
   }
 
   /**
-   * Scan the compiled template and dump stats.
+   * Scan the compiled template and print statistics.
    */
-  protected void stats(String templatePath) {
-    int exitCode = 1;
-    try {
-      String template = readFile(templatePath);
+  protected int stats(String templatePath) throws CodeException, IOException {
+    String template = readFile(templatePath);
 
-      CompiledTemplate compiled = compiler().compile(template, false);
-      ReferenceScanner scanner = new ReferenceScanner();
-      scanner.extract(compiled.code());
-      ObjectNode report = scanner.references().report();
-      String result = GeneralUtils.jsonPretty(report);
-      System.out.println(result);
+    CompiledTemplate compiled = compiler().compile(template, false);
+    ReferenceScanner scanner = new ReferenceScanner();
+    scanner.extract(compiled.code());
+    ObjectNode report = scanner.references().report();
+    String result = GeneralUtils.jsonPretty(report);
+    System.out.println(result);
+    return 0;
+  }
 
-    } catch (CodeException e) {
-      System.err.println(e.getMessage());
+  /**
+   * Print the syntax tree for the given template.
+   */
+  protected int tree(String templatePath) throws CodeException, IOException {
+    String template = readFile(templatePath);
 
-    } catch (Exception e) {
-      e.printStackTrace();
-
-    } finally {
-      System.exit(exitCode);
-    }
+    CompiledTemplate compiled = compiler().compile(template, false);
+    StringBuilder buf = new StringBuilder();
+    TreeEmitter.emit(compiled.code(), 0, buf);
+    System.out.println(buf.toString());
+    return 0;
   }
 
   protected Compiler compiler() {
