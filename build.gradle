@@ -58,7 +58,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 def configurePom(def pom) {
   pom.project {
     name "template-compiler"
-    description "Template compiler based on JSON-Template"
+    description "Squarespace Template Compiler"
     url 'https://github.com/squarespace/template-compiler'
 
     licenses {
@@ -191,15 +191,15 @@ subprojects {
     repositories.mavenDeployer {
       repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
         authentication(
-          userName: System.getenv('OSS_USERNAME'),
-          password: System.getenv('OSS_PASSWORD')
+          userName: OSS_USERNAME,
+          password: OSS_PASSWORD
         )
       }
       
       snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
         authentication(
-          userName: System.getenv('OSS_USERNAME'),
-          password: System.getenv('OSS_PASSWORD')
+          userName: OSS_USERNAME,
+          password: OSS_PASSWORD
         )
       }
 
