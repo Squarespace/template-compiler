@@ -201,24 +201,23 @@ subprojects {
         MavenDeployment deployment -> signing.signPom(deployment) 
       }
 
-      repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-        authentication(
-          userName: OSS_USERNAME,
-          password: OSS_PASSWORD
-        )
-      }
-      
-      snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-        authentication(
-          userName: OSS_USERNAME,
-          password: OSS_PASSWORD
-        )
+      if (project.hasProperty('OSS_USERNAME') && project.hasProperty('OSS_PASSWORD')) {
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+          authentication(userName: OSS_USERNAME, password: OSS_PASSWORD)
+        }
+        
+        snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+          authentication(userName: OSS_USERNAME, password: OSS_PASSWORD)
+        }
+      } else {
+        logger.error('Missing OSS_USERNAME, OSS_PASSWORD properties.')
       }
 
       configurePom(pom)
     }
   }
 
+  /*
   if (project.hasProperty('NEXUS_INTERNAL_RELEASE_URL')) {
     task uploadInternal(type: Upload) {
       description = 'Uploads archives to internal Nexus'
@@ -231,6 +230,7 @@ subprojects {
       }
     }
   }
+  */
 
 }
 
