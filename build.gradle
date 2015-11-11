@@ -79,6 +79,14 @@ def configurePom(def pom) {
       system 'github'
       url 'https://github.com/squarespace/template-compiler/issues'
     }
+
+    developers {
+      developer {
+        id 'pathensley'
+        name 'Patrick Hensley'
+        email 'pathensley@gmail.com'
+      }
+    }
   }
 }
 
