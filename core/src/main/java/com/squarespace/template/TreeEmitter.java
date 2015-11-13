@@ -111,8 +111,12 @@ public class TreeEmitter {
         PredicateInst predicateInst = (PredicateInst)inst;
         Predicate predicate = predicateInst.getPredicate();
         if (predicate != null) {
-          buf.append(predicate).append(' ');
-          emitArgs(predicateInst.getArguments(), buf);
+          buf.append(predicate);
+          Arguments args = predicateInst.getArguments();
+          if (!args.isEmpty()) {
+            buf.append(' ');
+            emitArgs(args, buf);
+          }
         }
         break;
 
@@ -138,10 +142,13 @@ public class TreeEmitter {
           buf.append('\n');
           indent(depth + INCR, buf);
           buf.append("| ");
-          buf.append(formatterCall.getFormatter().identifier()).append(" ");
-          emitArgs(formatterCall.getArguments(), buf);
+          buf.append(formatterCall.getFormatter().identifier());
+          Arguments args = formatterCall.getArguments();
+          if (!args.isEmpty()) {
+            buf.append(' ');
+            emitArgs(args, buf);
+          }
         }
-        indent(depth, buf);
         break;
 
       default:

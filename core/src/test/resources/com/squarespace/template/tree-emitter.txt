@@ -1,0 +1,28 @@
+:INPUT
+
+{.section example}
+  {foo|htmlattr|json}
+
+  {.equal?|foo|"bar"}
+    yes they are equal
+  {.or}
+    nope, not equal
+  {.end}
+{.end}
+
+:EXPECTED
+
+SECTION {1,1} example
+  TEXT {1,19} (len=3) "\n  "
+  VARIABLE {2,3} foo
+    | htmlattr
+    | json
+  TEXT {2,22} (len=4) "\n\n  "
+  PREDICATE {4,3} equal? delim='|' parsed=[foo, "bar"]
+    TEXT {4,22} (len=26) "\n    yes they are equal\n  "
+  OR_PREDICATE {6,3} 
+    TEXT {6,8} (len=23) "\n    nope, not equal\n  "
+  END {8,3} 
+  TEXT {8,9} (len=1) "\n"
+END {9,1} 
+

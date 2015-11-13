@@ -109,9 +109,9 @@ public class TestCaseParser extends UnitTestBase {
             .partialsMap(partialsMap)
             .safeExecution(true)
             .execute();
-        String result = ctx.buffer().toString().trim();
-        if (!output.equals(result)) {
-          throw new AssertionError("Output does not match:\n" + diff(output, result));
+        String actual = ctx.buffer().toString().trim();
+        if (!output.equals(actual)) {
+          throw new AssertionError("Output does not match:\n" + diff(output, actual));
         }
       } catch (Exception e) {
         throw new AssertionError("Error running test case", e);
@@ -171,7 +171,7 @@ public class TestCaseParser extends UnitTestBase {
    * Return a string showing the differences between the expected and actual
    * parameters.
    */
-  protected String diff(String expected, String actual) {
+  public static String diff(String expected, String actual) {
     List<String> expList = Arrays.asList(expected.split("\n"));
     List<String> actList = Arrays.asList(actual.split("\n"));
     Patch<String> patch = DiffUtils.diff(expList, actList);
