@@ -12,12 +12,12 @@ buildscript {
 plugins {
   id 'net.researchgate.release' version '2.0.2'
   id 'com.github.hierynomus.license' version '0.11.0'
-  id 'com.glonk.eclipse-checkstyle' version '0.0.4'
+  id 'com.glonk.eclipse-checkstyle' version '0.0.5'
   id 'com.github.kt3k.coveralls' version '2.4.0'
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.7'
+  gradleVersion = '2.8'
 }
 
 project.ext {
@@ -54,6 +54,7 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
   }
 }
+
 
 def configurePom(def pom) {
   pom.project {
@@ -151,7 +152,9 @@ subprojects {
 
   eclipseCheckstyle {
     syncFormatter = true
-    exclude = ['derived']
+    patterns {
+      include "src\\/.*\\.java"
+    }
   }
 
   signing {
