@@ -116,6 +116,13 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testSrcSet() {
+    runner.run(
+        "f-image-src-set-1.html"
+        );
+  }
+
+  @Test
   public void testChildImageMeta() {
     runner.run(
         "f-child-image-meta-1.html",

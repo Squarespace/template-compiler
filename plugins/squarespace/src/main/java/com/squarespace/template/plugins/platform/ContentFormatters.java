@@ -71,6 +71,7 @@ public class ContentFormatters implements FormatterRegistry {
     table.add(new ImageFormatter());
     table.add(new ImageColorFormatter());
     table.add(new ImageMetaFormatter());
+    table.add(new ImageMetaSrcSetFormatter());
     table.add(new ItemClassesFormatter());
     table.add(new ResizedHeightForWidthFormatter());
     table.add(new ResizedWidthForHeightFormatter());
@@ -480,6 +481,55 @@ public class ContentFormatters implements FormatterRegistry {
       outputImageMeta(var.node(), buf);
       var.set(buf);
     }
+  }
+
+  public static class ImageMetaSrcSetFormatter extends BaseFormatter {
+
+    public ImageMetaSrcSetFormatter() {
+      super("image-srcset", false);
+    }
+
+    protected static int filterVariants(String[] variants) {
+      int c = 0;
+      for (int i = 0; i < variants.length; i++) {
+        if (variants[i].endsWith("w")) {
+          variants[c] = variants[i];
+          c++;
+        }
+      }
+      return c;
+    }
+
+    protected void outputImageSrcSet(JsonNode image, StringBuilder buf) {
+      if (image.isMissingNode()) {
+        return;
+      }
+
+      String assetUrl = image.path("assetUrl").asText();
+      String[] variants = image.path("systemDataVariants").asText().split(",");
+      int limit = filterVariants(variants);
+      if (limit == 0) {
+        return;
+      }
+
+      buf.append(" data-srcset=\"");
+      for (int i = 0; i < limit; i++) {
+        if (i > 0) {
+          buf.append(',');
+        }
+        buf.append(assetUrl).append("?format=").append(variants[i]).append(" ").append(variants[i]);
+      }
+      buf.append("\"");
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      StringBuilder buf = new StringBuilder();
+      Variable var = variables.first();
+      outputImageSrcSet(var.node(), buf);
+      var.set(buf);
+    }
+
   }
 
   public static class CoverImageMetaFormatter extends ImageMetaBaseFormatter {
