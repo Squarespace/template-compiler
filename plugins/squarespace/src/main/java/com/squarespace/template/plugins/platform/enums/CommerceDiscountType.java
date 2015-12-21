@@ -38,7 +38,7 @@ public enum CommerceDiscountType implements PlatformEnum {
 
   private final String stringValue;
 
-  private CommerceDiscountType(int code, String stringValue) {
+  CommerceDiscountType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }

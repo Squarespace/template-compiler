@@ -131,7 +131,7 @@ public class ContentFormatters implements FormatterRegistry {
 
   private abstract static class ImageMetaBaseFormatter extends BaseFormatter {
 
-    public ImageMetaBaseFormatter(String identifier) {
+    ImageMetaBaseFormatter(String identifier) {
       super(identifier, false);
     }
 
@@ -549,7 +549,7 @@ public class ContentFormatters implements FormatterRegistry {
 
   private static abstract class ResizeBaseFormatter extends BaseFormatter {
 
-    public ResizeBaseFormatter(String identifier) {
+    ResizeBaseFormatter(String identifier) {
       super(identifier, true);
     }
 

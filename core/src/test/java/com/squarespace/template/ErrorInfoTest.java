@@ -34,7 +34,7 @@ public class ErrorInfoTest {
 
     private final MapFormat format;
 
-    public DummyType(String format) {
+    DummyType(String format) {
       this.format = new MapFormat(format, "?");
     }
 

@@ -53,7 +53,7 @@ public enum ExecuteErrorType implements ErrorType {
 
   private final MapFormat messageFormat;
 
-  private ExecuteErrorType(String messageFormat) {
+  ExecuteErrorType(String messageFormat) {
     this.prefixFormat = new MapFormat(PREFIX, NULL_PLACEHOLDER);
     this.messageFormat = new MapFormat(messageFormat, NULL_PLACEHOLDER);
   }

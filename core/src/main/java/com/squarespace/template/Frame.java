@@ -34,7 +34,7 @@ class Frame {
 
   int currentIndex;
 
-  public Frame(Frame parent, JsonNode node) {
+  Frame(Frame parent, JsonNode node) {
     this.parent = parent;
     this.node = node;
     this.currentIndex = -1;

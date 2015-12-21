@@ -75,11 +75,11 @@ public class CorePredicates implements PredicateRegistry {
    */
   private static abstract class JsonPredicate extends BasePredicate {
 
-    public JsonPredicate(String identifier) {
+    JsonPredicate(String identifier) {
       super(identifier, true);
     }
 
-    public JsonPredicate(String identifier, boolean requiresArgs) {
+    JsonPredicate(String identifier, boolean requiresArgs) {
       super(identifier, requiresArgs);
     }
 

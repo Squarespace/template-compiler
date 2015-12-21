@@ -56,7 +56,7 @@ public enum RecordType implements PlatformEnum {
 
   private final String stringValue;
 
-  private RecordType(int code, String stringValue) {
+  RecordType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }

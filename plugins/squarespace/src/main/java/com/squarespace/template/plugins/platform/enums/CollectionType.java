@@ -51,7 +51,7 @@ public enum CollectionType implements PlatformEnum {
 
   private static final Map<Integer, CollectionType> CODE_MAP = codeMap(CollectionType.class);
 
-  private CollectionType(int code, String strValue) {
+  CollectionType(int code, String strValue) {
     this.code = code;
     this.stringValue = strValue;
   }

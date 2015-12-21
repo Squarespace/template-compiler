@@ -116,7 +116,7 @@ public enum SyntaxErrorType implements ErrorType {
 
   private MapFormat messageFormat;
 
-  private SyntaxErrorType(String rawFormat) {
+  SyntaxErrorType(String rawFormat) {
     this.prefixFormat = new MapFormat(PREFIX, NULL_PLACEHOLDER);
     this.messageFormat = new MapFormat(rawFormat, NULL_PLACEHOLDER);
   }

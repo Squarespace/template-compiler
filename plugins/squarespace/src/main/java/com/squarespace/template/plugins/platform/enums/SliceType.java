@@ -56,7 +56,7 @@ public enum SliceType implements PlatformEnum {
 
   private final String stringValue;
 
-  private SliceType(int code, String stringValue) {
+  SliceType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }

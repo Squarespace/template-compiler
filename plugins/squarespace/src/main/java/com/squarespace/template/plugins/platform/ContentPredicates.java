@@ -382,7 +382,7 @@ public class ContentPredicates implements PredicateRegistry {
 
     private final String name;
 
-    public GallerySelectPredicate(String option, String name) {
+    GallerySelectPredicate(String option, String name) {
       super("gallery-" + option + "-" + name + "?", false);
       this.option = option;
       this.name = name;
@@ -399,7 +399,7 @@ public class ContentPredicates implements PredicateRegistry {
 
     private final String option;
 
-    public GalleryBooleanPredicate(String option) {
+    GalleryBooleanPredicate(String option) {
       super("gallery-" + option + "?", false);
       this.option = option;
     }
@@ -425,7 +425,7 @@ public class ContentPredicates implements PredicateRegistry {
 
     private final int recordType;
 
-    public RecordTypePredicate(String identifier, RecordType type) {
+    RecordTypePredicate(String identifier, RecordType type) {
       super(identifier, false);
       this.recordType = type.code();
     }
@@ -442,7 +442,7 @@ public class ContentPredicates implements PredicateRegistry {
 
     private final String promotedBlockType;
 
-    public PromotedRecordTypePredicate(String identifier, RecordType type, String promotedBlockType) {
+    PromotedRecordTypePredicate(String identifier, RecordType type, String promotedBlockType) {
       super(identifier, false);
       this.recordType = type.code();
       this.promotedBlockType = promotedBlockType;
@@ -460,7 +460,7 @@ public class ContentPredicates implements PredicateRegistry {
 
     private final String promotedBlockType;
 
-    public PromotedBlockTypePredicate(String identifier, String promotedBlockType) {
+    PromotedBlockTypePredicate(String identifier, String promotedBlockType) {
       super(identifier, false);
       this.promotedBlockType = promotedBlockType;
     }

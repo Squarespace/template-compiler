@@ -86,7 +86,7 @@ public class TestCaseParser extends UnitTestBase {
 
     private final String output;
 
-    public OutputTestCase(String json, String template, String partials, String output) {
+    OutputTestCase(String json, String template, String partials, String output) {
       assertSection(json, TYPE_JSON, TYPE_OUTPUT);
       assertSection(template, TYPE_TEMPLATE, TYPE_OUTPUT);
       this.json = json;

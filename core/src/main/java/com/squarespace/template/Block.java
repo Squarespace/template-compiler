@@ -39,7 +39,7 @@ class Block {
   /**
    * Constructs a block having the given initial size.
    */
-  public Block(int initialSize) {
+  Block(int initialSize) {
     this.initialSize = initialSize;
   }
 

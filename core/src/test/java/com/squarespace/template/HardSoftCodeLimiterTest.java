@@ -208,7 +208,7 @@ public class HardSoftCodeLimiterTest extends UnitTestBase {
 
     private boolean wasCalled;
 
-    public TestHandler(Limit limitType, int assertLimit) {
+    TestHandler(Limit limitType, int assertLimit) {
       this.limitType = limitType;
       this.assertLimit = assertLimit;
     }

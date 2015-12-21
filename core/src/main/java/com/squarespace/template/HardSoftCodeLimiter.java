@@ -97,7 +97,7 @@ public class HardSoftCodeLimiter implements CodeLimiter {
     }
   }
 
-  public static enum Limit {
+  public enum Limit {
     SOFT,
     HARD
   }

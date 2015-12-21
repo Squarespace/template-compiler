@@ -48,7 +48,7 @@ abstract class BlockInstruction extends BaseInstruction {
   /**
    * Constructs a block instruction with the initial capacity for the consequent block.
    */
-  public BlockInstruction(int consequentsLen) {
+  BlockInstruction(int consequentsLen) {
     consequent = new Block(consequentsLen);
   }
 

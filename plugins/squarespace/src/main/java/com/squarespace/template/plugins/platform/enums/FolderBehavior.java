@@ -38,7 +38,7 @@ public enum FolderBehavior implements PlatformEnum {
 
   private final String stringValue;
 
-  private FolderBehavior(int code, String stringValue) {
+  FolderBehavior(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }

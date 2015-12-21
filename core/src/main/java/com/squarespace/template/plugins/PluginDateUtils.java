@@ -32,7 +32,7 @@ public class PluginDateUtils {
   private PluginDateUtils() {
   }
 
-  static enum DatePartType {
+  enum DatePartType {
     YEAR("year"),
     MONTH("month"),
     WEEK("week"),
@@ -43,7 +43,7 @@ public class PluginDateUtils {
 
     private String name;
 
-    private DatePartType(String name) {
+    DatePartType(String name) {
       this.name = name;
     }
 
@@ -125,7 +125,7 @@ public class PluginDateUtils {
     buf.append("less than a minute ago");
   }
 
-  static enum DateTimeAggregate {
+  enum DateTimeAggregate {
     FULL,
     H240_M0,
     HHMMSSP,

@@ -51,7 +51,7 @@ public class Instructions {
    */
   static class AlternatesWithInst extends BlockInstruction {
 
-    public AlternatesWithInst() {
+    AlternatesWithInst() {
       super(ALTERNATES_BLOCK_LEN);
     }
 
@@ -94,7 +94,7 @@ public class Instructions {
 
     private List<FormatterCall> formatters;
 
-    public BindVarInst(String key, String variable) {
+    BindVarInst(String key, String variable) {
       this.name = key;
       this.variable = splitVariable(variable);
       setFormatters(null);
@@ -162,11 +162,11 @@ public class Instructions {
 
     private final boolean multiLine;
 
-    public CommentInst(StringView view) {
+    CommentInst(StringView view) {
       this(view, false);
     }
 
-    public CommentInst(StringView view, boolean multiLine) {
+    CommentInst(StringView view, boolean multiLine) {
       this.view = view;
       this.multiLine = multiLine;
     }
@@ -277,7 +277,7 @@ public class Instructions {
 
     private final List<Operator> operators;
 
-    public IfInst(List<String> vars, List<Operator> ops) {
+    IfInst(List<String> vars, List<Operator> ops) {
       super(CONSEQUENT_BLOCK_LEN);
       for (String name : vars) {
         Object[] parts = splitVariable(name);
@@ -362,7 +362,7 @@ public class Instructions {
 
     private final Arguments arguments;
 
-    public IfPredicateInst(Predicate predicate, Arguments arguments) {
+    IfPredicateInst(Predicate predicate, Arguments arguments) {
       super(CONSEQUENT_BLOCK_LEN);
       this.predicate = predicate;
       this.arguments = arguments;
@@ -419,7 +419,7 @@ public class Instructions {
 
     private final String value;
 
-    public LiteralInst(String name, String value) {
+    LiteralInst(String name, String value) {
       this.name = name;
       this.value = value;
     }
@@ -463,7 +463,7 @@ public class Instructions {
 
     private final boolean isLeft;
 
-    public MetaInst(boolean isLeft) {
+    MetaInst(boolean isLeft) {
       this.isLeft = isLeft;
     }
 
@@ -503,7 +503,7 @@ public class Instructions {
    */
   static class NewlineInst extends LiteralInst {
 
-    public NewlineInst() {
+    NewlineInst() {
       super("newline", "\n");
     }
 
@@ -525,7 +525,7 @@ public class Instructions {
 
     private final Arguments args;
 
-    public PredicateInst(Predicate impl, Arguments args) {
+    PredicateInst(Predicate impl, Arguments args) {
       super(CONSEQUENT_BLOCK_LEN);
       this.impl = impl;
       this.args = args;
@@ -604,7 +604,7 @@ public class Instructions {
 
     private AlternatesWithInst alternatesWith;
 
-    public RepeatedInst(String name) {
+    RepeatedInst(String name) {
       super(CONSEQUENT_BLOCK_LEN);
       this.variable = splitVariable(name);
     }
@@ -698,7 +698,7 @@ public class Instructions {
    */
   static class RootInst extends BlockInstruction {
 
-    public RootInst() {
+    RootInst() {
       super(ROOT_BLOCK_LEN);
     }
 
@@ -736,7 +736,7 @@ public class Instructions {
 
     private final Object[] variable;
 
-    public SectionInst(String name) {
+    SectionInst(String name) {
       super(CONSEQUENT_BLOCK_LEN);
       this.variable = splitVariable(name);
     }
@@ -787,7 +787,7 @@ public class Instructions {
   /** Outputs a literal space character */
   static class SpaceInst extends LiteralInst {
 
-    public SpaceInst() {
+    SpaceInst() {
       super("space", " ");
     }
 
@@ -801,7 +801,7 @@ public class Instructions {
   /** Outputs a literal tab character */
   static class TabInst extends LiteralInst {
 
-    public TabInst() {
+    TabInst() {
       super("tab", "\t");
     }
 
@@ -819,7 +819,7 @@ public class Instructions {
 
     private final StringView view;
 
-    public TextInst(StringView view) {
+    TextInst(StringView view) {
       this.view = view;
     }
 
@@ -869,11 +869,11 @@ public class Instructions {
 
     private List<FormatterCall> formatters;
 
-    public VariableInst(String name) {
+    VariableInst(String name) {
       this(name, null);
     }
 
-    public VariableInst(String name, List<FormatterCall> formatters) {
+    VariableInst(String name, List<FormatterCall> formatters) {
       this.variable = splitVariable(name);
       setFormatters(formatters);
     }

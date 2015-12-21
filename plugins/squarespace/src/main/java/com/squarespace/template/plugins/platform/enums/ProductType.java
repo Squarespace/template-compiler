@@ -38,7 +38,7 @@ public enum ProductType implements PlatformEnum {
 
   private final String stringValue;
 
-  private ProductType(int code, String stringValue) {
+  ProductType(int code, String stringValue) {
     this.code = code;
     this.stringValue = stringValue;
   }

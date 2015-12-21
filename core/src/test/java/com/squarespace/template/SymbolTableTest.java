@@ -74,7 +74,7 @@ public class SymbolTableTest {
 
     private final String name;
 
-    public Name(String n) {
+    Name(String n) {
       this.name = n;
     }
 
@@ -95,7 +95,7 @@ public class SymbolTableTest {
 
   static class NameTable extends SymbolTable<String, Name> {
 
-    public NameTable() {
+    NameTable() {
       super(8);
     }
 
