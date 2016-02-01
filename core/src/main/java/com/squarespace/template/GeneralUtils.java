@@ -121,12 +121,25 @@ public class GeneralUtils {
           case '7':
           case '8':
           case '9':
-          case 'f':
-          case 'n':
-          case 't':
           case '[':
           case '{':
             return true;
+
+          // Even when failSilently=true is passed, Jackson's decode method
+          // throws an exception and immediately swallows it.
+
+          // These string comparisons add more precision when trying to detect
+          // a JSON value without attempting to parse it.  They are place-holders
+          // to cut down on Jackson exceptions until a long-term fix is made.
+
+          case 'f':
+            return raw.startsWith("false");
+
+          case 'n':
+            return raw.startsWith("null");
+
+          case 't':
+            return raw.startsWith("true");
 
           default:
             return false;
