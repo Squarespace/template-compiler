@@ -63,7 +63,8 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   public void testComments() {
     runner.run(
         "f-comments-1.html",
-        "f-comments-2.html"
+        "f-comments-2.html",
+        "f-comments-3.html"
         );
   }
 
