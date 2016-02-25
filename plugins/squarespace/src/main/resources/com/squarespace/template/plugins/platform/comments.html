@@ -1,5 +1,5 @@
 {.if websiteSettings.disqusShortname}
   <div class="squarespace-comments" id="disqus_thread"></div>
 {.or}
-  <div class="squarespace-comments" id="comments-{id}"{.if item} data-item-id="{item.id}"{.or}{.if collection} data-collection-id="{collection.id}"{.end}{.end} {.section item}data-public-comment-count="{publicCommentCount}" data-comment-state="{commentState}"{.end}></div>
+  <div class="squarespace-comments" id="comments-{id}" {.if item} data-item-id="{item.id}" data-public-comment-count="{item.publicCommentCount}" data-comment-state="{item.commentState}" {.or} {.if collection} data-collection-id="{collection.id}" data-public-comment-count="{collection.publicCommentCount}" data-comment-state="{collection.commentState}"{.end} {.end}></div>
 {.end}
