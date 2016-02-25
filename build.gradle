@@ -220,7 +220,6 @@ subprojects {
     }
   }
 
-  /*
   if (project.hasProperty('NEXUS_INTERNAL_RELEASE_URL')) {
     task uploadInternal(type: Upload) {
       description = 'Uploads archives to internal Nexus'
@@ -233,7 +232,6 @@ subprojects {
       }
     }
   }
-  */
 
 }
 
