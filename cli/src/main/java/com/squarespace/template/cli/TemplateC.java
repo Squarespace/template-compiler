@@ -39,6 +39,13 @@ import com.squarespace.template.ReferenceScanner;
 import com.squarespace.template.TreeEmitter;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
+import com.squarespace.template.plugins.platform.CommerceFormatters;
+import com.squarespace.template.plugins.platform.CommercePredicates;
+import com.squarespace.template.plugins.platform.ContentFormatters;
+import com.squarespace.template.plugins.platform.ContentPredicates;
+import com.squarespace.template.plugins.platform.SlidePredicates;
+import com.squarespace.template.plugins.platform.SocialFormatters;
+import com.squarespace.template.plugins.platform.SocialPredicates;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -202,10 +209,23 @@ public class TemplateC {
 
   protected Compiler compiler() {
     FormatterTable formatterTable = new FormatterTable();
-    formatterTable.register(new CoreFormatters());
-
     PredicateTable predicateTable = new PredicateTable();
+
+    // core
+    formatterTable.register(new CoreFormatters());
     predicateTable.register(new CorePredicates());
+
+    // TODO: dynamic classpath scan and registration of plugin jars.
+
+    // squarespace
+    formatterTable.register(new CommerceFormatters());
+    formatterTable.register(new ContentFormatters());
+    formatterTable.register(new SocialFormatters());
+
+    predicateTable.register(new CommercePredicates());
+    predicateTable.register(new ContentPredicates());
+    predicateTable.register(new SlidePredicates());
+    predicateTable.register(new SocialPredicates());
 
     return new Compiler(formatterTable, predicateTable);
   }
