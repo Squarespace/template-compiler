@@ -16,14 +16,17 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION;
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
@@ -71,6 +74,8 @@ public class Context {
   private JsonNode rawPartials;
 
   private Map<String, Instruction> compiledPartials;
+
+  private Set<String> partialsExecuting;
 
   private LoggingHook loggingHook;
 
@@ -259,6 +264,38 @@ public class Context {
       compiledPartials.put(name, inst);
     }
     return inst;
+  }
+
+  /**
+   * Check if we're about to recurse through a partial we're already evaluating.
+   * This code currently prevents all reentrant evaluation of partials.
+   *
+   * NOTE: The template team will need to weigh in on whether we currently have
+   * partials which recurse but properly terminate recursion. For now this code treats
+   * all recursion as an error.
+   */
+  public boolean enterPartial(String name) throws CodeExecuteException {
+    if (partialsExecuting == null) {
+      partialsExecuting = new HashSet<>();
+    }
+
+    if (!partialsExecuting.add(name)) {
+      ErrorInfo error = error(APPLY_PARTIAL_RECURSION).name(name);
+      if (safeExecution) {
+        addError(error);
+        return false;
+      } else {
+        throw new CodeExecuteException(error);
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Clears flag indicating we're executing inside a partial template.
+   */
+  public void exitPartial(String name) {
+    partialsExecuting.remove(name);
   }
 
   public StringBuilder buffer() {

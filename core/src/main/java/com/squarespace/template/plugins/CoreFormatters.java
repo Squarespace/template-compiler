@@ -16,12 +16,11 @@
 
 package com.squarespace.template.plugins;
 
-import static com.squarespace.template.GeneralUtils.executeTemplate;
-
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
 import static com.squarespace.template.GeneralUtils.eatNull;
+import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 
 import java.io.IOException;
@@ -125,7 +124,16 @@ public class CoreFormatters implements FormatterRegistry {
         }
       }
 
-      return executeTemplate(ctx, inst, node, privateContext);
+      // A developer can attempt to recurse through a partial more than once. The following
+      // barrier checks if we're currently executing a given partial.  If so, we refuse to
+      // execute it a second time and return a missing node.  Otherwise we execute the partial
+      // template and return the result.
+      JsonNode result = Constants.MISSING_NODE;
+      if (ctx.enterPartial(name)) {
+        result = executeTemplate(ctx, inst, node, privateContext);
+      }
+      ctx.exitPartial(name);
+      return result;
     }
 
   }
