@@ -46,6 +46,7 @@ import com.squarespace.template.plugins.platform.ContentPredicates;
 import com.squarespace.template.plugins.platform.SlidePredicates;
 import com.squarespace.template.plugins.platform.SocialFormatters;
 import com.squarespace.template.plugins.platform.SocialPredicates;
+import com.squarespace.template.plugins.platform.i18n.InternationalFormatters;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -221,6 +222,7 @@ public class TemplateC {
     formatterTable.register(new CommerceFormatters());
     formatterTable.register(new ContentFormatters());
     formatterTable.register(new SocialFormatters());
+    formatterTable.register(new InternationalFormatters());
 
     predicateTable.register(new CommercePredicates());
     predicateTable.register(new ContentPredicates());

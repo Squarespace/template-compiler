@@ -20,6 +20,7 @@ package com.squarespace.template.plugins.platform;
 import com.squarespace.template.FormatterTable;
 import com.squarespace.template.PredicateTable;
 import com.squarespace.template.UnitTestBase;
+import com.squarespace.template.plugins.platform.i18n.InternationalFormatters;
 
 
 /**
@@ -33,6 +34,7 @@ public class PlatformUnitTestBase extends UnitTestBase {
     table.register(new CommerceFormatters());
     table.register(new ContentFormatters());
     table.register(new SocialFormatters());
+    table.register(new InternationalFormatters());
     return table;
   }
 
