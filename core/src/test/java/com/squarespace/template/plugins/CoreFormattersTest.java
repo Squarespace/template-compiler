@@ -17,7 +17,8 @@
 package com.squarespace.template.plugins;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
-import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION;
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SELF_RECURSION;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.COMPILE_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
@@ -240,7 +241,7 @@ public class CoreFormattersTest extends UnitTestBase {
         .execute();
     assertContext(ctx, "12");
     assertEquals(ctx.getErrors().size(), 1);
-    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_SELF_RECURSION);
   }
 
   @Test
@@ -274,7 +275,26 @@ public class CoreFormattersTest extends UnitTestBase {
         .execute();
     assertContext(ctx, "1234");
     assertEquals(ctx.getErrors().size(), 1);
-    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_SELF_RECURSION);
+  }
+
+  @Test
+  public void testApplyPartialRecursionDepth() throws CodeException {
+    String template = "{@|apply one}";
+    String partials = "{\"one\": \"1{@|apply two}\", \"two\": \"2{@|apply three}\", "
+        + "\"three\": \"3{@|apply four}\", \"four\": \"4\"}";
+    String input = "{}";
+    Instruction inst = compiler().compile(template).code();
+    Context ctx = compiler().newExecutor()
+        .json(input)
+        .code(inst)
+        .partialsMap(partials)
+        .safeExecution(true)
+        .maxPartialDepth(3)
+        .execute();
+    assertContext(ctx, "123");
+    assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
   }
 
   @Test

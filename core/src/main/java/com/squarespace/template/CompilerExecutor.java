@@ -46,6 +46,8 @@ public class CompilerExecutor {
 
   private boolean safeExecution;
 
+  private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
+
   CompilerExecutor(Compiler compiler) {
     this.compiler = compiler;
   }
@@ -78,6 +80,7 @@ public class CompilerExecutor {
     if (codeLimiter != null) {
       ctx.setCodeLimiter(codeLimiter);
     }
+    ctx.setMaxPartialDepth(maxPartialDepth);
     ctx.execute(instruction);
     return ctx;
   }
@@ -170,6 +173,14 @@ public class CompilerExecutor {
    */
   public CompilerExecutor safeExecution(boolean safeExecution) {
     this.safeExecution = safeExecution;
+    return this;
+  }
+
+  /**
+   * Sets the maximum partial nesting depth.
+   */
+  public CompilerExecutor maxPartialDepth(int depth) {
+    this.maxPartialDepth = depth;
     return this;
   }
 

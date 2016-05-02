@@ -32,7 +32,10 @@ public enum ExecuteErrorType implements ErrorType {
   APPLY_PARTIAL_MISSING
   ("Attempt to apply partial '%(name)s' which could not be found."),
 
-  APPLY_PARTIAL_RECURSION
+  APPLY_PARTIAL_RECURSION_DEPTH
+  ("Recursion through partial %(name)s exceeded maximum depth of %(data)s"),
+
+  APPLY_PARTIAL_SELF_RECURSION
   ("Recursion into self while evaluating partial '%(name)s'"),
 
   CODE_LIMIT_REACHED

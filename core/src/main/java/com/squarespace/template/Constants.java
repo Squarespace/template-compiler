@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 public class Constants {
 
+  public static final int DEFAULT_MAX_PARTIAL_DEPTH = 16;
+
   public static final StringView EMPTY_STRING_VIEW = new StringView("");
 
   public static final String[] EMPTY_ARRAY_OF_STRING = new String[] { };

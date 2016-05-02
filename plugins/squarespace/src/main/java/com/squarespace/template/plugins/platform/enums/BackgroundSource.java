@@ -26,9 +26,10 @@ public enum BackgroundSource implements PlatformEnum {
   NONE(4, "none");
 
   private final int code;
+
   private final String name;
 
-  private BackgroundSource(int code, String name) {
+  BackgroundSource(int code, String name) {
     this.code = code;
     this.name = name;
   }

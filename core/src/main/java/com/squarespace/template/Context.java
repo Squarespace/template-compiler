@@ -16,7 +16,9 @@
 
 package com.squarespace.template;
 
-import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION;
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
+
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SELF_RECURSION;
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
 import java.util.ArrayList;
@@ -63,6 +65,8 @@ public class Context {
 
   private boolean safeExecution = false;
 
+  private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
+
   private List<ErrorInfo> errors;
 
   /**
@@ -76,6 +80,8 @@ public class Context {
   private Map<String, Instruction> compiledPartials;
 
   private Set<String> partialsExecuting;
+
+  private int partialDepth;
 
   private LoggingHook loggingHook;
 
@@ -111,6 +117,10 @@ public class Context {
    */
   public void setSafeExecution() {
     this.safeExecution = true;
+  }
+
+  public void setMaxPartialDepth(int depth) {
+    this.maxPartialDepth = Math.max(0, depth);
   }
 
   public CharSequence getMetaLeft() {
@@ -279,8 +289,23 @@ public class Context {
       partialsExecuting = new HashSet<>();
     }
 
+    // Prevent partials from recursing into themselves
     if (!partialsExecuting.add(name)) {
-      ErrorInfo error = error(APPLY_PARTIAL_RECURSION).name(name);
+      ErrorInfo error = error(APPLY_PARTIAL_SELF_RECURSION).name(name);
+      if (safeExecution) {
+        addError(error);
+        return false;
+      } else {
+        throw new CodeExecuteException(error);
+      }
+    }
+
+    // Limit maximum partial recursion depth
+    partialDepth++;
+    if (partialDepth > maxPartialDepth) {
+      ErrorInfo error = error(APPLY_PARTIAL_RECURSION_DEPTH)
+          .name(name)
+          .data(maxPartialDepth);
       if (safeExecution) {
         addError(error);
         return false;
@@ -296,6 +321,7 @@ public class Context {
    */
   public void exitPartial(String name) {
     partialsExecuting.remove(name);
+    partialDepth--;
   }
 
   public StringBuilder buffer() {
