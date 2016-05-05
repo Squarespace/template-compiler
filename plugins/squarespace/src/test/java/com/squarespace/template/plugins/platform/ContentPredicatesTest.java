@@ -133,7 +133,7 @@ public class ContentPredicatesTest extends PlatformUnitTestBase {
   public void testRecordType() {
     runner.run("p-record-type.html");
   }
-  
+
   @Test
   public void testBackgroundSource() {
     runner.run("p-background-source.html");

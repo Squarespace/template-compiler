@@ -139,7 +139,7 @@ public class ContentPredicates implements PredicateRegistry {
       String identifier = "promoted" + blockType.toUpperCase() + "?";
       table.add(new PromotedBlockTypePredicate(identifier, blockType));
     }
-    
+
     for (BackgroundSource type : BackgroundSource.values()) {
       Predicate impl = new BackgroundSourcePredicate("background-source-" + type.stringValue() + "?", type);
       table.add(impl);
@@ -441,7 +441,7 @@ public class ContentPredicates implements PredicateRegistry {
       return ctx.node().path("recordType").asInt() == recordType;
     }
   }
-  
+
   private static class BackgroundSourcePredicate extends BasePredicate {
 
     private final int backgroundSource;
