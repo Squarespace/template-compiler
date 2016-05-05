@@ -1,0 +1,21 @@
+:JSON
+{
+  "items": [
+    {"backgroundSource": 1},
+    {"backgroundSource": 2},
+    {"backgroundSource": 3},
+    {"backgroundSource": 4}
+  ]
+}
+
+:TEMPLATE
+{.section items.0}{.background-source-upload?}upload{.end}{.end}
+{.section items.1}{.background-source-instagram?}instagram{.end}{.end}
+{.section items.2}{.background-source-video?}video{.end}{.end}
+{.section items.3}{.background-source-none?}none{.end}{.end}
+
+:OUTPUT
+upload
+instagram
+video
+none

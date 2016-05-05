@@ -38,6 +38,7 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.plugins.PluginDateUtils;
 import com.squarespace.template.plugins.PluginUtils;
+import com.squarespace.template.plugins.platform.enums.BackgroundSource;
 import com.squarespace.template.plugins.platform.enums.CollectionType;
 import com.squarespace.template.plugins.platform.enums.FolderBehavior;
 import com.squarespace.template.plugins.platform.enums.RecordType;
@@ -137,6 +138,11 @@ public class ContentPredicates implements PredicateRegistry {
     for (String blockType : PROMOTED_BLOCK_TYPES) {
       String identifier = "promoted" + blockType.toUpperCase() + "?";
       table.add(new PromotedBlockTypePredicate(identifier, blockType));
+    }
+    
+    for (BackgroundSource type : BackgroundSource.values()) {
+      Predicate impl = new BackgroundSourcePredicate("background-source-" + type.stringValue() + "?", type);
+      table.add(impl);
     }
   }
 
@@ -433,6 +439,21 @@ public class ContentPredicates implements PredicateRegistry {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       return ctx.node().path("recordType").asInt() == recordType;
+    }
+  }
+  
+  private static class BackgroundSourcePredicate extends BasePredicate {
+
+    private final int backgroundSource;
+
+    BackgroundSourcePredicate(String identifier, BackgroundSource type) {
+      super(identifier, false);
+      this.backgroundSource = type.code();
+    }
+
+    @Override
+    public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
+      return ctx.node().path("backgroundSource").asInt() == backgroundSource;
     }
   }
 
