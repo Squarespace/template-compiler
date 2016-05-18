@@ -2,7 +2,6 @@ package com.squarespace.template.plugins.platform.i18n;
 
 import static com.squarespace.template.plugins.platform.i18n.InternationalFormatterUtils.formatMoney;
 
-import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
