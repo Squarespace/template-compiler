@@ -1,0 +1,21 @@
+:JSON
+[
+  {
+    "currencyCode": "AUD",
+    "decimalValue": 1234.56
+  },
+  {
+    "currencyCode": "AUD",
+    "decimalValue": -1234.56
+  }
+]
+
+:TEMPLATE
+{.repeated section @}
+{@|i18n-money-format de-DE}
+{.end}
+
+:OUTPUT
+1.234,56 A$
+
+-1.234,56 A$
