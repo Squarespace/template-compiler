@@ -1,0 +1,21 @@
+:JSON
+[
+  {
+    "currencyCode": "EUR",
+    "decimalValue": 1234.56
+  },
+  {
+    "currencyCode": "EUR",
+    "decimalValue": -1234.56
+  }
+]
+
+:TEMPLATE
+{.repeated section @}
+{@|i18n-money-format en-UK}
+{.end}
+
+:OUTPUT
+€1,234.56
+
+-€1,234.56

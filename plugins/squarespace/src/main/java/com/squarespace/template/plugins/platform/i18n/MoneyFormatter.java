@@ -15,8 +15,6 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.template.plugins.platform.i18n.InternationalFormatterUtils.formatMoney;
-
 import java.util.Currency;
 import java.util.Locale;
 
@@ -72,7 +70,7 @@ class MoneyFormatter extends BaseFormatter {
     Locale locale = (Locale) args.getOpaque();
     Currency currency = getCurrency(node);
     double value = node.path(VALUE_FIELD_NAME).asDouble(0);
-    return ctx.buildNode(formatMoney(locale, currency, value));
+    return ctx.buildNode(MoneyFormatFactory.create(locale, currency).format(value));
   }
 
   private static String getLocaleArg(Arguments args) {
