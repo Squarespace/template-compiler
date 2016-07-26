@@ -1,0 +1,21 @@
+:JSON
+{}
+
+:PARTIALS
+{}
+
+:INJECT
+{
+  "foo.json": "{\"name\": \"albert\"}",
+  "bar.json": "{\"value\": 123}",
+  "quux.json": "3.14159"
+}
+
+:TEMPLATE
+{.inject @foo foo.json}
+{.inject @bar bar.json}
+{.inject @quux quux.json}
+{@foo.name}-{@bar.value}-{@quux}
+
+:OUTPUT
+albert-123-3.14159

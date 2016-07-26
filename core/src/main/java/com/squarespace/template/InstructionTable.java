@@ -53,6 +53,7 @@ public class InstructionTable {
     add(".alternates", InstructionType.ALTERNATES_WITH, false);
     add(".end", InstructionType.END);
     add(".if", InstructionType.IF);
+    add(".inject", InstructionType.INJECT);
     add(".meta-left", InstructionType.META_LEFT);
     add(".meta-right", InstructionType.META_RIGHT);
     add(".newline", InstructionType.NEWLINE);

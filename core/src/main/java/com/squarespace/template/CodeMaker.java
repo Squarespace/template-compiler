@@ -28,6 +28,7 @@ import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
+import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.NewlineInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -140,6 +141,14 @@ public class CodeMaker {
     IfPredicateInst res = new IfPredicateInst(predicate, args);
     predicate.validateArgs(args);
     return res;
+  }
+
+  public InjectInst inject(String variable, String path) {
+    return new InjectInst(variable, path, Constants.EMPTY_ARGUMENTS);
+  }
+
+  public InjectInst inject(String variable, String path, Arguments args) {
+    return new InjectInst(variable, path, args);
   }
 
   public List<Integer> intlist(Integer ... numbers) {

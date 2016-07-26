@@ -31,6 +31,8 @@ import static com.squarespace.template.SyntaxErrorType.IF_EMPTY;
 import static com.squarespace.template.SyntaxErrorType.IF_EXPECTED_VAROP;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_OPERATORS;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_VARS;
+import static com.squarespace.template.SyntaxErrorType.INJECT_EXPECTS_NAME;
+import static com.squarespace.template.SyntaxErrorType.INJECT_EXPECTS_PATH;
 import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
 import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.MISSING_VARIABLE_NAME;
@@ -47,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.squarespace.template.Instructions.BindVarInst;
+import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.VariableInst;
 
@@ -138,7 +141,7 @@ public class Tokenizer {
 
   public List<ErrorInfo> getErrors() {
     if (errors == null) {
-      errors = new ArrayList<ErrorInfo>(0);
+      errors = new ArrayList<>(0);
     }
     return errors;
   }
@@ -337,6 +340,40 @@ public class Tokenizer {
 
       case IF:
         return parseIfExpression();
+
+      case INJECT:
+      {
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        if (!matcher.localVariable()) {
+          fail(error(INJECT_EXPECTS_NAME).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String variable = matcher.consume().repr();
+
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        if (!matcher.path()) {
+          fail(error(INJECT_EXPECTS_PATH).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String path = matcher.consume().repr();
+
+        StringView rawArgs = null;
+        Arguments args = Constants.EMPTY_ARGUMENTS;
+        if (matcher.arguments()) {
+          rawArgs = matcher.consume();
+          args = new Arguments(rawArgs);
+        }
+
+        InjectInst instruction = maker.inject(variable, path, args);
+        emitInstruction(instruction);
+        return true;
+      }
 
       case OR_PREDICATE:
         if (matcher.space()) {

@@ -218,6 +218,13 @@ public class TokenizerCoreTest extends UnitTestBase {
   }
 
   @Test
+  public void testInject() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    assertResult("{.inject @foo bar.json}", mk.inject("@foo", "bar.json"), mk.eof());
+    assertResult("{.inject @foo foo/bar/baz.json}", mk.inject("@foo", "foo/bar/baz.json"), mk.eof());
+  }
+
+  @Test
   public void testLiteral() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{.space}", mk.space(), mk.eof());

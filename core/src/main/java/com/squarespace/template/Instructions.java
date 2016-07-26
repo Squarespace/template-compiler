@@ -411,6 +411,65 @@ public class Instructions {
   }
 
   /**
+   * Used to inject a JSON object and bind it to a variable. Optional
+   * arguments to add this to global scope.
+   */
+  static class InjectInst extends BaseInstruction {
+
+    private final String variable;
+
+    private final String filename;
+
+    private final Arguments arguments;
+
+    public InjectInst(String variable, String filename, Arguments arguments) {
+      this.variable = variable;
+      this.filename = filename;
+      this.arguments = arguments;
+    }
+
+    public String variable() {
+      return variable;
+    }
+
+    public String filename() {
+      return filename;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof InjectInst) {
+        InjectInst other = (InjectInst) obj;
+        return variable.equals(other.variable)
+            && filename.equals(other.filename)
+            && arguments.equals(other.arguments);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.INJECT;
+    }
+
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      JsonNode node = ctx.getInjectable(filename);
+      ctx.setVar(variable, node);
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf, recurse);
+    }
+  }
+
+  /**
    * Base class for instructions which emit literal characters directly into the output.
    */
   static abstract class LiteralInst extends BaseInstruction {
