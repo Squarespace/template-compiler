@@ -36,6 +36,8 @@ public class CompilerExecutor {
 
   private ObjectNode partialsMap;
 
+  private ObjectNode injectablesMap;
+
   private StringBuilder buffer;
 
   private Locale locale;
@@ -70,6 +72,9 @@ public class CompilerExecutor {
     ctx.setCompiler(compiler);
     if (partialsMap != null) {
       ctx.setPartials(partialsMap);
+    }
+    if (injectablesMap != null) {
+      ctx.setInjectables(injectablesMap);
     }
     if (loggingHook != null) {
       ctx.setLoggingHook(loggingHook);
@@ -132,6 +137,22 @@ public class CompilerExecutor {
    */
   public CompilerExecutor partialsMap(String jsonText) {
     this.partialsMap = (ObjectNode)JsonUtils.decode(jsonText);
+    return this;
+  }
+
+  /**
+   * Sets the injectables map, which is a map from name to JSON string.
+   */
+  public CompilerExecutor injectablesMap(ObjectNode node) {
+    this.injectablesMap = node;
+    return this;
+  }
+
+  /**
+   * Sets the injectables map by parsing JSON text.
+   */
+  public CompilerExecutor injectablesMap(String jsonText) {
+    this.injectablesMap = (ObjectNode)JsonUtils.decode(jsonText);
     return this;
   }
 

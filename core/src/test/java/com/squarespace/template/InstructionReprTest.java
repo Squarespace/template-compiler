@@ -28,6 +28,7 @@ import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
+import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
@@ -110,6 +111,13 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(i1.repr(), "{.if required-args? 1 2 3}");
     i1 = new IfPredicateInst(UnitTestPredicates.INVALID_ARGS, new Arguments(mk.view("/abc/def/ghi")));
     assertEquals(i1.repr(), "{.if invalid-args?/abc/def/ghi}");
+  }
+
+  @Test
+  public void testInjectRepr() {
+    CodeMaker mk = maker();
+    InjectInst i1 = mk.inject("@foo", "foo.json");
+    assertEquals(i1.repr(), "{.inject @foo foo.json}");
   }
 
   @Test

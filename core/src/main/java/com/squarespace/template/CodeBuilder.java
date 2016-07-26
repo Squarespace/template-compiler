@@ -179,6 +179,24 @@ public class CodeBuilder {
   }
 
   /**
+   * Builds an {@link InjectInst} instruction with the given local variable name,
+   * path and empty arguments, and feeds it to the state machine.
+   */
+  public CodeBuilder inject(String variable, String path) throws CodeSyntaxException {
+    machine.accept(maker.inject(variable, path));
+    return this;
+  }
+
+  /**
+   * Builds an {@link InjectInst} instruction with the given local variable name,
+   * path and optional arguments, and feeds it to the state machine.
+   */
+  public CodeBuilder inject(String variable, String path, Arguments args) throws CodeSyntaxException {
+    machine.accept(maker.inject(variable, path, args));
+    return this;
+  }
+
+  /**
    * Builds a {@link MetaInst} instruction for the left meta character and
    * feeds it to the state machine.
    */

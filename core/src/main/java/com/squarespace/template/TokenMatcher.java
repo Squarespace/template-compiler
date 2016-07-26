@@ -51,6 +51,8 @@ public class TokenMatcher {
 
   private final Matcher matcherLocalVariable;
 
+  private final Matcher matcherPath;
+
   private final Matcher matcherPredicate;
 
   private final Matcher matcherPredicateArgs;
@@ -72,6 +74,7 @@ public class TokenMatcher {
     this.matcherFormatter = Patterns.FORMATTER.matcher(raw);
     this.matcherKeyword = Patterns.KEYWORD.matcher(raw);
     this.matcherLocalVariable = Patterns.LOCAL_VARIABLE.matcher(raw);
+    this.matcherPath = Patterns.PATH.matcher(raw);
     this.matcherPredicate = Patterns.PREDICATE.matcher(raw);
     this.matcherPredicateArgs = Patterns.PREDICATE_ARGUMENTS.matcher(raw);
     this.matcherVariable = Patterns.VARIABLE.matcher(raw);
@@ -167,6 +170,11 @@ public class TokenMatcher {
   public boolean operator() {
     return match(matcherBooleanOp);
   }
+
+  public boolean path() {
+    return match(matcherPath);
+  }
+
 
   public boolean pipe() {
     return match('|');

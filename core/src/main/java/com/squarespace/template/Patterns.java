@@ -37,6 +37,8 @@ public class Patterns {
 
   public static final String _ABC09UH = "[a-zA-Z0-9_-]";
 
+  public static final String _PATH = "[./a-zA-Z0-9_-]";
+
   public static final String _WORD = _ABC + _ABC09UH + "*+";
 
   public static final String _WORD_OR_DIGITS = "(" + _WORD + "|\\d+)";
@@ -64,6 +66,8 @@ public class Patterns {
   public static final Pattern LOCAL_VARIABLE = Pattern.compile("@" + _WORD);
 
   public static final Pattern ONESPACE = Pattern.compile("\\s");
+
+  public static final Pattern PATH = Pattern.compile(_PATH + "+");
 
   /**
    * Predicates can appear as instructions or part of an OR instruction. We need this

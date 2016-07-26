@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 SQUARESPACE, Inc.
+ * Copyright (c) 2016 SQUARESPACE, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,19 @@
 
 package com.squarespace.template;
 
+import org.testng.annotations.Test;
 
-public enum InstructionType {
 
-  ALTERNATES_WITH,
-  BINDVAR,
-  COMMENT,
-  END,
-  EOF,
-  IF,
-  INJECT,
-  META_LEFT,
-  META_RIGHT,
-  NEWLINE,
-  OR_PREDICATE,
-  PREDICATE,
-  REPEATED,
-  ROOT,
-  SECTION,
-  SPACE,
-  TAB,
-  TEXT,
-  VARIABLE;
+public class InstructionTest extends UnitTestBase {
+
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), InstructionTest.class);
+
+  @Test
+  public void testInject() {
+    runner.run(
+        "f-inject-1.html",
+        "f-inject-2.html"
+    );
+  }
 
 }

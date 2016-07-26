@@ -24,6 +24,7 @@ import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
+import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.LiteralInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -132,6 +133,14 @@ public class ReprEmitter {
     buf.append("{.if ");
     buf.append(predicate.identifier());
     emit(inst.getArguments(), buf);
+    buf.append('}');
+  }
+
+  public static void emit(InjectInst inst, StringBuilder buf, boolean recurse) {
+    buf.append("{.inject ");
+    buf.append(inst.variable());
+    buf.append(' ');
+    buf.append(inst.filename());
     buf.append('}');
   }
 

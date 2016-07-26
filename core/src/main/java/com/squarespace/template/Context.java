@@ -17,7 +17,6 @@
 package com.squarespace.template;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
-
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SELF_RECURSION;
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
@@ -78,6 +77,10 @@ public class Context {
   private JsonNode rawPartials;
 
   private Map<String, Instruction> compiledPartials;
+
+  private JsonNode rawInjectables;
+
+  private Map<String, JsonNode> parsedInjectables;
 
   private Set<String> partialsExecuting;
 
@@ -323,6 +326,43 @@ public class Context {
     partialsExecuting.remove(name);
     partialDepth--;
   }
+
+  /**
+   * Lazily allocate the injectable JSON cache.
+   */
+  public void setInjectables(JsonNode node) {
+    this.rawInjectables = node;
+    this.parsedInjectables = new HashMap<>();
+  }
+
+  /**
+   * Retrieve an injectable JSON object by name.
+   */
+  public JsonNode getInjectable(String name) {
+    if (rawInjectables == null) {
+      return Constants.MISSING_NODE;
+    }
+
+    // Check if we've already parsed and cached this injectable
+    JsonNode result = parsedInjectables.get(name);
+    if (result == null) {
+
+      // Not cached, so parse the injectable if it exists.
+      JsonNode rawNode = rawInjectables.get(name);
+      if (rawNode != null) {
+        String raw = rawNode.asText();
+        result = JsonUtils.decode(raw, true);
+      } else {
+        result = Constants.MISSING_NODE;
+      }
+
+      // Update the mapping even if it is MISSING to save a lookup.
+      parsedInjectables.put(name, result);
+    }
+
+    return result;
+  }
+
 
   public StringBuilder buffer() {
     return buf;

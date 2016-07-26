@@ -44,6 +44,8 @@ public class TestCaseParser extends UnitTestBase {
 
   private static final String TYPE_OUTPUT = "OUTPUT";
 
+  private static final String TYPE_INJECT = "INJECT";
+
   private static final String TYPE_PARTIALS = "PARTIALS";
 
   private static final String TYPE_TEMPLATE = "TEMPLATE";
@@ -60,8 +62,9 @@ public class TestCaseParser extends UnitTestBase {
     String json = sections.get(TYPE_JSON);
     String template = sections.get(TYPE_TEMPLATE);
     String partials = sections.get(TYPE_PARTIALS);
+    String inject = sections.get(TYPE_INJECT);
     if (sections.containsKey(TYPE_OUTPUT)) {
-      return new OutputTestCase(json, template, partials, sections.get(TYPE_OUTPUT));
+      return new OutputTestCase(json, template, partials, inject, sections.get(TYPE_OUTPUT));
     } else if (sections.containsKey(TYPE_ERROR)) {
 // TBD:     return new ErrorCase(json, template, sections.get(TYPE_ERROR));
     }
@@ -84,14 +87,17 @@ public class TestCaseParser extends UnitTestBase {
 
     private final String partials;
 
+    private final String inject;
+
     private final String output;
 
-    OutputTestCase(String json, String template, String partials, String output) {
+    OutputTestCase(String json, String template, String partials, String inject, String output) {
       assertSection(json, TYPE_JSON, TYPE_OUTPUT);
       assertSection(template, TYPE_TEMPLATE, TYPE_OUTPUT);
       this.json = json;
       this.template = template;
       this.partials = partials;
+      this.inject = inject;
       this.output = output.trim();
     }
 
@@ -100,15 +106,26 @@ public class TestCaseParser extends UnitTestBase {
       try {
         ObjectNode partialsMap = null;
         if (partials != null) {
-          partialsMap = (ObjectNode) JsonUtils.decode(partials);
+          partialsMap = (ObjectNode) JsonUtils.decode(partials.trim());
+        }
+        ObjectNode injectMap = null;
+        if (inject != null) {
+          injectMap = (ObjectNode) JsonUtils.decode(inject.trim());
         }
         Instruction code = compiler.compile(template, false).code();
-        Context ctx = compiler.newExecutor()
+        CompilerExecutor executor = compiler.newExecutor()
             .code(code)
             .json(json)
-            .partialsMap(partialsMap)
-            .safeExecution(true)
-            .execute();
+            .safeExecution(true);
+
+        if (partialsMap != null) {
+          executor.partialsMap(partialsMap);
+        }
+        if (injectMap != null) {
+          executor.injectablesMap(injectMap);
+        }
+
+        Context ctx = executor.execute();
         String actual = ctx.buffer().toString().trim();
         if (!output.equals(actual)) {
           throw new AssertionError("Output does not match:\n" + diff(output, actual));

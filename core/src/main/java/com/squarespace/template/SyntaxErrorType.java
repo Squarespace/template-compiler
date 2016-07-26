@@ -71,6 +71,12 @@ public enum SyntaxErrorType implements ErrorType {
   IF_TOO_MANY_VARS
   ("Too many variables in IF instruction. Limit is %(limit)s."),
 
+  INJECT_EXPECTS_NAME
+  ("{.inject} expects a variable name (e.g. @foo), found '%(data)s'"),
+
+  INJECT_EXPECTS_PATH
+  ("{.inject} expects the path for a JSON injectable, found '%(data)s'"),
+
   INVALID_INSTRUCTION
   ("Invalid instruction '%(data)s'"),
 

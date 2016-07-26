@@ -1,0 +1,18 @@
+:JSON
+{}
+
+:PARTIALS
+{
+  "partial": "{.inject @foo foo.json}{@foo.name}"
+}
+
+:INJECT
+{
+  "foo.json": "{\"name\": \"albert\"}"
+}
+
+:TEMPLATE
+{@|apply partial}
+
+:OUTPUT
+albert
