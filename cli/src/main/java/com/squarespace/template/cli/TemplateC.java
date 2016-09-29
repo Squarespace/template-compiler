@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,6 +31,7 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.CompiledTemplate;
 import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
+import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.FormatterTable;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
@@ -141,7 +143,17 @@ public class TemplateC {
       partials = readFile(partialsPath);
     }
 
-    CompiledTemplate compiled = compiler().compile(template, false);
+    CompiledTemplate compiled = compiler().compile(template, true);
+
+    StringBuilder errorBuf = new StringBuilder();
+    List<ErrorInfo> errors = compiled.errors();
+    if (!errors.isEmpty()) {
+      errorBuf.append("Caught errors executing template:\n");
+      for (ErrorInfo error : errors) {
+        errorBuf.append("    ").append(error.getMessage()).append('\n');
+      }
+    }
+
     Instruction code = compiled.code();
 
     // Parse the JSON context
@@ -172,11 +184,16 @@ public class TemplateC {
     Context context = compiler().newExecutor()
         .code(code)
         .json(jsonTree)
+        .safeExecution(true)
         .partialsMap((ObjectNode)partialsTree)
         .execute();
 
     // If compile was successful, print the output.
     System.out.print(context.buffer().toString());
+
+    if (errorBuf.length() > 0) {
+      System.err.println(errorBuf.toString());
+    }
     return 0;
   }
 
