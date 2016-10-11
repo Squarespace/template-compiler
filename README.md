@@ -44,7 +44,7 @@ The project was started with these objectives:
 https://tldrlegal.com/license/apache-license-2.0-(apache-2.0) "Apache 2.0 tl;dr"
 
 [jsont]:
-http://json-template.googlecode.com/svn/trunk/doc/Introducing-JSON-Template.html
+http://jsont.squarespace.com/
 
 [nodejs]:
 http://nodejs.org
