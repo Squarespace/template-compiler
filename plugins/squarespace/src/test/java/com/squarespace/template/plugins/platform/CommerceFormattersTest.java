@@ -189,7 +189,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     runner.run(
         "f-quantity-input-1.html",
         "f-quantity-input-2.html",
-        "f-quantity-input-3.html"
+        "f-quantity-input-3.html",
+        "f-quantity-input-4.html"
         );
   }
 

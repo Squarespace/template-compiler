@@ -361,7 +361,8 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
       ProductType type = CommerceUtils.getProductType(item);
-      if (!ProductType.PHYSICAL.equals(type) || CommerceUtils.getTotalStockRemaining(item) <= 1) {
+      if (!(ProductType.PHYSICAL.equals(type) || ProductType.SERVICE.equals(type))
+          || CommerceUtils.getTotalStockRemaining(item) <= 1) {
         return MissingNode.getInstance();
       }
       return executeTemplate(ctx, template, item, true);
