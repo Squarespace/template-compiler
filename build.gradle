@@ -95,6 +95,10 @@ clean {
   delete 'templatec'
 }
 
+release {
+  requireBranch = ''
+}
+
 task makeCli(dependsOn: ':template-cli:makeCli') {
 }
 
