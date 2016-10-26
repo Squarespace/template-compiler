@@ -281,6 +281,12 @@ public class CodeValidityTest extends UnitTestBase {
   }
 
   @Test
+  public void testComplexVariables() throws CodeException {
+    RootInst root = builder().var("foo.bar").var("foo[qux]").eof().build();
+    assertContext(execute("{\"foo\": {\"bar\": 1, \"baz\": \"2\"}, \"qux\": \"baz\"}", root), "12");
+  }
+
+  @Test
   public void testVariableFormatters() throws CodeException {
     RootInst root = builder().var("a", SAFE).eof().build();
     assertContext(execute("{\"a\": \"x <> y\"}", root), "x  y");

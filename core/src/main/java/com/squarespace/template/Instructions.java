@@ -129,7 +129,7 @@ public class Instructions {
       if (obj instanceof BindVarInst) {
         BindVarInst other = (BindVarInst)obj;
         return name.equals(other.name)
-            && Arrays.equals(variable, other.variable)
+            && Arrays.deepEquals(variable, other.variable)
             && Objects.equals(formatters, other.formatters);
       }
       return false;
@@ -689,7 +689,7 @@ public class Instructions {
         return false;
       }
       RepeatedInst other = (RepeatedInst) obj;
-      if (!Arrays.equals(variable, other.variable)) {
+      if (!Arrays.deepEquals(variable, other.variable)) {
         return false;
       }
       return equals(alternatesWith, other.alternatesWith) && blockEquals(other);
@@ -810,7 +810,7 @@ public class Instructions {
         return false;
       }
       SectionInst other = (SectionInst) obj;
-      return Arrays.equals(variable, other.variable) && blockEquals(other);
+      return Arrays.deepEquals(variable, other.variable) && blockEquals(other);
     }
 
     @Override
@@ -955,7 +955,7 @@ public class Instructions {
     public boolean equals(Object obj) {
       if (obj instanceof VariableInst) {
         VariableInst other = (VariableInst) obj;
-        return Arrays.equals(variable, other.variable)
+        return Arrays.deepEquals(variable, other.variable)
             && Objects.equals(formatters, other.formatters);
       }
       return false;

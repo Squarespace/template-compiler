@@ -71,6 +71,14 @@ public class PatternsTest {
     isVariable("12");
     isVariable("0.name");
     isVariable("0.1.2.name");
+    isVariable("foo[0]");
+    isVariable("foo[bar]");
+    isVariable("foo[bar.baz]");
+    isVariable("foo[bar][baz]");
+    isVariable("foo[bar.baz].qux");
+
+    // works but shouldn't be used
+    isVariable("foo[bar].0[baz]");
 
     notVariable(" foo");
     notVariable(".foo");
@@ -80,6 +88,9 @@ public class PatternsTest {
     notVariable("0. foo");
     notVariable(".0");
     notVariable("0.");
+    notVariable("foo[");
+    notVariable("foo[ bar ]");
+    notVariable("foo[bar[baz]]");
   }
 
   private void isFormatter(String str) {

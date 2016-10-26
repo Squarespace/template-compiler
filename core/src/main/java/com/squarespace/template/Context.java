@@ -562,6 +562,13 @@ public class Context {
   private JsonNode nodePath(JsonNode node, Object key) {
     if (key instanceof Integer) {
       return node.path((int) key);
+    } else if (key == null || key instanceof Object[]) {
+      JsonNode refNode = resolve((Object[]) key);
+      if (refNode.isInt()) {
+        return node.path(refNode.intValue());
+      } else {
+        return node.path(refNode.textValue());
+      }
     }
     return node.path((String) key);
   }

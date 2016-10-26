@@ -71,6 +71,21 @@ public class CodeExecuteTest extends UnitTestBase {
     json = "{\"person\": {\"name\": \"Larry\", \"age\": \"21\"}}";
     root = builder().bindvar("@person", "person").var("@person.name").text(" is ").var("@person.age").eof().build();
     assertContext(execute(json, root), "Larry is 21");
+
+    // Examples of binding with brackets
+    json = "{\"strings\": {\"en\": [\"Hello\", \"world\"], \"fr\": [\"Bonjour\", \"le\", \"monde\"]}, "
+        + "\"languages\": [\"en\", \"fr\"]}";
+    cb = builder().bindvar("@english", "strings[languages.0]");
+    cb.repeated("@english").var("@").alternatesWith().text(" ").end().eof();
+    assertContext(execute(json, cb.build()), "Hello world");
+
+    cb = builder().bindvar("@strings", "strings");
+    cb.repeated("languages").bindvar("@string", "@strings[@]");
+    cb.repeated("@string").var("@").alternatesWith().text(" ").end();
+    cb.alternatesWith().text("\n").end().eof();
+    assertContext(execute(json, cb.build()),
+        "Hello world\n"
+        + "Bonjour le monde");
   }
 
   @Test
@@ -105,6 +120,11 @@ public class CodeExecuteTest extends UnitTestBase {
     root = builder().section("foo.1").var("@").end().eof().build();
     json = "{\"foo\": [\"a\", \"b\"]}";
     assertEquals(repr(root), "{.section foo.1}{@}{.end}");
+    assertContext(execute(json, root), "b");
+
+    root = builder().section("foo[bar]").var("@").end().eof().build();
+    json = "{\"foo\": [\"a\", \"b\"], \"bar\": 1}";
+    assertEquals(repr(root), "{.section foo[bar]}{@}{.end}");
     assertContext(execute(json, root), "b");
   }
 
@@ -151,9 +171,17 @@ public class CodeExecuteTest extends UnitTestBase {
     assertContext(execute("123.000", root), "123.0");
     assertContext(execute("null", root), "");
 
-
     root = builder().var("foo.2.bar").eof().build();
     assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}]}", root), "hi");
+
+    root = builder().var("foo[2].bar").eof().build();
+    assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}]}", root), "hi");
+
+    root = builder().var("foo[baz].bar").eof().build();
+    assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}], \"baz\": 2}", root), "hi");
+
+    root = builder().var("foo[2][baz]").eof().build();
+    assertContext(execute("{\"foo\": [0, 0, {\"bar\": \"hi\"}], \"baz\": \"bar\"}", root), "hi");
 
     root = builder().var("foo").eof().build();
     assertContext(execute("{\"foo\": [\"a\", \"b\", 123]}", root), "a,b,123");

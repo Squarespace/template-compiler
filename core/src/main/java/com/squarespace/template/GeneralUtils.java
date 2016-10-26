@@ -181,17 +181,61 @@ public class GeneralUtils {
    * Splits a variable name into its parts.
    */
   public static Object[] splitVariable(String name) {
-    String[] parts = name.equals("@") ? null : StringUtils.split(name, '.');
-    if (parts == null) {
+    if (name.equals("@")) {
       return null;
     }
-
-    // Each segment of the key path can be either a String or an Integer.
-    Object[] keys = new Object[parts.length];
-    for (int i = 0, len = parts.length; i < len; i++) {
-      keys[i] = allDigits(parts[i]) ? Integer.parseInt(parts[i], 10) : parts[i];
+    Object[] keys = new Object[countPathParts(name)];
+    int i = 0, start = 0, end = 0, brackets = 0;
+    for (int len = name.length(); end < len; end++) {
+      char current = name.charAt(end);
+      if (brackets == 0 && current == '.' || current == '[') {
+        if (start < end) {
+          keys[i] = stringToPathPart(name.substring(start, end));
+          i++;
+        }
+        start = end + 1;
+        if (current == '[') {
+          brackets++;
+        }
+      } else if (current == ']') {
+        if (start < end) {
+          keys[i] = bracketedExpToPathPart(name.substring(start, end));
+          i++;
+        }
+        start = end + 1;
+        brackets--;
+      }
+    }
+    if (start < end) {
+      keys[i] = stringToPathPart(name.substring(start, end));
     }
     return keys;
+  }
+
+  /**
+   * Counts the number of path parts in a variable. Path parts include
+   * dot separated words, along with bracked expressions. Ex:
+   * "my.variable[with][brackets]" contains four parts.
+   */
+  public static int countPathParts(String name) {
+    String nobrackets = name.replaceAll(Patterns._BRACKET_EXP, "._");
+    return StringUtils.split(nobrackets, '.').length;
+  }
+
+  /**
+   * Converts a string to a path part Object.
+   */
+  public static Object stringToPathPart(String name) {
+    return allDigits(name) ? Integer.parseInt(name, 10) : name;
+  }
+
+  /**
+   * Converts a bracketed expression to a path part Object.
+   * Handles both [0] and [var] style expressions.
+   * String {@code exp} should have brackets removed already.
+   */
+  public static Object bracketedExpToPathPart(String exp) {
+    return allDigits(exp) ? Integer.parseInt(exp, 10) : splitVariable(exp);
   }
 
   /**

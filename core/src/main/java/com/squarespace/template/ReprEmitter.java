@@ -246,13 +246,22 @@ public class ReprEmitter {
       return;
     }
     for (int i = 0, len = names.length; i < len; i++) {
-      if (i > 0) {
-        buf.append('.');
-      }
       Object name = names[i];
       if (name instanceof Integer) {
+        if (i > 0) {
+          buf.append('.');
+        }
         buf.append((int) name);
+      } else if (name == null) {
+        buf.append("[@]");
+      } else if (name instanceof Object[]) {
+        buf.append("[");
+        emitNames((Object[]) name, buf);
+        buf.append("]");
       } else {
+        if (i > 0) {
+          buf.append('.');
+        }
         buf.append((String) name);
       }
     }

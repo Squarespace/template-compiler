@@ -45,6 +45,17 @@ public class Patterns {
 
   public static final String _DOTWORD = _WORD_OR_DIGITS + "(\\." + _WORD_OR_DIGITS + ")*+";
 
+  public static final String _BRACKET_EXP = "\\[(@?" + _DOTWORD + "|\\d+|@)]";
+
+  public static final String _BRACKETS = "(" + _BRACKET_EXP + ")*+";
+
+  public static final String _NO_TRAILING_DELIM = "(?![\\[.])";
+
+  public static final String _VAR_PART = _WORD_OR_DIGITS + _BRACKETS;
+
+  public static final String _VAR_PATH = _VAR_PART + "(\\." + _VAR_PART + ")*+" + _NO_TRAILING_DELIM;
+
+
   // Compiled regular expressions
 
   public static final Pattern ARGUMENTS = Pattern.compile("[^|}]+");
@@ -81,7 +92,7 @@ public class Patterns {
 
   public static final Pattern PREDICATE_ARGUMENTS = Pattern.compile("[^}]+");
 
-  public static final Pattern VARIABLE = Pattern.compile("@*" + _DOTWORD + "|@");
+  public static final Pattern VARIABLE = Pattern.compile("@*" + _VAR_PATH + "|@");
 
   public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 

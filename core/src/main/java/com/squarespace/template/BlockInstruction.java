@@ -89,7 +89,7 @@ abstract class BlockInstruction extends BaseInstruction {
         return false;
       }
       for (int i = 0; i < sz; i++) {
-        if (!Arrays.equals(t1.get(i), t2.get(i))) {
+        if (!Arrays.deepEquals(t1.get(i), t2.get(i))) {
           return false;
         }
       }

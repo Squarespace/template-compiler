@@ -94,6 +94,8 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{foo.baz }", mk.text("{foo.baz }"), mk.eof());
     assertResult("{a.b=1;return 2;}", mk.text("{a.b=1;return 2;}"), mk.eof());
     assertResult("{return a.b}", mk.text("{return a.b}"), mk.eof());
+    assertResult("{foo[ bar ]}", mk.text("{foo[ bar ]}"), mk.eof());
+    assertResult("{foo[bar[baz]]}", mk.text("{foo[bar[baz]]}"), mk.eof());
 
     // There are limits to how much ambiguity we can tolerate. The PIPE causes this to expect
     // a Formatter identifier to follow, and its harder to discern the intent.
@@ -122,6 +124,12 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.var @name foo|htmlattr}", mk.bindvar("@name", "foo", mk.formatters(HTMLATTR)), mk.eof());
     assertResult("{.var @a b?}", mk.text("{.var @a b?}"), mk.eof());
 
+    assertResult("{.var @name foo.bar[baz]}", mk.bindvar("@name", "foo.bar[baz]"), mk.eof());
+    assertResult("{.var @name foo[baz].bar}", mk.bindvar("@name", "foo[baz].bar"), mk.eof());
+    assertResult("{.var @name foo.bar[baz.bif]}", mk.bindvar("@name", "foo.bar[baz.bif]"), mk.eof());
+    assertResult("{.var @name foo.bar[@baz]}", mk.bindvar("@name", "foo.bar[@baz]"), mk.eof());
+    assertResult("{.var @name foo[@baz.bar].bar[@baz]}", mk.bindvar("@name", "foo[@baz.bar].bar[@baz]"), mk.eof());
+
     assertSoftFailure("{.var @name foo|?}", FORMATTER_INVALID);
     assertSoftFailure("{.var @name foo|x}", FORMATTER_UNKNOWN);
 
@@ -131,6 +139,9 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.var.}", WHITESPACE_EXPECTED);
     assertFailure("{.varx}", INVALID_INSTRUCTION);
     assertFailure("{.var @foo ?foo}", MISSING_VARIABLE_NAME);
+    assertFailure("{.var @foo foo[}", MISSING_VARIABLE_NAME);
+    assertFailure("{.var @name foo[ bar ]}", MISSING_VARIABLE_NAME);
+    assertFailure("{.var @foo foo[bar[baz]]}", MISSING_VARIABLE_NAME);
   }
 
   @Test
@@ -171,6 +182,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     Arguments args1 = mk.args(" a1 a2");
     assertResult("{@|pluralize}", mk.var("@", PLURALIZE), mk.eof());
     assertResult("{a.b.c|slugify}", mk.var("a.b.c", SLUGIFY), mk.eof());
+    assertResult("{a[b][c.e].f[0]|slugify}", mk.var("a[b][c.e].f[0]", SLUGIFY), mk.eof());
     assertResult("{foo|pluralize a1 a2}", mk.var("foo", mk.fmt(PLURALIZE, args1)), mk.eof());
 
     Arguments args2 = mk.args("/b/c");
@@ -191,6 +203,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{foo|=123}", FORMATTER_INVALID);
     assertFailure("{foo|}", FORMATTER_INVALID);
     assertFailure("{foo|123}", FORMATTER_INVALID);
+    assertFailure("{foo[2]|123}", FORMATTER_INVALID);
 
     // Formatter arguments are required
     assertFailure("{foo|invalid-args a b}", FORMATTER_ARGS_INVALID);
@@ -206,6 +219,10 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.if a.b && c.d}", mk.ifexpn(mk.strlist("a.b", "c.d"), mk.oplist(LOGICAL_AND)), mk.eof());
     assertResult("{.if a&&b||c}", mk.ifexpn(mk.strlist("a", "b", "c"), mk.oplist(LOGICAL_AND, LOGICAL_OR)), mk.eof());
 
+    assertResult("{.if a[b][c]||d}", mk.ifexpn(mk.strlist("a[b][c]", "d"), mk.oplist(LOGICAL_OR)), mk.eof());
+    assertResult("{.if a.b[c] && d}", mk.ifexpn(mk.strlist("a.b[c]", "d"), mk.oplist(LOGICAL_AND)), mk.eof());
+    assertResult("{.if a&&b[c].d}", mk.ifexpn(mk.strlist("a", "b[c].d"), mk.oplist(LOGICAL_AND)), mk.eof());
+
     List<String> vars = mk.strlist("a", "b", "c", "d", "e");
     List<Operator> ops = mk.oplist(LOGICAL_OR, LOGICAL_OR, LOGICAL_OR, LOGICAL_OR);
     assertResult("{.if a||b||c||d||e}", mk.ifexpn(vars, ops), mk.eof());
@@ -215,6 +232,8 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.if a||b||c||d||e||}", IF_TOO_MANY_OPERATORS);
     assertFailure("{.if a||b||c||d||e||f}", IF_TOO_MANY_VARS);
     assertFailure("{.if .qrs||.tuv}", IF_EXPECTED_VAROP);
+    assertFailure("{.if a[ b ]||d}", IF_EXPECTED_VAROP);
+    assertFailure("{.if a&&b[c[d]]}", IF_EXPECTED_VAROP);
   }
 
   @Test
@@ -284,6 +303,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertResult("{.repeated section @}", mk.repeated("@"), mk.eof());
     assertResult("{.repeated section a.b.c}", mk.repeated("a.b.c"), mk.eof());
+    assertResult("{.repeated section a[b][c.d][0].e}", mk.repeated("a[b][c.d][0].e"), mk.eof());
     assertResult("{.repeated section a}A{.end}", mk.repeated("a"), mk.text("A"), mk.end(), mk.eof());
 
     // Invalid instruction but parses as TEXT
@@ -304,6 +324,10 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{@}", mk.var("@"), mk.eof());
     assertResult("{@index}", mk.var("@index"), mk.eof());
     assertResult("{foo.bar}", mk.var("foo.bar"), mk.eof());
+    assertResult("{foo[bar]}", mk.var("foo[bar]"), mk.eof());
+    assertResult("{foo[bar.baz]}", mk.var("foo[bar.baz]"), mk.eof());
+    assertResult("{foo[bar][baz]}", mk.var("foo[bar][baz]"), mk.eof());
+    assertResult("{foo[0].baz}", mk.var("foo[0].baz"), mk.eof());
   }
 
   private void assertFailure(String raw, SyntaxErrorType type) {
