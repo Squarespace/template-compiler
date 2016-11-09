@@ -59,8 +59,7 @@ public class ContextTest extends UnitTestBase {
 
     ctx = context("{\"a\": null}");
     ctx.push(mk.strarray("a", "b"));
-    assertTrue(ctx.node().isTextual());
-    assertTrue(ctx.node().asText().contains("Can't resolve"));
+    assertTrue(ctx.node().isMissingNode());
   }
 
   @Test
