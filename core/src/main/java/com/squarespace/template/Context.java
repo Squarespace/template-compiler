@@ -483,7 +483,8 @@ public class Context {
         return undefined;
       }
       if (node.isNull()) {
-        return new TextNode("[JSONT: Can't resolve '" + ReprEmitter.get(names) + "'.]");
+        // NOTE: Future warnings should be emitted as a side-effect not inline.
+        return Constants.MISSING_NODE;
       }
       node = nodePath(node, names[i]);
     }
