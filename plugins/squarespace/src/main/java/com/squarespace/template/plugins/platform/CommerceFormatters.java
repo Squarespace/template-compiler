@@ -144,7 +144,7 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return ctx.buildNode("/commerce/show-cart");
+      return ctx.buildNode("/cart");
     }
   }
 
