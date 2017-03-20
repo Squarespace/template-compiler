@@ -470,6 +470,17 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(JSON, "\"foo </script>\"", "\"foo </scr\"+\"ipt>\"");
 
     assertFormatter(JSON_PRETTY, "{ \"a\":  3.14159 }", "{\n  \"a\" : 3.14159\n}");
+
+    runner.run(
+        "f-json-1.html",
+        "f-json-2.html",
+        "f-json-3.html",
+        "f-json-4.html",
+        "f-json-5.html",
+
+        "f-json-pretty-1.html",
+        "f-json-pretty-2.html"
+    );
   }
 
   @Test

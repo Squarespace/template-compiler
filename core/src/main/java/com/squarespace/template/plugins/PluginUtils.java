@@ -17,6 +17,8 @@
 package com.squarespace.template.plugins;
 
 import static com.squarespace.template.Patterns.WHITESPACE;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static java.util.regex.Pattern.MULTILINE;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -27,6 +29,8 @@ import java.util.regex.Pattern;
 public class PluginUtils {
 
   private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
+
+  private static final Pattern SCRIPT_TAG = Pattern.compile("<(/?)script[^>]*>", CASE_INSENSITIVE | MULTILINE);
 
   private PluginUtils() {
   }
@@ -47,6 +51,13 @@ public class PluginUtils {
       return ch - 'A' + 10;
     }
     return -1;
+  }
+
+  /**
+   * Escape instances of HTML script tags.
+   */
+  public static String escapeScriptTags(String str) {
+    return SCRIPT_TAG.matcher(str).replaceAll("<$1scr\"+\"ipt>");
   }
 
   public static void escapeHtml(String str, StringBuilder buf) {

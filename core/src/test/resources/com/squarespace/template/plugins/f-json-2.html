@@ -1,0 +1,10 @@
+:JSON
+{
+  "var": {"title": "This is a <ScRIPt>alert('test');</scRIPt>"}
+}
+
+:TEMPLATE
+{var.title|json}
+
+:OUTPUT
+"This is a <scr"+"ipt>alert('test');</scr"+"ipt>"

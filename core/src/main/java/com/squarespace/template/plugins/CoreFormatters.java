@@ -22,6 +22,8 @@ import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
 import static com.squarespace.template.GeneralUtils.eatNull;
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
+import static com.squarespace.template.GeneralUtils.jsonPretty;
+import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -43,7 +45,6 @@ import com.squarespace.template.Context;
 import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
-import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.StringView;
@@ -327,9 +328,8 @@ public class CoreFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      // NOTE: this </script> replacement is copied verbatim from the JavaScript
-      // version of JSONT, but it seems quite error-prone to me.
-      return ctx.buildNode(node.toString().replace("</script>", "</scr\"+\"ipt>"));
+      String escaped = escapeScriptTags((node.toString()));
+      return ctx.buildNode(escaped);
     }
 
   }
@@ -340,6 +340,7 @@ public class CoreFormatters implements FormatterRegistry {
    */
   public static class JsonPrettyFormatter extends BaseFormatter {
 
+
     public JsonPrettyFormatter() {
       super("json-pretty", false);
     }
@@ -347,10 +348,8 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       try {
-        String result = GeneralUtils.jsonPretty(node);
-        // NOTE: this </script> replacement is copied verbatim from the JavaScript
-        // version of JSONT, but it seems quite error-prone to me.
-        return ctx.buildNode(result.replace("</script>", "</scr\"+\"ipt>"));
+        String result = jsonPretty(node);
+        return ctx.buildNode(escapeScriptTags(result));
 
       } catch (IOException e) {
         ErrorInfo error = ctx.error(GENERAL_ERROR).data(e.getMessage());
