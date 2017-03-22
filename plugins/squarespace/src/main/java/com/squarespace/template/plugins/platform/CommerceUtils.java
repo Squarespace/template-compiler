@@ -19,6 +19,7 @@ package com.squarespace.template.plugins.platform;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +60,7 @@ public class CommerceUtils {
 
       case PHYSICAL:
       case SERVICE:
+      case GIFT_CARD:
         JsonNode variants = structuredContent.path("variants");
         if (variants.size() == 0) {
           return 0;
@@ -112,6 +114,9 @@ public class CommerceUtils {
         JsonNode cents = structuredContent.path("priceCents");
         return cents.isMissingNode() ? 0 : cents.asDouble();
 
+      case GIFT_CARD:
+        // this should never happen
+
       default:
         return 0.0;
     }
@@ -141,6 +146,9 @@ public class CommerceUtils {
         JsonNode cents = structuredContent.path("salePriceCents");
         return cents.isMissingNode() ? 0.0 : cents.asDouble();
 
+      case GIFT_CARD:
+        // this should never happen
+
       default:
         return 0.0;
     }
@@ -150,9 +158,10 @@ public class CommerceUtils {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
-    if (ProductType.DIGITAL.equals(type)) {
+
+    if (EnumSet.of(ProductType.DIGITAL, ProductType.GIFT_CARD).contains(type)) {
       return Double.POSITIVE_INFINITY;
-    } else if (ProductType.PHYSICAL.equals(type) || ProductType.SERVICE.equals(type)) {
+    } else {
       int total = 0;
       JsonNode variants = structuredContent.path("variants");
       for (int i = 0; i < variants.size(); i++) {
@@ -165,8 +174,6 @@ public class CommerceUtils {
       }
       return total;
     }
-
-    return 0;
   }
 
   public static boolean hasVariedPrices(JsonNode item) {
@@ -190,6 +197,7 @@ public class CommerceUtils {
         return false;
 
       case DIGITAL:
+      case GIFT_CARD:
       default:
         return false;
     }
@@ -222,6 +230,7 @@ public class CommerceUtils {
       case DIGITAL:
         return isTruthy(structuredContent.path("onSale"));
 
+      case GIFT_CARD:
       default:
         break;
     }
@@ -246,6 +255,7 @@ public class CommerceUtils {
         return true;
 
       case DIGITAL:
+      case GIFT_CARD:
         return false;
 
       default:
@@ -362,6 +372,11 @@ public class CommerceUtils {
         } else {
           writeMoneyString(normalPrice, buf);
         }
+        break;
+
+      case GIFT_CARD:
+        buf.append("from ");
+        writeMoneyString(getFromPrice(item), buf);
         break;
 
       default:

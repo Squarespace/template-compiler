@@ -30,7 +30,8 @@ public enum ProductType implements PlatformEnum {
   UNDEFINED(-1, "undefined"),
   PHYSICAL(1, "physical"),
   DIGITAL(2, "digital"),
-  SERVICE(3, "service");
+  SERVICE(3, "service"),
+  GIFT_CARD(4, "gift-card");
 
   private static final Map<Integer, ProductType> CODE_MAP = codeMap(ProductType.class);
 
