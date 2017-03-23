@@ -1,0 +1,18 @@
+{
+    "hello": {
+        "world": "!"
+    },
+    "foo": {
+        "bar": "baz"
+    },
+    "bar": "baz",
+    "foos": [
+        { "bar": "baz1" },
+        { "bar": "baz2" },
+        { "bar": "baz3" },
+        { "bar": "baz4" },
+        { "bar": "baz5" }
+    ],
+    "var": "world"
+}
+
