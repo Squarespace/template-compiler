@@ -12,7 +12,6 @@
         { "bar": "baz3" },
         { "bar": "baz4" },
         { "bar": "baz5" }
-    ],
-    "var": "world"
+    ]
 }
 

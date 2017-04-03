@@ -23,6 +23,7 @@ import static com.squarespace.template.GeneralUtils.eatNull;
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
+import static com.squarespace.template.GeneralUtils.splitVariable;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
 import java.io.IOException;
@@ -70,6 +71,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new JsonFormatter());
     table.add(new JsonPrettyFormatter());
     table.add(new OutputFormatter());
+    table.add(new LookupFormatter());
     table.add(new PluralizeFormatter());
     table.add(new RawFormatter());
     table.add(new RoundFormatter());
@@ -380,6 +382,29 @@ public class CoreFormatters implements FormatterRegistry {
       return ctx.buildNode(StringUtils.join(values.toArray(), ' '));
     }
 
+  }
+
+  /**
+   * Lookup - given an object, returns the value for a given key
+   */
+  public static class LookupFormatter extends BaseFormatter {
+
+    public LookupFormatter() {
+      super("lookup", true);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.exactly(1);
+    }
+
+    @Override
+    public JsonNode apply(final Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String fieldName = args.first();
+      JsonNode value = ctx.resolve(splitVariable(fieldName));
+      JsonNode result = ctx.resolve(splitVariable(value.asText()));
+      return result;
+    }
   }
 
   static class PluralizeArgs {

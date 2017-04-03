@@ -55,6 +55,7 @@ import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
+import com.squarespace.template.plugins.CoreFormatters.LookupFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
 import com.squarespace.template.plugins.CoreFormatters.RawFormatter;
 import com.squarespace.template.plugins.CoreFormatters.RoundFormatter;
@@ -88,6 +89,8 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter JSON_PRETTY = new JsonPrettyFormatter();
 
   private static final Formatter OUTPUT = new OutputFormatter();
+
+  private static final Formatter LOOKUP = new LookupFormatter();
 
   private static final Formatter PLURALIZE = new PluralizeFormatter();
 
@@ -488,6 +491,25 @@ public class CoreFormattersTest extends UnitTestBase {
     CodeMaker mk = maker();
     Arguments args = mk.args(":1:2:3");
     assertFormatter(OUTPUT, args, "{}", "1 2 3");
+  }
+
+  @Test
+  public void testLookup() throws CodeException {
+    CodeMaker mk = maker();
+    Arguments args = mk.args(" var");
+    assertFormatter(LOOKUP, args, "{\"var\": \"foo\", \"foo\": 123}", "123");
+    assertFormatter(LOOKUP, args, "{\"var\": \"bar\", \"foo\": 123}", "");
+    assertFormatter(LOOKUP, args, "{\"var\": \"bar\", \"foo\": 123, \"bar\": 456}", "456");
+    assertFormatter(LOOKUP, args, "{\"var\": \"foo.bar\", \"foo\": {\"bar\": 123}}", "123");
+    assertFormatter(LOOKUP, args, "{\"var\": \"data.1\", \"data\": [123, 456]}", "456");
+    assertFormatter(LOOKUP, args, "{\"var\": \"foo.bar.0\", \"foo\": {\"bar\": [123]}}", "123");
+
+    Context ctx = compiler().newExecutor()
+        .json("{\"foo\": {\"bar\": 123}, \"baz\": \"bar\"}")
+        .template("{foo|lookup baz}")
+        .safeExecution(true)
+        .execute();
+    assertContext(ctx, "123");
   }
 
   @Test

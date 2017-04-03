@@ -52,11 +52,6 @@ public class ExecutorBenchmark {
   }
 
   @Benchmark
-  public void bracketVariableInst(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute(state.bracketVariableInst));
-  }
-
-  @Benchmark
   public void formatterInst(BenchmarkState state, Blackhole blackhole) throws CodeException {
     blackhole.consume(state.execute(state.formatterInst));
   }
@@ -92,8 +87,6 @@ public class ExecutorBenchmark {
 
     public Instruction dotVariableInst;
 
-    public Instruction bracketVariableInst;
-
     public Instruction formatterInst;
 
     public Instruction sectionInst;
@@ -112,7 +105,6 @@ public class ExecutorBenchmark {
         this.compiler = new Compiler(formatterTable(), predicateTable());
         this.variableInst = compiler.compile("{hello}").code();
         this.dotVariableInst = compiler.compile("{hello.world}").code();
-        this.bracketVariableInst = compiler.compile("{hello[var]}").code();
         this.formatterInst = compiler.compile("{hello|json}").code();
         this.sectionInst = compiler.compile("{.section foo}{bar}{.end}").code();
         this.repeatedSectionInst = compiler.compile("{.repeated section foos}{bar}{.end}").code();

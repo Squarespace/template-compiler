@@ -16,7 +16,6 @@
 
 package com.squarespace.template;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -49,11 +48,6 @@ public class CompilerBenchmark {
   @Benchmark
   public void dotVariableInst(BenchmarkState state, Blackhole blackhole) throws CodeException {
     blackhole.consume(state.compile("{hello.world}"));
-  }
-
-  @Benchmark
-  public void bracketVariableInst(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.compile("{hello[var]}"));
   }
 
   @Benchmark
