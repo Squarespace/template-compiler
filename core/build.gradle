@@ -9,6 +9,7 @@ apply plugin: 'be.insaneprogramming.gradle.animalsniffer'
 description = 'Template compiler core'
 
 dependencies {
+  compile "com.squarespace.compiler:compiler-core:${ccVersion}"
   compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
   compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
   compile 'commons-io:commons-io:2.1'

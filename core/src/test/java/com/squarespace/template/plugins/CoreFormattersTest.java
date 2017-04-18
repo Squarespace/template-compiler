@@ -49,13 +49,15 @@ import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.CountFormatter;
 import com.squarespace.template.plugins.CoreFormatters.CycleFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeSpaceFormatter;
+import com.squarespace.template.plugins.CoreFormatters.EncodeUriComponentFormatter;
+import com.squarespace.template.plugins.CoreFormatters.EncodeUriFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
-import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
 import com.squarespace.template.plugins.CoreFormatters.LookupFormatter;
+import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
 import com.squarespace.template.plugins.CoreFormatters.RawFormatter;
 import com.squarespace.template.plugins.CoreFormatters.RoundFormatter;
@@ -77,6 +79,10 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter CYCLE = new CycleFormatter();
 
   private static final Formatter ENCODE_SPACE = new EncodeSpaceFormatter();
+
+  private static final Formatter ENCODE_URI = new EncodeUriFormatter();
+
+  private static final Formatter ENCODE_URI_COMPONENT = new EncodeUriComponentFormatter();
 
   private static final Formatter HTML = new HtmlFormatter();
 
@@ -445,6 +451,16 @@ public class CoreFormattersTest extends UnitTestBase {
   @Test
   public void testEncodeSpace() throws CodeException {
     assertFormatter(ENCODE_SPACE, "\"  \\n \"", "&nbsp;&nbsp;&nbsp;&nbsp;");
+  }
+
+  @Test
+  public void testEscapeUri() throws CodeException {
+    assertFormatter(ENCODE_URI, "\"<=%>\"", "%3c=%25%3e");
+  }
+
+  @Test
+  public void testEscapeUriComponent() throws CodeException {
+    assertFormatter(ENCODE_URI_COMPONENT, "\"<=%>\"", "%3c%3d%25%3e");
   }
 
   @Test

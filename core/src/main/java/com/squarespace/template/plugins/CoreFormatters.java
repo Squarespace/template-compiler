@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.squarespace.compiler.text.EncodeUtils;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -64,6 +65,8 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new CycleFormatter());
     table.add(new DateFormatter());
     table.add(new EncodeSpaceFormatter());
+    table.add(new EncodeUriFormatter());
+    table.add(new EncodeUriComponentFormatter());
     table.add(new HtmlFormatter());
     table.add(new HtmlAttrFormatter());
     table.add(new HtmlTagFormatter());
@@ -240,6 +243,48 @@ public class CoreFormatters implements FormatterRegistry {
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       String value = Patterns.ONESPACE.matcher(node.asText()).replaceAll("&nbsp;");
       return ctx.buildNode(value);
+    }
+
+  }
+
+
+  /**
+   * ENCODE_URI - Encode characters equivalent to JavaScript encodeURI() function.
+   *
+   * See ECMA-262:
+   *   https://www.ecma-international.org/ecma-262/7.0/index.html#sec-encodeuri-uri
+   */
+  public static class EncodeUriFormatter extends BaseFormatter {
+
+    public EncodeUriFormatter() {
+      super("encode-uri", false);
+    }
+
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String value = node.asText();
+      return ctx.buildNode(EncodeUtils.encodeURI(value));
+    }
+
+  }
+
+
+  /**
+   * ENCODE_URI_COMPONENT - Encode characters equivalent to JavaScript encodeURIComponent() function.
+   *
+   * See ECMA-262:
+   *   https://www.ecma-international.org/ecma-262/7.0/index.html#sec-encodeuricomponent-uricomponent
+   */
+  public static class EncodeUriComponentFormatter extends BaseFormatter {
+
+    public EncodeUriComponentFormatter() {
+      super("encode-uri-component", false);
+    }
+
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      String value = node.asText();
+      return ctx.buildNode(EncodeUtils.encodeURIComponent(value));
     }
 
   }

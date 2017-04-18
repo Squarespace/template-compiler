@@ -22,6 +22,7 @@ task wrapper(type: Wrapper) {
 
 project.ext {
   argparseVersion = '0.4.4'
+  ccVersion = '1.0.1'
   diffutilsVersion = '1.3.0'
   hamcrestVersion = '2.0.0.0'
   jacksonVersion = '2.3.3'
@@ -100,6 +101,10 @@ task makeCli(dependsOn: ':template-cli:makeCli') {
 
 allprojects {
   repositories {
+    maven {
+      url 'http://nexus.nyc.squarespace.net:8081/nexus/content/groups/remote-repos-m2'
+    }
+    mavenLocal()
     mavenCentral()
   }
 }
