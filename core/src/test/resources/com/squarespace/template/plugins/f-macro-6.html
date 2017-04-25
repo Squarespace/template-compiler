@@ -1,0 +1,24 @@
+:JSON
+{
+  "numbers": [2, 3, 5, 7]
+}
+
+:PARTIALS
+{
+  "template": "The number is {@}"
+}
+
+:TEMPLATE
+{.macro number}-> {@|apply template}!{.end}
+{.repeated section numbers}
+{@|apply number}
+{.end}
+
+:OUTPUT
+-> The number is 2!
+
+-> The number is 3!
+
+-> The number is 5!
+
+-> The number is 7!

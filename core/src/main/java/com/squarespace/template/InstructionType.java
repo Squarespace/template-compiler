@@ -26,6 +26,7 @@ public enum InstructionType {
   EOF,
   IF,
   INJECT,
+  MACRO,
   META_LEFT,
   META_RIGHT,
   NEWLINE,

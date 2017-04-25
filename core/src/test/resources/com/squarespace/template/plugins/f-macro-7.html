@@ -1,0 +1,19 @@
+:JSON
+{
+  "names": ["John Doe!", "Jane Doe!"]
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro name}{@}{.end}
+
+{.repeated section names}
+{@|apply name|encode-uri|json}
+{.end}
+
+:OUTPUT
+"John%20Doe!"
+
+"Jane%20Doe!"

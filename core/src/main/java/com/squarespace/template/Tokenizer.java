@@ -34,6 +34,7 @@ import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_VARS;
 import static com.squarespace.template.SyntaxErrorType.INJECT_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.INJECT_EXPECTS_PATH;
 import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
+import static com.squarespace.template.SyntaxErrorType.MACRO_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.MISSING_VARIABLE_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_WITH_KEYWORD;
@@ -50,6 +51,7 @@ import java.util.List;
 
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.InjectInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.VariableInst;
 
@@ -372,6 +374,28 @@ public class Tokenizer {
 
         InjectInst instruction = maker.inject(variable, path, args);
         emitInstruction(instruction);
+        return true;
+      }
+
+      case MACRO:
+      {
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        if (!matcher.path()) {
+          fail(error(MACRO_EXPECTS_NAME));
+          return emitInvalid();
+        }
+        StringView path = matcher.consume();
+
+        if (!matcher.finished()) {
+          fail(error(EXTRA_CHARS).type(type).data(matcher.remainder()));
+          return emitInvalid();
+        }
+
+        MacroInst inst = maker.macro(path.repr());
+        emitInstruction(inst);
         return true;
       }
 

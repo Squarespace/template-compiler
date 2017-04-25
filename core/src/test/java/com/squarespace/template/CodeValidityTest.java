@@ -32,6 +32,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.SafeFormatter;
 import com.squarespace.template.plugins.CoreFormatters.TruncateFormatter;
 import com.squarespace.template.plugins.CorePredicates;
@@ -44,6 +45,8 @@ import com.squarespace.template.plugins.CorePredicates;
  */
 @Test(groups = { "unit" })
 public class CodeValidityTest extends UnitTestBase {
+
+  private static final Formatter APPLY = new ApplyFormatter();
 
   private static final Formatter SAFE = new SafeFormatter();
 
@@ -171,6 +174,16 @@ public class CodeValidityTest extends UnitTestBase {
     root = builder().ifpred(EQUAL, mk.args(" 2")).text("A").or().text("B").end().eof().build();
     assertContext(execute("2", root), "A");
     assertContext(execute("1", root), "B");
+  }
+
+  @Test
+  public void testMacro() throws CodeException {
+    CodeMaker mk = maker();
+    RootInst root = builder()
+          .macro("foo").text("A").var("@").end()
+          .var("@", mk.fmt(APPLY, mk.args(" foo")))
+          .eof().build();
+    assertContext(execute("1", root), "A1");
   }
 
   @Test

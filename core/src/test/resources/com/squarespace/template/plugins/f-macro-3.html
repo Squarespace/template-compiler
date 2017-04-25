@@ -1,0 +1,29 @@
+:JSON
+{
+  "people": [
+  	{"name": "Ivan Sutherland", "org": "RAND", "year": 1962, "app": "Sketchpad"},
+  	{"name": "Alan Kay", "org": "PARC", "year": 1972, "app": "Smalltalk"},
+  	{"name": "Doug Engelbart", "org": "SRI", "year": 1963, "app": "The Mouse"},
+  	{"name": "John McCarthy", "org": "MIT", "year": 1958, "app": "LISP"}
+  ]
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro person}Hello, my name is {name} and {@|apply bio}.{.end}
+{.macro bio}I created {app} at {org} in {year}{.end}
+
+{.repeated section people}
+{@|apply person}
+{.end}
+
+:OUTPUT
+Hello, my name is Ivan Sutherland and I created Sketchpad at RAND in 1962.
+
+Hello, my name is Alan Kay and I created Smalltalk at PARC in 1972.
+
+Hello, my name is Doug Engelbart and I created The Mouse at SRI in 1963.
+
+Hello, my name is John McCarthy and I created LISP at MIT in 1958.

@@ -80,6 +80,9 @@ public enum SyntaxErrorType implements ErrorType {
   INVALID_INSTRUCTION
   ("Invalid instruction '%(data)s'"),
 
+  MACRO_EXPECTS_NAME
+  ("{.macro} expects a name"),
+
   MISMATCHED_END
   ("Mismatched END found at ROOT."),
 

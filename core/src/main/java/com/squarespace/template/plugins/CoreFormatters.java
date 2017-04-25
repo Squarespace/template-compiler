@@ -130,7 +130,7 @@ public class CoreFormatters implements FormatterRegistry {
         }
       }
 
-      // A developer can attempt to recurse through a partial more than once. The following
+      // A developer can attempt to recurse through a partial / macro more than once. The following
       // barrier checks if we're currently executing a given partial.  If so, we refuse to
       // execute it a second time and return a missing node.  Otherwise we execute the partial
       // template and return the result.

@@ -26,6 +26,7 @@ import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.LiteralInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
@@ -158,6 +159,15 @@ public class ReprEmitter {
     buf.append('}');
   }
 
+  public static void emit(MacroInst inst, StringBuilder buf, boolean recurse) {
+    buf.append("{.macro ");
+    buf.append(inst.name());
+    buf.append('}');
+    if (recurse) {
+      emit(inst.root(), buf, true);
+    }
+  }
+
   public static void emit(PredicateInst inst, StringBuilder buf, boolean recurse) {
     Predicate predicate = inst.getPredicate();
     buf.append("{.");
@@ -171,7 +181,6 @@ public class ReprEmitter {
     }
     emit(inst.getArguments(), buf);
     buf.append('}');
-
     if (recurse) {
       emitBlock(inst, buf, recurse);
     }

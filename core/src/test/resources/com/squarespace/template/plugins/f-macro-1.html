@@ -1,0 +1,28 @@
+:JSON
+{
+  "people": [
+  	{"name": "Ivan Sutherland", "age": 78},
+  	{"name": "Alan Kay", "age": 76},
+  	{"name": "Doug Engelbart", "age": 92},
+  	{"name": "John McCarthy", "age": 90}
+  ]
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro person}Hello, I'm {name} and I'm {age} years old.{.end}
+
+{.repeated section people}
+{@|apply person}
+{.end}
+
+:OUTPUT
+Hello, I'm Ivan Sutherland and I'm 78 years old.
+
+Hello, I'm Alan Kay and I'm 76 years old.
+
+Hello, I'm Doug Engelbart and I'm 92 years old.
+
+Hello, I'm John McCarthy and I'm 90 years old.

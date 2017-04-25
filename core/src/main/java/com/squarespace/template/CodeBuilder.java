@@ -115,6 +115,14 @@ public class CodeBuilder {
   }
 
   /**
+   * Builds a block {@link MacroInst} instruction and feeds it to the state machine.
+   */
+  public CodeBuilder macro(String name) throws CodeSyntaxException {
+    machine.accept(maker.macro(name));
+    return this;
+  }
+
+  /**
    * Builds a block {@link CommentInst} instruction and feeds it to the state machine.
    */
   public CodeBuilder mcomment(StringView view) throws CodeSyntaxException {

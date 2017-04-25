@@ -30,6 +30,7 @@ import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MetaInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.NewlineInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
@@ -153,6 +154,10 @@ public class CodeMaker {
 
   public List<Integer> intlist(Integer ... numbers) {
     return Arrays.<Integer>asList(numbers);
+  }
+
+  public MacroInst macro(String path) {
+    return new MacroInst(path);
   }
 
   public MetaInst metaLeft() {

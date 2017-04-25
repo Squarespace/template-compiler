@@ -1,0 +1,28 @@
+:JSON
+{
+  "numbers": [2, 3, 5, 7]
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro number}This is not executed{.end}
+{.macro emit.the.numbers}
+{.macro number}The number is {@}{.end}
+{@|apply number}
+{.end}
+
+{.repeated section numbers}{@|apply emit.the.numbers}{.end}
+
+:OUTPUT
+The number is 2
+
+
+The number is 3
+
+
+The number is 5
+
+
+The number is 7

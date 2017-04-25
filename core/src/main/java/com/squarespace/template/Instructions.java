@@ -49,7 +49,7 @@ public class Instructions {
    * as it is not conditional.. it only exists to enhance the implementation of
    * the REPEAT instruction.
    */
-  static class AlternatesWithInst extends BlockInstruction {
+  static class AlternatesWithInst extends BlockInst {
 
     AlternatesWithInst() {
       super(ALTERNATES_BLOCK_LEN);
@@ -152,6 +152,103 @@ public class Instructions {
 
   }
 
+
+  /**
+   * Represents a generic block of instructions (consequent) and an optional
+   * alternative block.
+   */
+  static abstract class BlockInst extends BaseInstruction implements BlockInstruction {
+
+    /**
+     * Consequent block of instructions.
+     */
+    protected Block consequent;
+
+    /**
+     * Alternative instruction.
+     */
+    protected Instruction alternative;
+
+    /**
+     * Constructs a block instruction with the initial capacity for the consequent block.
+     */
+    BlockInst(int consequentsLen) {
+      consequent = new Block(consequentsLen);
+    }
+
+    /**
+     * Returns the consequent block.
+     */
+    public Block getConsequent() {
+      return consequent;
+    }
+
+    /**
+     * Set the instruction to execute instead of the consequents.
+     *
+     * For non-conditional blocks, like section, the alternate is simply the END
+     * instruction, indicating a complete parse.
+     */
+    public void setAlternative(Instruction inst) {
+      alternative = inst;
+    }
+
+    /**
+     * Sets the alternative instruction.
+     */
+    public Instruction getAlternative() {
+      return alternative;
+    }
+
+    /**
+     * Indicates if the two lists of {@code Object[]} are equal.
+     */
+    protected boolean variableListEquals(List<Object[]> t1, List<Object[]> t2) {
+      if (t1 == null) {
+        return (t2 == null);
+      }
+      if (t2 != null) {
+        int sz = t1.size();
+        if (sz != t2.size()) {
+          return false;
+        }
+        for (int i = 0; i < sz; i++) {
+          if (!Arrays.equals(t1.get(i), t2.get(i))) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Indicates if the current instruction's consequent and alternative are equal to that
+     * of the {@code other) instruction.
+     */
+    protected boolean blockEquals(BlockInst other) {
+      boolean res = (consequent == null) ? (other.consequent == null) : consequent.equals(other.consequent);
+      if (!res) {
+        return false;
+      }
+      return (alternative == null) ? (other.alternative == null) : alternative.equals(other.alternative);
+    }
+
+    /**
+     * Helper equals() method to simplify null checking.
+     */
+    protected static boolean equals(Instruction i1, Instruction i2) {
+      return (i1 == null) ? (i2 == null) : i1.equals(i2);
+    }
+
+    /**
+     * Helper equals() method to simplify null checking.
+     */
+    protected static boolean blockEquals(Block b1, Block b2) {
+      return (b1 == null) ? (b2 == null) : b1.equals(b2);
+    }
+
+  }
 
   /**
    * Terminal instruction representing a comment. Implementation is a NOOP.
@@ -269,7 +366,7 @@ public class Instructions {
    * precedence, grouping, etc.  This implementation replicates the behavior of the JS
    * version. - phensley
    */
-  static class IfInst extends BlockInstruction {
+  static class IfInst extends BlockInst {
 
     private static final List<Operator> EMPTY_OPS = Arrays.<Operator>asList();
 
@@ -356,7 +453,7 @@ public class Instructions {
    *
    * Example:  {.if foo?}  does the same thing as  {.foo?}
    */
-  static class IfPredicateInst extends BlockInstruction {
+  static class IfPredicateInst extends BlockInst {
 
     private final Predicate predicate;
 
@@ -514,6 +611,76 @@ public class Instructions {
   }
 
   /**
+   * Represents a named block of template code that can be applied.
+   */
+  static class MacroInst extends BaseInstruction implements BlockInstruction {
+
+    private final String name;
+
+    private final RootInst root;
+
+    MacroInst(String name) {
+      this.name = name;
+      this.root = new RootInst();
+    }
+
+    public String name() {
+      return name;
+    }
+
+    public RootInst root() {
+      return root;
+    }
+
+    @Override
+    public Block getConsequent() {
+      return root.getConsequent();
+    }
+
+    @Override
+    public Instruction getAlternative() {
+      return root.getAlternative();
+    }
+
+    @Override
+    public void setAlternative(Instruction inst) {
+      root.setAlternative(inst);
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.MACRO;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof MacroInst)) {
+        return false;
+      }
+      MacroInst other = (MacroInst) obj;
+      return name.equals(other.name) && root.equals(other.root);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      // This registers the macro in the current scope. Macros must be
+      // applied to produce output, e.g. {@|apply <macro name>}
+      ctx.setMacro(name, root);
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf, recurse);
+    }
+
+  }
+
+  /**
    * Represents either a left or right meta character, e.g. '{' or '}'.
    * Made this a runtime determination in case in the future we move
    * to a 2-character meta sequence, like "{{" and "}}".
@@ -576,7 +743,7 @@ public class Instructions {
   /**
    * Represents a boolean-valued function.
    */
-  static class PredicateInst extends BlockInstruction {
+  static class PredicateInst extends BlockInst {
 
     private InstructionType type = InstructionType.PREDICATE;
 
@@ -657,7 +824,7 @@ public class Instructions {
    * Represents a block of instructions to be executed with context set to each
    * element of an array.
    */
-  static class RepeatedInst extends BlockInstruction {
+  static class RepeatedInst extends BlockInst {
 
     private final Object[] variable;
 
@@ -755,7 +922,7 @@ public class Instructions {
    * never close it, which would execute fine, but would be considered invalid,
    * since each SECTION *must* have a corresponding END tag.
    */
-  static class RootInst extends BlockInstruction {
+  static class RootInst extends BlockInst {
 
     RootInst() {
       super(ROOT_BLOCK_LEN);
@@ -791,7 +958,7 @@ public class Instructions {
   /**
    * Represents a nested scope within the JSON tree.
    */
-  static class SectionInst extends BlockInstruction {
+  static class SectionInst extends BlockInst {
 
     private final Object[] variable;
 

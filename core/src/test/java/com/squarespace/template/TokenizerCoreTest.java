@@ -30,6 +30,7 @@ import static com.squarespace.template.SyntaxErrorType.IF_EXPECTED_VAROP;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_OPERATORS;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_VARS;
 import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
+import static com.squarespace.template.SyntaxErrorType.MACRO_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
 import static com.squarespace.template.SyntaxErrorType.MISSING_VARIABLE_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_WITH_KEYWORD;
@@ -230,6 +231,18 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.space}", mk.space(), mk.eof());
     assertResult("{.tab}", mk.tab(), mk.eof());
     assertResult("{.newline}", mk.newline(), mk.eof());
+  }
+
+  @Test
+  public void testMacro() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    assertResult("{.macro foo}", mk.macro("foo"), mk.eof());
+    assertResult("{.macro foo.bar}", mk.macro("foo.bar"), mk.eof());
+    assertResult("{.macro foo.1.bar.2}", mk.macro("foo.1.bar.2"), mk.eof());
+
+    assertFailure("{.macro}", WHITESPACE_EXPECTED);
+    assertFailure("{.macro foo }", EXTRA_CHARS);
+    assertFailure("{.macro @foo}", MACRO_EXPECTS_NAME);
   }
 
   @Test

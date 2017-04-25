@@ -78,6 +78,8 @@ public class Context {
 
   private Map<String, Instruction> compiledPartials;
 
+//  private Map<String, Instruction> compiledMacros;
+
   private JsonNode rawInjectables;
 
   private Map<String, JsonNode> parsedInjectables;
@@ -241,13 +243,19 @@ public class Context {
    * inside a loop.
    */
   public Instruction getPartial(String name) throws CodeSyntaxException {
+    // Macros override partials, so if one is defined in the current scope, return it.
+    Instruction inst = resolveMacro(name);
+    if (inst != null) {
+      return inst;
+    }
+
     if (rawPartials == null) {
       // Template wants to use a partial but none are defined.
       return null;
     }
 
     // See if we've previously compiled this exact partial.
-    Instruction inst = compiledPartials.get(name);
+    inst = compiledPartials.get(name);
     if (inst == null) {
       JsonNode partialNode = rawPartials.get(name);
       if (partialNode == null) {
@@ -464,8 +472,24 @@ public class Context {
     currentFrame.setVar(name, node);
   }
 
+  public void setMacro(String name, Instruction inst) {
+    currentFrame.setMacro(name, inst);
+  }
+
   public JsonNode resolve(Object name) {
     return lookupStack(name);
+  }
+
+  public Instruction resolveMacro(String name) {
+    Frame frame = currentFrame;
+    while (frame != null) {
+      Instruction inst = frame.getMacro(name);
+      if (inst != null) {
+        return inst;
+      }
+      frame = frame.parent();
+    }
+    return null;
   }
 
   /**

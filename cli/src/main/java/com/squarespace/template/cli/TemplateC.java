@@ -249,7 +249,7 @@ public class TemplateC {
     return new Compiler(formatterTable, predicateTable);
   }
 
-  protected String readFile(String rawPath) throws IOException {
+  protected static String readFile(String rawPath) throws IOException {
     try (Reader reader = new InputStreamReader(new FileInputStream(rawPath), "UTF-8")) {
       return IOUtils.toString(reader);
     }

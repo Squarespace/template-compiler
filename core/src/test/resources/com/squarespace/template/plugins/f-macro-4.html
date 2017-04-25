@@ -1,0 +1,18 @@
+:JSON
+{
+  "number": 1
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{# mutual recursion of foo/bar macros will produce no output #}
+{.macro emit}{@}{.end}
+{.macro foo}{@|apply emit}{@|apply bar}{.end}
+{.macro bar}{@|apply foo}{.end}
+
+{number|apply foo}
+
+:OUTPUT
+1

@@ -29,6 +29,7 @@ import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
@@ -126,6 +127,18 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(mk.space().repr(), "{.space}");
     assertEquals(mk.tab().repr(), "{.tab}");
     assertEquals(mk.newline().repr(), "{.newline}");
+  }
+
+  @Test
+  public void testMacroRepr() {
+    CodeMaker mk = maker();
+    MacroInst m1 = mk.macro("foo.1.bar.2");
+    assertEquals(m1.repr(), "{.macro foo.1.bar.2}");
+
+    MacroInst m2 = mk.macro("foo");
+    m2.getConsequent().add(mk.text("text"));
+    m2.getConsequent().add(mk.var("@bar"));
+    assertEquals(m2.repr(), "{.macro foo}text{@bar}");
   }
 
   @Test

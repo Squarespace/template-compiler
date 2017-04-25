@@ -18,6 +18,7 @@ package com.squarespace.template;
 
 import static com.squarespace.template.InstructionType.ALTERNATES_WITH;
 import static com.squarespace.template.InstructionType.IF;
+import static com.squarespace.template.InstructionType.MACRO;
 import static com.squarespace.template.InstructionType.OR_PREDICATE;
 import static com.squarespace.template.InstructionType.PREDICATE;
 import static com.squarespace.template.InstructionType.ROOT;
@@ -37,6 +38,7 @@ import java.util.NoSuchElementException;
 
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.EndInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.RootInst;
@@ -166,6 +168,7 @@ public class CodeMachine implements CodeSink {
       // These block instructions open a new scope, so they can occur in any state,
       // We handle them here to shorten the switch bodies of the individual states.
       case IF:
+      case MACRO:
       case PREDICATE:
       case REPEATED:
       case SECTION:
@@ -275,6 +278,8 @@ public class CodeMachine implements CodeSink {
         return stateAlternatesWith;
       case IF:
         return stateIf;
+      case MACRO:
+        return stateMacro;
       case OR_PREDICATE:
         return stateOrPredicate;
       case PREDICATE:
@@ -373,6 +378,39 @@ public class CodeMachine implements CodeSink {
 
       return this;
     }
+  };
+
+  /**
+   * MACRO state. A named block of instructions that can be applied to a node.
+   */
+  private final State stateMacro = new State() {
+
+    @Override
+    public State transition(Instruction inst) throws CodeSyntaxException {
+      InstructionType type = inst.getType();
+      switch (type) {
+        case EOF:
+          fail(error(EOF_IN_BLOCK, inst).data(currentInfo()));
+          return stateEOF;
+
+        case ALTERNATES_WITH:
+        case OR_PREDICATE:
+          fail(error(NOT_ALLOWED_IN_BLOCK, inst).data(MACRO));
+          break;
+
+        case END:
+          setAlternative(inst);
+          return pop();
+
+        default:
+          // Macro body represented by a root instruction.
+          MacroInst macro = (MacroInst)current;
+          macro.root().getConsequent().add(inst);
+      }
+
+      return this;
+    }
+
   };
 
   /**

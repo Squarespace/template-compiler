@@ -34,6 +34,7 @@ import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.LiteralInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
@@ -167,6 +168,26 @@ public class InstructionEqualityTest extends UnitTestBase {
       }
     };
     assertNotEquals(s1, fake);
+  }
+
+  @Test
+  public void testMacroEquals() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    MacroInst m1 = mk.macro("foo");
+    m1.getConsequent().add(mk.space());
+    m1.getConsequent().add(mk.tab());
+
+    MacroInst m2 = mk.macro("foo");
+    m2.getConsequent().add(mk.space());
+    m2.getConsequent().add(mk.tab());
+
+    assertEquals(m1, m2);
+    assertNotEquals(m1, mk.macro("foo"));
+
+    MacroInst m3 = mk.macro("foo");
+    m2.getConsequent().add(mk.space());
+
+    assertNotEquals(m1, m3);
   }
 
   @Test

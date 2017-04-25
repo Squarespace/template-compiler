@@ -124,6 +124,19 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testApplyMacros() {
+    runner.run(
+        "f-macro-1.html",
+        "f-macro-2.html",
+        "f-macro-3.html",
+        "f-macro-4.html",
+        "f-macro-5.html",
+        "f-macro-6.html",
+        "f-macro-7.html"
+    );
+  }
+
+  @Test
   public void testApplyPartial() throws CodeException {
     String partials = "{\"block.item\": \"this {@} value\"}";
     String input = "{\"foo\": 123}";

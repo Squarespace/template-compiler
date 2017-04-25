@@ -30,6 +30,8 @@ class Frame {
 
   private Map<String, JsonNode> variables;
 
+  private Map<String, Instruction> macros;
+
   boolean stopResolution;
 
   int currentIndex;
@@ -61,6 +63,17 @@ class Frame {
 
   public JsonNode getVar(String name) {
     return (variables == null) ? null : variables.get(name);
+  }
+
+  public void setMacro(String name, Instruction inst) {
+    if (macros == null) {
+      macros = new HashMap<>(4);
+    }
+    macros.put(name, inst);
+  }
+
+  public Instruction getMacro(String name) {
+    return (macros == null) ? null : macros.get(name);
   }
 
 }
