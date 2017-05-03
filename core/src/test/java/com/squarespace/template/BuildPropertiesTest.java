@@ -35,7 +35,7 @@ public class BuildPropertiesTest {
   public void testProperties() {
     assertThat(commit(), anyOf(equalTo(UNDEFINED), matchesPattern("[0-9a-fA-F]+")));
     assertThat(date(), anyOf(equalTo(UNDEFINED), matchesPattern("[\\w:\\s]+")));
-    assertThat(version(), anyOf(equalTo(UNDEFINED), matchesPattern("\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?")));
+    assertThat(version(), anyOf(equalTo(UNDEFINED), matchesPattern("\\d+\\.\\d+\\.\\d+([-\\w]+)?(-SNAPSHOT)?")));
   }
 
 }
