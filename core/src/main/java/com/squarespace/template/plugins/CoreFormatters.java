@@ -24,6 +24,7 @@ import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
 import static com.squarespace.template.GeneralUtils.splitVariable;
+import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
 import java.io.IOException;
@@ -223,12 +224,11 @@ public class CoreFormatters implements FormatterRegistry {
         tzName = tzNode.asText();
       }
       StringBuilder buf = new StringBuilder();
-      PluginDateUtils.formatDate(ctx.locale(), (String)args.getOpaque(), instant, tzName, buf);
+      formatDate(ctx.javaLocale(), (String)args.getOpaque(), instant, tzName, buf);
       return ctx.buildNode(buf.toString());
     }
 
   }
-
 
   /**
    * ENCODE_SPACE - Replace each space character with "&nbsp;".

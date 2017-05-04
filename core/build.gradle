@@ -1,12 +1,13 @@
 
 plugins {
-  id 'me.champeau.gradle.jmh' version '0.2.0'
+  id 'me.champeau.gradle.jmh' version '0.3.0'
 }
 
 description = 'Template compiler core'
 
 dependencies {
   compile "com.squarespace.compiler:compiler-core:${ccVersion}"
+  compile "com.squarespace.cldr:cldr-core:${cldrVersion}"
   compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
   compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
   compile 'commons-io:commons-io:2.1'
@@ -32,7 +33,7 @@ artifacts {
 }
 
 jmh {
-  jmhVersion = '1.11.1'
+  jmhVersion = '1.19'
   forceGC = true
 }
 

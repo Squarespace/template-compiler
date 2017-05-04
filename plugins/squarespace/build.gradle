@@ -1,4 +1,8 @@
 
+plugins {
+  id 'me.champeau.gradle.jmh' version '0.3.0'
+}
+
 description = 'Squarespace template compiler platform plugins'
 
 dependencies {
@@ -14,5 +18,14 @@ artifacts {
   archives sourcesJar
   archives testJar
   archives javadocJar
+}
+
+jmh {
+	jmhVersion = '1.19'
+	forceGC = true
+}
+
+plugins.withType(EclipsePlugin) {
+  project.eclipse.classpath.plusConfigurations += [ configurations.jmh ]
 }
 

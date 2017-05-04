@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.squarespace.cldr.CLDRLocale;
 
 
 /**
@@ -48,13 +49,17 @@ import com.fasterxml.jackson.databind.node.TextNode;
  */
 public class Context {
 
+  private static final CLDRLocale DEFAULT_LOCALE = new CLDRLocale("en", "", "US", "POSIX");
+
   private static final JsonNode DEFAULT_UNDEFINED = MissingNode.getInstance();
 
   private static final String META_LEFT = "{";
 
   private static final String META_RIGHT = "}";
 
-  private final Locale locale;
+  private Locale javaLocale;
+
+  private CLDRLocale cldrLocale = DEFAULT_LOCALE;
 
   private Compiler compiler;
 
@@ -78,8 +83,6 @@ public class Context {
 
   private Map<String, Instruction> compiledPartials;
 
-//  private Map<String, Instruction> compiledMacros;
-
   private JsonNode rawInjectables;
 
   private Map<String, JsonNode> parsedInjectables;
@@ -102,7 +105,8 @@ public class Context {
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
     this.currentFrame = new Frame(null, node == null ? MissingNode.getInstance() : node);
     this.buf = buf == null ? new StringBuilder() : buf;
-    this.locale = locale == null ? Locale.getDefault() : locale;
+    this.javaLocale = locale == null ? Locale.getDefault() : locale;
+    // this.cldrLocale = ??? TODO: replace with lookup
   }
 
   public boolean safeExecutionEnabled() {
@@ -113,8 +117,16 @@ public class Context {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
   }
 
-  public Locale locale() {
-    return locale;
+  public Locale javaLocale() {
+    return javaLocale;
+  }
+
+  public void cldrLocale(CLDRLocale locale) {
+    this.cldrLocale = locale;
+  }
+
+  public CLDRLocale cldrLocale() {
+    return cldrLocale;
   }
 
   /**

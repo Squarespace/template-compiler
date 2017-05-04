@@ -17,12 +17,13 @@ plugins {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.14'
+  gradleVersion = '2.11'
 }
 
 project.ext {
   argparseVersion = '0.4.4'
   ccVersion = '1.0.1'
+  cldrVersion = '0.0.3'
   diffutilsVersion = '1.3.0'
   hamcrestVersion = '2.0.0.0'
   jacksonVersion = '2.3.3'
@@ -122,8 +123,8 @@ subprojects {
 
   group 'com.squarespace.template'
 
-  sourceCompatibility = 1.7
-  targetCompatibility = 1.7
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
 
   configurations {
 		animalSniffer
