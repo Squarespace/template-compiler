@@ -21,6 +21,7 @@ import static com.squarespace.template.plugins.platform.CommerceUtils.hasVariant
 import static com.squarespace.template.JsonLoader.loadJson;
 import static com.squarespace.template.plugins.platform.CommerceUtils.getTotalStockRemaining;
 import static com.squarespace.template.plugins.platform.CommerceUtils.hasVariedPrices;
+import static com.squarespace.template.plugins.platform.CommerceUtils.isMultipleQuantityAllowedForServices;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -41,7 +42,7 @@ public class CommerceUtilsTest extends UnitTestBase {
 
   @Test
   public void testGetItemVariantOptions() {
-    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "get-item-variant-options.json");
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "get-item-variant-options.json");
     for (String testKey : extractTests(jsonMap)) {
       JsonNode item = jsonMap.get(testKey);
       JsonNode actual = CommerceUtils.getItemVariantOptions(item);
@@ -52,7 +53,7 @@ public class CommerceUtilsTest extends UnitTestBase {
 
   @Test
   public void testGetTotalStockRemaining() {
-    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "get-total-stock-remaining.json");
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "get-total-stock-remaining.json");
     JsonNode item = jsonMap.get("getTotalStock-unlimited-physical");
     assertEquals(getTotalStockRemaining(item), Double.POSITIVE_INFINITY);
 
@@ -74,7 +75,7 @@ public class CommerceUtilsTest extends UnitTestBase {
 
   @Test
   public void testHasVariants() {
-    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "has-variants.json");
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "has-variants.json");
     for (Map.Entry<String, JsonNode> entry : jsonMap.entrySet()) {
       String key = entry.getKey();
       if (key.endsWith("-true")) {
@@ -87,7 +88,7 @@ public class CommerceUtilsTest extends UnitTestBase {
 
   @Test
   public void testHasVariedPrices() {
-    Map<String, JsonNode> jsonMap = loadJson(CommerceUtilsTest.class, "has-varied-prices.json");
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "has-varied-prices.json");
     for (Map.Entry<String, JsonNode> entry : jsonMap.entrySet()) {
       String key = entry.getKey();
       if (key.endsWith("-true")) {
@@ -95,6 +96,15 @@ public class CommerceUtilsTest extends UnitTestBase {
       } else {
         assertFalse(hasVariedPrices(entry.getValue()), key);
       }
+    }
+  }
+
+  @Test
+  public void testIsMultipleQuantityAllowedForServices() {
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "is-multi-quantity-allowed-for-services.json");
+    for (Map.Entry<String, JsonNode> entry : jsonMap.entrySet()) {
+      String key = entry.getKey();
+      assertEquals(isMultipleQuantityAllowedForServices(entry.getValue()), key.endsWith("-true"), key);
     }
   }
 

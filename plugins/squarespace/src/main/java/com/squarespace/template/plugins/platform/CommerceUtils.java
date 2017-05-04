@@ -465,4 +465,18 @@ public class CommerceUtils {
     return userDefinedOptions;
   }
 
+  public static boolean isMultipleQuantityAllowedForServices(JsonNode websiteSettings) {
+
+    boolean defaultValue = true;
+    String fieldName = "multipleQuantityAllowedForServices";
+
+    JsonNode storeSettings = websiteSettings.get("storeSettings");
+
+    if (storeSettings == null || !storeSettings.hasNonNull(fieldName)) {
+      return defaultValue;
+    }
+
+    return storeSettings.get(fieldName).asBoolean(defaultValue);
+  }
+
 }

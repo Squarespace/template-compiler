@@ -360,9 +360,15 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
+
       ProductType type = CommerceUtils.getProductType(item);
-      if (!(ProductType.PHYSICAL.equals(type) || ProductType.SERVICE.equals(type))
-          || CommerceUtils.getTotalStockRemaining(item) <= 1) {
+
+      boolean multipleQuantityAllowed = ProductType.PHYSICAL.equals(type)
+          || (ProductType.SERVICE.equals(type)
+             && CommerceUtils.isMultipleQuantityAllowedForServices(ctx.resolve("websiteSettings")));
+      boolean hideQuantityInput = !multipleQuantityAllowed || CommerceUtils.getTotalStockRemaining(item) <= 1;
+
+      if (hideQuantityInput) {
         return MissingNode.getInstance();
       }
       return executeTemplate(ctx, template, item, true);

@@ -1,0 +1,19 @@
+:isMultipleQuantityAllowedForServices-1-true
+{
+    "storeSettings": {
+    }
+}
+
+:isMultipleQuantityAllowedForServices-2-true
+{
+    "storeSettings": {
+        "multipleQuantityAllowedForServices": true
+    }
+}
+
+:isMultipleQuantityAllowedForServices-3-false
+{
+    "storeSettings": {
+        "multipleQuantityAllowedForServices": false
+    }
+}
