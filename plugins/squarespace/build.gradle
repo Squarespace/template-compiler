@@ -1,10 +1,4 @@
 
-plugins {
-  id 'be.insaneprogramming.gradle.animalsniffer' version '1.4.0'
-}
-
-apply plugin: 'be.insaneprogramming.gradle.animalsniffer'
-
 description = 'Squarespace template compiler platform plugins'
 
 dependencies {
@@ -20,9 +14,5 @@ artifacts {
   archives sourcesJar
   archives testJar
   archives javadocJar
-}
-
-animalsniffer {
-  signature = 'org.codehaus.mojo.signature:java17:+@signature'
 }
 

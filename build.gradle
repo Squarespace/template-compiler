@@ -27,6 +27,7 @@ project.ext {
   hamcrestVersion = '2.0.0.0'
   jacksonVersion = '2.3.3'
   jsonunitVersion = '1.6.1'
+  snifferVersion = '1.15'
   testngVersion = '6.9.4'
 
   buildDate = new java.util.Date()
@@ -124,6 +125,16 @@ subprojects {
   sourceCompatibility = 1.7
   targetCompatibility = 1.7
 
+  configurations {
+		animalSniffer
+		javaApiSignature
+  }
+
+  dependencies {
+    animalSniffer("org.codehaus.mojo:animal-sniffer-ant-tasks:${snifferVersion}")
+    javaApiSignature("org.codehaus.mojo.signature:java18:1.0@signature")
+  }
+
   license {
     header rootProject.file('conf/apache-2.0-header.txt')
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
@@ -184,6 +195,28 @@ subprojects {
     classifier = 'javadoc' 
     from javadoc.destinationDir 
   } 
+
+	task copyJavaApiSignature(type: Copy) {
+			from configurations.javaApiSignature
+			into "$buildDir/javaApiSignature/"
+			rename '.*signature', 'javaApi.signature'
+	}
+
+	task checkJavaApiSignature << {
+			ant.taskdef(
+				name: 'animalSniffer', 
+				classname: 'org.codehaus.mojo.animal_sniffer.ant.CheckSignatureTask', 
+				classpath: configurations.animalSniffer.asPath
+			)
+			ant.animalSniffer(
+				signature: "$buildDir/javaApiSignature/javaApi.signature",
+				classpath: configurations.compile.asPath
+			) { path(path: "$buildDir/classes/main") }
+  }
+
+	checkJavaApiSignature.dependsOn compileJava
+	checkJavaApiSignature.dependsOn copyJavaApiSignature
+	check.dependsOn checkJavaApiSignature
 
   processResources {
     from (sourceSets.main.resources.srcDirs) {

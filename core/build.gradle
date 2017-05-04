@@ -1,10 +1,7 @@
 
 plugins {
   id 'me.champeau.gradle.jmh' version '0.2.0'
-  id 'be.insaneprogramming.gradle.animalsniffer' version '1.4.0'
 }
-
-apply plugin: 'be.insaneprogramming.gradle.animalsniffer'
 
 description = 'Template compiler core'
 
@@ -41,9 +38,5 @@ jmh {
 
 plugins.withType(EclipsePlugin) {
   project.eclipse.classpath.plusConfigurations += [ configurations.jmh ]
-}
-
-animalsniffer {
-  signature = 'org.codehaus.mojo.signature:java17:+@signature'
 }
 
