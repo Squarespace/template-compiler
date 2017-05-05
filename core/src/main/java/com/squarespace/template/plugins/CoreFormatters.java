@@ -52,6 +52,7 @@ import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.plugins.FormatUtils.FormatArg;
 
 
 public class CoreFormatters implements FormatterRegistry {
@@ -68,6 +69,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new EncodeSpaceFormatter());
     table.add(new EncodeUriFormatter());
     table.add(new EncodeUriComponentFormatter());
+    table.add(new FormatFormatter());
     table.add(new HtmlFormatter());
     table.add(new HtmlAttrFormatter());
     table.add(new HtmlTagFormatter());
@@ -289,6 +291,44 @@ public class CoreFormatters implements FormatterRegistry {
 
   }
 
+
+  /**
+   * FORMAT - Substitutes positional arguments in a format string.
+   */
+  public static class FormatFormatter extends BaseFormatter {
+
+    public FormatFormatter() {
+      super("format", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      // Build a reusable array holding the argument variable and a value placeholder
+      FormatArg[] arguments = new FormatArg[args.count()];
+      for (int i = 0; i < arguments.length; i++) {
+        arguments[i] = new FormatArg(splitVariable(args.get(i)));
+      }
+      args.setOpaque(arguments);
+    }
+
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      FormatArg[] arguments = (FormatArg[]) args.getOpaque();
+      resolve(ctx, arguments);
+      StringBuilder buf = new StringBuilder();
+      String pattern = ctx.node().asText();
+      FormatUtils.format(pattern, arguments, buf);
+      return ctx.buildNode(buf.toString());
+    }
+
+    private void resolve(Context ctx, FormatArg[] arguments) {
+      for (int i = 0; i < arguments.length; i++) {
+        FormatArg arg = arguments[i];
+        arg.value = ctx.resolve(arg.name).asText();
+      }
+    }
+
+  }
 
   /**
    * HTML - Escapes HTML characters & < > replacing them with the corresponding entity.

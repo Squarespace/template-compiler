@@ -1,0 +1,21 @@
+:JSON
+{
+  "message": "{1} and {5} optional {3}",
+  "arg0": "A",
+  "arg1": "B",
+  "arg2": "C",
+  "arg3": "D",
+  "arg4": "E"
+}
+
+:PARTIALS
+{}
+
+:INJECT
+{}
+
+:TEMPLATE
+{message|format arg0 arg1 arg2 arg3}
+
+:OUTPUT
+B and  optional D

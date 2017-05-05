@@ -477,6 +477,15 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testFormat() throws CodeException {
+    runner.run(
+        "f-format-1.html",
+        "f-format-2.html",
+        "f-format-3.html"
+    );
+  }
+
+  @Test
   public void testIter() throws CodeException {
     String template = "{.repeated section foo}{@|iter}{.end}";
     String input = "{\"foo\": [\"a\", \"b\", \"c\"]}";
