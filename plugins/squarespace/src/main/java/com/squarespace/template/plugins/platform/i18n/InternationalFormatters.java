@@ -87,6 +87,7 @@ public class InternationalFormatters implements FormatterRegistry {
    * If you provide no arguments you get the equivalent of "date-long time-long":
    *
    *     {t|datetime}
+   *     "November 2, 2017 at 2:26:57 PM"
    *
    */
   public static class DateTimeFormatter extends BaseFormatter {
@@ -94,7 +95,7 @@ public class InternationalFormatters implements FormatterRegistry {
     private static final ZoneId DEFAULT_ZONEID = ZoneId.of("America/New_York");
 
     public DateTimeFormatter() {
-      super("datetime", true);
+      super("datetime", false);
     }
 
     @Override
@@ -145,7 +146,12 @@ public class InternationalFormatters implements FormatterRegistry {
    * given width. This can be used if you simply want to print the year, name of
    * the current month or weekday, etc.
    *
-   * Repeating the format character changes the "field width":
+   * Date fields are represented by a single character. The fields are defined in
+   * the CLDR specification (not all fields are currently supported):
+   *
+   *  http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
+   *
+   * Repeating the character increases the "field width":
    *
    *     {t|datetimefield M}
    *     11
