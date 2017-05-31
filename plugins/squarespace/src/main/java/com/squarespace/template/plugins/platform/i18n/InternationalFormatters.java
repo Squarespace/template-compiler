@@ -16,6 +16,7 @@
 package com.squarespace.template.plugins.platform.i18n;
 
 import static com.squarespace.cldr.CLDRCalendarUtils.skeletonType;
+import static com.squarespace.template.GeneralUtils.splitVariable;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -40,11 +41,15 @@ import com.squarespace.template.SymbolTable;
 
 public class InternationalFormatters implements FormatterRegistry {
 
+  // Stateless, so we can safely reuse it.
+  private static final PluralFormat PLURAL_FORMAT = new PluralFormat();
+
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
     table.add(new DateTimeFormatter());
     table.add(new DateTimeFieldFormatter());
     table.add(new MoneyFormatter());
+    table.add(new PluralFormatter());
   }
 
 
@@ -210,7 +215,7 @@ public class InternationalFormatters implements FormatterRegistry {
     String dateSkeleton;
     String timeSkeleton;
 
-    public DateTimeFlags(Arguments args) {
+    DateTimeFlags(Arguments args) {
       // If you specify no arguments you'll still get something
       if (args.count() == 0) {
         dateType = FormatType.LONG;
@@ -298,6 +303,56 @@ public class InternationalFormatters implements FormatterRegistry {
       }
 
     }
+  }
+
+  /**
+   * PLURAL - Formats pluralization messages using CLDR plural rules.
+   */
+  public static class PluralFormatter extends BaseFormatter {
+
+    public PluralFormatter() {
+      super("plural", true);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.setOpaque(pluralArgs(args));
+    }
+
+    @Override
+    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+      PluralArg[] arguments = (PluralArg[]) args.getOpaque();
+      resolve(ctx, arguments, true);
+
+      String language = ctx.cldrLocale().language();
+      String message = node.asText();
+      StringBuilder buf = new StringBuilder();
+      PLURAL_FORMAT.format(language, message, arguments, buf);
+      return ctx.buildNode(buf.toString());
+    }
+
+  }
+
+  /**
+   * Resolve all plural arguments against the context, and evaluate the plural operands.
+   */
+  private static void resolve(Context ctx, PluralArg[] arguments, boolean cardinal) {
+    for (int i = 0; i < arguments.length; i++) {
+      PluralArg arg = arguments[i];
+      arg.value = ctx.resolve(arg.name).asText();
+      arg.operands.set(arg.value);
+    }
+  }
+
+  /**
+   * Initialize the plural arguments array.
+   */
+  private static PluralArg[] pluralArgs(Arguments args) {
+    PluralArg[] arguments = new PluralArg[args.count()];
+    for (int i = 0; i < arguments.length; i++) {
+      arguments[i] = new PluralArg(splitVariable(args.get(i)));
+    }
+    return arguments;
   }
 
 }

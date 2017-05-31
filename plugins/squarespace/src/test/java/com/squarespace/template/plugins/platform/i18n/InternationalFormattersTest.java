@@ -1,14 +1,17 @@
 /**
- * Copyright (c) 2016 SQUARESPACE, Inc.
+ * Copyright (c) 2017 SQUARESPACE, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.squarespace.template.plugins.platform.i18n;
@@ -135,6 +138,16 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     runner.run(paths.toArray(new String[paths.size()]));
   }
 
+  @Test
+  public void testPlural() throws Exception {
+    runner.run(
+        "f-plural-cardinal-1.html",
+        "f-plural-cardinal-2.html",
+        "f-plural-cardinal-3.html",
+        "f-plural-ordinal-1.html"
+    );
+  }
+
   @Test(expectedExceptions = ArgumentsException.class)
   public void testInvalidLocale() throws Exception {
     MONEY_FORMATTER.validateArgs(new Arguments(new StringView("qq-QQ")));
@@ -152,4 +165,5 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     JsonNode node = impl.apply(ctx, args, ctx.node());
     return node.asText();
   }
+
 }

@@ -22,8 +22,8 @@ task wrapper(type: Wrapper) {
 
 project.ext {
   argparseVersion = '0.4.4'
-  ccVersion = '1.0.1'
-  cldrVersion = '0.0.5'
+  ccVersion = '1.0.4-SNAPSHOT'
+  cldrVersion = '0.0.5-SNAPSHOT'
   diffutilsVersion = '1.3.0'
   hamcrestVersion = '2.0.0.0'
   jacksonVersion = '2.3.3'
@@ -144,7 +144,7 @@ subprojects {
   }
 
   checkstyle {
-    toolVersion = '5.7'
+    toolVersion = '7.7'
     ignoreFailures = false
     configFile = rootProject.file('checkstyle.xml')
     configProperties = [samedir: "${rootDir}"]

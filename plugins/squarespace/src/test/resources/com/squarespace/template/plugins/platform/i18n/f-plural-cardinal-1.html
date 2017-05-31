@@ -1,0 +1,26 @@
+:JSON
+{
+  "messages": {
+    "postcount": "The {1} blog has {0 cardinal one{# post} other{# posts}}."
+  },
+  "blogs": [
+  	{"name": "Apple", "count": 1},
+  	{"name": "Microsoft", "count": 2},
+  	{"name": "Google", "count": 3},
+  	{"name": "Hooli", "count": 0}
+  ]
+}
+
+:TEMPLATE
+{.repeated section blogs}
+{messages.postcount|plural count name}
+{.end}
+
+:OUTPUT
+The Apple blog has 1 post.
+
+The Microsoft blog has 2 posts.
+
+The Google blog has 3 posts.
+
+The Hooli blog has 0 posts.

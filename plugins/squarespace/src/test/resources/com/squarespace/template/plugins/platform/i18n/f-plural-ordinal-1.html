@@ -1,0 +1,29 @@
+:JSON
+{
+  "messages": {
+    "race": "{1} came in {0 ordinal one{#st} two{#nd} few{#rd} other{#th}} place."
+  },
+  "runners": [
+  	{"name": "Usain Bolt", "place": 1},
+  	{"name": "Justin Gatlin", "place": 2},
+  	{"name": "Andre de Grasse", "place": 3},
+  	{"name": "Yohan Blake", "place": 4},
+  	{"name": "Akani Simbine", "place": 5}
+  ]
+}
+
+:TEMPLATE
+{.repeated section runners}
+{messages.race|plural place name}
+{.end}
+
+:OUTPUT
+Usain Bolt came in 1st place.
+
+Justin Gatlin came in 2nd place.
+
+Andre de Grasse came in 3rd place.
+
+Yohan Blake came in 4th place.
+
+Akani Simbine came in 5th place.

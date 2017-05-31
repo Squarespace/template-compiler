@@ -1,0 +1,20 @@
+:JSON
+{
+  "messages": {
+    "postcount": "There {0 one{is # entry} other{are # entries}} posted to the {1} blog."
+  },
+  "blogs": [
+  	{"name": "Apple", "count": 1},
+  	{"name": "Microsoft", "count": 3}
+  ]
+}
+
+:TEMPLATE
+{.repeated section blogs}
+{messages.postcount|plural count name}
+{.end}
+
+:OUTPUT
+There is 1 entry posted to the Apple blog.
+
+There are 3 entries posted to the Microsoft blog.
