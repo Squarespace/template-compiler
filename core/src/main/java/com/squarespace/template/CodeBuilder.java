@@ -326,7 +326,7 @@ public class CodeBuilder {
    * Builds a {@link VariableInst} instruction with the given {@link Formatter}
    * implementations and feeds it to the state machine.
    */
-  public CodeBuilder var(String name, Formatter ... formatters) throws CodeSyntaxException {
+  public CodeBuilder var(String name, Formatter... formatters) throws CodeSyntaxException {
     machine.accept(maker.var(name, formatters));
     return this;
   }

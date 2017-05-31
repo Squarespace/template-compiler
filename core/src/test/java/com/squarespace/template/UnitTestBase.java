@@ -132,7 +132,7 @@ public class UnitTestBase {
   /**
    * Execute the instruction on the given JSON data.  Return the execution context.
    */
-  public Context execute(JsonNode node, Instruction ... instructions) throws CodeExecuteException {
+  public Context execute(JsonNode node, Instruction... instructions) throws CodeExecuteException {
     Context ctx = new Context(node);
     for (Instruction inst : instructions) {
       ctx.execute(inst);

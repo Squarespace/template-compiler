@@ -155,7 +155,7 @@ public class GeneralUtils {
    * Checks the {@code parent} node to see if it contains one of the keys, and
    * returns the first that matches. If none match it returns {@link Constants#MISSING_NODE}
    */
-  public static JsonNode getFirstMatchingNode(JsonNode parent, String ... keys) {
+  public static JsonNode getFirstMatchingNode(JsonNode parent, String... keys) {
     for (String key : keys) {
       JsonNode node = parent.path(key);
       if (!node.isMissingNode()) {

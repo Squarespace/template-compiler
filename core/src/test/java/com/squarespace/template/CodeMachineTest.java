@@ -80,7 +80,7 @@ public class CodeMachineTest extends UnitTestBase {
     assertErrors("{.repeated section a}{.alternates with}{.alternates with}", NOT_ALLOWED_IN_BLOCK, EOF_IN_BLOCK);
   }
 
-  private void assertErrors(String template, ErrorType ... expected) throws CodeException {
+  private void assertErrors(String template, ErrorType... expected) throws CodeException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
     assertEquals(actual.toArray(), expected);

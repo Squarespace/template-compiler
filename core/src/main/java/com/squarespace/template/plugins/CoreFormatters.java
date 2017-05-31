@@ -316,7 +316,7 @@ public class CoreFormatters implements FormatterRegistry {
       FormatArg[] arguments = (FormatArg[]) args.getOpaque();
       resolve(ctx, arguments);
       StringBuilder buf = new StringBuilder();
-      String pattern = ctx.node().asText();
+      String pattern = node.asText();
       FormatUtils.format(pattern, arguments, buf);
       return ctx.buildNode(buf.toString());
     }

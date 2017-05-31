@@ -26,32 +26,32 @@ import java.util.Map;
  */
 public enum ExecuteErrorType implements ErrorType {
 
-  APPLY_PARTIAL_SYNTAX
-  ("Applying partial '%(name)s' raised an error: %(data)s"),
+  APPLY_PARTIAL_SYNTAX(
+      "Applying partial '%(name)s' raised an error: %(data)s"),
 
-  APPLY_PARTIAL_MISSING
-  ("Attempt to apply partial '%(name)s' which could not be found."),
+  APPLY_PARTIAL_MISSING(
+      "Attempt to apply partial '%(name)s' which could not be found."),
 
-  APPLY_PARTIAL_RECURSION_DEPTH
-  ("Recursion through partial %(name)s exceeded maximum depth of %(data)s"),
+  APPLY_PARTIAL_RECURSION_DEPTH(
+      "Recursion through partial %(name)s exceeded maximum depth of %(data)s"),
 
-  APPLY_PARTIAL_SELF_RECURSION
-  ("Recursion into self while evaluating partial '%(name)s'"),
+  APPLY_PARTIAL_SELF_RECURSION(
+      "Recursion into self while evaluating partial '%(name)s'"),
 
-  CODE_LIMIT_REACHED
-  ("A %(name)s code limit was reached %(data)s"),
+  CODE_LIMIT_REACHED(
+      "A %(name)s code limit was reached %(data)s"),
 
-  COMPILE_PARTIAL_SYNTAX
-  ("Compiling partial '%(name)s' raised errors:"),
+  COMPILE_PARTIAL_SYNTAX(
+      "Compiling partial '%(name)s' raised errors:"),
 
-  GENERAL_ERROR
-  ("Default error %(name)s: %(data)s"),
+  GENERAL_ERROR(
+      "Default error %(name)s: %(data)s"),
 
-  RESOURCE_LOAD
-  ("Failed to load resource %(name)s: %(data)s"),
+  RESOURCE_LOAD(
+      "Failed to load resource %(name)s: %(data)s"),
 
-  UNEXPECTED_ERROR
-  ("Unexpected %(name)s when executing %(repr)s: %(data)s");
+  UNEXPECTED_ERROR(
+      "Unexpected %(name)s when executing %(repr)s: %(data)s");
 
   private static final String PREFIX = "RuntimeError %(code)s at line %(line)s character %(offset)s";
 

@@ -33,65 +33,65 @@ import org.openjdk.jmh.runner.RunnerException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.LongNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.squarespace.template.Arguments;
+import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.CodeException;
-import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
-import com.squarespace.template.FormatterTable;
-import com.squarespace.template.PredicateTable;
-import com.squarespace.template.plugins.CoreFormatters;
-import com.squarespace.template.plugins.CorePredicates;
+import com.squarespace.template.Formatter;
+import com.squarespace.template.StringView;
+import com.squarespace.template.plugins.CoreFormatters.DateFormatter;
+import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.DateTimeFormatter;
 
 
 @Fork(1)
 @Measurement(iterations = 5, time = 5)
-@Warmup(iterations = 10, time = 2)
+@Warmup(iterations = 3, time = 2)
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class DateBenchmark {
 
+  private static final Formatter DATE = new DateFormatter();
+
+  private static final Arguments DATE_ARGS = new Arguments(new StringView(" %c"));
+
+  private static final Formatter DATETIME = new DateTimeFormatter();
+
+  private static final Arguments DATETIME_ARGS = new Arguments(new StringView(" date-full time-full"));
+
+  private static final JsonNode TIMESTAMP = LongNode.valueOf(1);
+
+  private static final JsonNode JSON = new TextNode("");
+
   @Benchmark
   public void genericDate(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute("{@|date %c}"));
+    blackhole.consume(state.execute(DATE, DATE_ARGS, TIMESTAMP));
   }
 
   @Benchmark
   public void internationalDateFull(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute("{@|datetime date-full time-full}"));
+    blackhole.consume(state.execute(DATETIME, DATETIME_ARGS, TIMESTAMP));
   }
 
   @State(Scope.Benchmark)
   public static class BenchmarkState {
 
-    private Compiler compiler;
-
-    private JsonNode timestamp = LongNode.valueOf(1);
-
     @Setup
-    public void setupCompiler() throws RunnerException {
-      this.compiler = new Compiler(formatterTable(), predicateTable());
+    public void setup() throws RunnerException, ArgumentsException {
+      DATE.validateArgs(DATE_ARGS);
+      DATETIME.validateArgs(DATETIME_ARGS);
     }
 
-    public Context execute(String template) throws CodeException {
-      return compiler.newExecutor()
-          .template(template)
-          .json(timestamp)
-          .safeExecution(true)
-          .execute();
+    public JsonNode execute(Formatter formatter, Arguments args, JsonNode node) throws CodeException {
+      Context ctx = new Context(JSON);
+      return formatter.apply(ctx, args, node);
     }
   }
 
-  private static FormatterTable formatterTable() {
-    FormatterTable table = new FormatterTable();
-    table.register(new CoreFormatters());
-    table.register(new InternationalFormatters());
-    return table;
+  public static void main(String[] args) throws Exception {
+    BenchmarkState state = new BenchmarkState();
+    state.setup();
+    System.out.println(state.execute(DATE, DATE_ARGS, TIMESTAMP));
+    System.out.println(state.execute(DATETIME, DATETIME_ARGS, TIMESTAMP));
   }
-
-  private static PredicateTable predicateTable() {
-    PredicateTable table = new PredicateTable();
-    table.register(new CorePredicates());
-    return table;
-  }
-
-
 }

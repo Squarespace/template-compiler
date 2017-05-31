@@ -55,7 +55,7 @@ public class ValidationTest extends UnitTestBase {
     assertErrors("{.or}{## foo #", EOF_IN_COMMENT, NOT_ALLOWED_AT_ROOT);
   }
 
-  private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
+  private void assertErrors(String template, ErrorType... expected) throws CodeSyntaxException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
     if (VERBOSE) {

@@ -22,7 +22,7 @@ public class FormatUtils {
 
   public static class FormatArg {
 
-    public Object[] name;
+    public final Object[] name;
     public String value;
 
     public FormatArg(Object[] name) {
@@ -72,7 +72,7 @@ public class FormatUtils {
             break;
 
           case '}':
-            if (index != -1 && index < limit) {
+            if (index < limit) {
               buf.append(args[index].value);
             }
             index = -1;

@@ -29,95 +29,95 @@ public enum SyntaxErrorType implements ErrorType {
 
   // NOTE: The constructor placement below is odd but is a little easier to read.
 
-  BINDVAR_EXPECTS_NAME
-  ("{.var} expects a local variable name (e.g. @foo), found '%(data)s'"),
+  BINDVAR_EXPECTS_NAME(
+      "{.var} expects a local variable name (e.g. @foo), found '%(data)s'"),
 
-  DEAD_CODE_BLOCK
-  ("This %(type)s block will never execute."),
+  DEAD_CODE_BLOCK(
+      "This %(type)s block will never execute."),
 
-  EOF_IN_BLOCK
-  ("Reached EOF in the middle of %(data)s"),
+  EOF_IN_BLOCK(
+      "Reached EOF in the middle of %(data)s"),
 
-  EOF_IN_COMMENT
-  ("Reached EOF in the middle of a multi-line comment"),
+  EOF_IN_COMMENT(
+      "Reached EOF in the middle of a multi-line comment"),
 
-  EXTRA_CHARS
-  ("Extra characters found after %(type)s instruction: '%(data)s'"),
+  EXTRA_CHARS(
+      "Extra characters found after %(type)s instruction: '%(data)s'"),
 
-  FORMATTER_INVALID
-  ("Invalid formatter name '%(name)s' found."),
+  FORMATTER_INVALID(
+      "Invalid formatter name '%(name)s' found."),
 
-  FORMATTER_NEEDS_ARGS
-  ("Formatter '%(data)s' needs arguments but none were provided."),
+  FORMATTER_NEEDS_ARGS(
+      "Formatter '%(data)s' needs arguments but none were provided."),
 
-  FORMATTER_UNKNOWN
-  ("Formatter '%(name)s' is unknown."),
+  FORMATTER_UNKNOWN(
+      "Formatter '%(name)s' is unknown."),
 
-  FORMATTER_ARGS_INVALID
-  ("Formatter '%(name)s' arguments are invalid: '%(data)s'"),
+  FORMATTER_ARGS_INVALID(
+      "Formatter '%(name)s' arguments are invalid: '%(data)s'"),
 
-  FORMATTER_EXTRA_CHARS
-  ("Formatter expression has extra trailing characters"),
+  FORMATTER_EXTRA_CHARS(
+      "Formatter expression has extra trailing characters"),
 
-  IF_EMPTY
-  ("IF instruction requires at least one variable to test."),
+  IF_EMPTY(
+      "IF instruction requires at least one variable to test."),
 
-  IF_EXPECTED_VAROP
-  ("Expected an operator or a variable, found '%(data)s'"),
+  IF_EXPECTED_VAROP(
+      "Expected an operator or a variable, found '%(data)s'"),
 
-  IF_TOO_MANY_OPERATORS
-  ("Too many operators in IF instruction."),
+  IF_TOO_MANY_OPERATORS(
+      "Too many operators in IF instruction."),
 
-  IF_TOO_MANY_VARS
-  ("Too many variables in IF instruction. Limit is %(limit)s."),
+  IF_TOO_MANY_VARS(
+      "Too many variables in IF instruction. Limit is %(limit)s."),
 
-  INJECT_EXPECTS_NAME
-  ("{.inject} expects a variable name (e.g. @foo), found '%(data)s'"),
+  INJECT_EXPECTS_NAME(
+      "{.inject} expects a variable name (e.g. @foo), found '%(data)s'"),
 
-  INJECT_EXPECTS_PATH
-  ("{.inject} expects the path for a JSON injectable, found '%(data)s'"),
+  INJECT_EXPECTS_PATH(
+      "{.inject} expects the path for a JSON injectable, found '%(data)s'"),
 
-  INVALID_INSTRUCTION
-  ("Invalid instruction '%(data)s'"),
+  INVALID_INSTRUCTION(
+      "Invalid instruction '%(data)s'"),
 
-  MACRO_EXPECTS_NAME
-  ("{.macro} expects a name"),
+  MACRO_EXPECTS_NAME(
+      "{.macro} expects a name"),
 
-  MISMATCHED_END
-  ("Mismatched END found at ROOT."),
+  MISMATCHED_END(
+      "Mismatched END found at ROOT."),
 
-  MISSING_WITH_KEYWORD
-  ("Missing 'with' keyword, found '%(data)s'"),
+  MISSING_WITH_KEYWORD(
+      "Missing 'with' keyword, found '%(data)s'"),
 
-  MISSING_SECTION_KEYWORD
-  ("Missing 'section' keyword, found '%(data)s'"),
+  MISSING_SECTION_KEYWORD(
+      "Missing 'section' keyword, found '%(data)s'"),
 
-  MISSING_VARIABLE_NAME
-  ("Missing variable name, found '%(data)s'"),
+  MISSING_VARIABLE_NAME(
+      "Missing variable name, found '%(data)s'"),
 
-  NOT_ALLOWED_AT_ROOT
-  ("%(type)s instruction is not allowed at the template root."),
+  NOT_ALLOWED_AT_ROOT(
+      "%(type)s instruction is not allowed at the template root."),
 
-  NOT_ALLOWED_IN_BLOCK
-  ("%(type)s instruction is not allowed inside %(data)s block."),
+  NOT_ALLOWED_IN_BLOCK(
+      "%(type)s instruction is not allowed inside %(data)s block."),
 
-  OR_EXPECTED_PREDICATE
-  ("Expected a predicate to follow %(type)s, found '%(data)s'"),
+  OR_EXPECTED_PREDICATE(
+      "Expected a predicate to follow %(type)s, found '%(data)s'"),
 
-  PREDICATE_ARGS_INVALID
-  ("Predicate %(name)s arguments invalid: '%(data)s'"),
+  PREDICATE_ARGS_INVALID(
+      "Predicate %(name)s arguments invalid: '%(data)s'"),
 
-  PREDICATE_NEEDS_ARGS
-  ("Predicate '.%(data)s' requires arguments but none were provided."),
+  PREDICATE_NEEDS_ARGS(
+      "Predicate '.%(data)s' requires arguments but none were provided."),
 
-  PREDICATE_UNKNOWN
-  ("Predicate '%(data)s' is unknown."),
+  PREDICATE_UNKNOWN(
+      "Predicate '%(data)s' is unknown."),
 
-  VARIABLE_EXPECTED
-  ("Variable expected, found '%(data)s'"),
+  VARIABLE_EXPECTED(
+      "Variable expected, found '%(data)s'"),
 
-  WHITESPACE_EXPECTED
-  ("Whitespace expected, found '%(data)s'");
+  WHITESPACE_EXPECTED(
+      "Whitespace expected, found '%(data)s'");
 
   private static final String PREFIX = "SyntaxError %(code)s at line %(line)s character %(offset)s";
 

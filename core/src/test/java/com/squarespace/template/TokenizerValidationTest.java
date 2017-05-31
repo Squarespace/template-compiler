@@ -132,7 +132,7 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{a|safe|safe|invalid-args}", FORMATTER_ARGS_INVALID);
   }
 
-  private void assertErrors(String template, ErrorType ... expected) throws CodeSyntaxException {
+  private void assertErrors(String template, ErrorType... expected) throws CodeSyntaxException {
     List<ErrorInfo> errors = validate(template);
     List<ErrorType> actual = errorTypes(errors);
     if (VERBOSE) {

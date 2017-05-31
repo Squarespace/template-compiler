@@ -45,6 +45,11 @@ public abstract class BaseInstruction implements Instruction {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    throw new UnsupportedOperationException("equals() not supported");
+  }
+
+  @Override
   public int hashCode() {
     throw new UnsupportedOperationException("hashCode() not supported");
   }

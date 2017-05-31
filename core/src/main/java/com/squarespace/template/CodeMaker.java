@@ -118,7 +118,7 @@ public class CodeMaker {
     return res;
   }
 
-  public List<FormatterCall> formatters(Formatter ... formatters) {
+  public List<FormatterCall> formatters(Formatter... formatters) {
     List<FormatterCall> list = new ArrayList<>(formatters.length);
     for (Formatter impl : formatters) {
       list.add(new FormatterCall(impl, Constants.EMPTY_ARGUMENTS));
@@ -126,7 +126,7 @@ public class CodeMaker {
     return list;
   }
 
-  public List<FormatterCall> formatters(FormatterCall ... formatters) {
+  public List<FormatterCall> formatters(FormatterCall... formatters) {
     return Arrays.asList(formatters);
   }
 
@@ -152,7 +152,7 @@ public class CodeMaker {
     return new InjectInst(variable, path, args);
   }
 
-  public List<Integer> intlist(Integer ... numbers) {
+  public List<Integer> intlist(Integer... numbers) {
     return Arrays.<Integer>asList(numbers);
   }
 
@@ -172,7 +172,7 @@ public class CodeMaker {
     return new NewlineInst();
   }
 
-  public List<Operator> oplist(Operator ... ops) {
+  public List<Operator> oplist(Operator... ops) {
     return Arrays.<Operator>asList(ops);
   }
 
@@ -241,11 +241,11 @@ public class CodeMaker {
     return new SpaceInst();
   }
 
-  public List<String> strlist(String ... keys) {
+  public List<String> strlist(String... keys) {
     return Arrays.<String>asList(keys);
   }
 
-  public String[] strarray(String ... elements) {
+  public String[] strarray(String... elements) {
     return elements;
   }
 
@@ -269,11 +269,11 @@ public class CodeMaker {
     return var(name, Collections.<FormatterCall>emptyList());
   }
 
-  public VariableInst var(String name, Formatter ... formatters) {
+  public VariableInst var(String name, Formatter... formatters) {
     return new VariableInst(name, formatters(formatters));
   }
 
-  public VariableInst var(String name, FormatterCall ... formatters) {
+  public VariableInst var(String name, FormatterCall... formatters) {
     return new VariableInst(name, Arrays.asList(formatters));
   }
 

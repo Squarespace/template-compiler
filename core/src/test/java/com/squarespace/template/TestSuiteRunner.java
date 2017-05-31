@@ -45,7 +45,7 @@ public class TestSuiteRunner {
     this.resourceClass = resourceClass;
   }
 
-  public void run(String ... paths) {
+  public void run(String... paths) {
     Map<String, AssertionError> errors = new HashMap<>();
     for (String path : paths) {
       if (filesSeen.contains(path)) {

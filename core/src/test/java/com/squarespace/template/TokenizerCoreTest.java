@@ -361,7 +361,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     }
   }
 
-  private void assertResult(String raw, Instruction ... instructions) throws CodeSyntaxException {
+  private void assertResult(String raw, Instruction... instructions) throws CodeSyntaxException {
     CodeList collector = collector();
     tokenizer(raw, collector).consume();
     List<Instruction> expected = Arrays.asList(instructions);

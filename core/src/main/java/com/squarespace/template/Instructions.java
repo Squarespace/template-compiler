@@ -519,7 +519,7 @@ public class Instructions {
 
     private final Arguments arguments;
 
-    public InjectInst(String variable, String filename, Arguments arguments) {
+    InjectInst(String variable, String filename, Arguments arguments) {
       this.variable = variable;
       this.filename = filename;
       this.arguments = arguments;
