@@ -28,7 +28,7 @@ import com.squarespace.compiler.text.Scanner.Stream;
 
 /**
  * Simple state machine that formats pluralized messages. There are 3 states,
- * traversing the string, tag and choice. Should be less than O(3N).
+ * traversing the string: outer, tag and choice. Should be less than O(3N).
  *
  *          "There {0 one {is # entry} other {are # entries}} posted to the {1} blog."
  * <state>

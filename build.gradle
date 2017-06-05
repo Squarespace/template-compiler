@@ -22,8 +22,8 @@ task wrapper(type: Wrapper) {
 
 project.ext {
   argparseVersion = '0.4.4'
-  ccVersion = '1.0.4-SNAPSHOT'
-  cldrVersion = '0.0.5-SNAPSHOT'
+  ccVersion = '1.0.5'
+  cldrVersion = '0.0.6'
   diffutilsVersion = '1.3.0'
   hamcrestVersion = '2.0.0.0'
   jacksonVersion = '2.3.3'
