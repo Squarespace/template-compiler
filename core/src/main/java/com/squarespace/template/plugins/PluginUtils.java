@@ -30,7 +30,7 @@ public class PluginUtils {
 
   private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
 
-  private static final Pattern SCRIPT_TAG = Pattern.compile("<(/?)script[^>]*>", CASE_INSENSITIVE | MULTILINE);
+  private static final Pattern SCRIPT_TAG = Pattern.compile("</", CASE_INSENSITIVE | MULTILINE);
 
   private PluginUtils() {
   }
@@ -57,7 +57,7 @@ public class PluginUtils {
    * Escape instances of HTML script tags.
    */
   public static String escapeScriptTags(String str) {
-    return SCRIPT_TAG.matcher(str).replaceAll("<$1scr\"+\"ipt>");
+    return SCRIPT_TAG.matcher(str).replaceAll("<\\\\/");
   }
 
   public static void escapeHtml(String str, StringBuilder buf) {
