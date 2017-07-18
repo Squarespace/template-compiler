@@ -1,7 +1,7 @@
 :JSON
 {
   "messages": {
-    "postcount": "The {1} blog has {0 cardinal one{# post} other{# posts}}."
+    "postcount": "The {1} blog has {0 plural one{# post} other{# posts}}."
   },
   "blogs": [
   	{"name": "Apple", "count": 1},
@@ -13,7 +13,7 @@
 
 :TEMPLATE
 {.repeated section blogs}
-{messages.postcount|plural count name}
+{messages.postcount|message count name}
 {.end}
 
 :OUTPUT

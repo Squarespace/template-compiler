@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
 
 
@@ -49,7 +50,7 @@ import com.squarespace.cldr.CLDRLocale;
  */
 public class Context {
 
-  private static final CLDRLocale DEFAULT_LOCALE = new CLDRLocale("en", "", "US", "POSIX");
+  private static final CLDRLocale DEFAULT_LOCALE = CLDR.EN_US;
 
   private static final JsonNode DEFAULT_UNDEFINED = MissingNode.getInstance();
 

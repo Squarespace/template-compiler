@@ -16,6 +16,8 @@
 
 package com.squarespace.template.plugins.platform.i18n;
 
+import static com.squarespace.cldr.CLDR.EN_US;
+import static com.squarespace.cldr.CLDR.FR;
 import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -62,14 +64,8 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
   };
 
   private static final DateTimeFormatter DATETIME = new DateTimeFormatter();
-
   private static final DateTimeFieldFormatter DATETIMEFIELD = new DateTimeFieldFormatter();
-
   private static final MoneyFormatter MONEY_FORMATTER = new MoneyFormatter();
-
-  private static final CLDRLocale EN_US = new CLDRLocale("en", "US", "", "POSIX");
-
-  private static final CLDRLocale FR = new CLDRLocale("fr", "", "", "");
 
   private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), InternationalFormatters.class);
 

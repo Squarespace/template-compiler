@@ -19,6 +19,7 @@ package com.squarespace.template;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.NumericNode;
 
 
 /**
@@ -40,6 +43,45 @@ public class GeneralUtils {
 
   private GeneralUtils() {
   }
+
+  /**
+   * Convert an opaque JSON node to BigDecimal using the most correct
+   * conversion method.
+   */
+  public static BigDecimal nodeToBigDecimal(JsonNode node) {
+    JsonNodeType type = node.getNodeType();
+    if (type == JsonNodeType.NUMBER) {
+      return numericToBigDecimal((NumericNode)node);
+
+    } else {
+      try {
+        return new BigDecimal(node.asText());
+      } catch (ArithmeticException | NumberFormatException e) {
+        // Fall through..
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Convert a numeric JSON node to BigDecimal using the most correct
+   * conversion method.
+   */
+  private static BigDecimal numericToBigDecimal(NumericNode node) {
+    switch (node.numberType()) {
+      case INT:
+      case LONG:
+        return BigDecimal.valueOf(node.asLong());
+      case FLOAT:
+      case DOUBLE:
+        return BigDecimal.valueOf(node.asDouble());
+      case BIG_DECIMAL:
+      case BIG_INTEGER:
+      default:
+        return node.decimalValue();
+    }
+  }
+
 
   /**
    * Executes a compiled instruction using the given context and JSON node.

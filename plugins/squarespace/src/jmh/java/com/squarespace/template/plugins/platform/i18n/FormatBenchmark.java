@@ -40,7 +40,6 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
 import com.squarespace.template.plugins.CoreFormatters.FormatFormatter;
-import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.PluralFormatter;
 
 
 @Fork(1)
@@ -54,7 +53,7 @@ public class FormatBenchmark {
 
   private static final Arguments FORMAT_ARGS = new Arguments(new StringView(" count name"));
 
-  private static final Formatter PLURAL = new PluralFormatter();
+  private static final Formatter PLURAL = new MessageFormatter();
 
   private static final Arguments PLURAL_ARGS = new Arguments(new StringView(" count name"));
 
