@@ -45,6 +45,24 @@ public class GeneralUtils {
   }
 
   /**
+   * Quick string to integer conversion.
+   */
+  public static long toLong(CharSequence seq, int pos, int length) {
+    long n = 0;
+    int i = pos;
+    while (i < length) {
+      char c = seq.charAt(i);
+      if (c >= '0' && c <= '9') {
+        n *= 10;
+        n += (int)(c - '0');
+      } else {
+        break;
+      }
+      i++;
+    }
+    return n;
+  }
+  /**
    * Convert an opaque JSON node to BigDecimal using the most correct
    * conversion method.
    */

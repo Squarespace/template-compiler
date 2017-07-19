@@ -1,0 +1,16 @@
+:JSON
+[
+	"0", "1", "1.01", "1.001", "3.14159", "1.3456"
+]
+
+:TEMPLATE
+{.repeated section @}
+{@|decimal mode:significant-maxfrac minsig:1 maxfrac:3}{.end}
+
+:OUTPUT
+0
+1
+1.01
+1.001
+3.142
+1.346

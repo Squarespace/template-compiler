@@ -43,8 +43,10 @@ public class InternationalFormatters implements FormatterRegistry {
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
     table.add(new DateTimeFormatter());
     table.add(new DateTimeFieldFormatter());
+    table.add(new DecimalFormatter());
     table.add(new MessageFormatter());
     table.add(new MoneyFormatter());
+    table.add(new LegacyMoneyFormatter());
     table.add(new PluralFormatter());
   }
 

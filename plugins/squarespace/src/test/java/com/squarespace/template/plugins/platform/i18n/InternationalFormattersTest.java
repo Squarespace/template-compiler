@@ -65,7 +65,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
   private static final DateTimeFormatter DATETIME = new DateTimeFormatter();
   private static final DateTimeFieldFormatter DATETIMEFIELD = new DateTimeFieldFormatter();
-  private static final MoneyFormatter MONEY_FORMATTER = new MoneyFormatter();
+  private static final LegacyMoneyFormatter MONEY_FORMATTER = new LegacyMoneyFormatter();
 
   private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), InternationalFormatters.class);
 

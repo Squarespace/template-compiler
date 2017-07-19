@@ -12,8 +12,8 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.template.plugins.platform.i18n.CurrencyPlacement.LEFT;
-import static com.squarespace.template.plugins.platform.i18n.CurrencyPlacement.RIGHT;
+import static com.squarespace.template.plugins.platform.i18n.LegacyCurrencyPlacement.LEFT;
+import static com.squarespace.template.plugins.platform.i18n.LegacyCurrencyPlacement.RIGHT;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * logic. 2. The currency placement is determined by the locale. Defaults to left if once is not specified. 3. If the
  * currency symbol starts with a letter and the placement is on the right, add a space between a value and the symbol.
  */
-class MoneyFormatFactory {
+class LegacyMoneyFormatFactory {
 
   // Visible for testing
   static final Pattern STARTS_WITH_LETTER = Pattern.compile("^[A-Za-z].*?");
@@ -59,7 +59,8 @@ class MoneyFormatFactory {
     }
   };
 
-  private static final Map<String, CurrencyPlacement> CURRENCY_PLACEMENTS = new HashMap<String, CurrencyPlacement>() {
+  private static final Map<String, LegacyCurrencyPlacement> CURRENCY_PLACEMENTS
+      = new HashMap<String, LegacyCurrencyPlacement>() {
     {
       put("da-DK", RIGHT);
       put("de-DE", RIGHT);
@@ -77,7 +78,7 @@ class MoneyFormatFactory {
     }
   };
 
-  private MoneyFormatFactory() {
+  private LegacyMoneyFormatFactory() {
   }
 
   static NumberFormat create(Locale locale, Currency currency) {
@@ -91,7 +92,7 @@ class MoneyFormatFactory {
   }
 
   private static String getLocalizedPattern(Locale locale, Currency currency) {
-    CurrencyPlacement placement = getCurrencyPlacement(locale);
+    LegacyCurrencyPlacement placement = getCurrencyPlacement(locale);
     String symbol = getCurrencySymbol(locale, currency);
 
     String positive;
@@ -155,10 +156,10 @@ class MoneyFormatFactory {
    * @param locale locale
    * @return the currency placement
    */
-  private static CurrencyPlacement getCurrencyPlacement(Locale locale) {
-    CurrencyPlacement placement = CURRENCY_PLACEMENTS.get(locale.toLanguageTag());
+  private static LegacyCurrencyPlacement getCurrencyPlacement(Locale locale) {
+    LegacyCurrencyPlacement placement = CURRENCY_PLACEMENTS.get(locale.toLanguageTag());
     if (placement == null) {
-      placement = CurrencyPlacement.LEFT;
+      placement = LegacyCurrencyPlacement.LEFT;
     }
 
     return placement;

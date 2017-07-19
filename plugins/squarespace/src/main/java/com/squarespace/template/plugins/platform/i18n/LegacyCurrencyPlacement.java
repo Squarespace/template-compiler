@@ -15,7 +15,7 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-enum CurrencyPlacement {
+enum LegacyCurrencyPlacement {
   LEFT,
   RIGHT
 }

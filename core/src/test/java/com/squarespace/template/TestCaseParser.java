@@ -128,10 +128,6 @@ public class TestCaseParser extends UnitTestBase {
         Context ctx = executor.execute();
         String actual = ctx.buffer().toString().trim();
         if (!output.equals(actual)) {
-          System.out.println(output);
-          System.out.println("------------------");
-          System.out.println(actual);
-          System.out.println("\n\n\n-------------------");
           throw new AssertionError("Output does not match:\n" + diff(output, actual));
         }
       } catch (Exception e) {
