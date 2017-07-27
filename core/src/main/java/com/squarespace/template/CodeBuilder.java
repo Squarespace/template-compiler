@@ -26,6 +26,7 @@ import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
+import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.NewlineInst;
 import com.squarespace.template.Instructions.PredicateInst;
