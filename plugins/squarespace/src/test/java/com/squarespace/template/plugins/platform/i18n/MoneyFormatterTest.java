@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
@@ -56,13 +57,17 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testBasics() {
     String args = " style:accounting group";
-    run(EN_US, money("23.98", "USD"), args, "$23.98");
-    run(EN_US, money("-1551.75", "USD"), args, "($1,551.75)");
+    run(EN_US, usd("23.98"), args, "$23.98");
+    run(EN_US, usd("-1551.75"), args, "($1,551.75)");
 
     args = " style:name mode:significant-maxfrac minSig:1";
-    run(EN_US, money("1", "USD"), args, "1 US dollar");
-    run(EN_US, money(big("-1551.75"), "USD"), args, "-1,551.75 US dollars");
-    run(EN_US, money("-1551.75", "USD"), args, "-1,551.75 US dollars");
+    run(EN_US, usd("1"), args, "1 US dollar");
+    run(EN_US, usd("-1551.75"), args, "-1,551.75 US dollars");
+    run(EN_US, usd(big("-1551.75")), args, "-1,551.75 US dollars");
+
+    run(EN_US, eur("1"), args, "1 euro");
+    run(EN_US, eur("-1551.75"), args, "-1,551.75 euros");
+    run(EN_US, eur(big("-1551.75")), args, "-1,551.75 euros");
   }
 
   @Test
@@ -81,34 +86,37 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testSignificantDigits() {
     String args = " style:short";
-    run(EN_US, money("-1551.75", "USD"), args, "-$2K");
+    run(EN_US, usd("-1551.75"), args, "-$2K");
 
     args = " style:short mode:significant";
-    run(EN_US, money("-1551.75", "USD"), args, "-$1.6K");
+    run(EN_US, usd("-1551.75"), args, "-$1.6K");
 
     args = " style:short mode:significant maxSig:3";
-    run(EN_US, money("-1551.75", "USD"), args, "-$1.55K");
+    run(EN_US, usd("-1551.75"), args, "-$1.55K");
 
     args = " style:short mode:significant maxSig:4";
-    run(EN_US, money("-1551.75", "USD"), args, "-$1.552K");
+    run(EN_US, usd("-1551.75"), args, "-$1.552K");
   }
 
   @Test
   public void testFractionDigits() {
     String args = " style:short mode:fractions minFrac:2";
-    run(EN_US, money("-1551.75", "USD"), args, "-$1.55K");
+    run(EN_US, usd("-1551.75"), args, "-$1.55K");
+    run(EN_US, eur("-1551.75"), args, "-€1.55K");
 
     args = " style:short mode:fractions minFrac:3";
-    run(EN_US, money("-1551.75", "USD"), args, "-$1.552K");
+    run(EN_US, usd("-1551.75"), args, "-$1.552K");
+    run(EN_US, eur("-1551.75"), args, "-€1.552K");
   }
 
   @Test
   public void testIntegerDigits() {
     String args = " minInt:4";
-    run(EN_US, money("1.57", "USD"), args, "$0,001.57");
+    run(EN_US, usd("1.57"), args, "$0,001.57");
+    run(EN_US, usd("1.57"), args, "$0,001.57");
 
     args = " style:code minInt:4";
-    run(EN_US, money("1.57", "USD"), args, "0,001.57 USD");
+    run(EN_US, usd("1.57"), args, "0,001.57 USD");
   }
 
   private static BigDecimal big(String n) {
@@ -116,19 +124,19 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   }
 
   private static String usd(String n) {
-    return money(n, "USD");
+    return money(n, CLDR.Currency.USD);
   }
 
   private static String eur(String n) {
-    return money(n, "EUR");
+    return money(n, CLDR.Currency.EUR);
   }
 
   private static String usd(BigDecimal n) {
-    return money(n, "USD");
+    return money(n, CLDR.Currency.USD);
   }
 
   private static String eur(BigDecimal n) {
-    return money(n, "EUR");
+    return money(n, CLDR.Currency.EUR);
   }
 
   private static String money(BigDecimal n, String currencyCode) {

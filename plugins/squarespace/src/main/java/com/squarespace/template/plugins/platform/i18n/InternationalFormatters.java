@@ -22,8 +22,10 @@ import java.time.ZonedDateTime;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
-import com.squarespace.cldr.DateTimeOptions;
+import com.squarespace.cldr.dates.CalendarFormat;
+import com.squarespace.cldr.dates.CalendarFormatOptions;
 import com.squarespace.cldr.dates.CalendarFormatter;
+import com.squarespace.cldr.dates.CalendarSkeleton;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -65,41 +67,41 @@ public class InternationalFormatters implements FormatterRegistry {
    *
    * This formatter takes up to 3 arguments of the following types:
    *
-   *     Named date format:   'date-short', 'date-medium', 'date-long', 'date-full'
-   *     Named time format:   'time-short', 'time-medium', 'time-long', 'time-full'
-   *  Skeleton date format:   'yMMMd', 'yQQQQ', 'yM', etc.
-   *  Skeleton time format:   'Hmv', 'hms', etc.
-   *        Wrapper format:   'wrap-short', 'wrap-medium', 'wrap-long', 'wrap-full'
+   *     Named date format:   'date:short', 'date:medium', 'date:long', 'date:full'
+   *     Named time format:   'time:short', 'time:medium', 'time:long', 'time:full'
+   *  Skeleton date format:   'date:yMMMd', 'date:yQQQQ', 'date:yM', etc.
+   *  Skeleton time format:   'time:Hmv', 'time:hms', etc.
+   *        Wrapper format:   'wrap:short', 'wrap:medium', 'wrap:long', 'wrap:full'
    *
    * You can provide a date or time name/skeleton argument, and an optional
    * wrapper argument:
    *
-   *     {t|datetime date-long time-short wrap-full}
+   *     {t|datetime date:long time:short wrap:full}
    *     "November 2, 2017 at 2:26 PM"
    *
-   *     {t|datetime date-short time-full wrap-short}
+   *     {t|datetime date:short time:full wrap:short}
    *     "11/2/17, 2:26:57 PM"
    *
    * If no wrapper argument is specified, it is based on the date format. The
-   * following will use "wrap-medium" since "date-medium" is present:
+   * following will use "wrap:medium" since "date:medium" is present:
    *
-   *     {t|datetime date-medium time-short}
+   *     {t|datetime date:medium time:short}
    *     "Nov 2, 2017, 2:26 PM"
    *
    * You can also pass a date or time skeleton:
    *
-   *     {t|datetime yMMMd hm wrap-long}
+   *     {t|datetime date:yMMMd time:hm wrap:long}
    *     "Nov 2, 2017 at 2:26 PM"
    *
    * Order of arguments doesn't matter, so this is equivalent to the above:
    *
-   *     {t|datetime wrap-long hm yMMMd}
+   *     {t|datetime wrap:long time:hm date:yMMMd}
    *     "Nov 2, 2017 at 2:26 PM"
    *
-   * If you provide no arguments you get the equivalent of "date-long time-long":
+   * If you provide no arguments you get the equivalent of "date:yMd":
    *
    *     {t|datetime}
-   *     "November 2, 2017 at 2:26:57 PM"
+   *     "11/2/2017"
    *
    */
   public static class DateTimeFormatter extends BaseFormatter {
@@ -111,9 +113,8 @@ public class InternationalFormatters implements FormatterRegistry {
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
       args.atMost(3);
-      DateTimeOptions options = new DateTimeOptions();
-      options.set(args.getArgs());
-      options.done();
+      CalendarFormatOptions options = new CalendarFormatOptions();
+      setCalendarFormatOptions(options, args);
       args.setOpaque(options);
     }
 
@@ -122,33 +123,96 @@ public class InternationalFormatters implements FormatterRegistry {
       long instant = ctx.node().asLong();
 
       // TODO: obtain timezone via context or resolve via json.
-      ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), DEFAULT_ZONEID);
+      ZonedDateTime datetime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), DEFAULT_ZONEID);
 
       CLDRLocale locale = ctx.cldrLocale();
       CalendarFormatter formatter = CLDR.get().getCalendarFormatter(locale);
+      CalendarFormatOptions options = (CalendarFormatOptions) args.getOpaque();
+      StringBuilder buffer = new StringBuilder();
+      formatter.format(datetime, options, buffer);
+      return ctx.buildNode(buffer.toString());
+    }
+  }
 
-      StringBuilder buf = new StringBuilder();
+  private static void setCalendarFormatOptions(CalendarFormatOptions options, Arguments args) {
+    for (String arg : args.getArgs()) {
+      int i = arg.indexOf(':');
+      if (i == -1) {
+        switch (arg) {
+          case "date":
+            options.setDateFormat(CalendarFormat.SHORT);
+            break;
 
-      DateTimeOptions options = (DateTimeOptions) args.getOpaque();
+          case "time":
+            options.setTimeFormat(CalendarFormat.SHORT);
+            break;
 
-      if (options.wrapperType() != null) {
-        // If we're here, it means that we have both a date and a time, either named
-        // or skeleton, and are using a localized wrapper.
-        formatter.formatWrapped(options.wrapperType(), options.dateType(), options.timeType(),
-            options.dateSkeleton(), options.timeSkeleton(), dateTime, buf);
-
-      } else if (options.dateType() != null) {
-        formatter.formatDate(options.dateType(), dateTime, buf);
-
-      } else if (options.timeType() != null) {
-        formatter.formatTime(options.timeType(), dateTime, buf);
-
-      } else {
-        String skeleton = options.dateSkeleton() != null ? options.dateSkeleton() : options.timeSkeleton();
-        formatter.formatSkeleton(skeleton, dateTime, buf);
+          default:
+            break;
+        }
+        continue;
       }
 
-      return ctx.buildNode(buf.toString());
+      String key = arg.substring(0, i);
+      String val = arg.substring(i + 1);
+
+      switch (key) {
+        case "date":
+        {
+          CalendarFormat format = calendarFormat(val);
+          if (format == null) {
+            options.setDateSkeleton(CalendarSkeleton.fromString(val));
+          } else {
+            options.setDateFormat(format);
+          }
+          break;
+        }
+
+        case "time":
+        {
+          CalendarFormat format = calendarFormat(val);
+          if (format == null) {
+            options.setTimeSkeleton(CalendarSkeleton.fromString(val));
+          } else {
+            options.setTimeFormat(format);
+          }
+          break;
+        }
+
+        case "datetime":
+        case "wrap":
+        case "wrapper":
+        case "wrapped":
+        {
+          options.setWrapperFormat(calendarFormat(val));
+          break;
+        }
+
+        default:
+          break;
+      }
+    }
+  }
+
+  private static CalendarFormat calendarFormat(String arg) {
+    if (arg == null) {
+      return null;
+    }
+    switch (arg) {
+      case "short":
+        return CalendarFormat.SHORT;
+
+      case "medium":
+        return CalendarFormat.MEDIUM;
+
+      case "long":
+        return CalendarFormat.LONG;
+
+      case "full":
+        return CalendarFormat.FULL;
+
+      default:
+        return null;
     }
   }
 
@@ -206,7 +270,7 @@ public class InternationalFormatters implements FormatterRegistry {
       CalendarFormatter formatter = CLDR.get().getCalendarFormatter(locale);
 
       StringBuilder buf = new StringBuilder();
-      formatter.formatField(args.first(), dateTime, buf);
+      formatter.formatField(dateTime, args.first(), buf);
       return ctx.buildNode(buf.toString());
     }
   }
