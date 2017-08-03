@@ -333,7 +333,7 @@ public class PluginDateUtils {
 
   public static String getTimeZoneNameFromContext(Context ctx) {
     JsonNode tzNode = ctx.resolve(Constants.TIMEZONE_KEY);
-    
+
     String tzName = "UTC";
     if (tzNode.isMissingNode()) {
       tzName = DateTimeZone.getDefault().getID();

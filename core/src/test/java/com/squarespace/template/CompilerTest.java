@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.VariableInst;
 import com.squarespace.template.plugins.CoreFormatters;
-import com.squarespace.template.plugins.CoreFormatters.DateFormatter;
 import com.squarespace.template.plugins.CorePredicates;
 
 
@@ -40,7 +39,7 @@ public class CompilerTest {
 
   private static final PredicateTable PREDICATES = new PredicateTable();
 
-  private static final DateFormatter DATE = new DateFormatter();
+//  private static final DateFormatter DATE = new DateFormatter();
 
   private static final Compiler COMPILER;
 

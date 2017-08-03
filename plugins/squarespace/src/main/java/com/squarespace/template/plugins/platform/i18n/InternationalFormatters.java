@@ -19,8 +19,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.joda.time.DateTimeZone;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
@@ -43,8 +41,6 @@ import com.squarespace.template.plugins.PluginDateUtils;
 
 
 public class InternationalFormatters implements FormatterRegistry {
-
-  private static final ZoneId DEFAULT_ZONEID = ZoneId.of("America/New_York");
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
