@@ -33,6 +33,8 @@ import com.squarespace.template.Context;
 
 public class PluginDateUtils {
 
+  private static final String DEFAULT_TIMEZONEID = "America/New_York";
+
   private PluginDateUtils() {
   }
 
@@ -336,7 +338,7 @@ public class PluginDateUtils {
 
     String tzName = "UTC";
     if (tzNode.isMissingNode()) {
-      tzName = DateTimeZone.getDefault().getID();
+      tzName = DEFAULT_TIMEZONEID;
     } else {
       tzName = tzNode.asText();
     }
