@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.compiler.text.EncodeUtils;
@@ -200,14 +199,8 @@ public class CoreFormatters implements FormatterRegistry {
 
   public static class DateFormatter extends BaseFormatter {
 
-    private String[] timezoneKey = Constants.TIMEZONE_KEY;
-
     public DateFormatter() {
       super("date", true);
-    }
-
-    public void setTimezoneKey(String[] key) {
-      timezoneKey = key;
     }
 
     @Override
@@ -217,14 +210,8 @@ public class CoreFormatters implements FormatterRegistry {
 
     @Override
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      JsonNode tzNode = ctx.resolve(timezoneKey);
+      String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
       long instant = node.asLong();
-      String tzName = "UTC";
-      if (tzNode.isMissingNode()) {
-        tzName = DateTimeZone.getDefault().getID();
-      } else {
-        tzName = tzNode.asText();
-      }
       StringBuilder buf = new StringBuilder();
       formatDate(ctx.javaLocale(), (String)args.getOpaque(), instant, tzName, buf);
       return ctx.buildNode(buf.toString());

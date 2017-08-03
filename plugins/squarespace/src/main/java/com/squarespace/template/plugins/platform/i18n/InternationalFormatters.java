@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.joda.time.DateTimeZone;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
@@ -37,6 +39,7 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.plugins.PluginDateUtils;
 
 
 public class InternationalFormatters implements FormatterRegistry {
@@ -124,9 +127,8 @@ public class InternationalFormatters implements FormatterRegistry {
     public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
       long instant = ctx.node().asLong();
 
-      // TODO: obtain timezone via context or resolve via json.
-      ZonedDateTime datetime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), DEFAULT_ZONEID);
-
+      String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+      ZonedDateTime datetime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), ZoneId.of(tzName));
       CLDRLocale locale = ctx.cldrLocale();
       CalendarFormatter formatter = CLDR.get().getCalendarFormatter(locale);
       CalendarFormatOptions options = (CalendarFormatOptions) args.getOpaque();

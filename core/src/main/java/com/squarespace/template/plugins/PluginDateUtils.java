@@ -26,6 +26,10 @@ import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.squarespace.template.Constants;
+import com.squarespace.template.Context;
+
 
 public class PluginDateUtils {
 
@@ -325,6 +329,18 @@ public class PluginDateUtils {
       default:
         break;
     }
+  }
+
+  public static String getTimeZoneNameFromContext(Context ctx) {
+    JsonNode tzNode = ctx.resolve(Constants.TIMEZONE_KEY);
+    
+    String tzName = "UTC";
+    if (tzNode.isMissingNode()) {
+      tzName = DateTimeZone.getDefault().getID();
+    } else {
+      tzName = tzNode.asText();
+    }
+    return tzName;
   }
 
 }

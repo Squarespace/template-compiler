@@ -45,7 +45,6 @@ public class CompilerTest {
   private static final Compiler COMPILER;
 
   static {
-    DATE.setTimezoneKey(Constants.TIMEZONE_KEY);
     FORMATTERS.register(new CoreFormatters());
     FORMATTERS.register(new UnitTestFormatters());
     PREDICATES.register(new CorePredicates());
