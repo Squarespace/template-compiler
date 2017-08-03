@@ -90,6 +90,12 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     assertEquals(format(EN_US, DATETIME, mk.args(" time:medium wrap:full date:yMMMd"), json),
         "Nov 2, 2017 at 2:26:57 PM");
 
+    // Bare skeletons
+
+    assertEquals(format(EN_US, DATETIME, mk.args(" date:short hm"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(EN_US, DATETIME, mk.args(" yMMMd hm"), json), "Nov 2, 2017, 2:26 PM");
+
+
     // FRENCH
 
     assertEquals(format(FR, DATETIME, mk.args(" date:short"), json), "02/11/2017");

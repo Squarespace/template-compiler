@@ -26,6 +26,8 @@ import com.squarespace.cldr.dates.CalendarFormat;
 import com.squarespace.cldr.dates.CalendarFormatOptions;
 import com.squarespace.cldr.dates.CalendarFormatter;
 import com.squarespace.cldr.dates.CalendarSkeleton;
+import com.squarespace.cldr.dates.SkeletonType;
+import com.squarespace.cldr.dates._CalendarUtils;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -148,6 +150,14 @@ public class InternationalFormatters implements FormatterRegistry {
             break;
 
           default:
+            // Check if argument is a bare skeleton and set its type.
+            SkeletonType type = _CalendarUtils.skeletonType(arg);
+            CalendarSkeleton skeleton = CalendarSkeleton.fromString(arg);
+            if (type == SkeletonType.DATE) {
+              options.setDateSkeleton(skeleton);
+            } else {
+              options.setTimeSkeleton(skeleton);
+            }
             break;
         }
         continue;
