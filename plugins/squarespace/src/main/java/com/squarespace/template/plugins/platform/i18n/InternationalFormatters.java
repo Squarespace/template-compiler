@@ -148,13 +148,19 @@ public class InternationalFormatters implements FormatterRegistry {
             break;
 
           default:
-            // Check if argument is a bare skeleton and set its type.
-            SkeletonType type = _CalendarUtils.skeletonType(arg);
-            CalendarSkeleton skeleton = CalendarSkeleton.fromString(arg);
-            if (type == SkeletonType.DATE) {
-              options.setDateSkeleton(skeleton);
+            CalendarFormat format = calendarFormat(arg);
+            if (format != null) {
+              options.setDateFormat(format);
+              options.setTimeFormat(format);
             } else {
-              options.setTimeSkeleton(skeleton);
+              // Check if argument is a bare skeleton and set its type.
+              SkeletonType type = _CalendarUtils.skeletonType(arg);
+              CalendarSkeleton skeleton = CalendarSkeleton.fromString(arg);
+              if (type == SkeletonType.DATE) {
+                options.setDateSkeleton(skeleton);
+              } else {
+                options.setTimeSkeleton(skeleton);
+              }
             }
             break;
         }
