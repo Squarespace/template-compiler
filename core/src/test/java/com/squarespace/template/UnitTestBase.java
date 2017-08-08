@@ -168,8 +168,9 @@ public class UnitTestBase {
   public String format(Formatter impl, Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
     impl.validateArgs(args);
-    JsonNode node = impl.apply(ctx, args, ctx.node());
-    return node.asText();
+    Variables variables = new Variables("var", ctx.node());
+    impl.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 
   public void assertFormatter(Formatter impl, String json, String expected) throws CodeException {

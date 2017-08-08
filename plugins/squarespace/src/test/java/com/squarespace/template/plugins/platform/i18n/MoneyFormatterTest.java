@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
@@ -32,6 +31,7 @@ import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.TestSuiteRunner;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -170,8 +170,9 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     Context ctx = new Context(JsonUtils.decode(json));
     ctx.cldrLocale(locale);
     MONEY.validateArgs(args);
-    JsonNode node = MONEY.apply(ctx, args, ctx.node());
-    return node.asText();
+    Variables variables = new Variables("@", ctx.node());
+    MONEY.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 
 

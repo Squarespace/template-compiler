@@ -30,11 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
 
@@ -391,22 +388,6 @@ public class Context {
 
   public JsonNode node() {
     return currentFrame.node();
-  }
-
-  public JsonNode buildNode(String value) {
-    return new TextNode(value);
-  }
-
-  public JsonNode buildNode(int value) {
-    return new IntNode(value);
-  }
-
-  public JsonNode buildNode(long value) {
-    return new LongNode(value);
-  }
-
-  public JsonNode buildNode(double value) {
-    return new DoubleNode(value);
   }
 
   public boolean initIteration() {

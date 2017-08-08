@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.squarespace.template.plugins.platform.i18n;
 
 import static com.squarespace.cldr.CLDR.DE;
@@ -26,7 +27,6 @@ import java.math.BigDecimal;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.template.Arguments;
@@ -34,6 +34,7 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -173,8 +174,9 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     Context ctx = new Context(JsonUtils.decode(json));
     ctx.cldrLocale(locale);
     DECIMAL.validateArgs(args);
-    JsonNode node = DECIMAL.apply(ctx, args, ctx.node());
-    return node.asText();
+    Variables variables = new Variables("@", ctx.node());
+    DECIMAL.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 
 }

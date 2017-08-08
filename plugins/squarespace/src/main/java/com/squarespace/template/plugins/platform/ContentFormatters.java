@@ -16,6 +16,7 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.loadResource;
 import static com.squarespace.template.plugins.PluginUtils.slugify;
@@ -30,6 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -40,10 +43,11 @@ import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
-import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginDateUtils;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.RecordType;
@@ -87,10 +91,11 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       String baseUrl = ctx.resolve(baseUrlKey).asText();
-      String value = node.asText();
-      return ctx.buildNode(baseUrl + "/" + value);
+      String value = var.node().asText();
+      var.set(baseUrl + "/" + value);
     }
 
   }
@@ -110,8 +115,9 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return GeneralUtils.executeTemplate(ctx, template, node, true);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, template, var.node(), true));
     }
   }
 
@@ -122,9 +128,10 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String text = node.asText();
-      return ctx.buildNode(text.toUpperCase());
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      String text = var.node().asText();
+      var.set(text.toUpperCase());
     }
   }
 
@@ -184,12 +191,13 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       int index = (Integer)args.getOpaque();
-      JsonNode child = node.path("items").path(index);
+      JsonNode child = var.node().path("items").path(index);
       StringBuilder buf = new StringBuilder();
       outputImageMeta(child, buf);
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -218,11 +226,13 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String hex = node.asText();
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      String hex = var.node().asText();
       hex = hex.replace("#", "");
       if (!VALID_COLOR.matcher(hex).matches()) {
-        return Constants.MISSING_NODE;
+        var.setMissing();
+        return;
       }
       int value = 0;
       if (hex.length() == 3) {
@@ -231,7 +241,7 @@ public class ContentFormatters implements FormatterRegistry {
         value = Integer.parseInt(hex, 16);
       }
       String weight = (value > HALFBRIGHT) ? "light" : "dark";
-      return ctx.buildNode(weight);
+      var.set(weight);
     }
   };
 
@@ -282,13 +292,14 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String[] parts = splitDimensions(node);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      String[] parts = splitDimensions(var.node());
       if (parts == null || parts.length != 2) {
-        return ctx.buildNode("Invalid source parameter. Pass in 'originalSize'.");
+        var.set("Invalid source parameter. Pass in 'originalSize'.");
       } else {
         int height = Integer.parseInt(parts[1]);
-        return ctx.buildNode(height);
+        var.set(height);
       }
     }
   };
@@ -304,9 +315,10 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      long duration = node.asLong();
-      return ctx.buildNode(DurationFormatUtils.formatDuration(duration, "m:ss"));
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      long duration = var.node().asLong();
+      var.set(DurationFormatUtils.formatDuration(duration, "m:ss"));
     }
 
   };
@@ -331,7 +343,9 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
 
       String cls = (args.count() == 1) ? args.first() : "thumb-image";
 
@@ -373,7 +387,7 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("data-image-id=\"").append(id).append("\" ");
       buf.append("data-type=\"image\" ");
       buf.append("/>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
 
     private String getAltText(Context ctx) {
@@ -419,10 +433,13 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      JsonNode colorData = node.path("colorData");
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode colorData = var.node().path("colorData");
+
       if (colorData.isMissingNode()) {
-        return Constants.MISSING_NODE;
+        var.setMissing();
+        return;
       }
 
       StringBuilder buf = new StringBuilder();
@@ -446,7 +463,7 @@ public class ContentFormatters implements FormatterRegistry {
         }
       }
 
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -457,10 +474,11 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      outputImageMeta(node, buf);
-      return ctx.buildNode(buf.toString());
+      outputImageMeta(var.node(), buf);
+      var.set(buf);
     }
   }
 
@@ -471,10 +489,11 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      outputImageMeta(node.path("coverImage"), buf);
-      return ctx.buildNode(buf.toString());
+      outputImageMeta(var.node().path("coverImage"), buf);
+      var.set(buf);
     }
   };
 
@@ -489,7 +508,10 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode value) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode value = var.node();
+
       StringBuilder buf = new StringBuilder();
       buf.append("hentry");
 
@@ -542,7 +564,7 @@ public class ContentFormatters implements FormatterRegistry {
         }
       }
 
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
 
   }
@@ -563,7 +585,7 @@ public class ContentFormatters implements FormatterRegistry {
     protected JsonNode resize(Context ctx, JsonNode node, boolean resizeWidth, int requested) {
       String[] parts = splitDimensions(node);
       if (parts == null || parts.length != 2) {
-        return ctx.buildNode("Invalid source parameter. Pass in 'originalSize'.");
+        return new TextNode("Invalid source parameter. Pass in 'originalSize'.");
       }
       int width = Integer.parseInt(parts[0]);
       int height = Integer.parseInt(parts[1]);
@@ -573,7 +595,7 @@ public class ContentFormatters implements FormatterRegistry {
       } else {
         value = (int)(height * (requested / (float)width));
       }
-      return ctx.buildNode(value);
+      return new IntNode(value);
     }
 
     protected String getSquarespaceSizeForWidth(int width) {
@@ -601,8 +623,9 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return resize(ctx, node, false, (Integer)args.getOpaque());
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(resize(ctx, var.node(), false, (Integer)args.getOpaque()));
     }
   }
 
@@ -613,8 +636,9 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return resize(ctx, node, true, (Integer)args.getOpaque());
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(resize(ctx, var.node(), true, (Integer)args.getOpaque()));
     }
   }
 
@@ -625,8 +649,9 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return ctx.buildNode(getSquarespaceSizeForWidth((Integer)args.getOpaque()));
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(getSquarespaceSizeForWidth((Integer)args.getOpaque()));
     }
   }
 
@@ -637,12 +662,14 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      JsonNode resized = resize(ctx, node, true, (Integer)args.getOpaque());
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode resized = resize(ctx, var.node(), true, (Integer)args.getOpaque());
       if (resized.isInt()) {
-        return ctx.buildNode(getSquarespaceSizeForWidth(resized.asInt()));
+        var.set(getSquarespaceSizeForWidth(resized.asInt()));
+      } else {
+        var.set(resized);
       }
-      return resized;
     }
   }
 
@@ -657,7 +684,9 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
       StringBuilder buf = new StringBuilder();
       if (!node.isNumber()) {
         buf.append("Invalid date.");
@@ -667,7 +696,7 @@ public class ContentFormatters implements FormatterRegistry {
         PluginDateUtils.humanizeDate(value, false, buf);
         buf.append("</span>");
       }
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
 
   }
@@ -679,13 +708,14 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String[] parts = splitDimensions(node);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      String[] parts = splitDimensions(var.node());
       if (parts == null || parts.length != 2) {
-        return ctx.buildNode("Invalid source parameter. Pass in 'originalSize'.");
+        var.set("Invalid source parameter. Pass in 'originalSize'.");
       } else {
         int width = Integer.parseInt(parts[0]);
-        return ctx.buildNode(width);
+        var.set(width);
       }
     }
   }
@@ -708,7 +738,10 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+
       JsonNode oEmbed = node.path("oembed");
       JsonNode colorData = node.path("colorData");
       String assetUrl = node.path("assetUrl").asText();
@@ -773,7 +806,7 @@ public class ContentFormatters implements FormatterRegistry {
       }
 
       buf.append("</div>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
 
   }

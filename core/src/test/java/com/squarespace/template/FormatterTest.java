@@ -42,16 +42,16 @@ public class FormatterTest extends UnitTestBase {
     assertErrors("{@|unstable}", "1", ExecuteErrorType.UNEXPECTED_ERROR);
   }
 
-  @Test
-  public void testReturnsMissing() throws CodeException {
-    // If a formatter returns a "missing node" it will short-circuit
-    // evaluation of further formatters, so "npe" will never be invoked.
-    Context ctx = compiler().newExecutor()
-        .template("{@|returns-missing|npe}")
-        .json("1")
-        .execute();
-    assertEquals(ctx.buffer().toString(), "");
-  }
+//  @Test
+//  public void testReturnsMissing() throws CodeException {
+//    // If a formatter returns a "missing node" it will short-circuit
+//    // evaluation of further formatters, so "npe" will never be invoked.
+//    Context ctx = compiler().newExecutor()
+//        .template("{@|returns-missing|npe}")
+//        .json("1")
+//        .execute();
+//    assertEquals(ctx.buffer().toString(), "");
+//  }
 
   private void assertErrors(String template, String json, ErrorType expected) throws CodeSyntaxException {
     try {

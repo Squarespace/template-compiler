@@ -27,6 +27,8 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
 
 class LegacyMoneyFormatter extends BaseFormatter {
 
@@ -66,11 +68,16 @@ class LegacyMoneyFormatter extends BaseFormatter {
   }
 
   @Override
-  public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+  public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+    Variable var = variables.first();
+    JsonNode node = var.node();
+
     Locale locale = (Locale) args.getOpaque();
     Currency currency = getCurrency(node);
     double value = node.path(VALUE_FIELD_NAME).asDouble(0);
-    return ctx.buildNode(LegacyMoneyFormatFactory.create(locale, currency).format(value));
+
+    String result = LegacyMoneyFormatFactory.create(locale, currency).format(value);
+    var.set(result);
   }
 
   private static String getLocaleArg(Arguments args) {

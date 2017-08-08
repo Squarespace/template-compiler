@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 @Fork(1)
 @Measurement(iterations = 5, time = 5)
-@Warmup(iterations = 10, time = 2)
+@Warmup(iterations = 3, time = 2)
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class ExecutorBenchmark {

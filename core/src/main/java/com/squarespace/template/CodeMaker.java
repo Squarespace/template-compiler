@@ -269,6 +269,10 @@ public class CodeMaker {
     return var(name, Collections.<FormatterCall>emptyList());
   }
 
+  public VariableInst var(Variables variables) {
+    return new VariableInst(variables, Collections.<FormatterCall>emptyList());
+  }
+
   public VariableInst var(String name, Formatter... formatters) {
     return new VariableInst(name, formatters(formatters));
   }

@@ -73,47 +73,26 @@ import com.squarespace.template.plugins.CoreFormatters.UrlEncodeFormatter;
 public class CoreFormattersTest extends UnitTestBase {
 
   private static final Formatter APPLY = new ApplyFormatter();
-
   private static final Formatter COUNT = new CountFormatter();
-
   private static final Formatter CYCLE = new CycleFormatter();
-
   private static final Formatter ENCODE_SPACE = new EncodeSpaceFormatter();
-
   private static final Formatter ENCODE_URI = new EncodeUriFormatter();
-
   private static final Formatter ENCODE_URI_COMPONENT = new EncodeUriComponentFormatter();
-
   private static final Formatter HTML = new HtmlFormatter();
-
   private static final Formatter HTMLATTR = new HtmlAttrFormatter();
-
   private static final Formatter HTMLTAG = new HtmlTagFormatter();
-
   private static final Formatter JSON = new JsonFormatter();
-
   private static final Formatter JSON_PRETTY = new JsonPrettyFormatter();
-
   private static final Formatter OUTPUT = new OutputFormatter();
-
   private static final Formatter LOOKUP = new LookupFormatter();
-
   private static final Formatter PLURALIZE = new PluralizeFormatter();
-
   private static final Formatter RAW = new RawFormatter();
-
   private static final Formatter ROUND = new RoundFormatter();
-
   private static final Formatter SAFE = new SafeFormatter();
-
   private static final Formatter SLUGIFY = new SlugifyFormatter();
-
   private static final Formatter SMARTYPANTS = new SmartypantsFormatter();
-
   private static final Formatter STR = new StrFormatter();
-
   private static final Formatter TRUNCATE = new TruncateFormatter();
-
   private static final Formatter URL_ENCODE = new UrlEncodeFormatter();
 
   private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), CoreFormattersTest.class);

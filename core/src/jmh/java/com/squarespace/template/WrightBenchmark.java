@@ -16,10 +16,8 @@
 
 package com.squarespace.template;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.template.plugins.CoreFormatters;
-import com.squarespace.template.plugins.CorePredicates;
+import java.util.concurrent.TimeUnit;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -33,7 +31,10 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.RunnerException;
 
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.template.plugins.CoreFormatters;
+import com.squarespace.template.plugins.CorePredicates;
 
 @Fork(1)
 @Measurement(iterations = 5, time = 5)
@@ -41,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class WrightBenchmark {
-
 
   @Benchmark
   public void compile(BenchmarkState state, Blackhole blackhole) throws CodeException {
@@ -57,13 +57,9 @@ public class WrightBenchmark {
   public static class BenchmarkState {
 
     private Compiler compiler;
-
     private String wrightSource;
-
     private JsonNode wrightJsonNode;
-
     private ObjectNode wrightPartials;
-
     private Instruction wrightTemplate;
 
     @Setup
@@ -125,6 +121,18 @@ public class WrightBenchmark {
       }
     }
 
+  }
+
+  public static void main(String[] args) throws Exception {
+    BenchmarkState state = new BenchmarkState();
+    state.setupCompiler();
+    CompiledTemplate template = state.compileWright();
+    System.out.println(template.errors());
+    System.out.println(ReprEmitter.get(template.code(), true));
+//    System.out.println(TreeEmitter.get(template.code()));
+
+//    Context ctx = state.executeWright();
+//    System.out.println(ctx.buffer());
   }
 
 }

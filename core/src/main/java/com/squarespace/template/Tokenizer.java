@@ -73,43 +73,27 @@ public class Tokenizer {
   private final static int IF_VARIABLE_LIMIT = 5;
 
   private final String raw;
-
   private final int length;
-
   private final CodeSink sink;
-
   private final PredicateTable predicateTable;
-
   private final FormatterTable formatterTable;
-
   private final TokenMatcher matcher;
-
   private final CodeMaker maker;
 
   private State state;
-
   private List<ErrorInfo> errors;
 
   boolean validate = false;
 
   private int textLine;
-
   private int textOffset;
-
   private int instLine;
-
   private int instOffset;
-
   private int index = 0;
-
   private int save = 0;
-
   private int metaLeft = -1;
-
   private int lineCounter = 0;
-
   private int lineIndex = 0;
-
 
   public Tokenizer(String raw, CodeSink sink, FormatterTable formatterTable, PredicateTable predicateTable) {
     this.raw = raw;
@@ -608,17 +592,31 @@ public class Tokenizer {
   }
 
   /**
-   * Parses a variable reference with an optional list of formatters.  Formatters can be
-   * chained, e.g. {name|foo|bar}.
+   * Parses a variable reference that can consist of one or more variable names followed
+   * by an optional list of formatters. Formatters can be chained so the output of one
+   * formatter can be "piped" into the next.
    */
   private boolean parseVariable() throws CodeSyntaxException {
     if (!matcher.variable()) {
       return false;
     }
-    int start = matcher.matchStart();
-    StringView variable = matcher.consume();
 
-    VariableInst instruction = maker.var(variable.repr());
+    int start = matcher.matchStart();
+    StringView token = matcher.consume();
+    Variables vars = new Variables(token.repr());
+
+    while (matcher.variablesDelimiter()) {
+      matcher.consume();
+      if (matcher.finished()) {
+        return false;
+      }
+      if (matcher.pipe() || !matcher.variable()) {
+        break;
+      }
+      vars.add(matcher.consume().repr());
+    }
+
+    VariableInst instruction = maker.var(vars);
     List<FormatterCall> formatters = parseFormatters(instruction, start);
     if (formatters == null) {
       emitInstruction(instruction);

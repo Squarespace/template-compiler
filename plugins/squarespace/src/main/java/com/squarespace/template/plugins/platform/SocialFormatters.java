@@ -38,6 +38,8 @@ import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginDateUtils;
 
 
@@ -87,8 +89,9 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      String text = node.asText();
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      String text = var.node().asText();
       text = TWITTER_LINKS_REGEX.matcher(text).replaceAll(TWITTER_LINKS_REPLACE);
       text = TWITTER_TWEETS_REGEX.matcher(text).replaceAll(TWITTER_TWEETS_REPLACE);
       Matcher matcher = TWITTER_HASHTAG_REGEX.matcher(text);
@@ -100,7 +103,7 @@ public class SocialFormatters implements FormatterRegistry {
             + GeneralUtils.urlEncode(matcher.group(2)) + "\">" + matcher.group(2) + "</a>");
       }
       matcher.appendTail(buf);
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -119,8 +122,9 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return executeTemplate(ctx, template, item, false);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, template, var.node(), false));
     }
   }
 
@@ -153,8 +157,9 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return executeTemplate(ctx, template, item, false);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, template, var.node(), false));
     }
   }
 
@@ -165,10 +170,11 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      addCommentCount(item, buf);
-      return ctx.buildNode(buf.toString());
+      addCommentCount(var.node(), buf);
+      var.set(buf);
     }
   }
 
@@ -179,7 +185,9 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
       StringBuilder buf = new StringBuilder();
       long start = node.path("startDate").asLong();
       long end = node.path("endDate").asLong();
@@ -195,7 +203,7 @@ public class SocialFormatters implements FormatterRegistry {
           buf.append("&location=").append(GeneralUtils.urlEncode(location));
         }
       }
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -238,8 +246,9 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return executeTemplate(ctx, template, item, false);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, template, var.node(), false));
     }
   }
 
@@ -250,11 +259,12 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       JsonNode website = ctx.resolve("website");
       StringBuilder buf = new StringBuilder();
-      PlatformUtils.makeSocialButton(website, node, false, buf);
-      return ctx.buildNode(buf.toString());
+      PlatformUtils.makeSocialButton(website, var.node(), false, buf);
+      var.set(buf);
     }
   }
 
@@ -265,11 +275,12 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       JsonNode website = ctx.resolve("website");
       StringBuilder buf = new StringBuilder();
-      PlatformUtils.makeSocialButton(website, node, true, buf);
-      return ctx.buildNode(buf.toString());
+      PlatformUtils.makeSocialButton(website, var.node(), true, buf);
+      var.set(buf);
     }
   }
 
@@ -281,7 +292,9 @@ public class SocialFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode account) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode account = var.node();
       StringBuilder buf = new StringBuilder();
       String userName = account.path("userName").asText();
       if (userName.equals("")) {
@@ -294,7 +307,7 @@ public class SocialFormatters implements FormatterRegistry {
       buf.append("</script><div class=\"squarespace-follow-button\" data-username=\"");
       buf.append(userName);
       buf.append("\"></div>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 

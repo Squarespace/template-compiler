@@ -17,6 +17,7 @@
 package com.squarespace.template;
 
 import static com.squarespace.template.ReprEmitter.emitNames;
+import static com.squarespace.template.ReprEmitter.emitVariables;
 
 import java.util.List;
 
@@ -94,7 +95,7 @@ public class TreeEmitter {
       case BINDVAR:
         BindVarInst bindvar = (BindVarInst)inst;
         buf.append(bindvar.getName()).append(" = ");
-        emitNames(bindvar.getVariable(), buf);
+        emitVariables(bindvar.getVariables(), buf);
         break;
 
       case COMMENT:
@@ -136,9 +137,11 @@ public class TreeEmitter {
         break;
 
       case VARIABLE:
-        VariableInst variable = (VariableInst)inst;
-        emitNames(variable.getVariable(), buf);
-        for (FormatterCall formatterCall : variable.getFormatters()) {
+      {
+        VariableInst varInst = (VariableInst)inst;
+        Variables variables = varInst.getVariables();
+        ReprEmitter.emitVariables(variables, buf);
+        for (FormatterCall formatterCall : varInst.getFormatters()) {
           buf.append('\n');
           indent(depth + INCR, buf);
           buf.append("| ");
@@ -150,6 +153,7 @@ public class TreeEmitter {
           }
         }
         break;
+      }
 
       default:
         break;
@@ -204,6 +208,9 @@ public class TreeEmitter {
   }
 
   private static void emit(List<Instruction> instructions, int depth, StringBuilder buf) {
+    if (instructions == null) {
+      return;
+    }
     int size = instructions.size();
     for (int i = 0; i < size; i++) {
       emit(instructions.get(i), depth, buf);

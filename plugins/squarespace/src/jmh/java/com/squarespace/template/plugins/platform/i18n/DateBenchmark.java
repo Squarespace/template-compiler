@@ -28,7 +28,6 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.RunnerException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,8 +39,8 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.StringView;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.CoreFormatters.DateFormatter;
-import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.DateTimeFormatter;
 
 
 @Fork(1)
@@ -59,18 +58,18 @@ public class DateBenchmark {
 
   private static final Arguments DATETIME_ARGS = new Arguments(new StringView(" date-full time-full"));
 
-  private static final JsonNode TIMESTAMP = LongNode.valueOf(1);
+  private static final Variables VARIABLES = new Variables("@", new LongNode(1));
 
   private static final JsonNode JSON = new TextNode("");
 
   @Benchmark
-  public void genericDate(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute(DATE, DATE_ARGS, TIMESTAMP));
+  public void genericDate(BenchmarkState state) throws CodeException {
+    state.execute(DATE, DATE_ARGS, VARIABLES);
   }
 
   @Benchmark
-  public void internationalDateFull(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute(DATETIME, DATETIME_ARGS, TIMESTAMP));
+  public void internationalDateFull(BenchmarkState state) throws CodeException {
+    state.execute(DATETIME, DATETIME_ARGS, VARIABLES);
   }
 
   @State(Scope.Benchmark)
@@ -82,16 +81,18 @@ public class DateBenchmark {
       DATETIME.validateArgs(DATETIME_ARGS);
     }
 
-    public JsonNode execute(Formatter formatter, Arguments args, JsonNode node) throws CodeException {
+    public void execute(Formatter formatter, Arguments args, Variables variables) throws CodeException {
       Context ctx = new Context(JSON);
-      return formatter.apply(ctx, args, node);
+      formatter.apply(ctx, args, variables);
     }
   }
 
   public static void main(String[] args) throws Exception {
     BenchmarkState state = new BenchmarkState();
     state.setup();
-    System.out.println(state.execute(DATE, DATE_ARGS, TIMESTAMP));
-    System.out.println(state.execute(DATETIME, DATETIME_ARGS, TIMESTAMP));
+    state.execute(DATE, DATE_ARGS, VARIABLES);
+    System.out.println(VARIABLES.first().node());
+    state.execute(DATETIME, DATETIME_ARGS, VARIABLES);
+    System.out.println(VARIABLES.first().node());
   }
 }

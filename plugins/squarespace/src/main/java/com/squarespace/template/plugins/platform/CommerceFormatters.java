@@ -28,14 +28,12 @@ import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Compiler;
-import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
@@ -44,6 +42,8 @@ import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
 
@@ -93,8 +93,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return executeTemplate(ctx, template, node, true);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, template, var.node(), true));
     }
   }
 
@@ -105,16 +106,17 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       int count = 0;
-      JsonNode entriesNode = node.path("entries");
+      JsonNode entriesNode = var.node().path("entries");
       for (int i = 0; i < entriesNode.size(); i++) {
         count += entriesNode.get(i).get("quantity").intValue();
       }
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-quantity\">").append(count).append("</span>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -125,14 +127,15 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      double subtotalCents = node.path("subtotalCents").doubleValue();
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      double subtotalCents = var.node().path("subtotalCents").doubleValue();
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-subtotal\">");
       CommerceUtils.writeMoneyString(subtotalCents, buf);
       buf.append("</span>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -143,8 +146,8 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return ctx.buildNode("/cart");
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      variables.first().set("/cart");
     }
   }
 
@@ -155,10 +158,11 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeCouponDescriptor(node, buf);
-      return ctx.buildNode(buf.toString());
+      CommerceUtils.writeCouponDescriptor(var.node(), buf);
+      var.set(buf);
     }
   };
 
@@ -169,9 +173,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      double price = CommerceUtils.getFromPrice(item);
-      return ctx.buildNode(price);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable item = variables.first();
+      double price = CommerceUtils.getFromPrice(item.node());
+      item.set(price);
     }
   };
 
@@ -182,9 +187,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      double value = node.asDouble();
-      return ctx.buildNode(PluginUtils.formatMoney(value, Locale.US));
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      double value = var.node().asDouble();
+      var.set(PluginUtils.formatMoney(value, Locale.US));
     }
   }
 
@@ -210,9 +216,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      double value = ctx.node().asDouble();
-      return ctx.buildNode(PlatformUtils.formatBookkeeperMoney(value, Locale.US));
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      double value = var.node().asDouble();
+      var.set(PlatformUtils.formatBookkeeperMoney(value, Locale.US));
     }
   }
 
@@ -223,11 +230,12 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      double value = node.asDouble();
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      double value = var.node().asDouble();
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeMoneyString(value, buf);
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -238,13 +246,14 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      double value = node.asDouble();
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      double value = var.node().asDouble();
       StringBuilder buf = new StringBuilder();
       boolean trim = args.count() > 0 && args.first().equals("trim");
       String formatted = PlatformUtils.formatPercentage(value, trim, Locale.US);
       buf.append(formatted);
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -255,8 +264,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return ctx.buildNode(CommerceUtils.getNormalPrice(item));
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable item = variables.first();
+      item.set(CommerceUtils.getNormalPrice(item.node()));
     }
   }
 
@@ -276,8 +286,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return executeTemplate(ctx, template, item, false);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, template, var.node(), false));
     }
   }
 
@@ -288,12 +299,13 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
       buf.append("<div class=\"product-price\">");
-      CommerceUtils.writePriceString(node, buf);
+      CommerceUtils.writePriceString(var.node(), buf);
       buf.append("</div>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -304,7 +316,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
       String id = node.path("id").asText();
       String group = args.isEmpty() ? "" : args.first();
 
@@ -323,7 +337,7 @@ public class CommerceFormatters implements FormatterRegistry {
       buf.append("<span class=\"sqs-product-quick-view-button\" data-id=\"").append(id);
       buf.append("\" data-group=\"").append(group);
       buf.append("\">Quick View</span>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 
@@ -334,13 +348,16 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      if (CommerceUtils.isSoldOut(item)) {
-        return ctx.buildNode("<div class=\"product-mark sold-out\">sold out</div>");
-      } else if (CommerceUtils.isOnSale(item)) {
-        return ctx.buildNode("<div class=\"product-mark sale\">sale</div>");
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+      if (CommerceUtils.isSoldOut(node)) {
+        var.set("<div class=\"product-mark sold-out\">sold out</div>");
+      } else if (CommerceUtils.isOnSale(node)) {
+        var.set("<div class=\"product-mark sale\">sale</div>");
+      } else {
+        var.setMissing();
       }
-      return Constants.MISSING_NODE;
     }
   }
 
@@ -359,19 +376,21 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-
-      ProductType type = CommerceUtils.getProductType(item);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+      ProductType type = CommerceUtils.getProductType(node);
 
       boolean multipleQuantityAllowed = ProductType.PHYSICAL.equals(type)
           || (ProductType.SERVICE.equals(type)
              && CommerceUtils.isMultipleQuantityAllowedForServices(ctx.resolve("websiteSettings")));
-      boolean hideQuantityInput = !multipleQuantityAllowed || CommerceUtils.getTotalStockRemaining(item) <= 1;
+      boolean hideQuantityInput = !multipleQuantityAllowed || CommerceUtils.getTotalStockRemaining(node) <= 1;
 
       if (hideQuantityInput) {
-        return MissingNode.getInstance();
+        var.setMissing();
+        return;
       }
-      return executeTemplate(ctx, template, item, true);
+      var.set(executeTemplate(ctx, template, var.node(), true));
     }
   }
 
@@ -382,8 +401,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      return ctx.buildNode(CommerceUtils.getSalePrice(item));
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(CommerceUtils.getSalePrice(var.node()));
     }
   }
 
@@ -394,10 +414,11 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeVariantFormat(node, buf);
-      return ctx.buildNode(buf.toString());
+      CommerceUtils.writeVariantFormat(var.node(), buf);
+      var.set(buf);
     }
   }
 
@@ -416,17 +437,21 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode item) throws CodeExecuteException {
-      ArrayNode options = CommerceUtils.getItemVariantOptions(item);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+
+      ArrayNode options = CommerceUtils.getItemVariantOptions(node);
       if (options.size() == 0) {
         // Don't bother executing the template of nothing would be emitted.
-        return MissingNode.getInstance();
+        var.setMissing();
+        return;
       }
 
-      ObjectNode node = JsonUtils.createObjectNode();
-      node.put("item", item);
-      node.put("options", options);
-      return executeTemplate(ctx, template, node, false);
+      ObjectNode obj = JsonUtils.createObjectNode();
+      obj.put("item", node);
+      obj.put("options", options);
+      var.set(executeTemplate(ctx, template, obj, false));
     }
   }
 
@@ -454,7 +479,9 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode field) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode field = var.node();
       String type = field.path("type").asText();
       Instruction code = templateMap.get(type);
       JsonNode value = null;
@@ -480,7 +507,8 @@ public class CommerceFormatters implements FormatterRegistry {
         buf.append("N/A");
       }
       buf.append("\n</div>");
-      return ctx.buildNode(buf.toString());
+
+      var.set(buf);
     }
 
     private static JsonNode convertLikert(JsonNode values) {

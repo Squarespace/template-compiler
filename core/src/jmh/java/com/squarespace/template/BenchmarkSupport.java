@@ -43,8 +43,9 @@ public class BenchmarkSupport implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return GeneralUtils.executeTemplate(ctx, template, node, false);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(GeneralUtils.executeTemplate(ctx, template, var.node(), false));
     }
 
   }
@@ -56,7 +57,9 @@ public class BenchmarkSupport implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
       StringBuilder buf = new StringBuilder();
       String name = node.path("name").asText();
       int age = node.path("age").asInt();
@@ -81,7 +84,7 @@ public class BenchmarkSupport implements FormatterRegistry {
         buf.append("</div>\n");
       }
       buf.append("</span>");
-      return ctx.buildNode(buf.toString());
+      var.set(buf);
     }
   }
 

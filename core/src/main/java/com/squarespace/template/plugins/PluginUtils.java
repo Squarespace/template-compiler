@@ -16,7 +16,7 @@
 
 package com.squarespace.template.plugins;
 
-import static com.squarespace.template.Patterns.WHITESPACE;
+import static com.squarespace.template.Patterns.WHITESPACE_RE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.MULTILINE;
 
@@ -137,7 +137,7 @@ public class PluginUtils {
 
   public static String slugify(String value) {
     value = SLUG_KILLCHARS.matcher(value).replaceAll("");
-    value = WHITESPACE.matcher(value).replaceAll("-");
+    value = WHITESPACE_RE.matcher(value).replaceAll("-");
     return value.toLowerCase();
   }
 

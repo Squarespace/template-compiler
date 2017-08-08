@@ -24,7 +24,6 @@ import static com.squarespace.cldr.numbers.CurrencyFormatStyle.SYMBOL;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.cldr.numbers.CurrencyFormatOptions;
@@ -36,6 +35,8 @@ import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
 
 
 /**
@@ -77,11 +78,14 @@ public class MoneyFormatter extends BaseFormatter {
   }
 
   @Override
-  public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+  public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+    Variable var = variables.first();
+    JsonNode node = var.node();
     JsonNode decimal = node.path("decimalValue");
     JsonNode currency = node.path("currencyCode");
     if (decimal.isMissingNode() || currency.isMissingNode()) {
-      return MissingNode.getInstance();
+      var.setMissing();
+      return;
     }
     BigDecimal decimalValue = GeneralUtils.nodeToBigDecimal(decimal);
     String currencyCode = currency.asText();
@@ -91,7 +95,7 @@ public class MoneyFormatter extends BaseFormatter {
     NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
     StringBuilder buf = new StringBuilder();
     fmt.formatCurrency(decimalValue, currencyCode, buf, opts);
-    return ctx.buildNode(buf.toString());
+    var.set(buf);
   }
 
   private CurrencyFormatOptions parseOptions(Arguments args) {

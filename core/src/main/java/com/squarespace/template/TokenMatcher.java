@@ -16,7 +16,7 @@
 
 package com.squarespace.template;
 
-import java.util.regex.Matcher;
+import com.squarespace.compiler.match.Recognizers.Recognizer;
 
 
 /**
@@ -41,46 +41,10 @@ public class TokenMatcher {
   /** End of the character range of potential matches */
   private int end = -1;
 
-  private final Matcher matcherArgs;
-
-  private final Matcher matcherBooleanOp;
-
-  private final Matcher matcherFormatter;
-
-  private final Matcher matcherKeyword;
-
-  private final Matcher matcherLocalVariable;
-
-  private final Matcher matcherPath;
-
-  private final Matcher matcherPredicate;
-
-  private final Matcher matcherPredicateArgs;
-
-  private final Matcher matcherVariable;
-
-  private final Matcher matcherWhitespace;
-
-  private final Matcher matcherWordSection;
-
-  private final Matcher matchWordWith;
-
   private boolean matched;
 
   public TokenMatcher(final String raw) {
     this.raw = raw;
-    this.matcherArgs = Patterns.ARGUMENTS.matcher(raw);
-    this.matcherBooleanOp = Patterns.BOOLEAN_OP.matcher(raw);
-    this.matcherFormatter = Patterns.FORMATTER.matcher(raw);
-    this.matcherKeyword = Patterns.KEYWORD.matcher(raw);
-    this.matcherLocalVariable = Patterns.LOCAL_VARIABLE.matcher(raw);
-    this.matcherPath = Patterns.PATH.matcher(raw);
-    this.matcherPredicate = Patterns.PREDICATE.matcher(raw);
-    this.matcherPredicateArgs = Patterns.PREDICATE_ARGUMENTS.matcher(raw);
-    this.matcherVariable = Patterns.VARIABLE.matcher(raw);
-    this.matcherWhitespace = Patterns.WHITESPACE.matcher(raw);
-    this.matcherWordSection = Patterns.WORD_SECTION.matcher(raw);
-    this.matchWordWith = Patterns.WORD_WITH.matcher(raw);
     region(0, raw.length());
   }
 
@@ -152,40 +116,39 @@ public class TokenMatcher {
   }
 
   public boolean arguments() {
-    return match(matcherArgs);
+    return match(Patterns.ARGUMENTS);
   }
 
   public boolean formatter() {
-    return match(matcherFormatter);
+    return match(Patterns.FORMATTER);
   }
 
   public boolean keyword() {
-    return match(matcherKeyword);
+    return match(Patterns.RESERVED_WORD);
   }
 
   public boolean localVariable() {
-    return match(matcherLocalVariable);
+    return match(Patterns.VARIABLE_DEFINITION);
   }
 
   public boolean operator() {
-    return match(matcherBooleanOp);
+    return match(Patterns.BOOLEAN_OP);
   }
 
   public boolean path() {
-    return match(matcherPath);
+    return match(Patterns.PATH);
   }
-
 
   public boolean pipe() {
     return match('|');
   }
 
   public boolean predicate() {
-    return match(matcherPredicate);
+    return match(Patterns.PREDICATE);
   }
 
   public boolean predicateArgs() {
-    return match(matcherPredicateArgs);
+    return match(Patterns.PREDICATE_ARGUMENTS);
   }
 
   public boolean space() {
@@ -193,32 +156,37 @@ public class TokenMatcher {
   }
 
   public boolean variable() {
-    return match(matcherVariable);
+    return match(Patterns.VARIABLE_REF_DOTTED);
+  }
+
+  public boolean variablesDelimiter() {
+    return match(Patterns.VARIABLES_DELIMITER);
   }
 
   public boolean whitespace() {
-    return match(matcherWhitespace);
+    return match(Patterns.WHITESPACE);
   }
 
   public boolean wordSection() {
-    return match(matcherWordSection);
+    return match(Patterns.KEYWORD_SECTION);
   }
 
   public boolean wordWith() {
-    return match(matchWordWith);
+    return match(Patterns.KEYWORD_WITH);
   }
 
   /**
-   * Perform a match using a Matcher and, if successful, set the match range.
+   * Perform a match using a Recognizer pattern and, if successful,
+   * set the match range.
    */
-  private boolean match(Matcher matcher) {
-    matcher.region(pointer, end);
-    matched = matcher.lookingAt();
-    if (matched) {
+  private boolean match(Recognizer pattern) {
+    int pos = pattern.match(raw, pointer, end);
+    if (pos > pointer) {
       matchStart = pointer;
-      matchEnd = matcher.end();
+      matchEnd = pos;
+      return true;
     }
-    return matched;
+    return false;
   }
 
   /**

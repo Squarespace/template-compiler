@@ -28,7 +28,6 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.RunnerException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +38,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.CoreFormatters.FormatFormatter;
 
 
@@ -50,11 +50,9 @@ import com.squarespace.template.plugins.CoreFormatters.FormatFormatter;
 public class FormatBenchmark {
 
   private static final Formatter FORMAT = new FormatFormatter();
-
-  private static final Arguments FORMAT_ARGS = new Arguments(new StringView(" count name"));
-
   private static final Formatter PLURAL = new MessageFormatter();
 
+  private static final Arguments FORMAT_ARGS = new Arguments(new StringView(" count name"));
   private static final Arguments PLURAL_ARGS = new Arguments(new StringView(" count name"));
 
   private static final JsonNode JSON1 = JsonUtils.decode("{\"messages\": {"
@@ -62,18 +60,17 @@ public class FormatBenchmark {
       + "\"plural\": \"There {0 one{is # entry} other{are # entries}} posted to the {1} blog.\"},"
       + "\"count\": 2, \"name\": \"Apple\"}");
 
-  private static final JsonNode PLURAL_MESSAGE = JSON1.path("messages").path("plural");
-
-  private static final JsonNode FORMAT_MESSAGE = JSON1.path("messages").path("format");
+  private static final Variables PLURAL_MESSAGE = new Variables("@", JSON1.path("messages").path("plural"));
+  private static final Variables FORMAT_MESSAGE = new Variables("@", JSON1.path("messages").path("format"));
 
   @Benchmark
-  public void format(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute(FORMAT, FORMAT_ARGS, FORMAT_MESSAGE));
+  public void format(BenchmarkState state) throws CodeException {
+    state.execute(FORMAT, FORMAT_ARGS, FORMAT_MESSAGE);
   }
 
   @Benchmark
-  public void plural(BenchmarkState state, Blackhole blackhole) throws CodeException {
-    blackhole.consume(state.execute(PLURAL, PLURAL_ARGS, PLURAL_MESSAGE));
+  public void plural(BenchmarkState state) throws CodeException {
+    state.execute(PLURAL, PLURAL_ARGS, PLURAL_MESSAGE);
   }
 
   @State(Scope.Benchmark)
@@ -85,11 +82,18 @@ public class FormatBenchmark {
       PLURAL.validateArgs(PLURAL_ARGS);
     }
 
-    public JsonNode execute(Formatter formatter, Arguments args, JsonNode node) throws CodeException {
+    public void execute(Formatter formatter, Arguments args, Variables variables) throws CodeException {
       Context ctx = new Context(JSON1);
-      return formatter.apply(ctx, args, node);
+      formatter.apply(ctx, args, variables);
     }
 
   }
 
+  public static void main(String[] args) throws Exception {
+    BenchmarkState state = new BenchmarkState();
+    state.setup();
+    state.execute(FORMAT, FORMAT_ARGS, FORMAT_MESSAGE);
+    System.out.println(FORMAT_MESSAGE.first().node());
+
+  }
 }

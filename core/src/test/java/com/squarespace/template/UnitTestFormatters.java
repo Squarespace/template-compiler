@@ -18,8 +18,6 @@ package com.squarespace.template;
 
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 
 
 /**
@@ -65,8 +63,9 @@ public class UnitTestFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return executeTemplate(ctx, instruction, node.path("foo"), true);
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      var.set(executeTemplate(ctx, instruction, var.node().path("foo"), true));
     }
   }
 
@@ -77,7 +76,7 @@ public class UnitTestFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       throw new CodeExecuteException(ctx.error(ExecuteErrorType.GENERAL_ERROR).name("ABCXYZ"));
     }
 
@@ -103,7 +102,7 @@ public class UnitTestFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       throw new NullPointerException("fake NPE thrown by the test npe formatter.");
     }
 
@@ -124,8 +123,8 @@ public class UnitTestFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-      return Constants.MISSING_NODE;
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      variables.first().setMissing();
     }
 
   }
@@ -137,7 +136,7 @@ public class UnitTestFormatters implements FormatterRegistry {
     }
 
     @Override
-    public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       throw new IllegalArgumentException("unexpected error!");
     }
 

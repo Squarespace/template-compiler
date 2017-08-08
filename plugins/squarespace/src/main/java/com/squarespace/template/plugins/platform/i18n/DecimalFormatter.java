@@ -17,14 +17,12 @@ package com.squarespace.template.plugins.platform.i18n;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.cldr.numbers.DecimalFormatOptions;
+import com.squarespace.cldr.numbers.DecimalFormatStyle;
 import com.squarespace.cldr.numbers.NumberFormatMode;
 import com.squarespace.cldr.numbers.NumberFormatOptions;
-import com.squarespace.cldr.numbers.DecimalFormatStyle;
 import com.squarespace.cldr.numbers.NumberFormatter;
 import com.squarespace.cldr.numbers.NumberRoundMode;
 import com.squarespace.template.Arguments;
@@ -33,6 +31,8 @@ import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
 
 
 /**
@@ -72,10 +72,12 @@ public class DecimalFormatter extends BaseFormatter {
   }
 
   @Override
-  public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
-    BigDecimal number = GeneralUtils.nodeToBigDecimal(node);
+  public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+    Variable var = variables.first();
+    BigDecimal number = GeneralUtils.nodeToBigDecimal(var.node());
     if (number == null) {
-      return MissingNode.getInstance();
+      var.setMissing();
+      return;
     }
 
     DecimalFormatOptions opts = (DecimalFormatOptions) args.getOpaque();
@@ -83,7 +85,7 @@ public class DecimalFormatter extends BaseFormatter {
     NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
     StringBuilder buf = new StringBuilder();
     fmt.formatDecimal(number, buf, opts);
-    return ctx.buildNode(buf.toString());
+    var.set(buf);
   }
 
   private DecimalFormatOptions parseOptions(Arguments args) {

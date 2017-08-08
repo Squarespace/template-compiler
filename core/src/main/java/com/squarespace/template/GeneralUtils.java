@@ -32,6 +32,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.NumericNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 
 /**
@@ -124,7 +125,7 @@ public class GeneralUtils {
       ctx.swapBuffer(origBuf);
       ctx.pop();
     }
-    return ctx.buildNode(buf.toString());
+    return new TextNode(buf.toString());
   }
 
   /**
@@ -151,7 +152,8 @@ public class GeneralUtils {
 
 
   /**
-   * Map.getOrDefault only available in JDK 8, for now we support JDK 7.
+   * Map.getOrDefault only available in JDK 8., <s>For now we support JDK 7.</s>
+   * We now support JDK 8 but leaving this in place anyway.
    */
   public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
     V value = map.get(key);

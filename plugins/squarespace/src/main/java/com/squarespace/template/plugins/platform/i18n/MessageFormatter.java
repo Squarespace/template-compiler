@@ -27,14 +27,15 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.Variable;
+import com.squarespace.template.Variables;
+import com.squarespace.template.plugins.PluginDateUtils;
 
 
 /**
  * MESSAGE - Evaluates a MessageFormat against one or more arguments.
  */
 public class MessageFormatter extends BaseFormatter {
-
-  private static final ZoneId DEFAULT_ZONEID = ZoneId.of("America/New_York");
 
   public MessageFormatter() {
     this("message");
@@ -50,15 +51,19 @@ public class MessageFormatter extends BaseFormatter {
   }
 
   @Override
-  public JsonNode apply(Context ctx, Arguments args, JsonNode node) throws CodeExecuteException {
+  public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+    Variable var = variables.first();
+    JsonNode node = var.node();
+
     MessageArgs msgArgs = (MessageArgs) args.getOpaque();
     msgArgs.resetArgs();
     setContext(msgArgs, ctx);
     String message = node.asText();
-    MessageFormat msgFormat = new MessageFormat(ctx.cldrLocale(), DEFAULT_ZONEID, message);
+    String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+    MessageFormat msgFormat = new MessageFormat(ctx.cldrLocale(), ZoneId.of(tzName), message);
     StringBuilder buf = new StringBuilder();
     msgFormat.format(msgArgs, buf);
-    return ctx.buildNode(buf.toString());
+    var.set(buf);
   }
 
   /**

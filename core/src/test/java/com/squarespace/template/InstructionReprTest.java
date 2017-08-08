@@ -151,7 +151,7 @@ public class InstructionReprTest extends UnitTestBase {
   @Test
   public void testNames() {
     assertEquals(ReprEmitter.get(new String[] { "foo", "bar" }), "foo.bar");
-    assertEquals(ReprEmitter.get(null), "@");
+    assertEquals(ReprEmitter.get((Object[])null), "@");
   }
 
   @Test

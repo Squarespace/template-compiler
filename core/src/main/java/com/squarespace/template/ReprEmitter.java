@@ -56,6 +56,12 @@ public class ReprEmitter {
     return buf.toString();
   }
 
+  public static String get(Variables variables) {
+    StringBuilder buf = new StringBuilder();
+    emitVariables(variables, buf);
+    return buf.toString();
+  }
+
   public static String get(Object[] names) {
     StringBuilder buf = new StringBuilder();
     emitNames(names, buf);
@@ -223,7 +229,7 @@ public class ReprEmitter {
 
   public static void emit(BindVarInst inst, StringBuilder buf) {
     buf.append("{.var ").append(inst.getName()).append(' ');
-    emitNames(inst.getVariable(), buf);
+    emitVariables(inst.getVariables(), buf);
     buf.append('}');
   }
 
@@ -243,7 +249,7 @@ public class ReprEmitter {
 
   public static void emit(VariableInst inst, StringBuilder buf) {
     buf.append('{');
-    emitNames(inst.getVariable(), buf);
+    emitVariables(inst.getVariables(), buf);
     List<FormatterCall> formatterCalls = inst.getFormatters();
     int size = formatterCalls.size();
     for (int i = 0; i < size; i++) {
@@ -253,6 +259,16 @@ public class ReprEmitter {
       emit(call.getArguments(), buf);
     }
     buf.append('}');
+  }
+
+  public static void emitVariables(Variables variables, StringBuilder buf) {
+    int count = variables.count();
+    for (int i = 0; i < count; i++) {
+      if (i > 0) {
+        buf.append(" $ ");
+      }
+      emitNames(variables.get(i).name(), buf);
+    }
   }
 
   public static void emitNames(Object[] names, StringBuilder buf) {

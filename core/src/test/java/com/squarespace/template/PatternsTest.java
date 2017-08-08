@@ -19,10 +19,9 @@ package com.squarespace.template;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.testng.annotations.Test;
+
+import com.squarespace.compiler.match.Recognizers.Recognizer;
 
 
 /**
@@ -91,23 +90,23 @@ public class PatternsTest {
   }
 
   private void isKeyword(String str) {
-    assertTrue(matches(str, Patterns.KEYWORD));
+    assertTrue(matches(str, Patterns.RESERVED_WORD));
   }
 
   private void notKeyword(String str) {
-    assertFalse(matches(str, Patterns.KEYWORD));
+    assertFalse(matches(str, Patterns.RESERVED_WORD));
   }
 
   private void isVariable(String str) {
-    assertTrue(matches(str, Patterns.VARIABLE));
+    assertTrue(matches(str, Patterns.VARIABLE_REF_DOTTED));
   }
 
   private void notVariable(String str) {
-    assertFalse(matches(str, Patterns.VARIABLE));
+    assertFalse(matches(str, Patterns.VARIABLE_REF_DOTTED));
   }
 
-  private boolean matches(String str, Pattern pattern) {
-    Matcher matcher = pattern.matcher(str);
-    return matcher.lookingAt() && (matcher.start() == 0) && (matcher.end() == str.length());
+  private boolean matches(String str, Recognizer pattern) {
+    int len = str.length();
+    return pattern.match(str, 0, len) == len;
   }
 }

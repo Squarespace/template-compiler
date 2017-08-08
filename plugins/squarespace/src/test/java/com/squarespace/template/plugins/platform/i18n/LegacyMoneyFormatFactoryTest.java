@@ -22,7 +22,6 @@ import java.util.Map;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.cldr.CLDRLocale;
@@ -32,6 +31,7 @@ import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.JsonUtils;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -110,8 +110,9 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
     Arguments args = mk.args(" " + locale);
     LEGACY_MONEY.validateArgs(args);
     Context ctx = new Context(moneyJson(number, currency));
-    JsonNode node = LEGACY_MONEY.apply(ctx, args, ctx.node());
-    return node.asText();
+    Variables variables = new Variables("@", ctx.node());
+    LEGACY_MONEY.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 
   private String cldr(CLDRLocale locale, String currency, String number, boolean narrow) throws CodeException {
@@ -119,8 +120,9 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
     CLDR_MONEY.validateArgs(args);
     Context ctx = new Context(moneyJson(number, currency));
     ctx.cldrLocale(locale);
-    JsonNode node = CLDR_MONEY.apply(ctx, args, ctx.node());
-    return node.asText();
+    Variables variables = new Variables("@", ctx.node());
+    CLDR_MONEY.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 
   private static ObjectNode moneyJson(String number, String currency) {

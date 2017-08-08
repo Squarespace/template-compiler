@@ -112,7 +112,8 @@ public class CorePredicates implements PredicateRegistry {
       }
 
       // Attempt to parse variable name.
-      if (Patterns.VARIABLE.matcher(raw).matches()) {
+      int length = raw.length();
+      if (Patterns.VARIABLE_REF_DOTTED.match(raw, 0, length) != -1) {
         return new VariableRef(raw);
       }
 

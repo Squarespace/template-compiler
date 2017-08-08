@@ -89,14 +89,12 @@ public class Instructions {
   static class BindVarInst extends BaseInstruction implements Formattable {
 
     private final String name;
-
-    private final Object[] variable;
-
+    private final Variables variables;
     private List<FormatterCall> formatters;
 
     BindVarInst(String key, String variable) {
       this.name = key;
-      this.variable = splitVariable(variable);
+      this.variables = new Variables(variable);
       setFormatters(null);
     }
 
@@ -104,8 +102,8 @@ public class Instructions {
       return name;
     }
 
-    public Object[] getVariable() {
-      return variable;
+    public Variables getVariables() {
+      return variables;
     }
 
     @Override
@@ -120,8 +118,9 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      JsonNode value = applyFormatters(ctx, formatters, ctx.resolve(variable));
-      ctx.setVar(name, value);
+      variables.resolve(ctx);
+      applyFormatters(ctx, formatters, variables);
+      ctx.setVar(name, variables.first().node());
     }
 
     @Override
@@ -129,7 +128,7 @@ public class Instructions {
       if (obj instanceof BindVarInst) {
         BindVarInst other = (BindVarInst)obj;
         return name.equals(other.name)
-            && Arrays.equals(variable, other.variable)
+            && Objects.equals(variables, other.variables)
             && Objects.equals(formatters, other.formatters);
       }
       return false;
@@ -1091,8 +1090,7 @@ public class Instructions {
    */
   static class VariableInst extends BaseInstruction implements Formattable {
 
-    private final Object[] variable;
-
+    private final Variables variables;
     private List<FormatterCall> formatters;
 
     VariableInst(String name) {
@@ -1100,12 +1098,16 @@ public class Instructions {
     }
 
     VariableInst(String name, List<FormatterCall> formatters) {
-      this.variable = splitVariable(name);
+      this(new Variables(name), formatters);
+    }
+
+    VariableInst(Variables variables, List<FormatterCall> formatters) {
+      this.variables = variables;
       setFormatters(formatters);
     }
 
-    public Object[] getVariable() {
-      return variable;
+    public Variables getVariables() {
+      return variables;
     }
 
     @Override
@@ -1122,7 +1124,7 @@ public class Instructions {
     public boolean equals(Object obj) {
       if (obj instanceof VariableInst) {
         VariableInst other = (VariableInst) obj;
-        return Arrays.equals(variable, other.variable)
+        return Objects.equals(variables, other.variables)
             && Objects.equals(formatters, other.formatters);
       }
       return false;
@@ -1140,12 +1142,18 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
-      ctx.push(variable);
-      JsonNode value = applyFormatters(ctx, formatters, ctx.node());
+      int count = variables.count();
+      for (int i = 0; i < count; i++) {
+        variables.get(i).resolve(ctx);
+      }
+
+      Variable first = variables.first();
+      ctx.push(first.node());
+      applyFormatters(ctx, formatters, variables);
 
       // Finally, output the result.
-      if (!value.isMissingNode()) {
-        emitJsonNode(ctx.buffer(), value);
+      if (!first.missing()) {
+        emitJsonNode(ctx.buffer(), first.node());
       }
       ctx.pop();
     }
@@ -1157,21 +1165,17 @@ public class Instructions {
 
   }
 
-  private static JsonNode applyFormatters(Context ctx, List<FormatterCall> formatters, JsonNode value)
+  private static void applyFormatters(Context ctx, List<FormatterCall> formatters, Variables variables)
       throws CodeExecuteException {
 
     CodeLimiter limiter = ctx.getCodeLimiter();
     int size = formatters.size();
     for (int i = 0; i < size; i++) {
-      if (value.isMissingNode()) {
-        break;
-      }
       FormatterCall call = formatters.get(i);
       limiter.check();
       Formatter impl = call.getFormatter();
-      value = impl.apply(ctx, call.getArguments(), value);
+      impl.apply(ctx, call.getArguments(), variables);
     }
-    return value;
   }
 
   private static void emitJsonNode(StringBuilder buf, JsonNode node) {

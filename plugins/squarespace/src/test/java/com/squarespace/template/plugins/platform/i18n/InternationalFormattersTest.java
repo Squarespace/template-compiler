@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
@@ -36,9 +35,9 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
 import com.squarespace.template.TestSuiteRunner;
+import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.DateTimeFieldFormatter;
-import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.DateTimeFormatter;
 
 
 public class InternationalFormattersTest extends PlatformUnitTestBase {
@@ -164,8 +163,9 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     Context ctx = new Context(JsonUtils.decode(json));
     ctx.cldrLocale(locale);
     impl.validateArgs(args);
-    JsonNode node = impl.apply(ctx, args, ctx.node());
-    return node.asText();
+    Variables variables = new Variables("@", ctx.node());
+    impl.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 
 }

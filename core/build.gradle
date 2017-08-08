@@ -35,6 +35,7 @@ artifacts {
 jmh {
   jmhVersion = '1.19'
   forceGC = true
+  //include = '.*Wright.*'
 }
 
 plugins.withType(EclipsePlugin) {

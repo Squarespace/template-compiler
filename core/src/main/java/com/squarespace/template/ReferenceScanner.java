@@ -131,11 +131,10 @@ public class ReferenceScanner {
         break;
 
       case VARIABLE:
-        VariableInst variable = (VariableInst)inst;
-        name = ReprEmitter.get(variable.getVariable());
+        VariableInst varInst = (VariableInst)inst;
+        name = ReprEmitter.get(varInst.getVariables());
         refs.addVariable(name);
-
-        for (FormatterCall call : variable.getFormatters()) {
+        for (FormatterCall call : varInst.getFormatters()) {
           refs.increment(call.getFormatter());
         }
         break;
