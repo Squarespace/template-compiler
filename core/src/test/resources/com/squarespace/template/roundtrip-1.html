@@ -1,0 +1,33 @@
+{.section example}
+  {foo|htmlattr|json}
+
+  {.if foo || bar}{.or}output this{.end}
+  
+  {.equal?|foo|"bar"}
+    branch 1
+  {.or equal?|baz|"bar"}
+    branch 2
+  {.or}
+    branch 3
+  {.end}
+
+  {.repeated section baz}
+  	{@}
+  	{.alternates with}
+  	---
+  {.end}
+  
+  {.var @myvar foo}
+  
+  {.meta-left}.var @myvar foo{.meta-right}
+
+  whitespace:  {.space}{.tab}.newline}
+
+  {.inject @object baz.json}
+
+  {.macro mmymacro}
+  	this is a macro
+  	{.macro another}another macro{.end}
+  {.end}
+
+{.end}

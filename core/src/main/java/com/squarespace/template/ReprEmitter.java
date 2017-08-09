@@ -110,6 +110,9 @@ public class ReprEmitter {
     buf.append("{.if ");
     emitIfExpression(inst, buf);
     buf.append('}');
+    if (recurse) {
+      emitBlock(inst, buf, recurse);
+    }
   }
 
   public static void emitIfExpression(IfInst inst, StringBuilder buf) {
@@ -135,6 +138,9 @@ public class ReprEmitter {
     buf.append(predicate.identifier());
     emit(inst.getArguments(), buf);
     buf.append('}');
+    if (recurse) {
+      emitBlock(inst, buf, recurse);
+    }
   }
 
   public static void emit(InjectInst inst, StringBuilder buf, boolean recurse) {
@@ -164,7 +170,7 @@ public class ReprEmitter {
     buf.append(inst.name());
     buf.append('}');
     if (recurse) {
-      emit(inst.root(), buf, true);
+      emitBlock(inst.root(), buf, true);
     }
   }
 
