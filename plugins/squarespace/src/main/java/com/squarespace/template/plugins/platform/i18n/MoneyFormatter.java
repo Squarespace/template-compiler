@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.cldr.numbers.CurrencyFormatOptions;
 import com.squarespace.cldr.numbers.CurrencySymbolWidth;
 import com.squarespace.cldr.numbers.NumberFormatter;
@@ -91,7 +90,7 @@ public class MoneyFormatter extends BaseFormatter {
     String currencyCode = currency.asText();
 
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
-    CLDRLocale locale = ctx.cldrLocale();
+    CLDR.Locale locale = ctx.cldrLocale();
     NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
     StringBuilder buf = new StringBuilder();
     fmt.formatCurrency(decimalValue, currencyCode, buf, opts);

@@ -21,7 +21,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.cldr.dates.CalendarFormatter;
 import com.squarespace.cldr.dates.DateTimeIntervalSkeleton;
 import com.squarespace.template.Arguments;
@@ -72,7 +71,7 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
       skeleton = DateTimeIntervalSkeleton.fromString(skel);
     }
 
-    CLDRLocale locale = ctx.cldrLocale();
+    CLDR.Locale locale = ctx.cldrLocale();
     CalendarFormatter formatter = CLDR.get().getCalendarFormatter(locale);
     StringBuilder buffer = new StringBuilder();
     formatter.format(start, end, skeleton, buffer);

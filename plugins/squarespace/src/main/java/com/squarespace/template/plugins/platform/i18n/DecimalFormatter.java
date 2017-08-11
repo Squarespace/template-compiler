@@ -18,7 +18,6 @@ package com.squarespace.template.plugins.platform.i18n;
 import java.math.BigDecimal;
 
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.cldr.numbers.DecimalFormatOptions;
 import com.squarespace.cldr.numbers.DecimalFormatStyle;
 import com.squarespace.cldr.numbers.NumberFormatMode;
@@ -81,7 +80,7 @@ public class DecimalFormatter extends BaseFormatter {
     }
 
     DecimalFormatOptions opts = (DecimalFormatOptions) args.getOpaque();
-    CLDRLocale locale = ctx.cldrLocale();
+    CLDR.Locale locale = ctx.cldrLocale();
     NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
     StringBuilder buf = new StringBuilder();
     fmt.formatDecimal(number, buf, opts);

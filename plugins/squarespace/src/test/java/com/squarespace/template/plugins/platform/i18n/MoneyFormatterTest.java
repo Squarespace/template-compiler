@@ -15,7 +15,7 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldr.CLDR.EN_US;
+import static com.squarespace.cldr.CLDR.Locale.en_US;
 
 import java.math.BigDecimal;
 
@@ -24,7 +24,6 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
@@ -57,66 +56,66 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testBasics() {
     String args = " style:accounting group";
-    run(EN_US, usd("23.98"), args, "$23.98");
-    run(EN_US, usd("-1551.75"), args, "($1,551.75)");
+    run(en_US, usd("23.98"), args, "$23.98");
+    run(en_US, usd("-1551.75"), args, "($1,551.75)");
 
     args = " style:name mode:significant-maxfrac minSig:1";
-    run(EN_US, usd("1"), args, "1 US dollar");
-    run(EN_US, usd("-1551.75"), args, "-1,551.75 US dollars");
-    run(EN_US, usd(big("-1551.75")), args, "-1,551.75 US dollars");
+    run(en_US, usd("1"), args, "1 US dollar");
+    run(en_US, usd("-1551.75"), args, "-1,551.75 US dollars");
+    run(en_US, usd(big("-1551.75")), args, "-1,551.75 US dollars");
 
-    run(EN_US, eur("1"), args, "1 euro");
-    run(EN_US, eur("-1551.75"), args, "-1,551.75 euros");
-    run(EN_US, eur(big("-1551.75")), args, "-1,551.75 euros");
+    run(en_US, eur("1"), args, "1 euro");
+    run(en_US, eur("-1551.75"), args, "-1,551.75 euros");
+    run(en_US, eur(big("-1551.75")), args, "-1,551.75 euros");
   }
 
   @Test
   public void testLong() {
     String args = " style:name mode:significant group minSig:1";
-    run(EN_US, usd("0.00"), args, "0 US dollars");
-    run(EN_US, usd("1.00"), args, "1 US dollar");
-    run(EN_US, usd("3.59"), args, "3.59 US dollars");
-    run(EN_US, usd("1200"), args, "1,200 US dollars");
-    run(EN_US, usd("-15789.12"), args, "-15,789.12 US dollars");
-    run(EN_US, usd("99999.00"), args, "99,999 US dollars");
-    run(EN_US, usd("-100200300.40"), args, "-100,200,300.4 US dollars");
-    run(EN_US, usd("10000000001.00"), args, "10,000,000,001 US dollars");
+    run(en_US, usd("0.00"), args, "0 US dollars");
+    run(en_US, usd("1.00"), args, "1 US dollar");
+    run(en_US, usd("3.59"), args, "3.59 US dollars");
+    run(en_US, usd("1200"), args, "1,200 US dollars");
+    run(en_US, usd("-15789.12"), args, "-15,789.12 US dollars");
+    run(en_US, usd("99999.00"), args, "99,999 US dollars");
+    run(en_US, usd("-100200300.40"), args, "-100,200,300.4 US dollars");
+    run(en_US, usd("10000000001.00"), args, "10,000,000,001 US dollars");
   }
 
   @Test
   public void testSignificantDigits() {
     String args = " style:short";
-    run(EN_US, usd("-1551.75"), args, "-$2K");
+    run(en_US, usd("-1551.75"), args, "-$2K");
 
     args = " style:short mode:significant";
-    run(EN_US, usd("-1551.75"), args, "-$1.6K");
+    run(en_US, usd("-1551.75"), args, "-$1.6K");
 
     args = " style:short mode:significant maxSig:3";
-    run(EN_US, usd("-1551.75"), args, "-$1.55K");
+    run(en_US, usd("-1551.75"), args, "-$1.55K");
 
     args = " style:short mode:significant maxSig:4";
-    run(EN_US, usd("-1551.75"), args, "-$1.552K");
+    run(en_US, usd("-1551.75"), args, "-$1.552K");
   }
 
   @Test
   public void testFractionDigits() {
     String args = " style:short mode:fractions minFrac:2";
-    run(EN_US, usd("-1551.75"), args, "-$1.55K");
-    run(EN_US, eur("-1551.75"), args, "-€1.55K");
+    run(en_US, usd("-1551.75"), args, "-$1.55K");
+    run(en_US, eur("-1551.75"), args, "-€1.55K");
 
     args = " style:short mode:fractions minFrac:3";
-    run(EN_US, usd("-1551.75"), args, "-$1.552K");
-    run(EN_US, eur("-1551.75"), args, "-€1.552K");
+    run(en_US, usd("-1551.75"), args, "-$1.552K");
+    run(en_US, eur("-1551.75"), args, "-€1.552K");
   }
 
   @Test
   public void testIntegerDigits() {
     String args = " minInt:4";
-    run(EN_US, usd("1.57"), args, "$0,001.57");
-    run(EN_US, usd("1.57"), args, "$0,001.57");
+    run(en_US, usd("1.57"), args, "$0,001.57");
+    run(en_US, usd("1.57"), args, "$0,001.57");
 
     args = " style:code minInt:4";
-    run(EN_US, usd("1.57"), args, "0,001.57 USD");
+    run(en_US, usd("1.57"), args, "0,001.57 USD");
   }
 
   private static BigDecimal big(String n) {
@@ -157,7 +156,7 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     return obj;
   }
 
-  private void run(CLDRLocale locale, String json, String args, String expected) {
+  private void run(CLDR.Locale locale, String json, String args, String expected) {
     try {
       String actual = format(locale, mk.args(args), json);
       Assert.assertEquals(actual, expected);
@@ -166,7 +165,7 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     }
   }
 
-  private static String format(CLDRLocale locale,  Arguments args, String json) throws CodeException {
+  private static String format(CLDR.Locale locale,  Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
     ctx.cldrLocale(locale);
     MONEY.validateArgs(args);

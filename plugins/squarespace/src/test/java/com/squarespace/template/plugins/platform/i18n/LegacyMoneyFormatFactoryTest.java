@@ -24,7 +24,6 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
@@ -41,13 +40,13 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
   private static final Formatter LEGACY_MONEY = new LegacyMoneyFormatter();
   private final CodeMaker mk = maker();
 
-  private static final Map<String, CLDRLocale> LOCALE_MAP = new HashMap<String, CLDRLocale>() {{
-    put("de-DE", CLDR.DE_DE);
-    put("en-UK", CLDR.EN_GB);
-    put("en-US", CLDR.EN_US);
-    put("es-US", CLDR.ES_US);
-    put("fr-FR", CLDR.FR_FR);
-    put("sv-SE", CLDR.SV_SE);
+  private static final Map<String, CLDR.Locale> LOCALE_MAP = new HashMap<String, CLDR.Locale>() {{
+    put("de-DE", CLDR.Locale.de_DE);
+    put("en-UK", CLDR.Locale.en_GB);
+    put("en-US", CLDR.Locale.en_US);
+    put("es-US", CLDR.Locale.es_US);
+    put("fr-FR", CLDR.Locale.fr_FR);
+    put("sv-SE", CLDR.Locale.sv_SE);
   }};
 
   private static final String[] CURRENCIES = new String[] {
@@ -115,7 +114,7 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
     return variables.first().node().asText();
   }
 
-  private String cldr(CLDRLocale locale, String currency, String number, boolean narrow) throws CodeException {
+  private String cldr(CLDR.Locale locale, String currency, String number, boolean narrow) throws CodeException {
     Arguments args = mk.args(narrow ? " symbol:narrow" : " ");
     CLDR_MONEY.validateArgs(args);
     Context ctx = new Context(moneyJson(number, currency));

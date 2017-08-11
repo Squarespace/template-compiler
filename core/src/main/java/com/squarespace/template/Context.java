@@ -33,7 +33,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 
 
 /**
@@ -47,7 +46,7 @@ import com.squarespace.cldr.CLDRLocale;
  */
 public class Context {
 
-  private static final CLDRLocale DEFAULT_LOCALE = CLDR.EN_US;
+  private static final CLDR.Locale DEFAULT_LOCALE = CLDR.Locale.en_US;
 
   private static final JsonNode DEFAULT_UNDEFINED = MissingNode.getInstance();
 
@@ -57,7 +56,7 @@ public class Context {
 
   private Locale javaLocale;
 
-  private CLDRLocale cldrLocale = DEFAULT_LOCALE;
+  private CLDR.Locale cldrLocale = DEFAULT_LOCALE;
 
   private Compiler compiler;
 
@@ -119,11 +118,11 @@ public class Context {
     return javaLocale;
   }
 
-  public void cldrLocale(CLDRLocale locale) {
+  public void cldrLocale(CLDR.Locale locale) {
     this.cldrLocale = locale;
   }
 
-  public CLDRLocale cldrLocale() {
+  public CLDR.Locale cldrLocale() {
     return cldrLocale;
   }
 

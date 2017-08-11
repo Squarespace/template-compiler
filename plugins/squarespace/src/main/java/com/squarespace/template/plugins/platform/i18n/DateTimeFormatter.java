@@ -21,7 +21,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.CLDRLocale;
 import com.squarespace.cldr.dates.CalendarFormat;
 import com.squarespace.cldr.dates.CalendarFormatOptions;
 import com.squarespace.cldr.dates.CalendarFormatter;
@@ -101,7 +100,7 @@ public class DateTimeFormatter extends BaseFormatter {
 
     String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
     ZonedDateTime datetime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), ZoneId.of(tzName));
-    CLDRLocale locale = ctx.cldrLocale();
+    CLDR.Locale locale = ctx.cldrLocale();
     CalendarFormatter formatter = CLDR.get().getCalendarFormatter(locale);
     CalendarFormatOptions options = (CalendarFormatOptions) args.getOpaque();
     StringBuilder buffer = new StringBuilder();

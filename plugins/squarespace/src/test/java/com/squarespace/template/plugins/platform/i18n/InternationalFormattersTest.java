@@ -16,8 +16,8 @@
 
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldr.CLDR.EN_US;
-import static com.squarespace.cldr.CLDR.FR;
+import static com.squarespace.cldr.CLDR.Locale.en_US;
+import static com.squarespace.cldr.CLDR.Locale.fr;
 import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import com.squarespace.cldr.CLDRLocale;
+import com.squarespace.cldr.CLDR;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.CodeException;
@@ -76,38 +76,38 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
     // ENGLISH
 
-    assertEquals(format(EN_US, DATETIME, mk.args(" date:short"), json), "11/2/17");
-    assertEquals(format(EN_US, DATETIME, mk.args(" time:medium"), json), "2:26:57 PM");
-    assertEquals(format(EN_US, DATETIME, mk.args(" date:full time:short"), json),
+    assertEquals(format(en_US, DATETIME, mk.args(" date:short"), json), "11/2/17");
+    assertEquals(format(en_US, DATETIME, mk.args(" time:medium"), json), "2:26:57 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" date:full time:short"), json),
         "Thursday, November 2, 2017 at 2:26 PM");
 
-    assertEquals(format(EN_US, DATETIME, mk.args(" time:hm date:short"), json), "11/2/17, 2:26 PM");
-    assertEquals(format(EN_US, DATETIME, mk.args(" date:yMMMd time:hm"), json), "Nov 2, 2017, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" time:hm date:short"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" date:yMMMd time:hm"), json), "Nov 2, 2017, 2:26 PM");
 
-    assertEquals(format(EN_US, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
+    assertEquals(format(en_US, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
         "Nov 2, 2017, 2:26:57 PM");
-    assertEquals(format(EN_US, DATETIME, mk.args(" time:medium wrap:full date:yMMMd"), json),
+    assertEquals(format(en_US, DATETIME, mk.args(" time:medium wrap:full date:yMMMd"), json),
         "Nov 2, 2017 at 2:26:57 PM");
 
     // Bare skeletons
 
-    assertEquals(format(EN_US, DATETIME, mk.args(" date:short hm"), json), "11/2/17, 2:26 PM");
-    assertEquals(format(EN_US, DATETIME, mk.args(" yMMMd hm"), json), "Nov 2, 2017, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" date:short hm"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" yMMMd hm"), json), "Nov 2, 2017, 2:26 PM");
 
 
     // FRENCH
 
-    assertEquals(format(FR, DATETIME, mk.args(" date:short"), json), "02/11/2017");
-    assertEquals(format(FR, DATETIME, mk.args(" time:medium"), json), "14:26:57");
-    assertEquals(format(FR, DATETIME, mk.args(" date:full time:short"), json),
+    assertEquals(format(fr, DATETIME, mk.args(" date:short"), json), "02/11/2017");
+    assertEquals(format(fr, DATETIME, mk.args(" time:medium"), json), "14:26:57");
+    assertEquals(format(fr, DATETIME, mk.args(" date:full time:short"), json),
         "jeudi 2 novembre 2017 à 14:26");
 
-    assertEquals(format(FR, DATETIME, mk.args(" time:hm date:short"), json), "02/11/2017 2:26 PM");
-    assertEquals(format(FR, DATETIME, mk.args(" date:yMMMd time:hm"), json), "2 nov. 2017 2:26 PM");
+    assertEquals(format(fr, DATETIME, mk.args(" time:hm date:short"), json), "02/11/2017 2:26 PM");
+    assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:hm"), json), "2 nov. 2017 2:26 PM");
 
-    assertEquals(format(FR, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
+    assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
         "2 nov. 2017 14:26:57");
-    assertEquals(format(FR, DATETIME, mk.args(" time:medium wrap:full date:yMMMd"), json),
+    assertEquals(format(fr, DATETIME, mk.args(" time:medium wrap:full date:yMMMd"), json),
         "2 nov. 2017 à 14:26:57");
   }
 
@@ -116,15 +116,15 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     String json = "1509647217000";
     CodeMaker mk = maker();
 
-    assertEquals(format(EN_US, DATETIMEFIELD, mk.args(" dd"), json), "02");
-    assertEquals(format(EN_US, DATETIMEFIELD, mk.args(" MMMM"), json), "November");
-    assertEquals(format(EN_US, DATETIMEFIELD, mk.args(" EEE"), json), "Thu");
-    assertEquals(format(EN_US, DATETIMEFIELD, mk.args(" EEEE"), json), "Thursday");
+    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" dd"), json), "02");
+    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" MMMM"), json), "November");
+    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" EEE"), json), "Thu");
+    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" EEEE"), json), "Thursday");
 
-    assertEquals(format(FR, DATETIMEFIELD, mk.args(" dd"), json), "02");
-    assertEquals(format(FR, DATETIMEFIELD, mk.args(" MMMM"), json), "novembre");
-    assertEquals(format(FR, DATETIMEFIELD, mk.args(" EEE"), json), "jeu.");
-    assertEquals(format(FR, DATETIMEFIELD, mk.args(" EEEE"), json), "jeudi");
+    assertEquals(format(fr, DATETIMEFIELD, mk.args(" dd"), json), "02");
+    assertEquals(format(fr, DATETIMEFIELD, mk.args(" MMMM"), json), "novembre");
+    assertEquals(format(fr, DATETIMEFIELD, mk.args(" EEE"), json), "jeu.");
+    assertEquals(format(fr, DATETIMEFIELD, mk.args(" EEEE"), json), "jeudi");
   }
 
   @Test
@@ -159,7 +159,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     MONEY_FORMATTER.validateArgs(new Arguments(new StringView("en-US bad-arg")));
   }
 
-  private String format(CLDRLocale locale, Formatter impl, Arguments args, String json) throws CodeException {
+  private String format(CLDR.Locale locale, Formatter impl, Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
     ctx.cldrLocale(locale);
     impl.validateArgs(args);
