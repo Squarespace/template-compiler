@@ -8,6 +8,26 @@
   {.or}
     nope, not equal
   {.end}
+  
+  {#
+  	this is a long comment
+  	that spans multiple
+  	lines
+  #}
+  
+  {.repeated section items}
+  	{.var @title title}
+  	{@title|json}
+  	{.if new || updated}
+  		post is newer
+  	{.or}
+  		post is older
+  	{.end}
+  {.alternates with}---
+  {.or}
+  	otherwise
+  {.end}
+  
 {.end}
 
 :EXPECTED
@@ -20,9 +40,30 @@ SECTION {1,1} example
   TEXT {2,22} (len=4) "\n\n  "
   PREDICATE {4,3} equal? delim='|' parsed=[foo, "bar"]
     TEXT {4,22} (len=26) "\n    yes they are equal\n  "
-  OR_PREDICATE {6,3} 
+  OR_PREDICATE {6,3}
     TEXT {6,8} (len=23) "\n    nope, not equal\n  "
-  END {8,3} 
-  TEXT {8,9} (len=1) "\n"
-END {9,1} 
-
+  END {8,3}
+  TEXT {8,9} (len=6) "\n  \n  "
+  COMMENT {10,3} (len=62) "\n  \tthis is a long comment\n  \tthat spans ..."
+  TEXT {14,5} (len=6) "\n  \n  "
+  REPEATED {16,3} items
+    TEXT {16,28} (len=4) "\n  \t"
+    BINDVAR {17,4} @title = title
+    TEXT {17,23} (len=4) "\n  \t"
+    VARIABLE {18,4} @title
+      | json
+    TEXT {18,17} (len=4) "\n  \t"
+    IF {19,4} new || updated
+      TEXT {19,24} (len=22) "\n  \t\tpost is newer\n  \t"
+    OR_PREDICATE {21,4}
+      TEXT {21,9} (len=22) "\n  \t\tpost is older\n  \t"
+    END {23,4}
+    TEXT {23,10} (len=3) "\n  "
+    ALTERNATES_WITH {24,3}
+      TEXT {24,21} (len=6) "---\n  "
+    END {0,0}
+  OR_PREDICATE {25,3}
+    TEXT {25,8} (len=16) "\n  \totherwise\n  "
+  END {27,3}
+  TEXT {27,9} (len=4) "\n  \n"
+END {29,1}

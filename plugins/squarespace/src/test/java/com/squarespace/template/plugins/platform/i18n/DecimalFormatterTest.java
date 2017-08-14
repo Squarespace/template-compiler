@@ -65,6 +65,21 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testRounding() {
+    String args = " style:decimal round:truncate minFrac:2";
+    run(en_US, "1.2345", args, "1.23");
+    run(en_US, "1.5999", args, "1.59");
+
+    args = " style:decimal round:floor minFrac:2";
+    run(en_US, "1.2345", args, "1.23");
+    run(en_US, "1.5999", args, "1.59");
+
+    args = " style:decimal round:half-even minFrac:2";
+    run(en_US, "1.2345", args, "1.23");
+    run(en_US, "1.5999", args, "1.60");
+  }
+
+  @Test
   public void testStandard() {
     String args = " style:decimal grouping";
     run(en_US, "0", args, "0");
@@ -84,6 +99,18 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(es, "99999", args, "99.999");
     run(es, "-100200300.40", args, "-100.200.300,4");
     run(es, "10000000001", args, "10.000.000.001");
+
+    args = " style:decimal no-grouping";
+    run(en_US, "-15789.12", args, "-15789.12");
+    run(en_US, "99999", args, "99999");
+    run(en_US, "-100200300.40", args, "-100200300.4");
+    run(en_US, "10000000001", args, "10000000001");
+
+    args = " style:decimal minFrac:4";
+    run(en_US, "-15789.12", args, "-15789.1200");
+
+    args = " style:decimal minInt:5 no-group";
+    run(en_US, "123.45", args, "00123.45");
   }
 
   @Test
@@ -158,6 +185,10 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(fr, "-100200300.40", args, "-100,2 millions");
     run(fr, "10000000001", args, "10,0 milliards");
 
+    args = " style:long mode:significant-maxfrac minSig:1 maxFrac:2";
+    run(en_US, "3.59", args, "3.59");
+    run(en_US, "3.519", args, "3.52");
+    run(en_US, "3.5999", args, "3.6");
   }
 
   private void run(CLDR.Locale locale, String number, String args, String expected) {

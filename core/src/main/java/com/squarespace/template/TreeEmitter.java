@@ -89,21 +89,23 @@ public class TreeEmitter {
 
     indent(depth, buf);
     buf.append(type.toString());
-    buf.append(" {").append(inst.getLineNumber()).append(',').append(inst.getCharOffset()).append("} ");
+    buf.append(" {").append(inst.getLineNumber()).append(',').append(inst.getCharOffset()).append("}");
     switch (type) {
 
       case BINDVAR:
         BindVarInst bindvar = (BindVarInst)inst;
-        buf.append(bindvar.getName()).append(" = ");
+        buf.append(' ').append(bindvar.getName()).append(" = ");
         emitVariables(bindvar.getVariables(), buf);
         break;
 
       case COMMENT:
         CommentInst comment = (CommentInst)inst;
+        buf.append(' ');
         emitEscapedString(comment.getView(), buf);
         break;
 
       case IF:
+        buf.append(' ');
         ReprEmitter.emitIfExpression((IfInst)inst, buf);
         break;
 
@@ -112,7 +114,7 @@ public class TreeEmitter {
         PredicateInst predicateInst = (PredicateInst)inst;
         Predicate predicate = predicateInst.getPredicate();
         if (predicate != null) {
-          buf.append(predicate);
+          buf.append(' ').append(predicate);
           Arguments args = predicateInst.getArguments();
           if (!args.isEmpty()) {
             buf.append(' ');
@@ -123,16 +125,19 @@ public class TreeEmitter {
 
       case REPEATED:
         RepeatedInst repeated = (RepeatedInst)inst;
+        buf.append(' ');
         emitNames(repeated.getVariable(), buf);
         break;
 
       case SECTION:
         SectionInst section = (SectionInst)inst;
+        buf.append(' ');
         emitNames(section.getVariable(), buf);
         break;
 
       case TEXT:
         TextInst text = (TextInst)inst;
+        buf.append(' ');
         emitEscapedString(text.getView(), buf);
         break;
 
@@ -140,6 +145,7 @@ public class TreeEmitter {
       {
         VariableInst varInst = (VariableInst)inst;
         Variables variables = varInst.getVariables();
+        buf.append(' ');
         ReprEmitter.emitVariables(variables, buf);
         for (FormatterCall formatterCall : varInst.getFormatters()) {
           buf.append('\n');

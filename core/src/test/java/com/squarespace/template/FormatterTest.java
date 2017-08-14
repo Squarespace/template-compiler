@@ -42,6 +42,12 @@ public class FormatterTest extends UnitTestBase {
     assertErrors("{@|unstable}", "1", ExecuteErrorType.UNEXPECTED_ERROR);
   }
 
+  @Test
+  public void testMultipleVariableFormatters() throws CodeException {
+    String json = "{\"a\": \"123\", \"b\": \"456\", \"c\": \"789\"}";
+    assertContext(execute("{a $ b $ c|multiply-vars}", json), "44253432");
+  }
+
 //  @Test
 //  public void testReturnsMissing() throws CodeException {
 //    // If a formatter returns a "missing node" it will short-circuit

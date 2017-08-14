@@ -20,10 +20,11 @@ import static com.squarespace.template.BuildProperties.commit;
 import static com.squarespace.template.BuildProperties.date;
 import static com.squarespace.template.BuildProperties.version;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.core.AnyOf.anyOf;
+import static org.hamcrest.core.IsEqual.equalTo;
 
+import org.hamcrest.CustomMatcher;
+import org.hamcrest.Matcher;
 import org.testng.annotations.Test;
 
 
@@ -33,9 +34,17 @@ public class BuildPropertiesTest {
 
   @Test
   public void testProperties() {
-    assertThat(commit(), anyOf(equalTo(UNDEFINED), matchesPattern("[0-9a-fA-F]+")));
-    assertThat(date(), anyOf(equalTo(UNDEFINED), matchesPattern("[\\w:\\s]+")));
-    assertThat(version(), anyOf(equalTo(UNDEFINED), matchesPattern("\\d+\\.\\d+\\.\\d+([-\\w]+)?(-SNAPSHOT)?")));
+    assertThat(commit(), anyOf(equalTo(UNDEFINED), patternMatcher("[0-9a-fA-F]+")));
+    assertThat(date(), anyOf(equalTo(UNDEFINED), patternMatcher("[\\w:\\s]+")));
+    assertThat(version(), anyOf(equalTo(UNDEFINED), patternMatcher("\\d+\\.\\d+\\.\\d+([-\\w]+)?(-SNAPSHOT)?")));
   }
 
+  private Matcher<String> patternMatcher(String regex) {
+    return new CustomMatcher<String>("matches pattern") {
+      @Override
+      public boolean matches(Object item) {
+        return (item instanceof String) && ((String)item).matches(regex);
+      }
+    };
+  }
 }

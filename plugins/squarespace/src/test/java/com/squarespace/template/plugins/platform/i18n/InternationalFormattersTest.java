@@ -23,6 +23,7 @@ import static org.testng.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.squarespace.cldr.CLDR;
@@ -41,7 +42,6 @@ import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.Da
 
 
 public class InternationalFormattersTest extends PlatformUnitTestBase {
-
 
   private static final String[] TESTED_CURRENCIES = {
       "AUD",
@@ -149,14 +149,13 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     );
   }
 
-  @Test(expectedExceptions = ArgumentsException.class)
-  public void testInvalidLocale() throws Exception {
-    MONEY_FORMATTER.validateArgs(new Arguments(new StringView("qq-QQ")));
-  }
-
-  @Test(expectedExceptions = ArgumentsException.class)
   public void testExtraArgument() throws Exception {
-    MONEY_FORMATTER.validateArgs(new Arguments(new StringView("en-US bad-arg")));
+    try {
+      MONEY_FORMATTER.validateArgs(new Arguments(new StringView(" en-US bad-arg")));
+      Assert.fail("expected ArgumentsException, too many arguments passed");
+    } catch (ArgumentsException e) {
+      // fall through
+    }
   }
 
   private String format(CLDR.Locale locale, Formatter impl, Arguments args, String json) throws CodeException {

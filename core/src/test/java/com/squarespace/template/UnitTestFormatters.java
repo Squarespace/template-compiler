@@ -18,6 +18,8 @@ package com.squarespace.template;
 
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 
+import java.math.BigDecimal;
+
 
 
 /**
@@ -31,6 +33,7 @@ public class UnitTestFormatters implements FormatterRegistry {
     table.add(new DummyTemplateFormatter());
     table.add(new ExecuteErrorFormatter());
     table.add(new InvalidArgsFormatter());
+    table.add(new MultiplyVarsFormatter());
     table.add(new NpeFormatter());
     table.add(new RequiredArgsFormatter());
     table.add(new ReturnsMissingFormatter());
@@ -93,6 +96,24 @@ public class UnitTestFormatters implements FormatterRegistry {
       throw new ArgumentsException("Invalid arguments");
     }
 
+  }
+
+  public static class MultiplyVarsFormatter extends BaseFormatter {
+
+    public MultiplyVarsFormatter() {
+      super("multiply-vars", false);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      int count = variables.count();
+      BigDecimal n = new BigDecimal("1");
+      for (int i = 0; i < count; i++) {
+        BigDecimal var = GeneralUtils.nodeToBigDecimal(variables.get(i).node());
+        n = n.multiply(var);
+      }
+      variables.first().set(n.longValue());
+    }
   }
 
   public static class NpeFormatter extends BaseFormatter {

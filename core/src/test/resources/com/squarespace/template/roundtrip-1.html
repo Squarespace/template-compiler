@@ -1,6 +1,13 @@
 {.section example}
   {foo|htmlattr|json}
 
+	{# plain single line comment #}
+	
+	{##
+		multi line
+		comment
+	##}
+
   {.if foo || bar}{.or}output this{.end}
   
   {.equal?|foo|"bar"}

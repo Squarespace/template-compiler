@@ -221,7 +221,6 @@ public class CoreFormatters implements FormatterRegistry {
       long instant = var.node().asLong();
       StringBuilder buf = new StringBuilder();
       formatDate(ctx.javaLocale(), (String)args.getOpaque(), instant, tzName, buf);
-
       var.set(buf);
     }
 
@@ -262,7 +261,6 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-
       String value = var.node().asText();
       var.set(EncodeUtils.encodeURI(value));
     }

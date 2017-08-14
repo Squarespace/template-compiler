@@ -25,9 +25,9 @@ project.ext {
   ccVersion = '1.0.6'
   cldrVersion = '0.0.15'
   diffutilsVersion = '1.3.0'
-  hamcrestVersion = '2.0.0.0'
+  hamcrestVersion = '1.3'
   jacksonVersion = '2.3.3'
-  jsonunitVersion = '1.6.1'
+  jsonunitVersion = '1.25.0'
   snifferVersion = '1.15'
   testngVersion = '6.9.4'
 

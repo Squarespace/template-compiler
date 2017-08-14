@@ -29,6 +29,8 @@ import static com.squarespace.template.SyntaxErrorType.IF_EMPTY;
 import static com.squarespace.template.SyntaxErrorType.IF_EXPECTED_VAROP;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_OPERATORS;
 import static com.squarespace.template.SyntaxErrorType.IF_TOO_MANY_VARS;
+import static com.squarespace.template.SyntaxErrorType.INJECT_EXPECTS_NAME;
+import static com.squarespace.template.SyntaxErrorType.INJECT_EXPECTS_PATH;
 import static com.squarespace.template.SyntaxErrorType.INVALID_INSTRUCTION;
 import static com.squarespace.template.SyntaxErrorType.MACRO_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.MISSING_SECTION_KEYWORD;
@@ -176,6 +178,8 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     Arguments args2 = mk.args("/b/c");
     assertResult("{a|pluralize/b/c}", mk.var("a", mk.fmt(PLURALIZE, args2)), mk.eof());
+
+    assertResult("{a $ b $ c|pluralize/b/c}", mk.var(mk.vars("a", "b", "c"), mk.fmt(PLURALIZE, args2)), mk.eof());
   }
 
   @Test
@@ -223,6 +227,14 @@ public class TokenizerCoreTest extends UnitTestBase {
     CodeMaker mk = maker();
     assertResult("{.inject @foo bar.json}", mk.inject("@foo", "bar.json"), mk.eof());
     assertResult("{.inject @foo foo/bar/baz.json}", mk.inject("@foo", "foo/bar/baz.json"), mk.eof());
+    assertResult("{.inject @foo foo/bar/baz.json arg1 arg2}",
+        mk.inject("@foo", "foo/bar/baz.json", mk.args(" arg1 arg2")), mk.eof());
+
+    assertFailure("{.inject}", WHITESPACE_EXPECTED);
+    assertFailure("{.inject }", INJECT_EXPECTS_NAME);
+    assertFailure("{.inject @}", INJECT_EXPECTS_NAME);
+    assertFailure("{.inject @foo}", WHITESPACE_EXPECTED);
+    assertFailure("{.inject @foo }", INJECT_EXPECTS_PATH);
   }
 
   @Test
@@ -317,6 +329,9 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{@}", mk.var("@"), mk.eof());
     assertResult("{@index}", mk.var("@index"), mk.eof());
     assertResult("{foo.bar}", mk.var("foo.bar"), mk.eof());
+
+    assertResult("{foo $ bar}", mk.var(mk.vars("foo", "bar")), mk.eof());
+    assertResult("{a $ b $ c $ d}", mk.var(mk.vars("a", "b", "c", "d")), mk.eof());
   }
 
   private void assertFailure(String raw, SyntaxErrorType type) {

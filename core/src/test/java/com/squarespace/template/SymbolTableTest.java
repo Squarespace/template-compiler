@@ -41,7 +41,7 @@ public class SymbolTableTest {
     table.register(new UnitTestFormatters());
     String[] expected = new String[] {
         "dummy", "dummy-template", "execute-error", "invalid-args",
-        "npe", "required-args", "returns-missing", "unstable"
+        "multiply-vars", "npe", "required-args", "returns-missing", "unstable"
     };
     String[] symbols = table.getSymbols();
     Arrays.sort(symbols);

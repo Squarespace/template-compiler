@@ -318,6 +318,8 @@ public class InstructionEqualityTest extends UnitTestBase {
     VariableInst v3 = mk.var("a.b.c", mk.fmt(SLUGIFY, args1));
     assertEquals(v3, mk.var("a.b.c", mk.fmt(SLUGIFY, args1)));
 
+    VariableInst v4 = mk.var(mk.vars("a", "b", "c"));
+    assertEquals(v4, mk.var(mk.vars("a", "b", "c")));
   }
 
   /**

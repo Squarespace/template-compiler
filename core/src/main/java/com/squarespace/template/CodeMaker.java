@@ -269,10 +269,6 @@ public class CodeMaker {
     return var(name, Collections.<FormatterCall>emptyList());
   }
 
-  public VariableInst var(Variables variables) {
-    return new VariableInst(variables, Collections.<FormatterCall>emptyList());
-  }
-
   public VariableInst var(String name, Formatter... formatters) {
     return new VariableInst(name, formatters(formatters));
   }
@@ -283,6 +279,26 @@ public class CodeMaker {
 
   public VariableInst var(String name, List<FormatterCall> formatters) {
     return new VariableInst(name, formatters);
+  }
+
+  public VariableInst var(Variables variables) {
+    return new VariableInst(variables, Collections.<FormatterCall>emptyList());
+  }
+
+  public VariableInst var(Variables variables, Formatter... formatters) {
+    return new VariableInst(variables, formatters(formatters));
+  }
+
+  public VariableInst var(Variables name, FormatterCall... formatters) {
+    return new VariableInst(name, Arrays.asList(formatters));
+  }
+
+  public Variables vars(String name, String... names) {
+    Variables vars = new Variables(name);
+    for (String n : names) {
+      vars.add(n);
+    }
+    return vars;
   }
 
   public StringView view(String str) {

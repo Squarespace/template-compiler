@@ -16,8 +16,13 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.GeneralUtils.isJsonStart;
+import static com.squarespace.template.GeneralUtils.toLong;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,6 +34,35 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 @Test(groups = { "unit" })
 public class GeneralUtilsTest {
+
+  @Test
+  public void testLoadResourceTest() {
+    try {
+      GeneralUtils.loadResource(getClass(), "this/resource/is/missing.txt");
+      Assert.fail("GeneralUtils.loadResource() should throw on missing resource");
+    } catch (CodeException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void testToLong() {
+    assertEquals(toLong("12345", 0, 5), 12345);
+    assertEquals(toLong("12345xyz", 0, 8), 12345);
+    assertEquals(toLong("xyz", 0, 3), 0);
+    assertEquals(toLong("   ", 0, 3), 0);
+  }
+
+  @Test
+  public void testIsJsonStart() {
+    assertTrue(isJsonStart("123"));
+    assertTrue(isJsonStart("  123"));
+    assertTrue(isJsonStart("  {\"key\": \"val\"}"));
+    assertTrue(isJsonStart("  [1, 2, 3]"));
+    assertFalse(isJsonStart(":123"));
+    assertFalse(isJsonStart("'foo'"));
+    assertFalse(isJsonStart("   "));
+  }
 
   @Test
   public void testGetFirstMatchingNode() {
