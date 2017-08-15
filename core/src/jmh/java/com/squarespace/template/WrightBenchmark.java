@@ -129,10 +129,6 @@ public class WrightBenchmark {
     CompiledTemplate template = state.compileWright();
     System.out.println(template.errors());
     System.out.println(ReprEmitter.get(template.code(), true));
-//    System.out.println(TreeEmitter.get(template.code()));
-
-//    Context ctx = state.executeWright();
-//    System.out.println(ctx.buffer());
   }
 
 }
