@@ -1,0 +1,18 @@
+:PROPERTIES
+locale: en-US
+
+:JSON
+{
+	"giga": "12345678999.12",
+	"mega": "12345678.99"
+}
+
+:TEMPLATE
+{giga|unit in:hertz}
+{mega|unit in:hertz}
+{mega|unit in:hertz out:gigahertz maxfrac:6}
+
+:OUTPUT
+12.3GHz
+12.3MHz
+0.012346GHz

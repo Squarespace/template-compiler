@@ -86,14 +86,20 @@ public class MoneyFormatter extends BaseFormatter {
       var.setMissing();
       return;
     }
+
+    CLDR.Currency code = CLDR.Currency.valueOf(currency.asText());
+    if (code == null) {
+      var.setMissing();
+      return;
+    }
+
     BigDecimal decimalValue = GeneralUtils.nodeToBigDecimal(decimal);
-    String currencyCode = currency.asText();
 
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
     CLDR.Locale locale = ctx.cldrLocale();
     NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
     StringBuilder buf = new StringBuilder();
-    fmt.formatCurrency(decimalValue, currencyCode, buf, opts);
+    fmt.formatCurrency(decimalValue, code, buf, opts);
     var.set(buf);
   }
 

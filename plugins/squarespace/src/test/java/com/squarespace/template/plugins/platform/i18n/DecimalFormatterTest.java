@@ -161,16 +161,28 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(en_US, "1", args, "1");
     run(en_US, "3.59", args, "3.6");
     run(en_US, "1200", args, "1.2 thousand");
+    run(en_US, "2000", args, "2 thousand");
     run(en_US, "-15789.12", args, "-15.8 thousand");
     run(en_US, "99999", args, "100 thousand");
     run(en_US, "-100200300.40", args, "-100.2 million");
     run(en_US, "10000000001", args, "10 billion");
+
+    run(fr, "0", args, "0");
+    run(fr, "1", args, "1");
+    run(fr, "3.59", args, "3,6");
+    run(fr, "1200", args, "1,2 millier");
+    run(fr, "2000", args, "2 mille");
+    run(fr, "-15789.12", args, "-15,8 mille");
+    run(fr, "99999", args, "100 mille");
+    run(fr, "-100200300.40", args, "-100,2 millions");
+    run(fr, "10000000001", args, "10 milliards");
 
     args += " minSig:3 maxSig:4";
     run(en_US, "0", args, "0.00");
     run(en_US, "1", args, "1.00");
     run(en_US, "3.59", args, "3.59");
     run(en_US, "1200", args, "1.20 thousand");
+    run(en_US, "2000", args, "2.00 thousand");
     run(en_US, "-15789.12", args, "-15.79 thousand");
     run(en_US, "99999", args, "100 thousand");
     run(en_US, "-100200300.40", args, "-100.2 million");
@@ -179,7 +191,8 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(fr, "0", args, "0,00");
     run(fr, "1", args, "1,00");
     run(fr, "3.59", args, "3,59");
-    run(fr, "1200", args, "1,20 mille");
+    run(fr, "1200", args, "1,20 millier");
+    run(fr, "2000", args, "2,00 mille");
     run(fr, "-15789.12", args, "-15,79 mille");
     run(fr, "99999", args, "100 mille");
     run(fr, "-100200300.40", args, "-100,2 millions");

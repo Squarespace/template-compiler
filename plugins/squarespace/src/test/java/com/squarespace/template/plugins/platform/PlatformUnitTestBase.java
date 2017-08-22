@@ -21,6 +21,7 @@ import com.squarespace.template.FormatterTable;
 import com.squarespace.template.PredicateTable;
 import com.squarespace.template.UnitTestBase;
 import com.squarespace.template.plugins.platform.i18n.InternationalFormatters;
+import com.squarespace.template.plugins.platform.i18n.InternationalPredicates;
 
 
 /**
@@ -45,6 +46,7 @@ public class PlatformUnitTestBase extends UnitTestBase {
     table.register(new ContentPredicates());
     table.register(new SlidePredicates());
     table.register(new SocialPredicates());
+    table.register(new InternationalPredicates());
     return table;
   }
 

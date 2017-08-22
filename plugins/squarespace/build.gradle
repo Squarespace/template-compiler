@@ -23,6 +23,7 @@ artifacts {
 jmh {
 	jmhVersion = '1.19'
 	forceGC = true
+  include = '.*Unit.*'
 }
 
 plugins.withType(EclipsePlugin) {

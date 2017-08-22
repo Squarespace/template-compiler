@@ -18,14 +18,18 @@ package com.squarespace.template;
 
 import static org.testng.Assert.assertNotNull;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.cldr.CLDR;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -38,20 +42,14 @@ import difflib.Patch;
  */
 public class TestCaseParser extends UnitTestBase {
 
+  private static final String TYPE_PROPERTIES = "PROPERTIES";
   private static final String TYPE_ERROR = "ERROR";
-
   private static final String TYPE_JSON = "JSON";
-
   private static final String TYPE_OUTPUT = "OUTPUT";
-
   private static final String TYPE_INJECT = "INJECT";
-
   private static final String TYPE_PARTIALS = "PARTIALS";
-
   private static final String TYPE_TEMPLATE = "TEMPLATE";
-
   private static final Pattern RE_LINES = Pattern.compile("\n");
-
   private static final Pattern RE_SECTION = Pattern.compile("^:([\\w-_]+)\\s*$");
 
   /**
@@ -59,12 +57,23 @@ public class TestCaseParser extends UnitTestBase {
    */
   public TestCase parseTest(String source) {
     Map<String, String> sections = parseSections(source);
+    String props = sections.get(TYPE_PROPERTIES);
     String json = sections.get(TYPE_JSON);
     String template = sections.get(TYPE_TEMPLATE);
     String partials = sections.get(TYPE_PARTIALS);
     String inject = sections.get(TYPE_INJECT);
+
+    Properties properties = new Properties();
+    if (props != null) {
+      try {
+        properties.load(new StringReader(props));
+      } catch (IOException e) {
+        throw new AssertionError("Failed to parse test case properties: " + e.getMessage(), e);
+      }
+    }
+
     if (sections.containsKey(TYPE_OUTPUT)) {
-      return new OutputTestCase(json, template, partials, inject, sections.get(TYPE_OUTPUT));
+      return new OutputTestCase(properties, json, template, partials, inject, sections.get(TYPE_OUTPUT));
     } else if (sections.containsKey(TYPE_ERROR)) {
 // TBD:     return new ErrorCase(json, template, sections.get(TYPE_ERROR));
     }
@@ -81,19 +90,17 @@ public class TestCaseParser extends UnitTestBase {
    */
   private class OutputTestCase implements TestCase {
 
+    private final Properties properties;
     private final String json;
-
     private final String template;
-
     private final String partials;
-
     private final String inject;
-
     private final String output;
 
-    OutputTestCase(String json, String template, String partials, String inject, String output) {
+    OutputTestCase(Properties properties, String json, String template, String partials, String inject, String output) {
       assertSection(json, TYPE_JSON, TYPE_OUTPUT);
       assertSection(template, TYPE_TEMPLATE, TYPE_OUTPUT);
+      this.properties = properties;
       this.json = json;
       this.template = template;
       this.partials = partials;
@@ -123,6 +130,14 @@ public class TestCaseParser extends UnitTestBase {
         }
         if (injectMap != null) {
           executor.injectablesMap(injectMap);
+        }
+
+        String locale = properties.getProperty("locale");
+        if (locale != null) {
+          java.util.Locale javaLocale = java.util.Locale.forLanguageTag(locale);
+          CLDR.Locale cldrLocale = CLDR.get().get(javaLocale);
+          executor.locale(javaLocale);
+          executor.cldrLocale(cldrLocale);
         }
 
         Context ctx = executor.execute();

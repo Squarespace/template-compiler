@@ -106,10 +106,10 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testSignificantDigits() {
     String args = " style:short";
-    run(en_US, usd("-1551.75"), args, "-$2K");
-
-    args = " style:short mode:significant";
     run(en_US, usd("-1551.75"), args, "-$1.6K");
+
+    args = " style:short mode:significant-maxfrac maxfrac:0";
+    run(en_US, usd("-1551.75"), args, "-$2K");
 
     args = " style:short mode:significant maxSig:3";
     run(en_US, usd("-1551.75"), args, "-$1.55K");
@@ -159,14 +159,14 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     return money(n, CLDR.Currency.EUR);
   }
 
-  private static String money(BigDecimal n, String currencyCode) {
-    ObjectNode m = moneyBase(currencyCode);
+  private static String money(BigDecimal n, CLDR.Currency code) {
+    ObjectNode m = moneyBase(code.name());
     m.put("decimalValue", n);
     return m.toString();
   }
 
-  private static String money(String n, String currencyCode) {
-    ObjectNode m = moneyBase(currencyCode);
+  private static String money(String n, CLDR.Currency code) {
+    ObjectNode m = moneyBase(code.name());
     m.put("decimalValue", n);
     return m.toString();
   }
