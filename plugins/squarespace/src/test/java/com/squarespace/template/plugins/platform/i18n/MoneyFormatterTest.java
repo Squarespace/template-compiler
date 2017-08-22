@@ -16,6 +16,7 @@
 package com.squarespace.template.plugins.platform.i18n;
 
 import static com.squarespace.cldr.CLDR.Locale.en_US;
+import static org.testng.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
@@ -27,6 +28,7 @@ import com.squarespace.cldr.CLDR;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
+import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.TestSuiteRunner;
@@ -51,6 +53,25 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
         "f-decimal-1.html",
         "f-decimal-2.html"
     );
+  }
+
+  @Test
+  public void testExecutor() throws CodeException {
+    String json = "{\"decimalValue\": \"-15789.12\", \"currencyCode\": \"USD\"}";
+    String template = "{@|money style:short mode:significant}";
+
+    assertEquals(executeLocale(template, json, CLDR.Locale.fr), "-15,8 k $US");
+    assertEquals(executeLocale(template, json, CLDR.Locale.en_US), "-$15.8K");
+  }
+
+  private String executeLocale(String template, String json, CLDR.Locale locale) throws CodeException {
+    Compiler compiler = compiler();
+    Context ctx = compiler.newExecutor()
+        .json(json)
+        .template(template)
+        .cldrLocale(locale)
+        .execute();
+    return ctx.buffer().toString();
   }
 
   @Test

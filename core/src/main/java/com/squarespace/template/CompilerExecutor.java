@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.cldr.CLDR;
 
 
 /**
@@ -28,27 +29,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CompilerExecutor {
 
   private final Compiler compiler;
-
   private String template;
-
   private Instruction rootInstruction;
-
   private JsonNode rootNode;
-
   private ObjectNode partialsMap;
-
   private ObjectNode injectablesMap;
-
   private StringBuilder buffer;
-
   private Locale locale;
-
+  private CLDR.Locale cldrLocale;
   private LoggingHook loggingHook;
-
   private CodeLimiter codeLimiter;
-
   private boolean safeExecution;
-
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
 
   CompilerExecutor(Compiler compiler) {
@@ -86,6 +77,10 @@ public class CompilerExecutor {
     if (codeLimiter != null) {
       ctx.setCodeLimiter(codeLimiter);
     }
+    if (cldrLocale != null) {
+      ctx.cldrLocale(cldrLocale);
+    }
+
     ctx.setMaxPartialDepth(maxPartialDepth);
     ctx.execute(instruction);
     return ctx;
@@ -170,6 +165,14 @@ public class CompilerExecutor {
    */
   public CompilerExecutor locale(Locale locale) {
     this.locale = locale;
+    return this;
+  }
+
+  /**
+   * CLDR locale to execute against, used by some formatters.
+   */
+  public CompilerExecutor cldrLocale(CLDR.Locale locale) {
+    this.cldrLocale = locale;
     return this;
   }
 
