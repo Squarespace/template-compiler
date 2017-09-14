@@ -1,0 +1,35 @@
+:PROPERTIES
+locale=fr-FR
+
+:JSON
+{
+	"numbers": [0, 0.0, 0.1, 1, 1.0, 1.1, 2, 2.0, 3, 5, 8, 17, 17.0, 100, 101, 200],
+	"messages": {
+		"plural": "{0 plural zero{# ZERO} one{# ONE} two{# TWO} few{# FEW} many{# MANY} other{# OTHER}}"
+	}
+}
+
+:TEMPLATE
+{.repeated section numbers}
+{messages.plural|message @}{.end}
+
+{.repeated section runners}
+{messages.raceresult|message place name}{.end}
+
+:OUTPUT
+0 ONE
+0.0 ONE
+0.1 ONE
+1 ONE
+1.0 ONE
+1.1 ONE
+2 OTHER
+2.0 OTHER
+3 OTHER
+5 OTHER
+8 OTHER
+17 OTHER
+17.0 OTHER
+100 OTHER
+101 OTHER
+200 OTHER

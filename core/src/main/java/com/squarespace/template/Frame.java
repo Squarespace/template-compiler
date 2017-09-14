@@ -22,18 +22,13 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
-class Frame {
+public class Frame {
 
   private final Frame parent;
-
   private final JsonNode node;
-
   private Map<String, JsonNode> variables;
-
   private Map<String, Instruction> macros;
-
   boolean stopResolution;
-
   int currentIndex;
 
   Frame(Frame parent, JsonNode node) {

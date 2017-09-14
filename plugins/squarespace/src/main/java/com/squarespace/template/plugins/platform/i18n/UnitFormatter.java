@@ -46,6 +46,8 @@ import com.squarespace.template.plugins.platform.i18n.UnitUtils.UnitFormatterOpt
  *
  * Since there are a lot of possible permutations of input arguments, the apply()
  * method is split into sections each with a header comment.
+ *
+ * TODO: future: revise this to depend on CLDR's similar formatter in MessageFormat.
  */
 public class UnitFormatter extends BaseFormatter {
 
@@ -82,8 +84,9 @@ public class UnitFormatter extends BaseFormatter {
 
     // == FALLBACK ==
 
-    // If no arguments set, format a plain number with no unit.
-    if (inputUnit == null && exactUnit == null && exactUnits == null && compact == null && sequence == null) {
+    // Input must always be defined, except when exact output unit is specified.
+    // We default to output unit.
+    if (inputUnit == null && exactUnit == null) {
       UnitValue value = new UnitValue(amount, null);
       StringBuilder buf = new StringBuilder();
       NumberFormatter formatter = CLDR_INSTANCE.getNumberFormatter(locale);
@@ -132,13 +135,7 @@ public class UnitFormatter extends BaseFormatter {
 
     // Make sure we know what the input units are.
     if (inputUnit == null) {
-      if (exactUnit != null) {
-        inputUnit = inputFromExactUnit(exactUnit, converter);
-      } else if (exactUnits != null) {
-        inputUnit = inputFromExactUnit(exactUnits[0], converter);
-      } else if (factorSet != null) {
-        inputUnit = factorSet.base();
-      }
+      inputUnit = inputFromExactUnit(exactUnit, converter);
     }
 
     // == CONVERSION ==
@@ -153,12 +150,12 @@ public class UnitFormatter extends BaseFormatter {
       value = converter.convert(value, exactUnit);
 
     } else if (factorSet == null) {
-        // Convert directly to "best" unit using the default built-in factor sets.
-        value = converter.convert(value);
+      // Convert directly to "best" unit using the default built-in factor sets.
+      value = converter.convert(value);
 
     } else if (compact != null || exactUnits != null) {
-        // Use the factor set to build a compact form.
-        value = converter.convert(value, factorSet);
+      // Use the factor set to build a compact form.
+      value = converter.convert(value, factorSet);
 
     } else if (sequence != null) {
       // Use the factor set to produce a sequence.
@@ -224,6 +221,8 @@ public class UnitFormatter extends BaseFormatter {
           return UnitFactorSets.DURATION_LARGE;
         case "duration-small":
           return UnitFactorSets.DURATION_SMALL;
+        case "electric":
+          return UnitFactorSets.ELECTRIC;
         case "energy":
           return UnitFactorSets.ENERGY;
         case "frequency":
@@ -271,12 +270,18 @@ public class UnitFormatter extends BaseFormatter {
 
     UnitCategory category = exact.category();
     switch (category) {
+      case ANGLE:
+        return Unit.DEGREE;
       case CONSUMPTION:
         return converter.consumptionUnit();
+      case ELECTRIC:
+        return Unit.AMPERE;
       case FREQUENCY:
         return Unit.HERTZ;
       case LIGHT:
         return Unit.LUX;
+      case POWER:
+        return Unit.WATT;
       case PRESSURE:
         return Unit.MILLIBAR;
       case SPEED:
@@ -291,7 +296,7 @@ public class UnitFormatter extends BaseFormatter {
         }
         break;
     }
-    return null;
+    return exact;
   }
 
   /**
@@ -300,22 +305,14 @@ public class UnitFormatter extends BaseFormatter {
    */
   protected UnitFactorSet getDefaultFactorSet(UnitCategory category, UnitConverter converter) {
     switch (category) {
-      case ANGLE:
-        return UnitFactorSets.ANGLE;
       case AREA:
         return converter.areaFactors();
-      case DURATION:
-        return UnitFactorSets.DURATION;
       case ENERGY:
         return converter.energyFactors();
-      case FREQUENCY:
-        return UnitFactorSets.FREQUENCY;
       case LENGTH:
         return converter.lengthFactors();
       case MASS:
         return converter.massFactors();
-      case POWER:
-        return UnitFactorSets.POWER;
       case VOLUME:
         return converter.volumeFactors();
       default:

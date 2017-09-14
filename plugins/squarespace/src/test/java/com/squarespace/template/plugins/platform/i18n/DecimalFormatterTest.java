@@ -45,7 +45,7 @@ import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
  */
 public class DecimalFormatterTest extends PlatformUnitTestBase {
 
-  private static final DecimalFormatter deCIMAL = new DecimalFormatter();
+  private static final DecimalFormatter DECIMAL = new DecimalFormatter();
   private final CodeMaker mk = maker();
 
   @Test
@@ -217,9 +217,9 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
   private static String format(CLDR.Locale locale,  Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
     ctx.cldrLocale(locale);
-    deCIMAL.validateArgs(args);
+    DECIMAL.validateArgs(args);
     Variables variables = new Variables("@", ctx.node());
-    deCIMAL.apply(ctx, args, variables);
+    DECIMAL.apply(ctx, args, variables);
     return variables.first().node().asText();
   }
 

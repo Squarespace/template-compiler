@@ -66,8 +66,8 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
     ZonedDateTime end = parse(variables.get(1), zoneId);
 
     DateTimeIntervalSkeleton skeleton = null;
-    if (count >= 3) {
-      String skel = variables.get(2).node().asText();
+    if (!args.isEmpty()) {
+      String skel = args.first();
       skeleton = DateTimeIntervalSkeleton.fromString(skel);
     }
 

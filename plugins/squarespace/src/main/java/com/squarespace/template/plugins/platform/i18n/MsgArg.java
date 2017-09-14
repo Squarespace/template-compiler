@@ -19,7 +19,9 @@ import java.math.BigDecimal;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.MessageArg;
+import com.squarespace.cldr.MessageFormat;
 import com.squarespace.template.Context;
+import com.squarespace.template.Frame;
 import com.squarespace.template.GeneralUtils;
 
 
@@ -27,22 +29,15 @@ import com.squarespace.template.GeneralUtils;
  * Argument for MessageFormat allowing a formatter to resolve
  * the argument's value on demand.
  */
-public class MsgArg extends MessageArg {
+public class MsgArg implements MessageArg {
 
   protected final Object[] name;
-
   protected Context ctx;
-
   protected JsonNode node;
-
   protected JsonNode currencyNode;
-
   protected boolean castFailed;
-
   protected String value;
-
   protected String currencyCode;
-
   protected BigDecimal number;
 
   public MsgArg(Object[] name) {
@@ -68,7 +63,13 @@ public class MsgArg extends MessageArg {
   @Override
   public boolean resolve() {
     if (this.node == null) {
-      this.node = ctx.resolve(name);
+      // Since the message string is the node on the current stack frame, the
+      // variable reference '@' will point to it, instead of the parent scope.
+      // Skip the current frame so we avoid trying to resolve variables against
+      // the message string.
+      Frame parent = ctx.frame().parent();
+      this.node = ctx.resolve(name, parent == null ? ctx.frame() : parent);
+
       // Peek to see if this argument is a Money
       JsonNode decimal = node.path("decimalValue");
       if (!decimal.isMissingNode()) {
@@ -98,12 +99,20 @@ public class MsgArg extends MessageArg {
   @Override
   public BigDecimal asBigDecimal() {
     if (!castFailed) {
-      this.number = GeneralUtils.nodeToBigDecimal(node);
+      this.number = node == null ? null : GeneralUtils.nodeToBigDecimal(node);
       if (number == null) {
         castFailed = true;
       }
     }
     return number;
+  }
+
+  @Override
+  public long asLong() {
+    if (this.value == null) {
+      this.value = node == null ? "0" : node.asText();
+    }
+    return value == null ? 0 : MessageFormat.toLong(value, 0, value.length());
   }
 
 }

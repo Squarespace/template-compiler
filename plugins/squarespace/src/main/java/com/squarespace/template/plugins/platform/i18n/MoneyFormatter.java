@@ -87,7 +87,7 @@ public class MoneyFormatter extends BaseFormatter {
       return;
     }
 
-    CLDR.Currency code = CLDR.Currency.valueOf(currency.asText());
+    CLDR.Currency code = CLDR.Currency.fromString(currency.asText());
     if (code == null) {
       var.setMissing();
       return;

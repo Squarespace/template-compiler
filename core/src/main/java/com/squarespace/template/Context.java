@@ -489,8 +489,16 @@ public class Context {
    * Lookup the JSON node referenced by the list of names.
    */
   public JsonNode resolve(Object[] names) {
+    return resolve(names, currentFrame);  }
+
+  /**
+   * Lookup the JSON node referenced by the list of names, starting at
+   * the given frame. This allows formatters to selectively skip their
+   * stack frame when resolving a variable reference.
+   */
+  public JsonNode resolve(Object[] names, Frame startingFrame) {
     if (names == null) {
-      return currentFrame.node();
+      return startingFrame.node();
     }
 
     // Find the starting point.

@@ -1,0 +1,17 @@
+:PROPERTIES
+locale=fr-FR
+
+:JSON
+{
+	"messages": {
+		"transfer": "Transmission of {0 unit in:byte compact:bytes} took {1 unit in:second sequence:hour,minute,second format:long}"
+	},
+	"bytes": "12345657890",
+	"duration": "12345"
+}
+
+:TEMPLATE
+{messages.transfer|message bytes duration}
+
+:OUTPUT
+Transmission of 11,5 Go took 3 heures 25 minutes 45 secondes

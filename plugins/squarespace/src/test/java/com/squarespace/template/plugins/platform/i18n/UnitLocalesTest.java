@@ -88,6 +88,13 @@ public class UnitLocalesTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testEnergy() throws Exception {
+    String tmpl = "units/energy-in.html";
+    test(en_US, tmpl, "units/energy-out-en-US.html");
+    test(fr_FR, tmpl, "units/energy-out-fr-FR.html");
+  }
+
+  @Test
   public void testFrequency() throws Exception {
     String tmpl = "units/frequency-in.html";
     test(en_US, tmpl, "units/frequency-out-en-US.html");

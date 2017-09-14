@@ -74,9 +74,18 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     String json = "1509647217000";
     CodeMaker mk = maker();
 
+    // DEFAULTING
+
+    assertEquals(format(en_US, DATETIME, mk.args(" xyz foo"), json), "11/2/2017");
+
     // ENGLISH
 
+    assertEquals(format(en_US, DATETIME, mk.args(" short"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" long"), json), "November 2, 2017 at 2:26:57 PM EDT");
+
+    assertEquals(format(en_US, DATETIME, mk.args(" date"), json), "11/2/17");
     assertEquals(format(en_US, DATETIME, mk.args(" date:short"), json), "11/2/17");
+    assertEquals(format(en_US, DATETIME, mk.args(" time"), json), "2:26 PM");
     assertEquals(format(en_US, DATETIME, mk.args(" time:medium"), json), "2:26:57 PM");
     assertEquals(format(en_US, DATETIME, mk.args(" date:full time:short"), json),
         "Thursday, November 2, 2017 at 2:26 PM");
@@ -137,16 +146,6 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     }
 
     runner.run(paths.toArray(new String[paths.size()]));
-  }
-
-  @Test
-  public void testPlural() throws Exception {
-    runner.run(
-        "f-plural-cardinal-1.html",
-        "f-plural-cardinal-2.html",
-        "f-plural-cardinal-3.html",
-        "f-plural-ordinal-1.html"
-    );
   }
 
   public void testExtraArgument() throws Exception {

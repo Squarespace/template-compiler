@@ -58,20 +58,36 @@ public class UnitFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testDefaulting() {
-    String json = "1351531335";
+  public void testInvalid() {
+    String json = "\"xyz\"";
+    run(en_US, UNIT, json, "  in:second out:hour,minute,second format:long", "");
+  }
 
-    // Output compact form by default
-    run(en, UNIT, json, " in:byte", "1.3GB");
+  @Test
+  public void testDefaulting() {
+    String json = "1234567";
+
+    // No arguments
+    run(en_US, UNIT, json, "", "1234567");
+
+    // No unit-related arguments
+    run(en_US, UNIT, json, " group", "1,234,567");
 
     // No unit, nothing to do.
-    run(en, UNIT, json, " group:true", "1,351,531,335");
+    run(en_US, UNIT, json, " group:true", "1,234,567");
 
-    // Guess input is in bytes, inferred from the compact form
-    run(en, UNIT, json, " compact:byte", "1.3GB");
+    // If only compact form is specified, we don't infer the units since it is
+    // too fuzzy and locale-dependent. For example, compact form "temperature"
+    // would be CELSIUS in a metric locale or FAHRENHEIT in non-metric.
+    run(en_US, UNIT, json, " compact:byte", "1234567");
+    run(en_US, UNIT, json, " compact:temperature", "1234567");
+
+    // Output compact form by default
+    run(en_US, UNIT, json, " in:byte", "1.2MB");
+    run(en_US, UNIT, json, " in:inch", "19.5mi");
 
     // No input unit specified, infer bytes from output unit.
-    run(en, UNIT, json, " out:megabyte group:true", "1,288.9MB");
+    run(en_US, UNIT, json, " out:kilobyte group:true", "1,205.6kB");
   }
 
   @Test

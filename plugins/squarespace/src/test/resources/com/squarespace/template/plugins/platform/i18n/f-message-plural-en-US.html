@@ -1,0 +1,98 @@
+:JSON
+{
+	"numbers": [0, 0.0, 0.1, 1, 1.0, 1.1, 2, 2.0, 3, 5, 8, 17, 17.0, 100, 101, 200],
+	"one": 1,
+	"five": 5,
+	"data": "1234567890",
+    "blogs": [
+      {"name": "Apple", "count": 1},
+      {"name": "Microsoft", "count": 2},
+      {"name": "Google", "count": 3},
+      {"name": "Hooli", "count": 0}
+	],
+    "runners": [
+      {"name": "Usain Bolt", "place": 1},
+      {"name": "Justin Gatlin", "place": 2},
+      {"name": "Andre de Grasse", "place": 3},
+      {"name": "Yohan Blake", "place": 4},
+      {"name": "Akani Simbine", "place": 5}
+    ],
+    "customers": [
+      {"customer": "Fred", "count": 1},
+      {"customer": "Larry", "count": 3},
+      {"customer": "Steve", "count": 0}
+    ],
+	"messages": {
+		"plural": "{0 plural zero{# ZERO} one{# ONE} two{# TWO} few{# FEW} many{# MANY} other{# OTHER}}",
+		"recurse": "{0 plural one{{1} to bytes: {1 unit in:byte}} other{{1} to bits: {1 unit in:bit}}}",
+		"postcounts1": "The {1} blog has {0 plural one{# post} other{# posts}}.",
+		"postcounts2": "There {0 plural one{is # entry} other{are # entries}} posted to the {1} blog.",
+		"raceresult": "{1} came in {0 selectordinal one{#st} two{#nd} few{#rd} other{#th}} place.",
+		"cartempty": "your cart is empty.",
+		"cartitems": "you have {0} item{0 plural other{s}} in your cart, do you want to purchase {0 plural one{it} other{them}}?"
+	}
+}
+:TEMPLATE
+{.repeated section numbers}
+{messages.plural|message @}{.end}
+
+{messages.recurse|message one data}
+{messages.recurse|message five data}
+
+{.repeated section blogs}
+{messages.postcounts1|message count name}{.end}
+
+{.repeated section blogs}
+{messages.postcounts2|message count name}{.end}
+
+{.repeated section runners}
+{messages.raceresult|message place name}{.end}
+
+{.repeated section customers}
+Hi {customer}, {.equal? count 0}{messages.cartempty}
+{.or}{messages.cartitems|plural count customer}{.end}{.end}
+
+:OUTPUT
+0 OTHER
+0.0 OTHER
+0.1 OTHER
+1 ONE
+1.0 OTHER
+1.1 OTHER
+2 OTHER
+2.0 OTHER
+3 OTHER
+5 OTHER
+8 OTHER
+17 OTHER
+17.0 OTHER
+100 OTHER
+101 OTHER
+200 OTHER
+
+1234567890 to bytes: 1.1GB
+1234567890 to bits: 147.2MB
+
+
+The Apple blog has 1 post.
+The Microsoft blog has 2 posts.
+The Google blog has 3 posts.
+The Hooli blog has 0 posts.
+
+
+There is 1 entry posted to the Apple blog.
+There are 2 entries posted to the Microsoft blog.
+There are 3 entries posted to the Google blog.
+There are 0 entries posted to the Hooli blog.
+
+
+Usain Bolt came in 1st place.
+Justin Gatlin came in 2nd place.
+Andre de Grasse came in 3rd place.
+Yohan Blake came in 4th place.
+Akani Simbine came in 5th place.
+
+
+Hi Fred, you have 1 item in your cart, do you want to purchase it?
+Hi Larry, you have 3 items in your cart, do you want to purchase them?
+Hi Steve, your cart is empty.

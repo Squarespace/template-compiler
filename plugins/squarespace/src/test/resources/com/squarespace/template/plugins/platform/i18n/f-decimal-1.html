@@ -1,11 +1,14 @@
 :JSON
-[
-	"0", "1", "1.00", "3.59", "1200", "-15789.12", "99999.00", "-100200300.40", "-10000000001.00"
-]
+{
+	"nums": ["0", "1", "1.00", "3.59", "1200", "-15789.12", "99999.00", "-100200300.40", "-10000000001.00"],
+	"invalid": "xyz"
+}
 
 :TEMPLATE
-{.repeated section @}
+{.repeated section nums}
 {@|decimal}  {@|decimal group}{.end}
+
+{invalid|decimal group:true}
 
 :OUTPUT
 0  0

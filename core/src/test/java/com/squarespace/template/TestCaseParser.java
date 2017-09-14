@@ -135,7 +135,7 @@ public class TestCaseParser extends UnitTestBase {
         String locale = properties.getProperty("locale");
         if (locale != null) {
           java.util.Locale javaLocale = java.util.Locale.forLanguageTag(locale);
-          CLDR.Locale cldrLocale = CLDR.get().get(javaLocale);
+          CLDR.Locale cldrLocale = CLDR.get().resolve(javaLocale);
           executor.locale(javaLocale);
           executor.cldrLocale(cldrLocale);
         }

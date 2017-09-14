@@ -1,0 +1,32 @@
+:PROPERTIES
+locale=pl-PL
+
+:JSON
+{
+	"numbers": [0, 0.0, 0.1, 1, 1.0, 1.1, 2, 2.0, 3, 5, 8, 17, 17.0, 100, 101, 200],
+	"messages": {
+		"plural": "{0 plural zero{# ZERO} one{# ONE} two{# TWO} few{# FEW} many{# MANY} other{# OTHER}}"
+	}
+}
+
+:TEMPLATE
+{.repeated section numbers}
+{messages.plural|message @}{.end}
+
+:OUTPUT
+0 MANY
+0.0 OTHER
+0.1 OTHER
+1 ONE
+1.0 OTHER
+1.1 OTHER
+2 FEW
+2.0 OTHER
+3 FEW
+5 MANY
+8 MANY
+17 MANY
+17.0 OTHER
+100 MANY
+101 MANY
+200 MANY
