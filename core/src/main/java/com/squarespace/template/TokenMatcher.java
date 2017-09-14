@@ -175,6 +175,11 @@ public class TokenMatcher {
     return match(Patterns.KEYWORD_WITH);
   }
 
+  public boolean peek(int skip, char ch) {
+    int p = pointer + skip;
+    return pointer < end ? raw.charAt(p) == ch : false;
+  }
+
   /**
    * Perform a match using a Recognizer pattern and, if successful,
    * set the match range.

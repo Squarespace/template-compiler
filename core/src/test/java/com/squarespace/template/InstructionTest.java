@@ -31,4 +31,8 @@ public class InstructionTest extends UnitTestBase {
     );
   }
 
+  @Test
+  public void testVariableRefs() {
+    runner.run("variable-refs.html");
+  }
 }

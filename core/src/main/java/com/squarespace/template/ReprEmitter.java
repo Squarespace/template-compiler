@@ -265,7 +265,7 @@ public class ReprEmitter {
     int count = variables.count();
     for (int i = 0; i < count; i++) {
       if (i > 0) {
-        buf.append(" $ ");
+        buf.append(",");
       }
       emitNames(variables.get(i).name(), buf);
     }

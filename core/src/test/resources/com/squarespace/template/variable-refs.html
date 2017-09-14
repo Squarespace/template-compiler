@@ -1,0 +1,19 @@
+:JSON
+{
+	"$a": "A",
+	"$b": {
+		"c": {
+			"$d": "D"
+		}
+	}
+}
+
+:TEMPLATE
+{$a}
+{$b.c.$d}
+{$b.c|json}
+
+:OUTPUT
+A
+D
+{"$d":"D"}

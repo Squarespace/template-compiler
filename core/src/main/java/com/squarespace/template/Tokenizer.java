@@ -601,6 +601,7 @@ public class Tokenizer {
       return false;
     }
 
+    boolean requirePipe = false;
     int start = matcher.matchStart();
     StringView token = matcher.consume();
     Variables vars = new Variables(token.repr());
@@ -611,9 +612,26 @@ public class Tokenizer {
         return false;
       }
       if (matcher.pipe() || !matcher.variable()) {
-        break;
+        return false;
       }
       vars.add(matcher.consume().repr());
+      requirePipe = true;
+    }
+
+    boolean matchedPipe = matcher.peek(0, '|');
+    // If we see JavaScript boolean or operator, skip. This would fail anyway
+    // when we tried to parse the second '|' as a formatter name, so since
+    // we've already matched one pipe, sanity-check here.
+    if (matchedPipe && matcher.peek(1, '|')) {
+      return false;
+    }
+
+    // Multiple variable syntax is only allowed when passing variables to
+    // formatters, which requires a pipe character immediately after the last variable.
+    if (requirePipe) {
+      if (!matchedPipe) {
+        return false;
+      }
     }
 
     VariableInst instruction = maker.var(vars);

@@ -45,7 +45,7 @@ public class FormatterTest extends UnitTestBase {
   @Test
   public void testMultipleVariableFormatters() throws CodeException {
     String json = "{\"a\": \"123\", \"b\": \"456\", \"c\": \"789\"}";
-    assertContext(execute("{a $ b $ c|multiply-vars}", json), "44253432");
+    assertContext(execute("{a,b,c|multiply-vars}", json), "44253432");
   }
 
 //  @Test

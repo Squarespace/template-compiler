@@ -54,6 +54,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
+import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
 import com.squarespace.template.plugins.CoreFormatters.SlugifyFormatter;
 
@@ -66,11 +67,9 @@ import com.squarespace.template.plugins.CoreFormatters.SlugifyFormatter;
 public class TokenizerCoreTest extends UnitTestBase {
 
   private static final Formatter HTMLATTR = new HtmlAttrFormatter();
-
+  private static final Formatter JSON = new JsonFormatter();
   private static final Formatter PLURALIZE = new PluralizeFormatter();
-
   private static final Formatter SLUGIFY = new SlugifyFormatter();
-
   private static final boolean VERBOSE = false;
 
   @Test
@@ -179,7 +178,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     Arguments args2 = mk.args("/b/c");
     assertResult("{a|pluralize/b/c}", mk.var("a", mk.fmt(PLURALIZE, args2)), mk.eof());
 
-    assertResult("{a $ b $ c|pluralize/b/c}", mk.var(mk.vars("a", "b", "c"), mk.fmt(PLURALIZE, args2)), mk.eof());
+    assertResult("{a,b,c|pluralize/b/c}", mk.var(mk.vars("a", "b", "c"), mk.fmt(PLURALIZE, args2)), mk.eof());
   }
 
   @Test
@@ -330,8 +329,13 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{@index}", mk.var("@index"), mk.eof());
     assertResult("{foo.bar}", mk.var("foo.bar"), mk.eof());
 
-    assertResult("{foo $ bar}", mk.var(mk.vars("foo", "bar")), mk.eof());
-    assertResult("{a $ b $ c $ d}", mk.var(mk.vars("a", "b", "c", "d")), mk.eof());
+    assertResult("{a, b, c, d|json}", mk.var(mk.vars("a", "b", "c", "d"), JSON), mk.eof());
+    assertResult("{$a, @b, c.d.e|json}", mk.var(mk.vars("$a", "@b", "c.d.e"), JSON), mk.eof());
+
+    // Invalid forms
+    assertResult("{foo||json}", mk.text("{foo||json}"), mk.eof());
+    assertResult("{foo, bar}", mk.text("{foo, bar}"), mk.eof());
+    assertResult("{foo, bar||json}", mk.text("{foo, bar||json}"), mk.eof());
   }
 
   private void assertFailure(String raw, SyntaxErrorType type) {

@@ -69,7 +69,7 @@ public class Patterns {
    * libraries (jQuery, d3, moment) to confirm no increase in false matches.
    */
   public static final Recognizer VARIABLES_DELIMITER = sequence(
-      oneOrMore(characters(' ')), characters('$'), oneOrMore(characters(' ')));
+      zeroOrMore(characters(' ')), characters(','), zeroOrMore(characters(' ')));
 
   /** Recognizer that matches Java's regular expression "\\s+" */
   public static final Recognizer WHITESPACE = oneOrMore(characters(' ', '\t', '\n', '\u000b', '\f', '\r'));
@@ -97,7 +97,7 @@ public class Patterns {
 
   /** Variable reference segment. */
   private static final Recognizer VARIABLE_REF_SEGMENT =
-      choice(characters('@'), digits(), sequence(zeroOrOne(characters('@')), WORD));
+      choice(characters('@'), digits(), sequence(zeroOrOne(characters('@', '$')), WORD));
 
   /** Variable reference, optionally dotted. */
   public static final Recognizer VARIABLE_REF_DOTTED =
