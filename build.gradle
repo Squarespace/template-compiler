@@ -14,6 +14,7 @@ plugins {
   id 'com.github.hierynomus.license' version '0.11.0'
   id 'com.glonk.eclipse-checkstyle' version '0.0.5'
   id 'com.github.kt3k.coveralls' version '2.4.0'
+  id 'org.kordamp.jdeps' version '0.2.0'
 }
 
 task wrapper(type: Wrapper) {
@@ -120,6 +121,7 @@ subprojects {
   apply plugin: 'jacoco'
   apply plugin: 'signing'
   apply plugin: 'maven'
+  apply plugin: 'org.kordamp.jdeps'
 
   group 'com.squarespace.template'
 
