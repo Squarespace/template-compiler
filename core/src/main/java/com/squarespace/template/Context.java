@@ -391,7 +391,7 @@ public class Context {
 
   public boolean initIteration() {
     JsonNode node = node();
-    if (!node.isArray()) {
+    if (!node.isArray() || node.size() == 0) {
       return false;
     }
     currentFrame.currentIndex = 0;

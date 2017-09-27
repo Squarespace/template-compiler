@@ -138,6 +138,7 @@ public class CodeExecuteTest extends UnitTestBase {
     RootInst root = builder().repeated("foo").text("A").var("@").or().text("B").end().eof().build();
     assertEquals(repr(root), "{.repeated section foo}A{@}{.or}B{.end}");
     assertContext(execute("{\"foo\": [1, 2, 3]}", root), "A1A2A3");
+    assertContext(execute("{\"foo\": []}", root), "B");
     assertContext(execute("{}", root), "B");
   }
 
