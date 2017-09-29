@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 @Test(groups = { "unit" })
 public class BlockTest extends UnitTestBase {
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testEquality() {
     CodeMaker maker = maker();

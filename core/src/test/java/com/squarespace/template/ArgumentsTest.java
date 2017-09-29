@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 @Test(groups = { "unit" })
 public class ArgumentsTest extends UnitTestBase {
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testBasics() {
     CodeMaker mk = maker();

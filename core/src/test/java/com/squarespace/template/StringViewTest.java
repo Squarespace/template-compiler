@@ -99,6 +99,7 @@ public class StringViewTest {
     }
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testEquals() {
     String s1 = "..........abc..";
