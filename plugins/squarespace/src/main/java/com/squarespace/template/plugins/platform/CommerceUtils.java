@@ -183,6 +183,7 @@ public class CommerceUtils {
     switch (type) {
       case PHYSICAL:
       case SERVICE:
+      case GIFT_CARD:
         JsonNode variants = structuredContent.path("variants");
         JsonNode first = variants.get(0);
         for (int i = 1; i < variants.size(); i++) {
@@ -195,9 +196,7 @@ public class CommerceUtils {
           }
         }
         return false;
-
       case DIGITAL:
-      case GIFT_CARD:
       default:
         return false;
     }
@@ -375,7 +374,9 @@ public class CommerceUtils {
         break;
 
       case GIFT_CARD:
-        buf.append("from ");
+        if (hasVariedPrices(item)) {
+          buf.append("from ");
+        }
         writeMoneyString(getFromPrice(item), buf);
         break;
 
