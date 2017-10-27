@@ -49,7 +49,7 @@ public class Instructions {
    * as it is not conditional.. it only exists to enhance the implementation of
    * the REPEAT instruction.
    */
-  static class AlternatesWithInst extends BlockInst {
+  public static class AlternatesWithInst extends BlockInst {
 
     AlternatesWithInst() {
       super(ALTERNATES_BLOCK_LEN);
@@ -86,7 +86,7 @@ public class Instructions {
   /**
    * Set a local variable's value.
    */
-  static class BindVarInst extends BaseInstruction implements Formattable {
+  public static class BindVarInst extends BaseInstruction implements Formattable {
 
     private final String name;
     private final Variables variables;
@@ -156,7 +156,7 @@ public class Instructions {
    * Represents a generic block of instructions (consequent) and an optional
    * alternative block.
    */
-  static abstract class BlockInst extends BaseInstruction implements BlockInstruction {
+  public static abstract class BlockInst extends BaseInstruction implements BlockInstruction {
 
     /**
      * Consequent block of instructions.
@@ -252,7 +252,7 @@ public class Instructions {
   /**
    * Terminal instruction representing a comment. Implementation is a NOOP.
    */
-  static class CommentInst extends BaseInstruction {
+  public static class CommentInst extends BaseInstruction {
 
     private final StringView view;
 
@@ -304,7 +304,7 @@ public class Instructions {
   /**
    * Instruction that closes a block instruction. Implementation is a NOOP.
    */
-  static class EndInst extends BaseInstruction {
+  public static class EndInst extends BaseInstruction {
 
     @Override
     public boolean equals(Object obj) {
@@ -332,7 +332,7 @@ public class Instructions {
    * Marker instruction indicating the end of the parse. Implementation is a NOOP,
    * and it has no visible representation in the template.
    */
-  static class EofInst extends BaseInstruction {
+  public static class EofInst extends BaseInstruction {
 
     @Override
     public boolean equals(Object obj) {
@@ -365,7 +365,7 @@ public class Instructions {
    * precedence, grouping, etc.  This implementation replicates the behavior of the JS
    * version. - phensley
    */
-  static class IfInst extends BlockInst {
+  public static class IfInst extends BlockInst {
 
     private static final List<Operator> EMPTY_OPS = Arrays.<Operator>asList();
 
@@ -452,7 +452,7 @@ public class Instructions {
    *
    * Example:  {.if foo?}  does the same thing as  {.foo?}
    */
-  static class IfPredicateInst extends BlockInst {
+  public static class IfPredicateInst extends BlockInst {
 
     private final Predicate predicate;
 
@@ -510,7 +510,7 @@ public class Instructions {
    * Used to inject a JSON object and bind it to a variable. Optional
    * arguments to add this to global scope.
    */
-  static class InjectInst extends BaseInstruction {
+  public static class InjectInst extends BaseInstruction {
 
     private final String variable;
 
@@ -568,7 +568,7 @@ public class Instructions {
   /**
    * Base class for instructions which emit literal characters directly into the output.
    */
-  static abstract class LiteralInst extends BaseInstruction {
+  public static abstract class LiteralInst extends BaseInstruction {
 
     private final String name;
 
@@ -612,7 +612,7 @@ public class Instructions {
   /**
    * Represents a named block of template code that can be applied.
    */
-  static class MacroInst extends BaseInstruction implements BlockInstruction {
+  public static class MacroInst extends BaseInstruction implements BlockInstruction {
 
     private final String name;
 
@@ -684,7 +684,7 @@ public class Instructions {
    * Made this a runtime determination in case in the future we move
    * to a 2-character meta sequence, like "{{" and "}}".
    */
-  static class MetaInst extends BaseInstruction {
+  public static class MetaInst extends BaseInstruction {
 
     private final boolean isLeft;
 
@@ -726,7 +726,7 @@ public class Instructions {
   /**
    * Emits a newline character to the output.
    */
-  static class NewlineInst extends LiteralInst {
+  public static class NewlineInst extends LiteralInst {
 
     NewlineInst() {
       super("newline", "\n");
@@ -742,7 +742,7 @@ public class Instructions {
   /**
    * Represents a boolean-valued function.
    */
-  static class PredicateInst extends BlockInst {
+  public static class PredicateInst extends BlockInst {
 
     private InstructionType type = InstructionType.PREDICATE;
 
@@ -823,7 +823,7 @@ public class Instructions {
    * Represents a block of instructions to be executed with context set to each
    * element of an array.
    */
-  static class RepeatedInst extends BlockInst {
+  public static class RepeatedInst extends BlockInst {
 
     private final Object[] variable;
 
@@ -921,7 +921,7 @@ public class Instructions {
    * never close it, which would execute fine, but would be considered invalid,
    * since each SECTION *must* have a corresponding END tag.
    */
-  static class RootInst extends BlockInst {
+  public static class RootInst extends BlockInst {
 
     RootInst() {
       super(ROOT_BLOCK_LEN);
@@ -957,7 +957,7 @@ public class Instructions {
   /**
    * Represents a nested scope within the JSON tree.
    */
-  static class SectionInst extends BlockInst {
+  public static class SectionInst extends BlockInst {
 
     private final Object[] variable;
 
@@ -1010,7 +1010,7 @@ public class Instructions {
   }
 
   /** Outputs a literal space character */
-  static class SpaceInst extends LiteralInst {
+  public static class SpaceInst extends LiteralInst {
 
     SpaceInst() {
       super("space", " ");
@@ -1040,7 +1040,7 @@ public class Instructions {
   /**
    * Represents a range of characters to be copied directly into the output buffer.
    */
-  static class TextInst extends BaseInstruction {
+  public static class TextInst extends BaseInstruction {
 
     private final StringView view;
 
@@ -1088,7 +1088,7 @@ public class Instructions {
    * invoke() method will determine which representation to emit for the final
    * value.
    */
-  static class VariableInst extends BaseInstruction implements Formattable {
+  public static class VariableInst extends BaseInstruction implements Formattable {
 
     private final Variables variables;
     private List<FormatterCall> formatters;
