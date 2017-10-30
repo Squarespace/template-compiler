@@ -66,6 +66,8 @@ public class Context {
 
   private boolean safeExecution = false;
 
+  private boolean preprocess = false;
+
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
 
   private List<ErrorInfo> errors;
@@ -131,6 +133,13 @@ public class Context {
    */
   public void setSafeExecution() {
     this.safeExecution = true;
+  }
+
+  /**
+   * Enable pre-processor mode.
+   */
+  public void setPreprocess(boolean preprocess) {
+    this.preprocess = preprocess;
   }
 
   public void setMaxPartialDepth(int depth) {
@@ -279,7 +288,7 @@ public class Context {
       // Compile the partial.  This can throw a syntax exception, which the formatter
       // will catch and nest inside a runtime exception.
       String source = partialNode.asText();
-      CompiledTemplate template = compiler.compile(source, safeExecution);
+      CompiledTemplate template = compiler.compile(source, safeExecution, preprocess);
       if (safeExecution) {
         List<ErrorInfo> errors = template.errors();
         if (!errors.isEmpty()) {

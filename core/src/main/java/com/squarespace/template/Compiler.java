@@ -58,7 +58,7 @@ public class Compiler {
    * If the compile fails an exception will be thrown.
    */
   public CompiledTemplate compile(String template) throws CodeSyntaxException {
-    return compile(template, false);
+    return compile(template, false, false);
   }
 
   /**
@@ -66,12 +66,12 @@ public class Compiler {
    * compile a template once and execute it multiple times. The {@code safeMode} flag
    * indicates whether errors cause an exception to be thrown.
    */
-  public CompiledTemplate compile(String template, boolean safeMode) throws CodeSyntaxException {
+  public CompiledTemplate compile(String template, boolean safeMode, boolean preprocess) throws CodeSyntaxException {
     CodeMachine machine = new CodeMachine();
     if (safeMode) {
       machine.setValidate();
     }
-    Tokenizer tokenizer = new Tokenizer(template, machine, formatterTable, predicateTable);
+    Tokenizer tokenizer = new Tokenizer(template, machine, preprocess, formatterTable, predicateTable);
     if (safeMode) {
       tokenizer.setValidate();
     }

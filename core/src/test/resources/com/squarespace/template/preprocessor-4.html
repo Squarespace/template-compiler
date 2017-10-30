@@ -1,0 +1,33 @@
+:COMMENTS
+
+Demonstrates processing a template that contains unevaluated pre-processor
+instructions, producing unexpected results.
+
+The pre-processor scoped instructions will be ignored and filtered from the
+output by the tokenizer.
+
+:PROPERTIES
+preprocess=false
+
+:JSON
+{
+  "comment": "This is a comment.",
+  "foo": {"bar": "Oops", "baz": "Uh-oh"}
+}
+
+:TEMPLATE
+{^# preprocessor mode comments should disappear #}
+{^.macro start}
+{.section foo}{bar}
+  {# {^comment} #}{^.end}
+
+{^.macro end}{baz}
+{.end}{^.end}
+
+{^@|apply start}{^@|apply end}
+
+:OUTPUT
+Oops
+  {#  #}
+
+Uh-oh

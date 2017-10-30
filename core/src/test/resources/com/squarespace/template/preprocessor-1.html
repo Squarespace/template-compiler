@@ -1,0 +1,25 @@
+:PROPERTIES
+preprocess=true
+
+:JSON
+{
+	"states": [
+		{"name": "Arizona"},
+		{"name": "New York"},
+		{"name": "Massachusetts"}
+	]
+}
+
+:TEMPLATE
+{^.repeated section states}{^name}{^.alternates with}, {^.end}
+
+{.repeated section states}
+	State {@index} is {name}.
+{.end}
+
+:OUTPUT
+Arizona, New York, Massachusetts
+
+{.repeated section states}
+	State {@index} is {name}.
+{.end}

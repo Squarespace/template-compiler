@@ -40,6 +40,7 @@ public class CompilerExecutor {
   private LoggingHook loggingHook;
   private CodeLimiter codeLimiter;
   private boolean safeExecution;
+  private boolean preprocess;
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
 
   CompilerExecutor(Compiler compiler) {
@@ -54,7 +55,8 @@ public class CompilerExecutor {
     Context ctx = new Context(rootNode, buffer, locale);
     Instruction instruction = rootInstruction;
     if (instruction == null) {
-      CompiledTemplate compiled = compiler.compile(template == null ? "" : template, safeExecution);
+      template = template == null ? "" : template;
+      CompiledTemplate compiled = compiler.compile(template, safeExecution, preprocess);
       for (ErrorInfo error : compiled.errors()) {
         ctx.addError(error);
       }
@@ -198,6 +200,14 @@ public class CompilerExecutor {
    */
   public CompilerExecutor safeExecution(boolean safeExecution) {
     this.safeExecution = safeExecution;
+    return this;
+  }
+
+  /**
+   * Put the compiler into pre-process mode.
+   */
+  public CompilerExecutor preprocess(boolean preprocess) {
+    this.preprocess = preprocess;
     return this;
   }
 

@@ -27,14 +27,21 @@ public class RoundTripTest extends UnitTestBase {
 
   @Test
   public void testRoundTrip() throws CodeException {
-    run("roundtrip-1.html");
-    run("wright.html");
+    run("roundtrip-1.html", false);
+    run("wright.html", false);
   }
 
-  private void run(String path) throws CodeException {
+  @Test
+  public void testPreprocessor() throws CodeException {
+    run("roundtrip-1.html", true);
+    run("wright.html", true);
+    run("roundtrip-preprocessor-1.html", true);
+  }
+
+  private void run(String path, boolean preprocess) throws CodeException {
     String expected = GeneralUtils.loadResource(RoundTripTest.class, path);
     CodeMachine sink = new CodeMachine();
-    Tokenizer tokenizer = new Tokenizer(expected, sink, formatterTable(), predicateTable());
+    Tokenizer tokenizer = new Tokenizer(expected, sink, preprocess, formatterTable(), predicateTable());
     tokenizer.setValidate();
     tokenizer.consume();
 

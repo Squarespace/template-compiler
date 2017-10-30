@@ -24,6 +24,10 @@ public interface Instruction {
 
   InstructionType getType();
 
+  void setPreprocessScope();
+
+  boolean inPreprocessScope();
+
   void setLineNumber(int line);
 
   int getLineNumber();

@@ -1,0 +1,23 @@
+:PROPERTIES
+preprocess=true
+
+:JSON
+{
+  "comment": "This is a comment."
+}
+
+:TEMPLATE
+{^# preprocessor mode comments should disappear #}
+{^.macro start}
+{.section foo}{bar}
+  {# {^comment} #}{^.end}
+
+{^.macro end}{baz}
+{.end}{^.end}
+
+{^@|apply start}{^@|apply end}
+
+:OUTPUT
+{.section foo}{bar}
+  {# This is a comment. #}{baz}
+{.end}

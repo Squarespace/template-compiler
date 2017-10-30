@@ -77,6 +77,13 @@ public class TokenMatcher {
   }
 
   /**
+   * Skip a token rather than consume it.
+   */
+  public void skip() {
+    pointer = matchEnd;
+  }
+
+  /**
    * Once we're done matching we can assert that we've consumed the entire input range.
    */
   public boolean finished() {
@@ -177,7 +184,11 @@ public class TokenMatcher {
 
   public boolean peek(int skip, char ch) {
     int p = pointer + skip;
-    return pointer < end ? raw.charAt(p) == ch : false;
+    return p < end ? raw.charAt(p) == ch : false;
+  }
+
+  public void seek(int n) {
+    pointer += n;
   }
 
   /**

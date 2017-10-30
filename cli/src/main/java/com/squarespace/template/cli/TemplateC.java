@@ -98,6 +98,10 @@ public class TemplateC {
       .type(String.class)
       .help("JSON partials");
 
+    parser.addArgument("--preprocess", "-P")
+      .action(Arguments.storeTrue())
+      .help("Preprocess the template");
+
     parser.addArgument("template")
     .type(String.class)
     .help("Template source");
@@ -105,14 +109,19 @@ public class TemplateC {
     int exitCode = 1;
     try {
       Namespace res = parser.parseArgs(args);
+      boolean preprocess = res.getBoolean("preprocess");
       if (res.getBoolean("stats")) {
-        exitCode = stats(res.getString("template"));
+        exitCode = stats(res.getString("template"), preprocess);
 
       } else if (res.getBoolean("tree")) {
-        exitCode = tree(res.getString("template"));
+        exitCode = tree(res.getString("template"), preprocess);
 
       } else {
-        exitCode = compile(res.getString("template"), res.getString("json"), res.getString("partials"));
+        exitCode = compile(
+            res.getString("template"),
+            res.getString("json"),
+            res.getString("partials"),
+            preprocess);
       }
 
     } catch (CodeException | IOException e) {
@@ -130,7 +139,7 @@ public class TemplateC {
   /**
    * Compile a template against a given json tree and emit the result.
    */
-  protected int compile(String templatePath, String jsonPath, String partialsPath)
+  protected int compile(String templatePath, String jsonPath, String partialsPath, boolean preprocess)
       throws CodeException, IOException {
 
     String template = readFile(templatePath);
@@ -144,7 +153,7 @@ public class TemplateC {
       partials = readFile(partialsPath);
     }
 
-    CompiledTemplate compiled = compiler().compile(template, true);
+    CompiledTemplate compiled = compiler().compile(template, true, preprocess);
 
     StringBuilder errorBuf = new StringBuilder();
     List<ErrorInfo> errors = compiled.errors();
@@ -201,10 +210,10 @@ public class TemplateC {
   /**
    * Scan the compiled template and print statistics.
    */
-  protected int stats(String templatePath) throws CodeException, IOException {
+  protected int stats(String templatePath, boolean preprocess) throws CodeException, IOException {
     String template = readFile(templatePath);
 
-    CompiledTemplate compiled = compiler().compile(template, false);
+    CompiledTemplate compiled = compiler().compile(template, false, preprocess);
     ReferenceScanner scanner = new ReferenceScanner();
     scanner.extract(compiled.code());
     ObjectNode report = scanner.references().report();
@@ -216,10 +225,10 @@ public class TemplateC {
   /**
    * Print the syntax tree for the given template.
    */
-  protected int tree(String templatePath) throws CodeException, IOException {
+  protected int tree(String templatePath, boolean preprocess) throws CodeException, IOException {
     String template = readFile(templatePath);
 
-    CompiledTemplate compiled = compiler().compile(template, false);
+    CompiledTemplate compiled = compiler().compile(template, false, preprocess);
     StringBuilder buf = new StringBuilder();
     TreeEmitter.emit(compiled.code(), 0, buf);
     System.out.println(buf.toString());

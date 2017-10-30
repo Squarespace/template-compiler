@@ -396,5 +396,4 @@ public class TokenizerCoreTest extends UnitTestBase {
     }
     assertEquals(collector.getInstructions(), expected);
   }
-
 }

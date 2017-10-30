@@ -56,7 +56,6 @@ public class UnitTestBase {
     table.register(new CoreFormatters());
     table.register(new UnitTestFormatters());
     return table;
-
   }
 
   public PredicateTable predicateTable() {
@@ -96,6 +95,10 @@ public class UnitTestBase {
 
   public Tokenizer tokenizer(String data, CodeSink sink) {
     return new Tokenizer(data, sink, formatterTable(), predicateTable());
+  }
+
+  public Tokenizer tokenizer(String data, CodeSink sink, boolean preprocess) {
+    return new Tokenizer(data, sink, preprocess, formatterTable(), predicateTable());
   }
 
   public String repr(Instruction inst) {

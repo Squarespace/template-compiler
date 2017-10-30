@@ -113,7 +113,7 @@ public class ReferenceScannerTest extends UnitTestBase {
 
   private ObjectNode scan(String source) throws CodeException {
     ReferenceScanner scanner = new ReferenceScanner();
-    CompiledTemplate template = compiler().compile(source, false);
+    CompiledTemplate template = compiler().compile(source, false, false);
     scanner.extract(template.code());
     return scanner.references().report();
   }

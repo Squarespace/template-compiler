@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 public class CodeBuilderTest extends UnitTestBase {
 
+  private final Compiler compiler = compiler();
 
   @Test
   public void testComment() throws CodeException {
@@ -61,7 +62,7 @@ public class CodeBuilderTest extends UnitTestBase {
   }
 
   private Instruction parse(String template) throws CodeException {
-    return compiler().compile(template).code();
+    return compiler.compile(template).code();
   }
 
 }

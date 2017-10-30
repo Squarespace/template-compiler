@@ -68,15 +68,28 @@ public class ReprEmitter {
     return buf.toString();
   }
 
+  private static void emitPreprocess(Instruction inst, StringBuilder buf) {
+    if (inst.inPreprocessScope()) {
+      buf.append('^');
+    }
+  }
+
   public static void emit(AlternatesWithInst inst, StringBuilder buf, boolean recurse) {
-    buf.append("{.alternates with}");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".alternates with}");
     if (recurse) {
       emitBlock(inst, buf, recurse);
     }
   }
 
   public static void emit(CommentInst inst, StringBuilder buf) {
-    buf.append("{#");
+    boolean preproc = inst.inPreprocessScope() && !inst.isMultiLine();
+    buf.append('{');
+    if (preproc) {
+      buf.append('^');
+    }
+    buf.append('#');
     if (inst.isMultiLine()) {
       buf.append('#');
     }
@@ -89,7 +102,9 @@ public class ReprEmitter {
   }
 
   public static void emit(EndInst inst, StringBuilder buf) {
-    buf.append("{.end}");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".end}");
   }
 
   public static void emit(Arguments args, StringBuilder buf) {
@@ -113,7 +128,9 @@ public class ReprEmitter {
   }
 
   public static void emit(IfInst inst, StringBuilder buf, boolean recurse) {
-    buf.append("{.if ");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".if ");
     emitIfExpression(inst, buf);
     buf.append('}');
     if (recurse) {
@@ -140,7 +157,9 @@ public class ReprEmitter {
 
   public static void emit(IfPredicateInst inst, StringBuilder buf, boolean recurse) {
     Predicate predicate = inst.getPredicate();
-    buf.append("{.if ");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".if ");
     buf.append(predicate.identifier());
     emit(inst.getArguments(), buf);
     buf.append('}');
@@ -150,7 +169,9 @@ public class ReprEmitter {
   }
 
   public static void emit(InjectInst inst, StringBuilder buf, boolean recurse) {
-    buf.append("{.inject ");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".inject ");
     buf.append(inst.variable());
     buf.append(' ');
     buf.append(inst.filename());
@@ -158,11 +179,15 @@ public class ReprEmitter {
   }
 
   public static void emit(LiteralInst inst, StringBuilder buf) {
-    buf.append("{.").append(inst.getName()).append('}');
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".").append(inst.getName()).append('}');
   }
 
   public static void emit(MetaInst inst, StringBuilder buf) {
-    buf.append("{.");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append('.');
     if (inst.isLeft()) {
       buf.append("meta-left");
     } else {
@@ -172,7 +197,9 @@ public class ReprEmitter {
   }
 
   public static void emit(MacroInst inst, StringBuilder buf, boolean recurse) {
-    buf.append("{.macro ");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".macro ");
     buf.append(inst.name());
     buf.append('}');
     if (recurse) {
@@ -182,7 +209,9 @@ public class ReprEmitter {
 
   public static void emit(PredicateInst inst, StringBuilder buf, boolean recurse) {
     Predicate predicate = inst.getPredicate();
-    buf.append("{.");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append('.');
     if (inst.getType() == InstructionType.PREDICATE) {
       buf.append(predicate.identifier());
     } else {
@@ -199,7 +228,9 @@ public class ReprEmitter {
   }
 
   public static void emit(RepeatedInst inst, StringBuilder buf, boolean recurse) {
-    buf.append("{.repeated section ");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".repeated section ");
     emitNames(inst.getVariable(), buf);
     buf.append('}');
     if (recurse) {
@@ -228,14 +259,18 @@ public class ReprEmitter {
   }
 
   public static void emit(BindVarInst inst, StringBuilder buf) {
-    buf.append("{.var ").append(inst.getName()).append(' ');
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".var ").append(inst.getName()).append(' ');
     emitVariables(inst.getVariables(), buf);
     emit(inst.getFormatters(), buf);
     buf.append('}');
   }
 
   public static void emit(SectionInst inst, StringBuilder buf, boolean recurse) {
-    buf.append("{.section ");
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".section ");
     emitNames(inst.getVariable(), buf);
     buf.append('}');
     if (recurse) {
@@ -250,6 +285,7 @@ public class ReprEmitter {
 
   public static void emit(VariableInst inst, StringBuilder buf) {
     buf.append('{');
+    emitPreprocess(inst, buf);
     emitVariables(inst.getVariables(), buf);
     emit(inst.getFormatters(), buf);
     buf.append('}');

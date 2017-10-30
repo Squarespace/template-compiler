@@ -42,6 +42,7 @@ import difflib.Patch;
  */
 public class TestCaseParser extends UnitTestBase {
 
+  private static final String TYPE_COMMENTS = "COMMENTS";
   private static final String TYPE_PROPERTIES = "PROPERTIES";
   private static final String TYPE_ERROR = "ERROR";
   private static final String TYPE_JSON = "JSON";
@@ -57,6 +58,7 @@ public class TestCaseParser extends UnitTestBase {
    */
   public TestCase parseTest(String source) {
     Map<String, String> sections = parseSections(source);
+    String comments = sections.get(TYPE_COMMENTS);
     String props = sections.get(TYPE_PROPERTIES);
     String json = sections.get(TYPE_JSON);
     String template = sections.get(TYPE_TEMPLATE);
@@ -119,7 +121,10 @@ public class TestCaseParser extends UnitTestBase {
         if (inject != null) {
           injectMap = (ObjectNode) JsonUtils.decode(inject.trim());
         }
-        Instruction code = compiler.compile(template, false).code();
+
+        boolean preprocess = Boolean.valueOf(properties.getProperty("preprocess"));
+
+        Instruction code = compiler.compile(template, false, preprocess).code();
         CompilerExecutor executor = compiler.newExecutor()
             .code(code)
             .json(json)

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 SQUARESPACE, Inc.
+ * Copyright (c) 2017 SQUARESPACE, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,21 @@
 
 package com.squarespace.template;
 
+import org.testng.annotations.Test;
 
-public enum InstructionType {
 
-  ALTERNATES_WITH,
-  BINDVAR,
-  COMMENT,
-  END,
-  EOF,
-  IF,
-  INJECT,
-  MACRO,
-  META_LEFT,
-  META_RIGHT,
-  NEWLINE,
-  NOOP,
-  OR_PREDICATE,
-  PREDICATE,
-  PREPROCESSOR,
-  REPEATED,
-  ROOT,
-  SECTION,
-  SPACE,
-  TAB,
-  TEXT,
-  VARIABLE;
+public class PreprocessTest extends UnitTestBase {
+
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), PreprocessTest.class);
+
+  @Test
+  public void testPreprocess() {
+    runner.run(
+        "preprocessor-1.html",
+        "preprocessor-2.html",
+        "preprocessor-3.html",
+        "preprocessor-4.html"
+    );
+  }
 
 }

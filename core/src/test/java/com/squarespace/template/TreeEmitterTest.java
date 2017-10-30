@@ -30,7 +30,7 @@ public class TreeEmitterTest extends UnitTestBase {
 
     String input = sections.get("INPUT").trim();
     String expected = sections.get("EXPECTED").trim();
-    Instruction inst = compiler().compile(input, false).code();
+    Instruction inst = compiler().compile(input, false, false).code();
     String actual = TreeEmitter.get(inst).trim();
     if (!actual.equals(expected)) {
       throw new AssertionError("Output does not match:\n" + TestCaseParser.diff(expected, actual));

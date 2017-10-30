@@ -48,6 +48,11 @@ import com.squarespace.template.Instructions.VariableInst;
  */
 public class CodeMaker {
 
+  public <T extends Instruction> T pre(T inst) {
+    inst.setPreprocessScope();
+    return inst;
+  }
+
   public AlternatesWithInst alternates() {
     return new AlternatesWithInst();
   }

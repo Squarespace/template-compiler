@@ -84,6 +84,7 @@ public class Tokenizer {
   private List<ErrorInfo> errors;
 
   boolean validate = false;
+  boolean preprocess = false;
 
   private int textLine;
   private int textOffset;
@@ -95,10 +96,26 @@ public class Tokenizer {
   private int lineCounter = 0;
   private int lineIndex = 0;
 
-  public Tokenizer(String raw, CodeSink sink, FormatterTable formatterTable, PredicateTable predicateTable) {
+  public Tokenizer(
+      String raw,
+      CodeSink sink,
+      FormatterTable formatterTable,
+      PredicateTable predicateTable) {
+
+    this(raw, sink, false, formatterTable, predicateTable);
+  }
+
+  public Tokenizer(
+      String raw,
+      CodeSink sink,
+      boolean preprocess,
+      FormatterTable formatterTable,
+      PredicateTable predicateTable) {
+
     this.raw = raw;
     this.length = raw.length();
     this.sink = sink;
+    this.preprocess = preprocess;
     this.formatterTable = formatterTable;
     this.predicateTable = predicateTable;
     this.matcher = new TokenMatcher(raw);
@@ -125,6 +142,10 @@ public class Tokenizer {
     }
   }
 
+  public void setPreprocess() {
+    this.preprocess = true;
+  }
+
   public List<ErrorInfo> getErrors() {
     if (errors == null) {
       errors = new ArrayList<>(0);
@@ -136,10 +157,17 @@ public class Tokenizer {
     return (index < length) ? raw.charAt(index) : Patterns.EOF_CHAR;
   }
 
-  private void emitInstruction(Instruction inst) throws CodeSyntaxException {
+  private void emitInstruction(Instruction inst, boolean preprocessorScope) throws CodeSyntaxException {
     inst.setLineNumber(instLine + 1);
     inst.setCharOffset(instOffset + 1);
+    if (preprocessorScope) {
+      inst.setPreprocessScope();
+    }
     sink.accept(inst);
+  }
+
+  private void emitInstruction(Instruction inst) throws CodeSyntaxException {
+    emitInstruction(inst, preprocess);
   }
 
   private boolean emitInvalid() throws CodeSyntaxException {
@@ -209,17 +237,30 @@ public class Tokenizer {
     if (!(start < end)) {
       throw new RuntimeException("Start position should always be less than end. Bug in tokenizer.");
     }
-    int innerStart = start + 1;
-    int innerEnd = end - 1;
-
-    // Emit a comment, skipping over the "#".
-    if (getc(innerStart) == '#') {
-      emitInstruction(maker.comment(raw, innerStart + 1, innerEnd));
-      return true;
-    }
 
     // Start token matching everything between '{' and '}'
-    matcher.region(innerStart, innerEnd);
+    matcher.region(start + 1, end - 1);
+
+    // See if the current instruction is scoped to the pre-processor.
+    if (matcher.peek(0, '^')) {
+      // If not in pre-processing mode, skip it.
+      if (!preprocess) {
+        return true;
+      }
+      matcher.seek(1);
+
+    } else if (preprocess) {
+      // Normal instructions in pre-processing mode are output as text.
+      return false;
+    }
+
+    // Emit a comment, skipping over the "#".
+    if (matcher.peek(0, '#')) {
+      matcher.seek(1);
+      Instruction comment = maker.comment(raw, matcher.pointer(), matcher.end());
+      emitInstruction(comment);
+      return true;
+    }
 
     return parseKeyword() || parseVariable();
   }
@@ -837,7 +878,7 @@ public class Tokenizer {
           case POUND_CHAR:
             // Look-ahead for ##} sequence to terminate the comment block.
             if (getc(index + 1) == POUND_CHAR && getc(index + 2) == META_RIGHT_CHAR) {
-              emitInstruction(maker.mcomment(raw, start, index));
+              emitInstruction(maker.mcomment(raw, start, index), false);
               // Skip over multi-line suffix.
               index += 3;
               save = index;

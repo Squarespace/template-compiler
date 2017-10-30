@@ -66,6 +66,9 @@ public class InstructionReprTest extends UnitTestBase {
     assertEquals(a1.repr(), "{.alternates with}---");
 
     assertEquals(ReprEmitter.get(a1, false), "{.alternates with}");
+
+    a1.setPreprocessScope();
+    assertEquals(ReprEmitter.get(a1, false), "{^.alternates with}");
   }
 
   @Test

@@ -1,0 +1,30 @@
+:COMMENTS
+
+Demonstrates emitting instructions without regard to proper nesting.
+In pre-processor mode non-lifted instructions are treated as text.
+
+:PROPERTIES
+preprocess=true
+
+:JSON
+{
+  "foo": {"a": 0, "b": 1}
+}
+
+:TEMPLATE
+{^.section foo}{^.if b}{.repeated section items}{^.or}{.repeated section blogs}{^.end}
+  {name}
+{^.end}{.end}
+
+{^.section foo}{.section {^.if a}bar}{^.or}baz{^.end}}
+  {quux}
+{^.end}{.end}
+
+:OUTPUT
+{.repeated section items}
+  {name}
+{.end}
+
+{.section baz}
+  {quux}
+{.end}

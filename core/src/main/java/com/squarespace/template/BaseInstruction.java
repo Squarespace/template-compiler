@@ -24,9 +24,17 @@ import org.apache.commons.lang3.StringEscapeUtils;
  */
 public abstract class BaseInstruction implements Instruction {
 
+  private boolean preprocessScope;
   private int lineNumber;
-
   private int charOffset;
+
+  public void setPreprocessScope() {
+    this.preprocessScope = true;
+  }
+
+  public boolean inPreprocessScope() {
+    return this.preprocessScope;
+  }
 
   public void setLineNumber(int number) {
     this.lineNumber = number;

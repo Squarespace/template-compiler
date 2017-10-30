@@ -52,9 +52,9 @@ public class CompilerTest {
 
   @Test
   public void testCompile() throws CodeException {
-    COMPILER.compile("{.section foo}{@}{.end}", false);
+    COMPILER.compile("{.section foo}{@}{.end}", false, false);
     try {
-      COMPILER.compile("{.foo?}", false);
+      COMPILER.compile("{.foo?}", false, false);
       Assert.fail("Expected CodeException");
     } catch (CodeException e) {
     }

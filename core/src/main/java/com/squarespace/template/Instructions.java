@@ -517,9 +517,7 @@ public class Instructions {
   public static class InjectInst extends BaseInstruction {
 
     private final String variable;
-
     private final String filename;
-
     private final Arguments arguments;
 
     InjectInst(String variable, String filename, Arguments arguments) {
@@ -743,6 +741,33 @@ public class Instructions {
     @Override
     public InstructionType getType() {
       return InstructionType.NEWLINE;
+    }
+
+  }
+
+  /**
+   * Does nothing.
+   */
+  public static class NoopInst extends BaseInstruction {
+
+    @Override
+    public boolean equals(Object obj) {
+      return (obj instanceof NoopInst);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.NOOP;
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      // NO VISIBLE REPRESENTATION
     }
 
   }
