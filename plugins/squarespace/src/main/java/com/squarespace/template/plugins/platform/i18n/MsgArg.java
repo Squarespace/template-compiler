@@ -16,6 +16,7 @@
 package com.squarespace.template.plugins.platform.i18n;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldr.MessageArg;
@@ -38,6 +39,7 @@ public class MsgArg implements MessageArg {
   protected boolean castFailed;
   protected String value;
   protected String currencyCode;
+  protected ZoneId timeZone;
   protected BigDecimal number;
 
   public MsgArg(Object[] name) {
@@ -50,6 +52,7 @@ public class MsgArg implements MessageArg {
     this.castFailed = false;
     this.value = null;
     this.currencyCode = null;
+    this.timeZone = null;
     this.number = null;
   }
 
@@ -86,6 +89,17 @@ public class MsgArg implements MessageArg {
       this.currencyCode = this.currencyNode.asText();
     }
     return this.currencyCode;
+  }
+
+  /**
+   * TODO: underlying cldr message format supports a per-argument timezone,
+   * but we currently have no standardized time object which associates
+   * a timezone with an instant. Once that exists we can obtain the zoneId
+   * in resolve() above.
+   */
+  @Override
+  public ZoneId timeZone() {
+    return this.timeZone;
   }
 
   @Override
