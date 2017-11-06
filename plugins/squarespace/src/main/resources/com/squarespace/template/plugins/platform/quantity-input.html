@@ -1,5 +1,7 @@
+{.var @quantityLabel localizedStrings.quantity}
+
 <div class="product-quantity-input" data-item-id="{id}">
-  <div class="quantity-label">Quantity:</div>
+  <div class="quantity-label">{.if @quantityLabel}{@quantityLabel}{.or}Quantity{.end}:</div>
   <input size="4" max="9999" min="1" value="1" type="number" step="1"></input>
 </div>
 

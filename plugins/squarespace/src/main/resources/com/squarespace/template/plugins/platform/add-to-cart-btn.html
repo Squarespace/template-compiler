@@ -4,9 +4,10 @@
 {.var @useCustom @content.useCustomAddButtonText}
 {.var @customButton @content.customAddButtonText}
 {.var @productType @content.productType}
+{.var @addToCartText localizedStrings.addToCart}
 
 <div class="sqs-add-to-cart-button-wrapper">
   <div class="sqs-add-to-cart-button sqs-suppress-edit-mode sqs-editable-button {.if @fieldsFormId && @fieldsForm}use-form{.end}" data-collection-id="{collectionId}" data-item-id="{id}" data-product-type="{@productType}" data-use-custom-label="{@useCustom}" data-original-label="{.if @useCustom && @customButton}{@customButton}{.or}Add To Cart{.end}" {.if @fieldsFormId && @fieldsForm}data-form="{@fieldsForm|json|htmlattr}"{.end}>
-    <div class="sqs-add-to-cart-button-inner">{.if @useCustom && @customButton}{@customButton}{.or}Add To Cart{.end}</div>
+    <div class="sqs-add-to-cart-button-inner">{.if @useCustom && @customButton}{@customButton}{.or}{.if @addToCartText}{@addToCartText}{.or}Add To Cart{.end}{.end}</div>
   </div>
 </div>
