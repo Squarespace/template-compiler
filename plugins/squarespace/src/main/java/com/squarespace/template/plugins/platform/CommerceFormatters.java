@@ -95,7 +95,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      var.set(executeTemplate(ctx, template, var.node(), true));
+      var.set(executeTemplate(ctx, template, var.node(), false));
     }
   }
 
@@ -390,7 +390,7 @@ public class CommerceFormatters implements FormatterRegistry {
         var.setMissing();
         return;
       }
-      var.set(executeTemplate(ctx, template, var.node(), true));
+      var.set(executeTemplate(ctx, template, var.node(), false));
     }
   }
 
