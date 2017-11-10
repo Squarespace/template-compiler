@@ -161,6 +161,15 @@ public class GeneralUtils {
   }
 
   /**
+   * Returns the translated string given the key in that localizedStrings node.
+   * If key is not found, it returns the defaultValue.
+   */
+  public static String localizeOrDefault(JsonNode localizedStrings, String key, String defaultValue) {
+    JsonNode node = localizedStrings.get(key);
+    return node == null ? defaultValue : node.asText();
+  }
+
+  /**
    * Returns true if the first non-whitespace character is one of the
    * valid starting characters for a JSON value; else false.
    */

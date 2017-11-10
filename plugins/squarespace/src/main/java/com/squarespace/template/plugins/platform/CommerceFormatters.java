@@ -26,6 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -335,8 +337,9 @@ public class CommerceFormatters implements FormatterRegistry {
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-product-quick-view-button\" data-id=\"").append(id);
-      buf.append("\" data-group=\"").append(group);
-      buf.append("\">Quick View</span>");
+      buf.append("\" data-group=\"").append(group).append("\">");
+      buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productQuickViewText").asText(), "Quick View"));
+      buf.append("</span>");
       var.set(buf);
     }
   }
@@ -351,10 +354,17 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode node = var.node();
+      StringBuilder buf = new StringBuilder();
       if (CommerceUtils.isSoldOut(node)) {
-        var.set("<div class=\"product-mark sold-out\">sold out</div>");
+        buf.append("<div class=\"product-mark sold-out\">");
+        buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productSoldOutText").asText(), "sold out"));
+        buf.append("</div>");
+        var.set(buf);
       } else if (CommerceUtils.isOnSale(node)) {
-        var.set("<div class=\"product-mark sale\">sale</div>");
+        buf.append("<div class=\"product-mark sale\">");
+        buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productSaleText").asText(), "sale"));
+        buf.append("</div>");
+        var.set(buf);
       } else {
         var.setMissing();
       }
@@ -457,8 +467,6 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class SummaryFormFieldFormatter extends BaseFormatter {
 
-    private static final Map<String, String> ANSWER_MAP = buildAnswerMap();
-
     private static final String[] TEMPLATES = new String[] {
       "address", "checkbox", "date", "likert", "name", "phone", "time"
     };
@@ -490,7 +498,8 @@ public class CommerceFormatters implements FormatterRegistry {
       } else {
         JsonNode node = field;
         if (type.equals("likert")) {
-          node = convertLikert(field.path("values"));
+          Map<String, String> ANSWER_MAP = buildAnswerMap(ctx.resolve("localizedStrings"));
+          node = convertLikert(field.path("values"), ANSWER_MAP);
         }
         value = executeTemplate(ctx, code, node, true);
       }
@@ -504,14 +513,14 @@ public class CommerceFormatters implements FormatterRegistry {
       if (GeneralUtils.isTruthy(value)) {
         buf.append(value.asText());
       } else {
-        buf.append("N/A");
+        buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productSummaryFormNoAnswerText").asText(), "N/A"));
       }
       buf.append("\n</div>");
 
       var.set(buf);
     }
 
-    private static JsonNode convertLikert(JsonNode values) {
+    private static JsonNode convertLikert(JsonNode values, Map<String, String> ANSWER_MAP) {
       ArrayNode result = JsonUtils.createArrayNode();
       Iterator<Entry<String, JsonNode>> likertFields = values.fields();
       while (likertFields.hasNext()) {
@@ -519,19 +528,20 @@ public class CommerceFormatters implements FormatterRegistry {
         String answer = likertField.getValue().asText();
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("question", likertField.getKey());
-        node.put("answer", getOrDefault(ANSWER_MAP, answer, "Neutral"));
+        node.put("answer", getOrDefault(ANSWER_MAP, answer, ANSWER_MAP.get("0")));
         result.add(node);
       }
       return result;
     }
 
-    private static Map<String, String> buildAnswerMap() {
+    private Map<String, String> buildAnswerMap(JsonNode localizedStringsNode) {
       Map<String, String> map = new HashMap<>();
-      map.put("-2", "Strongly Disagree");
-      map.put("-1", "Disagree");
-      map.put("0", "Neutral");
-      map.put("1", "Agree");
-      map.put("2", "Strongly Agree");
+      map.put("-2", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapStronglyDisagree", "Strongly Disagree"));
+      map.put("-2", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapStronglyDisagree", "Strongly Disagree"));
+      map.put("-1", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapDisagree", "Disagree"));
+      map.put("0", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapNeutral", "Neutral"));
+      map.put("1", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapAgree", "Agree"));
+      map.put("2", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerStronglyAgree", "Strongly Agree"));
       return map;
     }
   }
