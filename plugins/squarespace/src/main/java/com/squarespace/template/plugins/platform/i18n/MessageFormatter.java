@@ -84,9 +84,24 @@ public class MessageFormatter extends BaseFormatter {
     MessageArgs result = new MessageArgs();
     int count = arguments.count();
     for (int i = 0; i < count; i++) {
-      Object[] name = splitVariable(arguments.get(i));
-      MsgArg arg = new MsgArg(name);
-      result.add(arg);
+      String raw = arguments.get(i);
+      String name = null;
+
+      // Check if this is a named argument, e.g. <name>:<context variable>
+      int index = raw.indexOf(':');
+      if (index != -1) {
+        name = raw.substring(0, index);
+        raw = raw.substring(index + 1);
+      }
+
+      // Parse the context variable reference and append the argument.
+      Object[] variable = splitVariable(raw);
+      MsgArg arg = new MsgArg(variable);
+      if (name == null) {
+        result.add(arg);
+      } else {
+        result.add(name, arg);
+      }
     }
     return result;
   }
