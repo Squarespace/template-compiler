@@ -338,7 +338,8 @@ public class CommerceFormatters implements FormatterRegistry {
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-product-quick-view-button\" data-id=\"").append(id);
       buf.append("\" data-group=\"").append(group).append("\">");
-      buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productQuickViewText").asText(), "Quick View"));
+      String text = ctx.resolve("localizedStrings.productQuickViewText").asText();
+      buf.append(StringUtils.defaultIfEmpty(text, "Quick View"));
       buf.append("</span>");
       var.set(buf);
     }
@@ -356,13 +357,15 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode node = var.node();
       StringBuilder buf = new StringBuilder();
       if (CommerceUtils.isSoldOut(node)) {
+        String text = ctx.resolve("localizedStrings.productSoldOutText").asText();
         buf.append("<div class=\"product-mark sold-out\">");
-        buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productSoldOutText").asText(), "sold out"));
+        buf.append(StringUtils.defaultIfEmpty(text, "sold out"));
         buf.append("</div>");
         var.set(buf);
       } else if (CommerceUtils.isOnSale(node)) {
+        String text = ctx.resolve("localizedStrings.productSaleText").asText();
         buf.append("<div class=\"product-mark sale\">");
-        buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productSaleText").asText(), "sale"));
+        buf.append(StringUtils.defaultIfEmpty(text, "sale"));
         buf.append("</div>");
         var.set(buf);
       } else {
@@ -498,8 +501,8 @@ public class CommerceFormatters implements FormatterRegistry {
       } else {
         JsonNode node = field;
         if (type.equals("likert")) {
-          Map<String, String> ANSWER_MAP = buildAnswerMap(ctx.resolve("localizedStrings"));
-          node = convertLikert(field.path("values"), ANSWER_MAP);
+          Map<String, String> answerMap = buildAnswerMap(ctx.resolve("localizedStrings"));
+          node = convertLikert(field.path("values"), answerMap);
         }
         value = executeTemplate(ctx, code, node, true);
       }
@@ -513,14 +516,15 @@ public class CommerceFormatters implements FormatterRegistry {
       if (GeneralUtils.isTruthy(value)) {
         buf.append(value.asText());
       } else {
-        buf.append(StringUtils.defaultIfEmpty(ctx.resolve("localizedStrings.productSummaryFormNoAnswerText").asText(), "N/A"));
+        String text = ctx.resolve("localizedStrings.productSummaryFormNoAnswerText").asText();
+        buf.append(StringUtils.defaultIfEmpty(text, "N/A"));
       }
       buf.append("\n</div>");
 
       var.set(buf);
     }
 
-    private static JsonNode convertLikert(JsonNode values, Map<String, String> ANSWER_MAP) {
+    private static JsonNode convertLikert(JsonNode values, Map<String, String> answerMap) {
       ArrayNode result = JsonUtils.createArrayNode();
       Iterator<Entry<String, JsonNode>> likertFields = values.fields();
       while (likertFields.hasNext()) {
@@ -528,20 +532,26 @@ public class CommerceFormatters implements FormatterRegistry {
         String answer = likertField.getValue().asText();
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("question", likertField.getKey());
-        node.put("answer", getOrDefault(ANSWER_MAP, answer, ANSWER_MAP.get("0")));
+        node.put("answer", getOrDefault(answerMap, answer, answerMap.get("0")));
         result.add(node);
       }
       return result;
     }
 
-    private Map<String, String> buildAnswerMap(JsonNode localizedStringsNode) {
+    private static final String KEY_PREFIX = "productAnswerMap";
+    private static final String KEY_STRONGLY_DISAGREE = KEY_PREFIX + "StronglyDisagree";
+    private static final String KEY_DISAGREE = KEY_PREFIX + "Disagree";
+    private static final String KEY_NEUTRAL = KEY_PREFIX + "Neutral";
+    private static final String KEY_AGREE = KEY_PREFIX + "Agree";
+    private static final String KEY_STRONGLY_AGREE = KEY_PREFIX + "StronglyAgree";
+
+    private Map<String, String> buildAnswerMap(JsonNode strings) {
       Map<String, String> map = new HashMap<>();
-      map.put("-2", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapStronglyDisagree", "Strongly Disagree"));
-      map.put("-2", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapStronglyDisagree", "Strongly Disagree"));
-      map.put("-1", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapDisagree", "Disagree"));
-      map.put("0", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapNeutral", "Neutral"));
-      map.put("1", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerMapAgree", "Agree"));
-      map.put("2", GeneralUtils.localizeOrDefault(localizedStringsNode, "productAnswerStronglyAgree", "Strongly Agree"));
+      map.put("-2", GeneralUtils.localizeOrDefault(strings, KEY_STRONGLY_DISAGREE, "Strongly Disagree"));
+      map.put("-1", GeneralUtils.localizeOrDefault(strings, KEY_DISAGREE, "Disagree"));
+      map.put("0", GeneralUtils.localizeOrDefault(strings, KEY_NEUTRAL, "Neutral"));
+      map.put("1", GeneralUtils.localizeOrDefault(strings, KEY_AGREE, "Agree"));
+      map.put("2", GeneralUtils.localizeOrDefault(strings, KEY_STRONGLY_AGREE, "Strongly Agree"));
       return map;
     }
   }
