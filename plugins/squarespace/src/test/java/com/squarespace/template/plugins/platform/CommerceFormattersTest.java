@@ -72,20 +72,6 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testCouponDescriptor() {
-    runner.run(
-        "f-coupon-descriptor-1.html",
-        "f-coupon-descriptor-2.html",
-        "f-coupon-descriptor-3.html",
-        "f-coupon-descriptor-4.html",
-        "f-coupon-descriptor-5.html",
-        "f-coupon-descriptor-6.html",
-        "f-coupon-descriptor-7.html",
-        "f-coupon-descriptor-8.html"
-        );
-  }
-
-  @Test
   public void testFromPrice() {
     runner.run(
         "f-from-price-1.html",

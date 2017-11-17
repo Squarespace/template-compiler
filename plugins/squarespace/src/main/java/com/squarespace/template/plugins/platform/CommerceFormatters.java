@@ -62,7 +62,6 @@ public class CommerceFormatters implements FormatterRegistry {
     table.add(new CartQuantityFormatter());
     table.add(new CartSubtotalFormatter());
     table.add(new CartUrlFormatter());
-    table.add(new CouponDescriptorFormatter());
     table.add(new FromPriceFormatter());
     table.add(new MoneyCamelFormatter());
     table.add(new MoneyDashFormatter());
@@ -152,21 +151,6 @@ public class CommerceFormatters implements FormatterRegistry {
       variables.first().set("/cart");
     }
   }
-
-  protected static class CouponDescriptorFormatter extends BaseFormatter {
-
-    public CouponDescriptorFormatter() {
-      super("coupon-descriptor", false);
-    }
-
-    @Override
-    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
-      Variable var = variables.first();
-      StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeCouponDescriptor(var.node(), buf);
-      var.set(buf);
-    }
-  };
 
   protected static class FromPriceFormatter extends BaseFormatter {
 

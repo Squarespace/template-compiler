@@ -27,13 +27,8 @@ import java.util.Locale;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
-import com.squarespace.template.MapBuilder;
-import com.squarespace.template.MapFormat;
 import com.squarespace.template.plugins.PluginUtils;
-import com.squarespace.template.plugins.platform.enums.CommerceCouponType;
-import com.squarespace.template.plugins.platform.enums.CommerceDiscountType;
 import com.squarespace.template.plugins.platform.enums.ProductType;
 
 
@@ -260,77 +255,6 @@ public class CommerceUtils {
       default:
         return true;
     }
-  }
-
-  private static final MapFormat ALL_ORDERS_AMT = new MapFormat("Save %(discountAmt)s on any order.");
-
-  private static final MapFormat ALL_ORDERS_SHP = new MapFormat("Free shipping on any order.");
-
-  private static final MapFormat ORDERS_OVER_AMT = new MapFormat(
-      "Save %(discountAmt)s on any order over %(minPrice)s.");
-
-  private static final MapFormat ORDERS_OVER_SHP = new MapFormat("Free shipping on any order over %(minPrice)s.");
-
-  private static final MapFormat CATEGORIES_AMT = new MapFormat("Save %(discountAmt)s on select products.");
-
-  private static final MapFormat SINGLE_PRODUCT_AMT = new MapFormat("Save %(discountAmt)s on %(productTitle)s .");
-
-  public static void writeCouponDescriptor(JsonNode coupon, StringBuilder buf) {
-    String minPrice = PluginUtils.formatMoney(coupon.path("minPrice").asDouble(), Locale.US);
-    String productTitle = GeneralUtils.ifString(coupon.path("productTitle"), "?");
-    double discountAmt = GeneralUtils.ifDouble(coupon.path("discountAmt"), 0.0);
-    String discountAmtStr = (discountAmt > 0) ? Double.toString(discountAmt) : "?";
-
-    MapBuilder<String, Object> tplData = new MapBuilder<>();
-    tplData.put("minPrice", minPrice).put("productTitle", productTitle).put("discountAmt", discountAmtStr);
-
-    CommerceCouponType type = CommerceCouponType.fromCode(coupon.path("type").asInt());
-    MapFormat amountTpl = null;
-    MapFormat freeShipTpl = null;
-
-    switch (type) {
-      case ALL_ORDERS:
-        amountTpl = ALL_ORDERS_AMT;
-        freeShipTpl = ALL_ORDERS_SHP;
-        break;
-
-      case ORDERS_OVER:
-        amountTpl = ORDERS_OVER_AMT;
-        freeShipTpl = ORDERS_OVER_SHP;
-        break;
-
-      case CATEGORIES:
-        amountTpl = CATEGORIES_AMT;
-        break;
-
-      case SINGLE_PRODUCT:
-        amountTpl = SINGLE_PRODUCT_AMT;
-        break;
-
-      default:
-        return;
-    }
-
-    CommerceDiscountType discountType = CommerceDiscountType.fromCode(coupon.path("discountType").asInt());
-    switch (discountType) {
-      case FLAT:
-        tplData.put("discountAmt", PluginUtils.formatMoney(discountAmt, Locale.US));
-        break;
-
-      case PERCENTAGE:
-        tplData.put("discountAmt", discountAmt + "%");
-        break;
-
-      case FREE_SHIPPING:
-        if (freeShipTpl != null) {
-          buf.append(freeShipTpl.apply(tplData.get()));
-        }
-        return;
-
-      default:
-        return;
-    }
-    buf.append(amountTpl.apply(tplData.get()));
   }
 
   public static void writeMoneyString(double value, StringBuilder buf) {
