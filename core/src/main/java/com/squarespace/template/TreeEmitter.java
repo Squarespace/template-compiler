@@ -27,6 +27,7 @@ import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.IfInst;
+import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.SectionInst;
@@ -105,9 +106,24 @@ public class TreeEmitter {
         break;
 
       case IF:
-        buf.append(' ');
-        ReprEmitter.emitIfExpression((IfInst)inst, buf);
+      {
+        if (inst instanceof IfInst) {
+          buf.append(' ');
+          ReprEmitter.emitIfExpression((IfInst)inst, buf);
+        } else {
+          IfPredicateInst predicateInst = (IfPredicateInst) inst;
+          Predicate predicate = predicateInst.getPredicate();
+          if (predicate != null) {
+            buf.append(' ').append(predicate);
+            Arguments args = predicateInst.getArguments();
+            if (!args.isEmpty()) {
+              buf.append(' ');
+              emitArgs(args, buf);
+            }
+          }
+        }
         break;
+      }
 
       case OR_PREDICATE:
       case PREDICATE:

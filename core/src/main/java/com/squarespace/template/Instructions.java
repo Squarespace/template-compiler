@@ -93,8 +93,12 @@ public class Instructions {
     private List<FormatterCall> formatters;
 
     BindVarInst(String key, String variable) {
+      this(key, new Variables(variable));
+    }
+
+    BindVarInst(String key, Variables variables) {
       this.name = key;
-      this.variables = new Variables(variable);
+      this.variables = variables;
       setFormatters(null);
     }
 
@@ -530,6 +534,10 @@ public class Instructions {
 
     public String filename() {
       return filename;
+    }
+
+    public Arguments arguments() {
+      return arguments;
     }
 
     @Override

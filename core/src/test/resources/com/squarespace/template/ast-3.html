@@ -1,0 +1,23 @@
+:SOURCE
+{.repeated section items}
+a{.alternates with}---{.or}b
+{.end}
+
+{.repeated section items}
+{name}
+{.end}
+
+:JSON
+[17, 1, [
+  [4, "items",
+    [[0, "\na"]],
+  	[7, 0, 0, [[0, "b\n"]], 3],
+  	[[0, "---"]]
+  ],
+  [0, "\n\n"],
+  [4, "items", 
+    [[0, "\n"], [1, ["name"], 0], [0, "\n"]], 
+    3, 
+    0
+  ]
+], 18]

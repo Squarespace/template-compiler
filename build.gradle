@@ -31,6 +31,7 @@ project.ext {
   jsonunitVersion = '1.25.0'
   snifferVersion = '1.15'
   testngVersion = '6.9.4'
+  zjsonVersion = '0.3.6'
 
   buildDate = new java.util.Date()
   buildCommit = ('git rev-parse HEAD').execute().text.trim()

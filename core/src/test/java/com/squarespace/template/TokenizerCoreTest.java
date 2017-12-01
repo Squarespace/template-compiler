@@ -117,6 +117,13 @@ public class TokenizerCoreTest extends UnitTestBase {
   }
 
   @Test
+  public void testFoo() throws Exception {
+    CodeMaker mk = maker();
+    assertResult("{.var @name a,b|htmlattr}",
+        mk.bindvar("@name", mk.vars("a", "b"), mk.formatters(HTMLATTR)), mk.eof());
+  }
+
+  @Test
   public void testBindVar() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{.var @name foo.bar}", mk.bindvar("@name", "foo.bar"), mk.eof());

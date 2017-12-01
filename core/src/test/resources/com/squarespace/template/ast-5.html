@@ -1,0 +1,10 @@
+:SOURCE
+{.var @foo bar|html}
+{@foo}
+
+:JSON
+[17,1,[
+  [6, "@foo", ["bar"], [["html"]]],
+  [0, "\n"],
+  [1, ["@foo"], 0]
+],18]

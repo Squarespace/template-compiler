@@ -8,7 +8,7 @@
 		comment
 	##}
 
-  {.if foo || bar}{.or}output this{.end}
+  {.if quux && foo || bar}{.or}output this{.end}
   
   {.equal?|foo|"bar"}
     branch 1
@@ -37,8 +37,8 @@
   	{.macro another}another macro{.end}
   {.end}
 
-  {foo $ bar|json-pretty}
+  {foo,bar|json-pretty}
 
-  {.var @myvar baz $ bar|json-pretty}
+  {.var @myvar baz,bar|json-pretty}
 
 {.end}

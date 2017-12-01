@@ -17,6 +17,7 @@ dependencies {
   testCompile "org.testng:testng:${testngVersion}"
   testCompile "org.hamcrest:hamcrest-core:${hamcrestVersion}"
   testCompile "com.googlecode.java-diff-utils:diffutils:${diffutilsVersion}"
+  testCompile "com.flipkart.zjsonpatch:zjsonpatch:${zjsonVersion}"
 }
 
 configurations {

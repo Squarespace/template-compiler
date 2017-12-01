@@ -624,15 +624,13 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(URL_ENCODE, "\"\u201ca b\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
   }
 
-
   protected static String getDateTestJson(long timestamp, String tzId) {
     DateTimeZone timezone = DateTimeZone.forID(tzId);
     ObjectNode node = JsonUtils.createObjectNode();
     node.put("time", timestamp);
-    ObjectNode website = JsonUtils.createObjectNode();
+    ObjectNode website = node.putObject("website");
     website.put("timeZoneOffset", timezone.getOffset(timestamp));
     website.put("timeZone", timezone.getID());
-    node.put("website", website);
     return node.toString();
   }
 }

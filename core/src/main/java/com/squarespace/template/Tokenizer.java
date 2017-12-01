@@ -293,13 +293,13 @@ public class Tokenizer {
           return emitInvalid();
         }
 
-        if (!matcher.variable()) {
+        Variables vars = parseVariables();
+        if (vars == null) {
           fail(error(MISSING_VARIABLE_NAME).data(matcher.remainder()));
           return emitInvalid();
         }
 
-        String path = matcher.consume().repr();
-        BindVarInst instruction = maker.bindvar(name, path);
+        BindVarInst instruction = maker.bindvar(name, vars);
         List<FormatterCall> formatters = parseFormatters(instruction, start);
         if (formatters == null) {
           emitInstruction(instruction);
@@ -597,22 +597,41 @@ public class Tokenizer {
    * formatter can be "piped" into the next.
    */
   private boolean parseVariable() throws CodeSyntaxException {
-    if (!matcher.variable()) {
+    int start = matcher.matchStart();
+    Variables vars = parseVariables();
+    if (vars == null) {
       return false;
+    }
+    VariableInst instruction = maker.var(vars);
+    List<FormatterCall> formatters = parseFormatters(instruction, start);
+    if (formatters == null) {
+      emitInstruction(instruction);
+    } else if (!formatters.isEmpty()) {
+      instruction.setFormatters(formatters);
+      emitInstruction(instruction);
+    }
+    return true;
+  }
+
+  /**
+   * Parse one or more variable references. Returns null if an error occurred.
+   */
+  private Variables parseVariables() throws CodeSyntaxException {
+    if (!matcher.variable()) {
+      return null;
     }
 
     boolean requirePipe = false;
-    int start = matcher.matchStart();
     StringView token = matcher.consume();
     Variables vars = new Variables(token.repr());
 
     while (matcher.variablesDelimiter()) {
       matcher.consume();
       if (matcher.finished()) {
-        return false;
+        return null;
       }
       if (matcher.pipe() || !matcher.variable()) {
-        return false;
+        return null;
       }
       vars.add(matcher.consume().repr());
       requirePipe = true;
@@ -623,26 +642,17 @@ public class Tokenizer {
     // when we tried to parse the second '|' as a formatter name, so since
     // we've already matched one pipe, sanity-check here.
     if (matchedPipe && matcher.peek(1, '|')) {
-      return false;
+      return null;
     }
 
     // Multiple variable syntax is only allowed when passing variables to
     // formatters, which requires a pipe character immediately after the last variable.
     if (requirePipe) {
       if (!matchedPipe) {
-        return false;
+        return null;
       }
     }
-
-    VariableInst instruction = maker.var(vars);
-    List<FormatterCall> formatters = parseFormatters(instruction, start);
-    if (formatters == null) {
-      emitInstruction(instruction);
-    } else if (!formatters.isEmpty()) {
-      instruction.setFormatters(formatters);
-      emitInstruction(instruction);
-    }
-    return true;
+    return vars;
   }
 
   /**

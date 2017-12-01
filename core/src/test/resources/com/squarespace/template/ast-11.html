@@ -1,0 +1,11 @@
+:SOURCE
+{.if equal? foo bar}
+  they are equal.
+{.end}
+
+:JSON
+[17, 1, [ 
+  [5, "equal?", ["foo","bar"], [
+    [0,"\n  they are equal.\n"]
+  ], 3]
+], 18]

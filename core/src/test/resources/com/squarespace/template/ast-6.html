@@ -1,0 +1,28 @@
+:SOURCE
+{.macro person.html}
+  {name} is {status}.
+{.end}
+{.section person}
+  {@|apply person.html}
+{.end}
+
+:JSON
+[17,1,[
+
+  [10, "person.html", [
+    [0, "\n  "], 
+	[1, ["name"], 0],
+	[0, " is " ],
+	[1, ["status"], 0],
+	[0, ".\n"]
+  ]],
+
+  [0, "\n" ],
+
+  [2, "person", [
+    [0, "\n  "],
+    [1, ["@"], [[ "apply", ["person.html"]]]],
+    [0, "\n"] 
+  ], 3]
+
+],18]

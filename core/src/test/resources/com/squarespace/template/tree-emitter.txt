@@ -23,6 +23,9 @@
   	{.or}
   		post is older
   	{.end}
+  	{.if equal? foo bar}
+  	    yes they are equal
+  	{.end}
   {.alternates with}---
   {.or}
   	otherwise
@@ -58,12 +61,16 @@ SECTION {1,1} example
     OR_PREDICATE {21,4}
       TEXT {21,9} (len=22) "\n  \t\tpost is older\n  \t"
     END {23,4}
-    TEXT {23,10} (len=3) "\n  "
-    ALTERNATES_WITH {24,3}
-      TEXT {24,21} (len=6) "---\n  "
+    TEXT {23,10} (len=4) "\n  \t"
+    IF {24,4} equal? delim=' ' parsed=[foo, bar]
+      TEXT {24,24} (len=30) "\n  \t    yes they are equal\n  \t"
+    END {26,4}
+    TEXT {26,10} (len=3) "\n  "
+    ALTERNATES_WITH {27,3}
+      TEXT {27,21} (len=6) "---\n  "
     END {0,0}
-  OR_PREDICATE {25,3}
-    TEXT {25,8} (len=16) "\n  \totherwise\n  "
-  END {27,3}
-  TEXT {27,9} (len=4) "\n  \n"
-END {29,1}
+  OR_PREDICATE {28,3}
+    TEXT {28,8} (len=16) "\n  \totherwise\n  "
+  END {30,3}
+  TEXT {30,9} (len=4) "\n  \n"
+END {32,1}

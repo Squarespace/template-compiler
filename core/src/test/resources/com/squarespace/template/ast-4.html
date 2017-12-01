@@ -1,0 +1,13 @@
+:SOURCE
+{.even?}node is even{.end}
+{.odd? foo}foo is odd{.end}
+bar{.plural? bar}s{.end}
+
+:JSON
+[17, 1, [
+  [5, "even?", 0, [[0, "node is even"]], 3],
+  [0, "\n"],
+  [5, "odd?", ["foo"], [[0, "foo is odd"]], 3],
+  [0, "\nbar"],
+  [5, "plural?", ["bar"], [[0, "s"]], 3]
+], 18]

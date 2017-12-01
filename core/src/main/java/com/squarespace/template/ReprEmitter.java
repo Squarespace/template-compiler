@@ -230,6 +230,7 @@ public class ReprEmitter {
   public static void emit(BindVarInst inst, StringBuilder buf) {
     buf.append("{.var ").append(inst.getName()).append(' ');
     emitVariables(inst.getVariables(), buf);
+    emit(inst.getFormatters(), buf);
     buf.append('}');
   }
 
@@ -250,15 +251,22 @@ public class ReprEmitter {
   public static void emit(VariableInst inst, StringBuilder buf) {
     buf.append('{');
     emitVariables(inst.getVariables(), buf);
-    List<FormatterCall> formatterCalls = inst.getFormatters();
-    int size = formatterCalls.size();
+    emit(inst.getFormatters(), buf);
+    buf.append('}');
+  }
+
+  public static void emit(List<FormatterCall> formatters, StringBuilder buf) {
+    if (formatters == null) {
+      return;
+    }
+    int size = formatters.size();
     for (int i = 0; i < size; i++) {
-      FormatterCall call = formatterCalls.get(i);
+      FormatterCall call = formatters.get(i);
       buf.append('|');
       buf.append(call.getFormatter().identifier());
       emit(call.getArguments(), buf);
     }
-    buf.append('}');
+
   }
 
   public static void emitVariables(Variables variables, StringBuilder buf) {
