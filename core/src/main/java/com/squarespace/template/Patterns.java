@@ -105,7 +105,7 @@ public class Patterns {
 
   /** Local variable definition */
   public static final Recognizer VARIABLE_DEFINITION =
-      sequence(characters('@'), oneOrMore(WORD));
+      sequence(characters('@'), WORD);
 
   /**
    *  Matches instructions as well as predicates in their dot-prefixed form.

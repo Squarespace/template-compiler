@@ -18,8 +18,6 @@ package com.squarespace.template.plugins;
 
 public class FormatUtils {
 
-  private static final int MAX_ARGS = 50;
-
   public static class FormatArg {
 
     public final Object[] name;
@@ -39,6 +37,9 @@ public class FormatUtils {
     int i = 0;
 
     // indicates which slot to emit when we finish parsing a tag
+    //  0  - inside tag
+    // -1  - outside tag
+    // -2  - inside tag but ignoring
     int index = -1;
 
     // max arguments we can substitute
@@ -47,8 +48,10 @@ public class FormatUtils {
     int length = pattern.length();
     while (i < length) {
       char ch = pattern.charAt(i);
+      if (index == -2 && ch == '}') {
+        index = -1;
 
-      if (index != -1) {
+      } else if (index != -1) {
         switch (ch) {
           case '0':
           case '1':
@@ -60,10 +63,6 @@ public class FormatUtils {
           case '7':
           case '8':
           case '9':
-            // enforce an upper limit on the max number of arguments
-            if (index >= MAX_ARGS) {
-              break;
-            }
             // support > 9 arguments
             if (index > 0) {
               index *= 10;
@@ -79,19 +78,19 @@ public class FormatUtils {
             break;
 
           default:
+            index = -2;
             break;
         }
 
       } else if (ch == '{') {
         index = 0;
 
-      } else {
+      } else if (index != -2) {
         buf.append(ch);
       }
 
       i++;
     }
-
   }
 
 }

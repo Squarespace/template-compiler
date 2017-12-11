@@ -69,6 +69,8 @@ public class AstEmitterTest extends UnitTestBase {
     JsonNode expected = JsonUtils.decode(json);
 
     JsonNode actual = AstEmitter.get(template.code());
+
+    // TODO: improve the diff formatting.
     String diff = JsonDiff.asJson(expected, actual).toString();
     assertEquals(actual.toString(), expected.toString(), diff);
 

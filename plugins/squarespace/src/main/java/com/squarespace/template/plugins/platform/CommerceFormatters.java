@@ -446,8 +446,8 @@ public class CommerceFormatters implements FormatterRegistry {
       }
 
       ObjectNode obj = JsonUtils.createObjectNode();
-      obj.put("item", node);
-      obj.put("options", options);
+      obj.set("item", node);
+      obj.set("options", options);
       var.set(executeTemplate(ctx, template, obj, false));
     }
   }

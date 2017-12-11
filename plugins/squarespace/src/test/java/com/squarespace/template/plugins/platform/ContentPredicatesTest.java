@@ -157,7 +157,7 @@ public class ContentPredicatesTest extends PlatformUnitTestBase {
     ObjectNode dates = JsonUtils.createObjectNode();
     dates.put("startDate", date1);
     dates.put("endDate", KnownDates.NOV_15_2013_123030_UTC);
-    node.put("dates", dates);
+    node.set("dates", dates);
 
     String[] key = new String[] { "dates" };
     Context ctx = new Context(node);
@@ -204,7 +204,7 @@ public class ContentPredicatesTest extends PlatformUnitTestBase {
     ObjectNode website = JsonUtils.createObjectNode();
     website.put("timeZoneOffset", timezone.getOffset(timestamp));
     website.put("timeZone", timezone.getID());
-    node.put("website", website);
+    node.set("website", website);
     return node.toString();
   }
 
