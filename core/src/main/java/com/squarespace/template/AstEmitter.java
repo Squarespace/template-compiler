@@ -19,8 +19,6 @@ package com.squarespace.template;
 import java.util.EnumMap;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -261,11 +259,21 @@ public class AstEmitter {
   /**
    * Encodes a variable name as a string.
    */
-  private static String variable(Object[] name) {
+  private static ArrayNode variable(Object[] name) {
+    ArrayNode result = JsonUtils.createArrayNode();
     if (name == null) {
-      return "@";
+      result.add("@");
+
+    } else {
+      for (Object obj : name) {
+        if (obj instanceof Integer) {
+          result.add((Integer) obj);
+        } else {
+          result.add(obj.toString());
+        }
+      }
     }
-    return StringUtils.join(name, '.');
+    return result;
   }
 
   /**
