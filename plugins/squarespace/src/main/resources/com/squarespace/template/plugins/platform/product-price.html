@@ -1,0 +1,5 @@
+<div class="product-price">
+{.if formattedFromPrice}{fromText|message fromPrice:formattedFromPrice}
+{.or}{.if formattedSalePrice}{formattedSalePrice}{.space}<span class="original-price">{formattedNormalPrice}</span>
+{.or}{.if formattedNormalPrice}{formattedNormalPrice}{.end}{.end}{.end}
+</div>

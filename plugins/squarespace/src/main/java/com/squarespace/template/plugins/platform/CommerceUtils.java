@@ -257,56 +257,17 @@ public class CommerceUtils {
     }
   }
 
+
+
   public static void writeMoneyString(double value, StringBuilder buf) {
     String formatted = PluginUtils.formatMoney(value, Locale.US);
     buf.append("<span class=\"sqs-money-native\">").append(formatted).append("</span>");
   }
 
-  public static void writePriceString(JsonNode item, StringBuilder buf) {
-    ProductType type = getProductType(item);
-    double normalPrice = getNormalPrice(item);
-    switch (type) {
-      case PHYSICAL:
-      case SERVICE:
-        if (isOnSale(item)) {
-          if (hasVariedPrices(item)) {
-            buf.append("from ");
-            writeMoneyString(getFromPrice(item), buf);
-          } else {
-            writeMoneyString(getSalePrice(item), buf);
-            buf.append(" <span class=\"original-price\">");
-            writeMoneyString(normalPrice, buf);
-            buf.append("</span>");
-          }
-        } else if (hasVariedPrices(item)) {
-          buf.append("from ");
-          writeMoneyString(getFromPrice(item), buf);
-        } else {
-          writeMoneyString(normalPrice, buf);
-        }
-        break;
-
-      case DIGITAL:
-        if (isOnSale(item)) {
-          writeMoneyString(getSalePrice(item), buf);
-          buf.append(" <span class=\"original-price\">");
-          writeMoneyString(normalPrice, buf);
-          buf.append("</span>");
-        } else {
-          writeMoneyString(normalPrice, buf);
-        }
-        break;
-
-      case GIFT_CARD:
-        if (hasVariedPrices(item)) {
-          buf.append("from ");
-        }
-        writeMoneyString(getFromPrice(item), buf);
-        break;
-
-      default:
-        break;
-    }
+  public static String getMoneyString(double value) {
+    StringBuilder buf = new StringBuilder();
+    writeMoneyString(value, buf);
+    return buf.toString();
   }
 
   public static void writeVariantFormat(JsonNode variant, StringBuilder buf) {

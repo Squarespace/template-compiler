@@ -152,6 +152,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   }
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected static class FromPriceFormatter extends BaseFormatter {
 
     public FromPriceFormatter() {
@@ -243,6 +247,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   }
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected static class NormalPriceFormatter extends BaseFormatter {
 
     public NormalPriceFormatter() {
@@ -280,17 +288,38 @@ public class CommerceFormatters implements FormatterRegistry {
 
   protected static class ProductPriceFormatter extends BaseFormatter {
 
+    private Instruction template;
+
     public ProductPriceFormatter() {
       super("product-price", false);
     }
 
     @Override
+    public void initialize(Compiler compiler) throws CodeException {
+        String source = loadResource(CommerceFormatters.class, "product-price.html");
+        this.template = compiler.compile(source.trim()).code();
+    }
+
+    @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
+      JsonNode node = var.node();
       StringBuilder buf = new StringBuilder();
-      buf.append("<div class=\"product-price\">");
-      CommerceUtils.writePriceString(var.node(), buf);
-      buf.append("</div>");
+
+      ObjectNode obj = JsonUtils.createObjectNode();
+      if (CommerceUtils.getProductType(node) != ProductType.UNDEFINED) {
+        if (CommerceUtils.hasVariedPrices(node)) {
+          String fromText = ctx.resolve("localizedStrings.productPriceFromText").asText();
+          obj.put("fromText", StringUtils.defaultIfEmpty(fromText, "from {fromPrice}"));
+          obj.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getFromPrice(node)));
+        }
+        if (CommerceUtils.isOnSale(node)) {
+          obj.put("formattedSalePrice", CommerceUtils.getMoneyString(CommerceUtils.getSalePrice(node)));
+        }
+        obj.put("formattedNormalPrice", CommerceUtils.getMoneyString(CommerceUtils.getNormalPrice(node)));
+      }
+      JsonNode priceInfo = executeTemplate(ctx, template, obj, true);
+      buf.append(priceInfo.asText());
       var.set(buf);
     }
   }
