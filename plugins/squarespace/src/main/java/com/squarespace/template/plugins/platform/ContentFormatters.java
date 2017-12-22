@@ -774,7 +774,6 @@ public class ContentFormatters implements FormatterRegistry {
         if (isTruthy(node.path("mainImageId")) || isTruthy(node.path("systemDataId"))) {
           buf.append("\" style=\"opacity: 0;\">");
           buf.append("<img data-load=\"false\" data-src=\"").append(assetUrl).append("\" ");
-          buf.append("data-src=\"").append(assetUrl).append("\" ");
           buf.append("data-image-dimensions=\"").append(originalSize).append("\" ");
           buf.append("data-image-focal-point=\"").append(focalPoint).append("\" ");
 
