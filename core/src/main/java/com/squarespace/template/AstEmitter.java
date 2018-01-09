@@ -376,6 +376,8 @@ public class AstEmitter {
         // AlternatesWith never appears in this syntax tree, but its type
         // may be referenced in code.
         put(InstructionType.ALTERNATES_WITH, opcode(19));
+
+        // TODO: Struct and Atom are not yet implemented in the server compiler.
       }};
 
   private static IntNode opcode(int code) {
