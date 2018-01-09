@@ -34,6 +34,7 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
@@ -47,6 +48,16 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
 
   private static final DecimalFormatter DECIMAL = new DecimalFormatter();
   private final CodeMaker mk = maker();
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), DecimalFormatterTest.class);
+
+  @Test
+  public void testDecimal() {
+    runner.run(
+        "f-decimal-1.html",
+        "f-decimal-2.html",
+        "f-decimal-3.html"
+    );
+  }
 
   @Test
   public void testArguments() {

@@ -1,0 +1,16 @@
+:JSON
+[
+	"0", "1", "1.01", "10.001", "3.14159", "1.3456"
+]
+
+:TEMPLATE
+{.repeated section @}
+{@|decimal style:percent group}  {@|decimal style:percent-scaled group}{.end}
+
+:OUTPUT
+0%  0%
+100%  1%
+101%  1%
+1,000%  10%
+314%  3%
+135%  1%

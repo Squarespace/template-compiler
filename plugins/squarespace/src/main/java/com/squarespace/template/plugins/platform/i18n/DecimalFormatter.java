@@ -39,7 +39,8 @@ import com.squarespace.template.Variables;
  *
  * Options:
  *
- *   style:<name>     - pattern style:  decimal, percent, permille, short, long.
+ *   style:<name>     - pattern style:  decimal, short, long, percent, permille
+ *                                      percent-scaled, permille-scaled
  *   mode:<name>      - formatting mode: default, significant, significant-maxfrac
  *   round:<name>     - rounding mode: default, ceil, floor, truncate
  *   group            - if present this enables digit grouping
@@ -105,8 +106,16 @@ public class DecimalFormatter extends BaseFormatter {
             opts.setStyle(DecimalFormatStyle.PERCENT);
             break;
 
+          case "percent-scaled":
+            opts.setStyle(DecimalFormatStyle.PERCENT_SCALED);
+            break;
+
           case "permille":
             opts.setStyle(DecimalFormatStyle.PERMILLE);
+            break;
+
+          case "permille-scaled":
+            opts.setStyle(DecimalFormatStyle.PERMILLE_SCALED);
             break;
 
           case "short":

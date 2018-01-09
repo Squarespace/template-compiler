@@ -31,7 +31,6 @@ import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
-import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
@@ -44,16 +43,7 @@ import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 public class MoneyFormatterTest extends PlatformUnitTestBase {
 
   private static final MoneyFormatter MONEY = new MoneyFormatter();
-  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), InternationalFormatters.class);
   private final CodeMaker mk = maker();
-
-  @Test
-  public void testTemplates() {
-    runner.run(
-        "f-decimal-1.html",
-        "f-decimal-2.html"
-    );
-  }
 
   @Test
   public void testExecutor() throws CodeException {
