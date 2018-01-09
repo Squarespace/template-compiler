@@ -227,7 +227,7 @@ public class Instructions {
 
     /**
      * Indicates if the current instruction's consequent and alternative are equal to that
-     * of the {@code other) instruction.
+     * of the {@code other} instruction.
      */
     protected boolean blockEquals(BlockInst other) {
       boolean res = (consequent == null) ? (other.consequent == null) : consequent.equals(other.consequent);
