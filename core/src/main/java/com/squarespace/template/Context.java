@@ -571,18 +571,23 @@ public class Context {
 
   /**
    * Obtain the value for 'name' from the given stack frame's node.
+   * Special variables:
+   *
+   *   @         current node
+   *   @index0   0-based index of the current iteration context
+   *   @index    1-based index of the current iteration context
    */
   private JsonNode resolve(Object name, Frame frame) {
-    // Special internal variable @index points to the array index for a
-    // given stack frame.
     if (name instanceof String) {
       String strName = (String)name;
 
       if (strName.startsWith("@")) {
-        if (name.equals("@index")) {
+        boolean isIndex = name.equals("@index");
+        if (isIndex || name.equals("@index0")) {
           if (frame.currentIndex != -1) {
-            // @index is 1-based
-            return new IntNode(frame.currentIndex + 1);
+            // @zindex is 0-based, @index is 1-based
+            int index = isIndex ? frame.currentIndex + 1 : frame.currentIndex;
+            return new IntNode(index);
           }
           return Constants.MISSING_NODE;
         }

@@ -143,6 +143,17 @@ public class CodeExecuteTest extends UnitTestBase {
   }
 
   @Test
+  public void testRepeatIndex() throws CodeException {
+    RootInst root = builder().repeated("foo")
+          .var("@index").text("-").var("@index0").text(" ")
+          .end().eof().build();
+    assertEquals(repr(root), "{.repeated section foo}{@index}-{@index0} {.end}");
+    assertContext(execute("{\"foo\": [8, 8, 8]}", root), "1-0 2-1 3-2 ");
+    assertContext(execute("{\"foo\": []}", root), "");
+    assertContext(execute("{}", root), "");
+  }
+
+  @Test
   public void testVariable() throws CodeException {
     RootInst root = builder().var("foo.bar").eof().build();
     assertContext(execute("{\"foo\": {\"bar\": 123}}", root), "123");
