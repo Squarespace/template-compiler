@@ -38,7 +38,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     runner.run(
         "f-add-to-cart-btn-1.html",
         "f-add-to-cart-btn-2.html",
-        "f-add-to-cart-btn-3.html"
+        "f-add-to-cart-btn-3.html",
+        "f-add-to-cart-btn-4.html"
         );
   }
 
