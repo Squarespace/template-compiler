@@ -24,9 +24,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.cldr.CLDR;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
@@ -38,6 +41,8 @@ import com.squarespace.template.plugins.platform.enums.ProductType;
 public class CommerceUtils {
 
   private static final ArrayNode EMPTY_ARRAY = JsonUtils.createArrayNode();
+
+  private static final String DEFAULT_CURRENCY = "USD";
 
   private CommerceUtils() {
   }
@@ -149,6 +154,11 @@ public class CommerceUtils {
     }
   }
 
+  public static String getCurrencyCode(JsonNode node) {
+    String currency = StringUtils.trimToNull(node.path("priceMoney").path("currency").asText());
+    return currency == null ? DEFAULT_CURRENCY : currency;
+  }
+
   public static double getTotalStockRemaining(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
@@ -257,17 +267,20 @@ public class CommerceUtils {
     }
   }
 
-
-
-  public static void writeMoneyString(double value, StringBuilder buf) {
+  /**
+   * Format money using legacy currency formatter
+   */
+  public static void writeLegacyMoneyString(double value, StringBuilder buf) {
     String formatted = PluginUtils.formatMoney(value, Locale.US);
     buf.append("<span class=\"sqs-money-native\">").append(formatted).append("</span>");
   }
 
-  public static String getMoneyString(double value) {
-    StringBuilder buf = new StringBuilder();
-    writeMoneyString(value, buf);
-    return buf.toString();
+  /**
+   * Format money using CLDR currency formatter
+   */
+  public static void writeCLDRMoneyString(double value, StringBuilder buf, String currencyCode, CLDR.Locale locale) {
+    String formatted = PluginUtils.formatMoney(value, currencyCode, locale);
+    buf.append(formatted);
   }
 
   public static void writeVariantFormat(JsonNode variant, StringBuilder buf) {

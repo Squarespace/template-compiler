@@ -1,0 +1,21 @@
+:JSON
+{
+    "structuredContent": {
+        "productType": 2,
+        "priceCents": 250000
+    },
+    "website": {
+        "useCLDRMoneyFormat": true
+    },
+    "priceMoney": {
+        "currency": "USD"
+    }
+}
+
+:TEMPLATE
+{@|product-price}
+
+:OUTPUT
+<div class="product-price">
+$2,500.00
+</div>

@@ -31,11 +31,13 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.cldr.CLDR;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Compiler;
+import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
@@ -121,6 +123,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   }
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected static class CartSubtotalFormatter extends BaseFormatter {
 
     public CartSubtotalFormatter() {
@@ -134,7 +140,7 @@ public class CommerceFormatters implements FormatterRegistry {
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-subtotal\">");
-      CommerceUtils.writeMoneyString(subtotalCents, buf);
+      CommerceUtils.writeLegacyMoneyString(subtotalCents, buf);
       buf.append("</span>");
       var.set(buf);
     }
@@ -170,6 +176,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   };
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected abstract static class MoneyBaseFormatter extends BaseFormatter {
 
     public MoneyBaseFormatter(String identifier) {
@@ -184,6 +194,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   }
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected static class MoneyCamelFormatter extends MoneyBaseFormatter {
 
     public MoneyCamelFormatter() {
@@ -192,6 +206,10 @@ public class CommerceFormatters implements FormatterRegistry {
 
   }
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected static class MoneyDashFormatter extends MoneyBaseFormatter {
 
     public MoneyDashFormatter() {
@@ -213,6 +231,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
   }
 
+  /**
+   * @deprecated this formatter is not used internally anymore. Remove it when all external usage is cleared.
+   */
+  @Deprecated
   protected static class MoneyStringFormatter extends BaseFormatter {
 
     public MoneyStringFormatter() {
@@ -224,7 +246,7 @@ public class CommerceFormatters implements FormatterRegistry {
       Variable var = variables.first();
       double value = var.node().asDouble();
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeMoneyString(value, buf);
+      CommerceUtils.writeLegacyMoneyString(value, buf);
       var.set(buf);
     }
   }
@@ -311,16 +333,33 @@ public class CommerceFormatters implements FormatterRegistry {
         if (CommerceUtils.hasVariedPrices(node)) {
           String fromText = ctx.resolve("localizedStrings.productPriceFromText").asText();
           obj.put("fromText", StringUtils.defaultIfEmpty(fromText, "from {fromPrice}"));
-          obj.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getFromPrice(node)));
+          obj.put("formattedFromPrice", getMoneyString(CommerceUtils.getFromPrice(node), ctx, node));
         }
         if (CommerceUtils.isOnSale(node)) {
-          obj.put("formattedSalePrice", CommerceUtils.getMoneyString(CommerceUtils.getSalePrice(node)));
+          obj.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePrice(node), ctx, node));
         }
-        obj.put("formattedNormalPrice", CommerceUtils.getMoneyString(CommerceUtils.getNormalPrice(node)));
+        obj.put("formattedNormalPrice", getMoneyString(CommerceUtils.getNormalPrice(node), ctx, node));
       }
       JsonNode priceInfo = executeTemplate(ctx, template, obj, true);
       buf.append(priceInfo.asText());
       var.set(buf);
+    }
+
+    private static String getMoneyString(double value, Context ctx, JsonNode node) {
+      StringBuilder buf = new StringBuilder();
+      if (useCLDRMode(ctx)) {
+        String currencyCode = CommerceUtils.getCurrencyCode(node);
+        CLDR.Locale locale = ctx.cldrLocale();
+        CommerceUtils.writeCLDRMoneyString(value, buf, currencyCode, locale);
+      } else {
+        CommerceUtils.writeLegacyMoneyString(value, buf);
+      }
+
+      return buf.toString();
+    }
+
+    private static boolean useCLDRMode(Context ctx) {
+      return GeneralUtils.isTruthy(ctx.resolve(Constants.CLDR_MONEYFORMAT_KEY));
     }
   }
 

@@ -20,10 +20,15 @@ import static com.squarespace.template.Patterns.WHITESPACE_RE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.MULTILINE;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import com.squarespace.cldr.CLDR;
+import com.squarespace.cldr.numbers.CurrencyFormatOptions;
+import com.squarespace.cldr.numbers.NumberFormatter;
 
 
 public class PluginUtils {
@@ -31,6 +36,10 @@ public class PluginUtils {
   private static final Pattern SLUG_KILLCHARS = Pattern.compile("[^a-zA-Z0-9\\s-]+");
 
   private static final Pattern SCRIPT_TAG = Pattern.compile("</", CASE_INSENSITIVE | MULTILINE);
+
+  private static final CLDR CLDR_INSTANCE = CLDR.get();
+
+  private static final CurrencyFormatOptions CLDR_DEFAULT_OPTIONS = new CurrencyFormatOptions();
 
   private PluginUtils() {
   }
@@ -108,6 +117,15 @@ public class PluginUtils {
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
     DecimalFormat format = new DecimalFormat("#,##0.00", symbols);
     return format.format(cents);
+  }
+
+  public static String formatMoney(double cents, String currencyCode, CLDR.Locale locale) {
+    BigDecimal amount = new BigDecimal(cents).movePointLeft(2);
+    CLDR.Currency currency = CLDR.Currency.fromString(currencyCode);
+    NumberFormatter formatter = CLDR_INSTANCE.getNumberFormatter(locale);
+    StringBuilder builder = new StringBuilder();
+    formatter.formatCurrency(amount, currency, builder, CLDR_DEFAULT_OPTIONS);
+    return builder.toString();
   }
 
   public static String removeTags(String str) {

@@ -143,7 +143,10 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-product-price-4.html",
         "f-product-price-5.html",
         "f-product-price-6.html",
-        "f-product-price-7.html"
+        "f-product-price-7.html",
+        "f-product-price-8.html",
+        "f-product-price-9.html",
+        "f-product-price-10.html"
         );
   }
 

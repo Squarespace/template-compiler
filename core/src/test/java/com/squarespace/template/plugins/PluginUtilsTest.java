@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import org.testng.annotations.Test;
 
+import com.squarespace.cldr.CLDR;
 
 
 @Test(groups = { "unit" })
@@ -44,6 +45,14 @@ public class PluginUtilsTest {
     assertEquals(PluginUtils.formatMoney(100, Locale.US), "1.00");
     assertEquals(PluginUtils.formatMoney(12345, Locale.US), "123.45");
     assertEquals(PluginUtils.formatMoney(12345, Locale.GERMAN), "123,45");
+  }
+
+  @Test
+  public void testFormatMoneyCLDR() {
+    assertEquals(PluginUtils.formatMoney(100, "USD", CLDR.Locale.en_US), "$1.00");
+    assertEquals(PluginUtils.formatMoney(12345, "USD", CLDR.Locale.en_US), "$123.45");
+    assertEquals(PluginUtils.formatMoney(12345, "USD", CLDR.Locale.de_DE), "123,45 $");
+    assertEquals(PluginUtils.formatMoney(12345, "EUR", CLDR.Locale.de_DE), "123,45 €");
   }
 
   @Test
