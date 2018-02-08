@@ -97,6 +97,7 @@ public class CommerceUtils {
     switch (type) {
       case PHYSICAL:
       case SERVICE:
+      case GIFT_CARD:
         JsonNode variants = structuredContent.path("variants");
         if (variants.size() == 0) {
           return 0;
@@ -113,9 +114,6 @@ public class CommerceUtils {
       case DIGITAL:
         JsonNode cents = structuredContent.path("priceCents");
         return cents.isMissingNode() ? 0 : cents.asDouble();
-
-      case GIFT_CARD:
-        // this should never happen
 
       default:
         return 0.0;
