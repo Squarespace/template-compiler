@@ -18,6 +18,7 @@ package com.squarespace.template.plugins.platform;
 
 import static com.squarespace.template.GeneralUtils.isTruthy;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
@@ -44,6 +46,13 @@ public class CommerceUtils {
 
   private static final String DEFAULT_CURRENCY = "USD";
 
+  private static final BigDecimal DEFAULT_MONEY_AMOUNT = new BigDecimal(0);
+
+  private static final JsonNode DEFAULT_MONEY_NODE = new ObjectMapper()
+      .createObjectNode()
+      .put("currency", "USD")
+      .put("value", "0");
+
   private CommerceUtils() {
   }
 
@@ -53,7 +62,7 @@ public class CommerceUtils {
     return ProductType.fromCode(node.asInt());
   }
 
-  public static double getFromPrice(JsonNode item) {
+  public static JsonNode getFromPriceMoneyNode(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
     switch (type) {
@@ -63,34 +72,38 @@ public class CommerceUtils {
       case GIFT_CARD:
         JsonNode variants = structuredContent.path("variants");
         if (variants.size() == 0) {
-          return 0;
+          return DEFAULT_MONEY_NODE;
         }
 
         JsonNode first = variants.get(0);
-        double price = isTruthy(first.path("onSale"))
-            ? first.path("salePrice").asDouble()
-            : first.path("price").asDouble();
+        JsonNode moneyNode = isTruthy(first.path("onSale"))
+            ? first.path("salePriceMoney")
+            : first.path("priceMoney");
+        BigDecimal price = getAmountFromMoneyNode(moneyNode);
         for (int i = 1; i < variants.size(); i++) {
           JsonNode var = variants.get(i);
-          double current = isTruthy(var.path("onSale"))
-              ? var.path("salePrice").asDouble()
-              : var.path("price").asDouble();
-          if (current < price) {
+          JsonNode currentMoneyNode = isTruthy(var.path("onSale"))
+              ? var.path("salePriceMoney")
+              : var.path("priceMoney");
+
+          BigDecimal current = getAmountFromMoneyNode(currentMoneyNode);
+          if (current.compareTo(price) < 0) {
             price = current;
+            moneyNode = currentMoneyNode;
           }
         }
-        return price;
+        return moneyNode;
 
       case DIGITAL:
-        JsonNode cents = structuredContent.path("priceCents");
-        return cents.isMissingNode() ? 0 : cents.asDouble();
+        JsonNode digitalMoneyNode = structuredContent.path("priceMoney");
+        return digitalMoneyNode.isMissingNode() ? DEFAULT_MONEY_NODE : digitalMoneyNode;
 
       default:
-        return 0.0;
+        return DEFAULT_MONEY_NODE;
     }
   }
 
-  public static double getNormalPrice(JsonNode item) {
+  public static JsonNode getNormalPriceMoneyNode(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
@@ -100,27 +113,30 @@ public class CommerceUtils {
       case GIFT_CARD:
         JsonNode variants = structuredContent.path("variants");
         if (variants.size() == 0) {
-          return 0;
+          return DEFAULT_MONEY_NODE;
         }
-        double price = variants.get(0).path("price").asDouble();
+        JsonNode moneyNode = variants.get(0).path("priceMoney");
+        BigDecimal price = getAmountFromMoneyNode(moneyNode);
         for (int i = 1; i < variants.size(); i++) {
-          double curr = variants.get(i).path("price").asDouble();
-          if (curr > price) {
+          JsonNode currMoneyNode = variants.get(i).path("priceMoney");
+          BigDecimal curr = getAmountFromMoneyNode(currMoneyNode);
+          if (curr.compareTo(price) > 0) {
             price = curr;
+            moneyNode = currMoneyNode;
           }
         }
-        return price;
+        return moneyNode;
 
       case DIGITAL:
-        JsonNode cents = structuredContent.path("priceCents");
-        return cents.isMissingNode() ? 0 : cents.asDouble();
+        JsonNode digitalMoneyNode = structuredContent.path("priceMoney");
+        return digitalMoneyNode.isMissingNode() ? DEFAULT_MONEY_NODE : digitalMoneyNode;
 
       default:
-        return 0.0;
+        return DEFAULT_MONEY_NODE;
     }
   }
 
-  public static double getSalePrice(JsonNode item) {
+  public static JsonNode getSalePriceMoneyNode(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
     switch (type) {
@@ -128,33 +144,46 @@ public class CommerceUtils {
       case SERVICE:
         JsonNode variants = structuredContent.path("variants");
         if (variants.size() == 0) {
-          return 0.0;
+          return DEFAULT_MONEY_NODE;
         }
-        Double salePrice = null;
+        BigDecimal salePrice = null;
+        JsonNode salePriceNode = null;
         for (int i = 0; i < variants.size(); i++) {
           JsonNode variant = variants.path(i);
-          double price = variant.path("salePrice").asDouble();
-          if (isTruthy(variant.path("onSale")) && (salePrice == null || price < salePrice)) {
+          JsonNode priceMoney = variant.path("salePriceMoney");
+          BigDecimal price = getAmountFromMoneyNode(priceMoney);
+          if (isTruthy(variant.path("onSale")) && (salePriceNode == null || price.compareTo(salePrice) < 0)) {
             salePrice = price;
+            salePriceNode = priceMoney;
           }
         }
-        return (salePrice == null) ? 0.0 : salePrice;
+        return (salePriceNode == null) ? DEFAULT_MONEY_NODE : salePriceNode;
 
       case DIGITAL:
-        JsonNode cents = structuredContent.path("salePriceCents");
-        return cents.isMissingNode() ? 0.0 : cents.asDouble();
+        JsonNode digitalMoneyNode = structuredContent.path("salePriceMoney");
+        return digitalMoneyNode.isMissingNode() ? DEFAULT_MONEY_NODE : digitalMoneyNode;
 
       case GIFT_CARD:
         // this should never happen
 
       default:
-        return 0.0;
+        return DEFAULT_MONEY_NODE;
     }
   }
 
-  public static String getCurrencyCode(JsonNode node) {
-    String currency = StringUtils.trimToNull(node.path("priceMoney").path("currency").asText());
+  public static BigDecimal getAmountFromMoneyNode(JsonNode moneyNode) {
+    String value = StringUtils.trimToNull(moneyNode.path("value").asText());
+    return value == null ? DEFAULT_MONEY_AMOUNT : new BigDecimal(value);
+  }
+
+  public static String getCurrencyFromMoneyNode(JsonNode moneyNode) {
+    String currency = StringUtils.trimToNull(moneyNode.path("currency").asText());
     return currency == null ? DEFAULT_CURRENCY : currency;
+  }
+
+  public static double getLegacyPriceFromMoneyNode(JsonNode moneyNode) {
+    BigDecimal price = getAmountFromMoneyNode(moneyNode);
+    return price.movePointRight(2).doubleValue();
   }
 
   public static double getTotalStockRemaining(JsonNode item) {
@@ -276,9 +305,8 @@ public class CommerceUtils {
   /**
    * Format money using CLDR currency formatter
    */
-  public static void writeCLDRMoneyString(double value, StringBuilder buf, String currencyCode, CLDR.Locale locale) {
-    String formatted = PluginUtils.formatMoney(value, currencyCode, locale);
-    buf.append(formatted);
+  public static String getCLDRMoneyString(BigDecimal amount, String currencyCode, CLDR.Locale locale) {
+    return PluginUtils.formatMoney(amount, currencyCode, locale);
   }
 
   public static void writeVariantFormat(JsonNode variant, StringBuilder buf) {

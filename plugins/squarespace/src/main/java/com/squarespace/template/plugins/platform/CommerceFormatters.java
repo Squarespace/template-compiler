@@ -20,6 +20,7 @@ import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.getOrDefault;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -171,8 +172,9 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable item = variables.first();
-      double price = CommerceUtils.getFromPrice(item.node());
-      item.set(price);
+      JsonNode moneyNode = CommerceUtils.getFromPriceMoneyNode(item.node());
+      double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      item.set(legacyPrice);
     }
   };
 
@@ -282,7 +284,9 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable item = variables.first();
-      item.set(CommerceUtils.getNormalPrice(item.node()));
+      JsonNode moneyNode = CommerceUtils.getNormalPriceMoneyNode(item.node());
+      double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      item.set(legacyPrice);
     }
   }
 
@@ -333,29 +337,30 @@ public class CommerceFormatters implements FormatterRegistry {
         if (CommerceUtils.hasVariedPrices(node)) {
           String fromText = ctx.resolve("localizedStrings.productPriceFromText").asText();
           obj.put("fromText", StringUtils.defaultIfEmpty(fromText, "from {fromPrice}"));
-          obj.put("formattedFromPrice", getMoneyString(CommerceUtils.getFromPrice(node), ctx, node));
+          obj.put("formattedFromPrice", getMoneyString(CommerceUtils.getFromPriceMoneyNode(node), ctx));
         }
         if (CommerceUtils.isOnSale(node)) {
-          obj.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePrice(node), ctx, node));
+          obj.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(node), ctx));
         }
-        obj.put("formattedNormalPrice", getMoneyString(CommerceUtils.getNormalPrice(node), ctx, node));
+        obj.put("formattedNormalPrice", getMoneyString(CommerceUtils.getNormalPriceMoneyNode(node), ctx));
       }
       JsonNode priceInfo = executeTemplate(ctx, template, obj, true);
       buf.append(priceInfo.asText());
       var.set(buf);
     }
 
-    private static String getMoneyString(double value, Context ctx, JsonNode node) {
-      StringBuilder buf = new StringBuilder();
+    private static String getMoneyString(JsonNode moneyNode, Context ctx) {
       if (useCLDRMode(ctx)) {
-        String currencyCode = CommerceUtils.getCurrencyCode(node);
+        BigDecimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
+        String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
         CLDR.Locale locale = ctx.cldrLocale();
-        CommerceUtils.writeCLDRMoneyString(value, buf, currencyCode, locale);
+        return CommerceUtils.getCLDRMoneyString(amount, currencyCode, locale);
       } else {
-        CommerceUtils.writeLegacyMoneyString(value, buf);
+        double legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+        StringBuilder buf = new StringBuilder();
+        CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
+        return buf.toString();
       }
-
-      return buf.toString();
     }
 
     private static boolean useCLDRMode(Context ctx) {
@@ -468,7 +473,9 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      var.set(CommerceUtils.getSalePrice(var.node()));
+      JsonNode moneyNode = CommerceUtils.getSalePriceMoneyNode(var.node());
+      double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      var.set(legacyPrice);
     }
   }
 

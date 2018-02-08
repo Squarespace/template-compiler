@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins;
 import static org.testng.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 
 import org.testng.annotations.Test;
@@ -49,10 +50,10 @@ public class PluginUtilsTest {
 
   @Test
   public void testFormatMoneyCLDR() {
-    assertEquals(PluginUtils.formatMoney(100, "USD", CLDR.Locale.en_US), "$1.00");
-    assertEquals(PluginUtils.formatMoney(12345, "USD", CLDR.Locale.en_US), "$123.45");
-    assertEquals(PluginUtils.formatMoney(12345, "USD", CLDR.Locale.de_DE), "123,45 $");
-    assertEquals(PluginUtils.formatMoney(12345, "EUR", CLDR.Locale.de_DE), "123,45 €");
+    assertEquals(PluginUtils.formatMoney(new BigDecimal(1), "USD", CLDR.Locale.en_US), "$1.00");
+    assertEquals(PluginUtils.formatMoney(new BigDecimal(123.45), "USD", CLDR.Locale.en_US), "$123.45");
+    assertEquals(PluginUtils.formatMoney(new BigDecimal(123.45), "USD", CLDR.Locale.de_DE), "123,45 $");
+    assertEquals(PluginUtils.formatMoney(new BigDecimal(123.45), "EUR", CLDR.Locale.de_DE), "123,45 €");
   }
 
   @Test

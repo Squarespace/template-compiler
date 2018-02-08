@@ -119,8 +119,7 @@ public class PluginUtils {
     return format.format(cents);
   }
 
-  public static String formatMoney(double cents, String currencyCode, CLDR.Locale locale) {
-    BigDecimal amount = new BigDecimal(cents).movePointLeft(2);
+  public static String formatMoney(BigDecimal amount, String currencyCode, CLDR.Locale locale) {
     CLDR.Currency currency = CLDR.Currency.fromString(currencyCode);
     NumberFormatter formatter = CLDR_INSTANCE.getNumberFormatter(locale);
     StringBuilder builder = new StringBuilder();
