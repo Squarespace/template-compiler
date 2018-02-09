@@ -43,7 +43,9 @@ project.ext {
 
 // Sign release archives
 gradle.taskGraph.whenReady { taskGraph ->
-  ext.isUpload = taskGraph.allTasks.any { it instanceof Upload }
+  ext.isUpload = taskGraph.allTasks.any { 
+    it instanceof Upload && it.name != 'uploadInternal' 
+  }
   ext.isSign = taskGraph.allTasks.any { it instanceof Sign }
   if (isRelease && isUpload && isSign) {
     def password = System.console().readPassword('\n\n\n===>  Signing key password: ')
