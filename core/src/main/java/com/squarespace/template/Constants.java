@@ -36,17 +36,23 @@ public class Constants {
 
   public static final String[] TIMEZONE_KEY = new String[] { "website", "timeZone" };
 
-  public static final String[] PRODUCT_PRICE_FROM_TEXT_KEY = new String[] { "localizedStrings", "productPriceFromText"};
+  public static final String[] PRODUCT_PRICE_FROM_TEXT_KEY = new String[] {
+      "localizedStrings", "productPriceFromText"};
 
-  public static final String[] PRODUCT_QUICK_VIEW_TEXT_KEY = new String[] { "localizedStrings", "productQuickViewText" };
+  public static final String[] PRODUCT_QUICK_VIEW_TEXT_KEY = new String[] {
+      "localizedStrings", "productQuickViewText" };
 
-  public static final String[] PRODUCT_SOLD_OUT_TEXT_KEY = new String[] { "localizedStrings", "productSoldOutText" };
+  public static final String[] PRODUCT_SOLD_OUT_TEXT_KEY = new String[] {
+      "localizedStrings", "productSoldOutText" };
 
-  public static final String[] PRODUCT_SALE_TEXT_KEY = new String[] { "localizedStrings", "productSaleText" };
+  public static final String[] PRODUCT_SALE_TEXT_KEY = new String[] {
+      "localizedStrings", "productSaleText" };
 
-  public static final String[] PRODUCT_SUMMARY_FORM_NO_ANSWER_TEXT_KEY = new String[] { "localizedStrings", "productSummaryFormNoAnswerText"};
+  public static final String[] PRODUCT_SUMMARY_FORM_NO_ANSWER_TEXT_KEY = new String[] {
+      "localizedStrings", "productSummaryFormNoAnswerText"};
 
-  public static final String[] CLDR_MONEYFORMAT_KEY = new String[] { "website", "useCLDRMoneyFormat" };
+  public static final String[] CLDR_MONEYFORMAT_KEY = new String[] {
+      "website", "useCLDRMoneyFormat" };
 
   public static final JsonNode MISSING_NODE = MissingNode.getInstance();
 
