@@ -335,7 +335,7 @@ public class CommerceFormatters implements FormatterRegistry {
       ObjectNode obj = JsonUtils.createObjectNode();
       if (CommerceUtils.getProductType(node) != ProductType.UNDEFINED) {
         if (CommerceUtils.hasVariedPrices(node)) {
-          String fromText = ctx.resolve("localizedStrings.productPriceFromText").asText();
+          String fromText = ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText();
           obj.put("fromText", StringUtils.defaultIfEmpty(fromText, "from {fromPrice}"));
           obj.put("formattedFromPrice", getMoneyString(CommerceUtils.getFromPriceMoneyNode(node), ctx));
         }
@@ -395,7 +395,7 @@ public class CommerceFormatters implements FormatterRegistry {
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-product-quick-view-button\" data-id=\"").append(id);
       buf.append("\" data-group=\"").append(group).append("\">");
-      String text = ctx.resolve("localizedStrings.productQuickViewText").asText();
+      String text = ctx.resolve(Constants.PRODUCT_QUICK_VIEW_TEXT_KEY).asText();
       buf.append(StringUtils.defaultIfEmpty(text, "Quick View"));
       buf.append("</span>");
       var.set(buf);
@@ -414,13 +414,13 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode node = var.node();
       StringBuilder buf = new StringBuilder();
       if (CommerceUtils.isSoldOut(node)) {
-        String text = ctx.resolve("localizedStrings.productSoldOutText").asText();
+        String text = ctx.resolve(Constants.PRODUCT_SOLD_OUT_TEXT_KEY).asText();
         buf.append("<div class=\"product-mark sold-out\">");
         buf.append(StringUtils.defaultIfEmpty(text, "sold out"));
         buf.append("</div>");
         var.set(buf);
       } else if (CommerceUtils.isOnSale(node)) {
-        String text = ctx.resolve("localizedStrings.productSaleText").asText();
+        String text = ctx.resolve(Constants.PRODUCT_SALE_TEXT_KEY).asText();
         buf.append("<div class=\"product-mark sale\">");
         buf.append(StringUtils.defaultIfEmpty(text, "sale"));
         buf.append("</div>");
@@ -575,7 +575,7 @@ public class CommerceFormatters implements FormatterRegistry {
       if (GeneralUtils.isTruthy(value)) {
         buf.append(value.asText());
       } else {
-        String text = ctx.resolve("localizedStrings.productSummaryFormNoAnswerText").asText();
+        String text = ctx.resolve(Constants.PRODUCT_SUMMARY_FORM_NO_ANSWER_TEXT_KEY).asText();
         buf.append(StringUtils.defaultIfEmpty(text, "N/A"));
       }
       buf.append("\n</div>");
