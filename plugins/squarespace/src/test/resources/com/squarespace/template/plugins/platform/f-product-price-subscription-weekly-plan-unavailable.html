@@ -1,0 +1,24 @@
+:JSON
+{
+  "structuredContent": {
+  "productType": 1,
+  "isSubscribable" : "true",
+  "variants": [
+      {
+        "price": 10000, "priceMoney": { "value": "100" }
+      }
+    ]
+  },
+
+  "localizedStrings": {
+    "productPriceUnavailable" : "Localized: Unavailable"
+  }
+}
+
+:TEMPLATE
+{@|product-price}
+
+:OUTPUT
+<div class="product-price">
+Localized: Unavailable
+</div>

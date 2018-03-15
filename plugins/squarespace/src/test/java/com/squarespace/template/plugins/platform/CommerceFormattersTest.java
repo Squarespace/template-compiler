@@ -39,7 +39,9 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-add-to-cart-btn-1.html",
         "f-add-to-cart-btn-2.html",
         "f-add-to-cart-btn-3.html",
-        "f-add-to-cart-btn-4.html"
+        "f-add-to-cart-btn-4.html",
+        "f-add-to-cart-btn-subscribable-attribute-false.html",
+        "f-add-to-cart-btn-subscribable-attribute-true.html"
         );
   }
 
@@ -137,17 +139,44 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testProductPrice() {
     runner.run(
-        "f-product-price-1.html",
-        "f-product-price-2.html",
-        "f-product-price-3.html",
-        "f-product-price-4.html",
-        "f-product-price-5.html",
-        "f-product-price-6.html",
-        "f-product-price-7.html",
-        "f-product-price-8.html",
-        "f-product-price-9.html",
-        "f-product-price-10.html"
+      "f-product-price-1.html",
+      "f-product-price-2.html",
+      "f-product-price-3.html",
+      "f-product-price-4.html",
+      "f-product-price-5.html",
+      "f-product-price-6.html",
+      "f-product-price-7.html",
+      "f-product-price-8.html",
+      "f-product-price-9.html",
+      "f-product-price-10.html"
+      );
+  }
+
+  @Test
+  public void testProductSubscriptionPrice() {
+    runner.run("f-product-price-subscription-weekly.html",
+        "f-product-price-subscription-bi-weekly.html",
+        "f-product-price-subscription-monthly.html",
+        "f-product-price-subscription-bi-monthly.html");
+
+    runner.run("f-product-price-subscription-from-weekly.html",
+        "f-product-price-subscription-from-bi-weekly.html",
+        "f-product-price-subscription-from-monthly.html",
+        "f-product-price-subscription-from-bi-monthly.html",
+        "f-product-price-subscription-from-weekly-on-sale.html");
+
+    runner.run("f-product-price-subscription-on-sale-bi-monthly.html",
+        "f-product-price-subscription-on-sale-bi-weekly.html",
+        "f-product-price-subscription-on-sale-monthly.html",
+        "f-product-price-subscription-on-sale-weekly.html",
+        "f-product-price-subscription-weekly-localized.html",
+        "f-product-price-subscription-weekly-localized-multiple.html"
         );
+  }
+
+  @Test
+  public void testProductSubscriptionPriceMissingPlan() {
+    runner.run("f-product-price-subscription-weekly-plan-unavailable.html");
   }
 
   @Test

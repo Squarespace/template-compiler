@@ -39,6 +39,33 @@ public class Constants {
   public static final String[] PRODUCT_PRICE_FROM_TEXT_KEY = new String[] {
       "localizedStrings", "productPriceFromText"};
 
+  public static final String[] PRODUCT_PRICE_FROM_ONE_MONTH_TEXT_KEY = new String[] {
+      "localizedStrings", "productPriceFromMonthlyText", "one"};
+
+  public static final String[] PRODUCT_PRICE_FROM_MULTIPLE_MONTH_TEXT_KEY = new String[] {
+      "localizedStrings", "productPriceFromMonthlyText", "other"};
+
+  public static final String[] PRODUCT_PRICE_FROM_ONE_WEEK_TEXT_KEY = new String[] {
+      "localizedStrings", "productPriceFromWeeklyText", "one"};
+
+  public static final String[] PRODUCT_PRICE_FROM_MULTIPLE_WEEK_TEXT_KEY = new String[] {
+      "localizedStrings", "productPriceFromWeeklyText", "other"};
+
+  public static final String[] PRODUCT_PRICE_ONE_MONTH_TEXT_KEY = new String[] {
+      "localizedStrings", "productPricePerMonth", "one"};
+
+  public static final String[] PRODUCT_PRICE_MULTIPLE_MONTH_TEXT_KEY = new String[] {
+      "localizedStrings", "productPricePerMonth", "other"};
+
+  public static final String[] PRODUCT_PRICE_ONE_WEEK_TEXT_KEY = new String[] {
+      "localizedStrings", "productPricePerWeek", "one"};
+
+  public static final String[] PRODUCT_PRICE_MULTIPLE_WEEK_TEXT_KEY = new String[] {
+      "localizedStrings", "productPricePerWeek", "other"};
+
+  public static final String[] PRODUCT_PRICE_UNAVAILABLE_TEXT_KEY = new String[] {
+      "localizedStrings", "productPriceUnavailable"};
+
   public static final String[] PRODUCT_QUICK_VIEW_TEXT_KEY = new String[] {
       "localizedStrings", "productQuickViewText" };
 

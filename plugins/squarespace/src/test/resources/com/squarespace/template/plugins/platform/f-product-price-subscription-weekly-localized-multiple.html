@@ -1,0 +1,36 @@
+:JSON
+{
+  "structuredContent": {
+  "productType": 1,
+  "isSubscribable" : "true",
+  "subscriptionPlan" : {
+    "billingPeriod" : {
+      "unit" : "WEEK",
+      "value" : 5
+    }
+  },
+  "variants": [
+      {
+        "price": 10000, "priceMoney": { "value": "100" }
+      }
+    ]
+  },
+
+  "localizedStrings": {
+    "productPricePerWeek" : {
+      "one": "{price}/Week Super Translated",
+      "other": "{price} every {billingPeriodValue} months Other Super Translated"
+    }
+  }
+}
+
+:TEMPLATE
+{@|product-price}
+
+:PROPERTIES
+locale: en-US
+
+:OUTPUT
+<div class="product-price">
+<span class="sqs-money-native">100.00</span> every 5 months Other Super Translated
+</div>

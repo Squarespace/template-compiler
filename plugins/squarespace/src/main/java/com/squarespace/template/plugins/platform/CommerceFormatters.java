@@ -52,7 +52,6 @@ import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
 
-
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
  */
@@ -315,6 +314,9 @@ public class CommerceFormatters implements FormatterRegistry {
   protected static class ProductPriceFormatter extends BaseFormatter {
 
     private Instruction template;
+    private static final String BILLING_PERIOD_MONTHLY = "MONTH";
+    private static final String BILLING_PERIOD_WEEKLY = "WEEK";
+
 
     public ProductPriceFormatter() {
       super("product-price", false);
@@ -322,8 +324,8 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public void initialize(Compiler compiler) throws CodeException {
-        String source = loadResource(CommerceFormatters.class, "product-price.html");
-        this.template = compiler.compile(source.trim()).code();
+      String source = loadResource(CommerceFormatters.class, "product-price.html");
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override
@@ -333,20 +335,99 @@ public class CommerceFormatters implements FormatterRegistry {
       StringBuilder buf = new StringBuilder();
 
       ObjectNode obj = JsonUtils.createObjectNode();
+
+      boolean isSubscribable = CommerceUtils.isSubscribable(node);
+      JsonNode subscriptionPlanBillingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(node);
+
       if (CommerceUtils.getProductType(node) != ProductType.UNDEFINED) {
+
         if (CommerceUtils.hasVariedPrices(node)) {
-          String fromText = ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText();
+          String fromText = isSubscribable ? getSubscriptionFromPriceText(ctx, subscriptionPlanBillingPeriodNode)
+              : ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText();
+          if (isSubscribable) {
+            obj.put("billingPeriodValue",
+                CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(subscriptionPlanBillingPeriodNode));
+          }
           obj.put("fromText", StringUtils.defaultIfEmpty(fromText, "from {fromPrice}"));
           obj.put("formattedFromPrice", getMoneyString(CommerceUtils.getFromPriceMoneyNode(node), ctx));
         }
+
+        String priceText = isSubscribable ? getSubscriptionPriceText(ctx, subscriptionPlanBillingPeriodNode)
+            : "{price}";
+        if (isSubscribable) {
+          obj.put("billingPeriodValue",
+              CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(subscriptionPlanBillingPeriodNode));
+        }
+
         if (CommerceUtils.isOnSale(node)) {
+          obj.put("formattedSalePriceText", priceText);
           obj.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(node), ctx));
         }
+
+        obj.put("formattedNormalPriceText", priceText);
         obj.put("formattedNormalPrice", getMoneyString(CommerceUtils.getNormalPriceMoneyNode(node), ctx));
       }
       JsonNode priceInfo = executeTemplate(ctx, template, obj, true);
       buf.append(priceInfo.asText());
       var.set(buf);
+    }
+
+    private static String getSubscriptionPriceText(Context context, JsonNode billingPeriodNode) {
+      String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      switch (billingPeriodUnit) {
+        case BILLING_PERIOD_MONTHLY:
+          if (billingPeriodValue == 1) {
+            return StringUtils.defaultIfEmpty(
+                context.resolve(Constants.PRODUCT_PRICE_ONE_MONTH_TEXT_KEY).asText(),
+                "{price}/Month");
+          }
+          return StringUtils.defaultIfEmpty(
+              context.resolve(Constants.PRODUCT_PRICE_MULTIPLE_MONTH_TEXT_KEY).asText(),
+              "{price} every {billingPeriodValue} months");
+        case BILLING_PERIOD_WEEKLY:
+          if (billingPeriodValue == 1) {
+            return StringUtils.defaultIfEmpty(
+                context.resolve(Constants.PRODUCT_PRICE_ONE_WEEK_TEXT_KEY).asText(),
+                "{price}/Week");
+          }
+          return StringUtils.defaultIfEmpty(
+              context.resolve(Constants.PRODUCT_PRICE_MULTIPLE_WEEK_TEXT_KEY).asText(),
+              "{price} every {billingPeriodValue} weeks");
+        default:
+      }
+      return StringUtils.defaultIfEmpty(
+          context.resolve(Constants.PRODUCT_PRICE_UNAVAILABLE_TEXT_KEY).asText(),
+          "Unavailable");
+    }
+
+    private static String getSubscriptionFromPriceText(Context context, JsonNode billingPeriodNode) {
+      String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      switch (billingPeriodUnit) {
+        case BILLING_PERIOD_MONTHLY:
+          if (billingPeriodValue == 1) {
+            return StringUtils.defaultIfEmpty(
+                context.resolve(Constants.PRODUCT_PRICE_FROM_ONE_MONTH_TEXT_KEY).asText(),
+                "from {fromPrice}/Month");
+          }
+          return StringUtils.defaultIfEmpty(
+              context.resolve(Constants.PRODUCT_PRICE_FROM_MULTIPLE_MONTH_TEXT_KEY).asText(),
+              "from {fromPrice} every {billingPeriodValue} months");
+        case BILLING_PERIOD_WEEKLY:
+          if (billingPeriodValue == 1) {
+            return StringUtils.defaultIfEmpty(
+                context.resolve(Constants.PRODUCT_PRICE_FROM_ONE_WEEK_TEXT_KEY).asText(),
+                "from {fromPrice}/Week");
+          }
+          return StringUtils.defaultIfEmpty(
+              context.resolve(Constants.PRODUCT_PRICE_FROM_MULTIPLE_WEEK_TEXT_KEY).asText(),
+              "from {fromPrice} every {billingPeriodValue} weeks");
+        default:
+      }
+      return StringUtils.defaultIfEmpty(
+          context.resolve(Constants.PRODUCT_PRICE_UNAVAILABLE_TEXT_KEY).asText(),
+          "Unavailable");
     }
 
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {

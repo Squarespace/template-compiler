@@ -62,6 +62,30 @@ public class CommerceUtils {
     return ProductType.fromCode(node.asInt());
   }
 
+  public static boolean isSubscribable(JsonNode item) {
+    JsonNode structuredContent = item.path("structuredContent");
+    JsonNode node = structuredContent.path("isSubscribable");
+    return node.asBoolean();
+  }
+
+  public static JsonNode getSubscriptionPlanBillingPeriodNode(JsonNode item) {
+    // BillingPeriod is represented as {value, unit} and is the period of time in between recurring billings
+    // e.g. {2, MONTH} means a subscriber is billed once every 2 months
+    JsonNode structuredContent = item.path("structuredContent");
+    JsonNode node = structuredContent.path("subscriptionPlan").path("billingPeriod");
+    return node;
+  }
+
+  public static String getUnitFromSubscriptionPlanBillingPeriod(JsonNode billingPeriodNode) {
+    JsonNode node = billingPeriodNode.path("unit");
+    return node.asText();
+  }
+
+  public static int getValueFromSubscriptionPlanBillingPeriod(JsonNode billingPeriodNode) {
+    JsonNode node = billingPeriodNode.path("value");
+    return node.asInt();
+  }
+
   public static JsonNode getFromPriceMoneyNode(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");

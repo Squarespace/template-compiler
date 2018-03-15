@@ -1,0 +1,26 @@
+:JSON
+{
+  "structuredContent": {
+  "productType": 1,
+  "isSubscribable" : "true",
+  "subscriptionPlan" : {
+    "billingPeriod" : {
+      "unit" : "MONTH",
+      "value" : 2
+    }
+  },
+  "variants": [
+      {
+        "price": 10000, "priceMoney": { "value": "100" }
+      }
+    ]
+  }
+}
+
+:TEMPLATE
+{@|product-price}
+
+:OUTPUT
+<div class="product-price">
+<span class="sqs-money-native">100.00</span> every 2 months
+</div>
