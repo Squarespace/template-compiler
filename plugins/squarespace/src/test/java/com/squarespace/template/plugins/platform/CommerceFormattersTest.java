@@ -273,7 +273,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     runner.run(
         "f-variants-select-1.html",
         "f-variants-select-2.html",
-        "f-variants-select-3.html"
+        "f-variants-select-3.html",
+        "f-variants-select-subscription.html"
         );
   }
 
