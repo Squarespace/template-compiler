@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.cldr.CLDR;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
@@ -604,7 +605,21 @@ public class CommerceFormatters implements FormatterRegistry {
       ObjectNode obj = JsonUtils.createObjectNode();
       obj.set("item", node);
       obj.set("options", options);
+      obj.set("selectText", getSelectText(ctx, node));
       var.set(executeTemplate(ctx, template, obj, false));
+    }
+
+    private static TextNode getSelectText(Context ctx, JsonNode node) {
+      ProductType productType = CommerceUtils.getProductType(node);
+      // Gift Cards have variants forcibly named "Value" by default (as opposed to a merchant-defined variant name) and
+      // thus must be translated differently than other products. See COM-4912 for more details
+      if (productType == ProductType.GIFT_CARD) {
+        String localizedSelectText = ctx.resolve(Constants.GIFT_CARD_VARIANT_SELECT_TEXT).asText();
+        return new TextNode(StringUtils.defaultIfEmpty(localizedSelectText, "Select Value"));
+      } else {
+        String localizedSelectText = ctx.resolve(Constants.PRODUCT_VARIANT_SELECT_TEXT).asText();
+        return new TextNode(StringUtils.defaultIfEmpty(localizedSelectText, "Select {variantName}"));
+      }
     }
   }
 

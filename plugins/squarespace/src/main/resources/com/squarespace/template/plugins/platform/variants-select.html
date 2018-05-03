@@ -1,5 +1,3 @@
-{.var @selectText localizedStrings.productVariantSelectText}
-
 {.if options}
   {.var @content item.structuredContent}
   {.var @variants @content.variants}
@@ -11,7 +9,7 @@
     <div class="variant-option-title">{name}: </div>
     <div class="variant-select-wrapper">
       <select data-variant-option-name="{name|htmltag}">
-        <option value="">{.if @selectText}{@selectText}{.or}Select{.end} {name}</option>
+        <option value="">{selectText|message variantName:name}</option>
         {.repeated section values}<option value="{@|htmltag}">{@}</option>{.end}
       </select>
     </div>

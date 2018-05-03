@@ -78,6 +78,14 @@ public class Constants {
   public static final String[] PRODUCT_SUMMARY_FORM_NO_ANSWER_TEXT_KEY = new String[] {
       "localizedStrings", "productSummaryFormNoAnswerText"};
 
+  public static final String[] PRODUCT_VARIANT_SELECT_TEXT = new String[] {
+      "localizedStrings", "productVariantSelectText"
+  };
+
+  public static final String[] GIFT_CARD_VARIANT_SELECT_TEXT = new String[] {
+      "localizedStrings", "giftCardVariantSelectText"
+  };
+
   public static final String[] CLDR_MONEYFORMAT_KEY = new String[] {
       "website", "useCLDRMoneyFormat" };
 

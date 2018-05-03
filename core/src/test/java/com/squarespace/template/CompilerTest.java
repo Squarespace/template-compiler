@@ -94,6 +94,35 @@ public class CompilerTest {
   }
 
   @Test
+  public void testMixedArray() throws CodeException {
+    String json = "{\"a\": [1, null, 2, null, 3]}";
+    CompiledTemplate compiled = COMPILER.compile("{a}");
+    Context ctx = COMPILER.newExecutor()
+        .code(compiled.code())
+        .json(json)
+        .execute();
+    assertEquals(ctx.buffer().toString(), "1,null,2,null,3");
+
+    compiled = COMPILER.compile("{.repeated section a}{@}{.end}");
+    ctx = COMPILER.newExecutor()
+        .code(compiled.code())
+        .json(json)
+        .execute();
+    assertEquals(ctx.buffer().toString(), "123");
+  }
+
+  @Test
+  public void testMixedObject() throws CodeException {
+    String json = "{\"a\": {\"b\":1,\"c\":null,\"d\":false,\"e\":\"foo\"} }";
+    CompiledTemplate compiled = COMPILER.compile("{a}");
+    Context ctx = COMPILER.newExecutor()
+        .code(compiled.code())
+        .json(json)
+        .execute();
+    assertEquals(ctx.buffer().toString(), "");
+  }
+
+  @Test
   public void testExecuteCompiled() throws CodeException {
     CompiledTemplate compiled = COMPILER.compile("{@}");
     Context ctx = COMPILER.newExecutor()
