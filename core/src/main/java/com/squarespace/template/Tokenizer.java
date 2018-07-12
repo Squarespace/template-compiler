@@ -70,7 +70,8 @@ import com.squarespace.template.Instructions.VariableInst;
  */
 public class Tokenizer {
 
-  private final static int IF_VARIABLE_LIMIT = 5;
+  // Increased at the request of template developers.
+  private final static int IF_VARIABLE_LIMIT = 30;
 
   private final String raw;
   private final int length;

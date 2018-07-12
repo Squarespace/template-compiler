@@ -48,9 +48,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
@@ -224,9 +226,16 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertFailure("{.if}", WHITESPACE_EXPECTED);
     assertFailure("{.if }", IF_EMPTY);
     assertFailure("{.if a||b||c||d||e||}", IF_TOO_MANY_OPERATORS);
-    assertFailure("{.if a||b||c||d||e||f}", IF_TOO_MANY_VARS);
     assertFailure("{.if .qrs||.tuv}", IF_EXPECTED_VAROP);
-  }
+
+    List<String> args = makeArgs("a%d", 30);
+    ops = makeOps(LOGICAL_OR, 29);
+    assertResult("{.if " + StringUtils.join(args, "||") + "}", mk.ifexpn(args, ops), mk.eof());
+
+    args = makeArgs("a%d", 31);
+    ops = makeOps(LOGICAL_OR, 30);
+    assertFailure("{.if " + StringUtils.join(args, "||") + "}", IF_TOO_MANY_VARS);
+}
 
   @Test
   public void testInject() throws CodeSyntaxException {
@@ -343,6 +352,22 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{foo||json}", mk.text("{foo||json}"), mk.eof());
     assertResult("{foo, bar}", mk.text("{foo, bar}"), mk.eof());
     assertResult("{foo, bar||json}", mk.text("{foo, bar||json}"), mk.eof());
+  }
+
+  private List<String> makeArgs(String format, int count) {
+    List<String> args = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      args.add(String.format(format, i));
+    }
+    return args;
+  }
+
+  private List<Operator> makeOps(Operator op, int count) {
+    List<Operator> ops = new ArrayList<>(count);
+    for (int i = 0; i < count; i++) {
+      ops.add(op);
+    }
+    return ops;
   }
 
   private void assertFailure(String raw, SyntaxErrorType type) {

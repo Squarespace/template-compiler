@@ -38,6 +38,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 
 
@@ -76,8 +77,8 @@ public class TokenizerValidationTest extends UnitTestBase {
     assertErrors("{.if a ||}", IF_TOO_MANY_OPERATORS);
     assertErrors("{.if a || b ||}", IF_TOO_MANY_OPERATORS);
     assertErrors("{.if a b}", IF_EXPECTED_VAROP);
-    assertErrors("{.if a || b || c || d || e || f}", SyntaxErrorType.IF_TOO_MANY_VARS);
     assertErrors("{.if a .}", IF_EXPECTED_VAROP);
+    assertErrors("{.if " + StringUtils.repeat("a || ", 30) + "a" + " }", SyntaxErrorType.IF_TOO_MANY_VARS);
 
     // Predicates
     assertErrors("{.if foo?}", PREDICATE_UNKNOWN);
