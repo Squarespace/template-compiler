@@ -381,7 +381,7 @@ public class CommerceFormatters implements FormatterRegistry {
           if (billingPeriodValue == 1) {
             return StringUtils.defaultIfEmpty(
                 context.resolve(Constants.PRODUCT_PRICE_ONE_MONTH_TEXT_KEY).asText(),
-                "{price}/Month");
+                "{price} every month");
           }
           return StringUtils.defaultIfEmpty(
               context.resolve(Constants.PRODUCT_PRICE_MULTIPLE_MONTH_TEXT_KEY).asText(),
@@ -390,7 +390,7 @@ public class CommerceFormatters implements FormatterRegistry {
           if (billingPeriodValue == 1) {
             return StringUtils.defaultIfEmpty(
                 context.resolve(Constants.PRODUCT_PRICE_ONE_WEEK_TEXT_KEY).asText(),
-                "{price}/Week");
+                "{price} every week");
           }
           return StringUtils.defaultIfEmpty(
               context.resolve(Constants.PRODUCT_PRICE_MULTIPLE_WEEK_TEXT_KEY).asText(),
@@ -410,7 +410,7 @@ public class CommerceFormatters implements FormatterRegistry {
           if (billingPeriodValue == 1) {
             return StringUtils.defaultIfEmpty(
                 context.resolve(Constants.PRODUCT_PRICE_FROM_ONE_MONTH_TEXT_KEY).asText(),
-                "from {fromPrice}/Month");
+                "from {fromPrice} every month");
           }
           return StringUtils.defaultIfEmpty(
               context.resolve(Constants.PRODUCT_PRICE_FROM_MULTIPLE_MONTH_TEXT_KEY).asText(),
@@ -419,7 +419,7 @@ public class CommerceFormatters implements FormatterRegistry {
           if (billingPeriodValue == 1) {
             return StringUtils.defaultIfEmpty(
                 context.resolve(Constants.PRODUCT_PRICE_FROM_ONE_WEEK_TEXT_KEY).asText(),
-                "from {fromPrice}/Week");
+                "from {fromPrice} every week");
           }
           return StringUtils.defaultIfEmpty(
               context.resolve(Constants.PRODUCT_PRICE_FROM_MULTIPLE_WEEK_TEXT_KEY).asText(),
