@@ -533,9 +533,10 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode node = var.node();
       ProductType type = CommerceUtils.getProductType(node);
 
-      boolean multipleQuantityAllowed = ProductType.PHYSICAL.equals(type)
+      boolean multipleQuantityAllowed = (ProductType.PHYSICAL.equals(type)
           || (ProductType.SERVICE.equals(type)
-             && CommerceUtils.isMultipleQuantityAllowedForServices(ctx.resolve("websiteSettings")));
+             && CommerceUtils.isMultipleQuantityAllowedForServices(ctx.resolve("websiteSettings"))))
+          && !CommerceUtils.isSubscribable(node);
       boolean hideQuantityInput = !multipleQuantityAllowed || CommerceUtils.getTotalStockRemaining(node) <= 1;
 
       if (hideQuantityInput) {
