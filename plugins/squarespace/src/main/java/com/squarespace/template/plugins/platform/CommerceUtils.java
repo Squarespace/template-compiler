@@ -91,7 +91,7 @@ public class CommerceUtils {
     JsonNode node = structuredContent.path("subscriptionPlan").path("numBillingCycles");
     return node.asInt();
   }
-  
+
   public static JsonNode getLowestPriceAmongVariants(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
@@ -132,7 +132,7 @@ public class CommerceUtils {
         return DEFAULT_MONEY_NODE;
     }
   }
-  
+
   public static JsonNode getHighestPriceAmongVariants(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");

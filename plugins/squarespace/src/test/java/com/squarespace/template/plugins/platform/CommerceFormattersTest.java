@@ -173,7 +173,7 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-product-price-subscription-weekly-localized-multiple.html"
         );
   }
-  
+
   @Test
   public void testProductFiniteSubscriptionPrice() {
     runner.run(

@@ -347,7 +347,7 @@ public class CommerceFormatters implements FormatterRegistry {
       buf.append(priceInfo.asText());
       var.set(buf);
     }
-    
+
     private static void resolveTemplateVariablesForOTPProduct(Context ctx, JsonNode productNode, ObjectNode args) {
       if (CommerceUtils.hasVariedPrices(productNode)) {
         args.put("fromText", StringUtils.defaultIfEmpty(
@@ -364,7 +364,8 @@ public class CommerceFormatters implements FormatterRegistry {
       args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
-    private static void resolveTemplateVariablesForSubscriptionProduct(Context ctx, JsonNode productNode, ObjectNode args) {
+    private static void resolveTemplateVariablesForSubscriptionProduct(
+        Context ctx, JsonNode productNode, ObjectNode args) {
       JsonNode billingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(productNode);
 
       if (billingPeriodNode.isMissingNode()) {
@@ -443,7 +444,7 @@ public class CommerceFormatters implements FormatterRegistry {
 
       return sb.toString();
     }
-    
+
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {
       if (useCLDRMode(ctx)) {
         BigDecimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
