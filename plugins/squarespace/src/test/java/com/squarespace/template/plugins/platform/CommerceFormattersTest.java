@@ -153,7 +153,7 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testProductSubscriptionPrice() {
+  public void testProductIndefiniteSubscriptionPrice() {
     runner.run("f-product-price-subscription-weekly.html",
         "f-product-price-subscription-bi-weekly.html",
         "f-product-price-subscription-monthly.html",
@@ -172,6 +172,29 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-product-price-subscription-weekly-localized.html",
         "f-product-price-subscription-weekly-localized-multiple.html"
         );
+  }
+  
+  @Test
+  public void testProductFiniteSubscriptionPrice() {
+    runner.run(
+        "f-product-price-finite-subscription-weekly.html",
+        "f-product-price-finite-subscription-bi-weekly.html",
+        "f-product-price-finite-subscription-monthly.html",
+        "f-product-price-finite-subscription-bi-monthly.html");
+
+    runner.run("f-product-price-finite-subscription-from-weekly.html",
+        "f-product-price-finite-subscription-from-bi-weekly.html",
+        "f-product-price-finite-subscription-from-monthly.html",
+        "f-product-price-finite-subscription-from-bi-monthly.html",
+        "f-product-price-finite-subscription-from-weekly-on-sale.html");
+
+    runner.run("f-product-price-finite-subscription-on-sale-bi-monthly.html",
+        "f-product-price-finite-subscription-on-sale-bi-weekly.html",
+        "f-product-price-finite-subscription-on-sale-monthly.html",
+        "f-product-price-finite-subscription-on-sale-weekly.html",
+        "f-product-price-finite-subscription-weekly-localized.html",
+        "f-product-price-finite-subscription-weekly-localized-multiple.html"
+    );
   }
 
   @Test

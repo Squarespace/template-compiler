@@ -6,8 +6,9 @@
   "subscriptionPlan" : {
     "billingPeriod" : {
       "unit" : "WEEK",
-      "value" : 5
-    }
+      "value" : 1
+    },
+    "numBillingCycles": 8
   },
   "variants": [
       {
@@ -17,7 +18,7 @@
   },
 
   "localizedStrings": {
-    "productPrice__singlePrice__nWeekly__indefinite" : "{price} every {billingPeriodValue} months Other Super Translated"
+    "productPrice__singlePrice__1Weekly__limited__nWeeks" : "{price} every week Super Translated for {duration} weeks"
   }
 }
 
@@ -29,5 +30,5 @@ locale: en-US
 
 :OUTPUT
 <div class="product-price">
-<span class="sqs-money-native">100.00</span> every 5 months Other Super Translated
+<span class="sqs-money-native">100.00</span> every week Super Translated for 8 weeks
 </div>

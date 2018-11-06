@@ -1,5 +1,5 @@
 <div class="product-price">
-{.if formattedFromPrice}{fromText|message fromPrice:formattedFromPrice billingPeriodValue:billingPeriodValue}
-{.or}{.if formattedSalePrice}{formattedSalePriceText|message price:formattedSalePrice billingPeriodValue:billingPeriodValue}{.space}<span class="original-price">{formattedNormalPriceText|message price:formattedNormalPrice billingPeriodValue:billingPeriodValue}</span>
-{.or}{.if formattedNormalPrice}{formattedNormalPriceText|message price:formattedNormalPrice billingPeriodValue:billingPeriodValue}{.end}{.end}{.end}
+{.if formattedFromPrice}{fromText|message fromPrice:formattedFromPrice price:formattedFromPrice billingPeriodValue:billingPeriodValue duration:duration}
+{.or}{.if formattedSalePrice}{formattedSalePriceText|message price:formattedSalePrice billingPeriodValue:billingPeriodValue duration:duration}{.space}<span class="original-price">{formattedNormalPriceText|message price:formattedNormalPrice billingPeriodValue:billingPeriodValue duration:duration}</span>
+{.or}{.if formattedNormalPrice}{formattedNormalPriceText|message price:formattedNormalPrice billingPeriodValue:billingPeriodValue duration:duration}{.end}{.end}{.end}
 </div>

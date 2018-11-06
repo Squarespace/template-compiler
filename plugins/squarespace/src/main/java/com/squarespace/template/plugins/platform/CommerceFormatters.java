@@ -172,7 +172,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable item = variables.first();
-      JsonNode moneyNode = CommerceUtils.getFromPriceMoneyNode(item.node());
+      JsonNode moneyNode = CommerceUtils.getLowestPriceAmongVariants(item.node());
       double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
       item.set(legacyPrice);
     }
@@ -284,7 +284,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable item = variables.first();
-      JsonNode moneyNode = CommerceUtils.getNormalPriceMoneyNode(item.node());
+      JsonNode moneyNode = CommerceUtils.getHighestPriceAmongVariants(item.node());
       double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
       item.set(legacyPrice);
     }
@@ -337,100 +337,113 @@ public class CommerceFormatters implements FormatterRegistry {
 
       ObjectNode obj = JsonUtils.createObjectNode();
 
-      boolean isSubscribable = CommerceUtils.isSubscribable(node);
-      JsonNode subscriptionPlanBillingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(node);
-
-      if (CommerceUtils.getProductType(node) != ProductType.UNDEFINED) {
-
-        if (CommerceUtils.hasVariedPrices(node)) {
-          String fromText = isSubscribable ? getSubscriptionFromPriceText(ctx, subscriptionPlanBillingPeriodNode)
-              : ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText();
-          if (isSubscribable) {
-            obj.put("billingPeriodValue",
-                CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(subscriptionPlanBillingPeriodNode));
-          }
-          obj.put("fromText", StringUtils.defaultIfEmpty(fromText, "from {fromPrice}"));
-          obj.put("formattedFromPrice", getMoneyString(CommerceUtils.getFromPriceMoneyNode(node), ctx));
-        }
-
-        String priceText = isSubscribable ? getSubscriptionPriceText(ctx, subscriptionPlanBillingPeriodNode)
-            : "{price}";
-        if (isSubscribable) {
-          obj.put("billingPeriodValue",
-              CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(subscriptionPlanBillingPeriodNode));
-        }
-
-        if (CommerceUtils.isOnSale(node)) {
-          obj.put("formattedSalePriceText", priceText);
-          obj.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(node), ctx));
-        }
-
-        obj.put("formattedNormalPriceText", priceText);
-        obj.put("formattedNormalPrice", getMoneyString(CommerceUtils.getNormalPriceMoneyNode(node), ctx));
+      if (CommerceUtils.isSubscribable(node)) {
+        resolveTemplateVariablesForSubscriptionProduct(ctx, node, obj);
+      } else if (CommerceUtils.getProductType(node) != ProductType.UNDEFINED) {
+        resolveTemplateVariablesForOTPProduct(ctx, node, obj);
       }
+
       JsonNode priceInfo = executeTemplate(ctx, template, obj, true);
       buf.append(priceInfo.asText());
       var.set(buf);
     }
-
-    private static String getSubscriptionPriceText(Context context, JsonNode billingPeriodNode) {
-      String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
-      int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
-      switch (billingPeriodUnit) {
-        case BILLING_PERIOD_MONTHLY:
-          if (billingPeriodValue == 1) {
-            return StringUtils.defaultIfEmpty(
-                context.resolve(Constants.PRODUCT_PRICE_ONE_MONTH_TEXT_KEY).asText(),
-                "{price} every month");
-          }
-          return StringUtils.defaultIfEmpty(
-              context.resolve(Constants.PRODUCT_PRICE_MULTIPLE_MONTH_TEXT_KEY).asText(),
-              "{price} every {billingPeriodValue} months");
-        case BILLING_PERIOD_WEEKLY:
-          if (billingPeriodValue == 1) {
-            return StringUtils.defaultIfEmpty(
-                context.resolve(Constants.PRODUCT_PRICE_ONE_WEEK_TEXT_KEY).asText(),
-                "{price} every week");
-          }
-          return StringUtils.defaultIfEmpty(
-              context.resolve(Constants.PRODUCT_PRICE_MULTIPLE_WEEK_TEXT_KEY).asText(),
-              "{price} every {billingPeriodValue} weeks");
-        default:
+    
+    private static void resolveTemplateVariablesForOTPProduct(Context ctx, JsonNode productNode, ObjectNode args) {
+      if (CommerceUtils.hasVariedPrices(productNode)) {
+        args.put("fromText", StringUtils.defaultIfEmpty(
+            ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
+        args.put("formattedFromPrice", getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
       }
-      return StringUtils.defaultIfEmpty(
-          context.resolve(Constants.PRODUCT_PRICE_UNAVAILABLE_TEXT_KEY).asText(),
-          "Unavailable");
+
+      if (CommerceUtils.isOnSale(productNode)) {
+        args.put("formattedSalePriceText", "{price}");
+        args.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
+      }
+
+      args.put("formattedNormalPriceText", "{price}");
+      args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
-    private static String getSubscriptionFromPriceText(Context context, JsonNode billingPeriodNode) {
-      String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
-      int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
-      switch (billingPeriodUnit) {
-        case BILLING_PERIOD_MONTHLY:
-          if (billingPeriodValue == 1) {
-            return StringUtils.defaultIfEmpty(
-                context.resolve(Constants.PRODUCT_PRICE_FROM_ONE_MONTH_TEXT_KEY).asText(),
-                "from {fromPrice} every month");
-          }
-          return StringUtils.defaultIfEmpty(
-              context.resolve(Constants.PRODUCT_PRICE_FROM_MULTIPLE_MONTH_TEXT_KEY).asText(),
-              "from {fromPrice} every {billingPeriodValue} months");
-        case BILLING_PERIOD_WEEKLY:
-          if (billingPeriodValue == 1) {
-            return StringUtils.defaultIfEmpty(
-                context.resolve(Constants.PRODUCT_PRICE_FROM_ONE_WEEK_TEXT_KEY).asText(),
-                "from {fromPrice} every week");
-          }
-          return StringUtils.defaultIfEmpty(
-              context.resolve(Constants.PRODUCT_PRICE_FROM_MULTIPLE_WEEK_TEXT_KEY).asText(),
-              "from {fromPrice} every {billingPeriodValue} weeks");
-        default:
+    private static void resolveTemplateVariablesForSubscriptionProduct(Context ctx, JsonNode productNode, ObjectNode args) {
+      JsonNode billingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(productNode);
+
+      if (billingPeriodNode.isMissingNode()) {
+        args.put("formattedFromPrice", true);
+        args.put("fromText", StringUtils.defaultIfEmpty(
+            ctx.resolve(new String[] {"localizedStrings", "productPriceUnavailable"}).asText(), "Unavailable"));
+        return;
       }
-      return StringUtils.defaultIfEmpty(
-          context.resolve(Constants.PRODUCT_PRICE_UNAVAILABLE_TEXT_KEY).asText(),
-          "Unavailable");
+
+      boolean hasMultiplePrices = CommerceUtils.hasVariedPrices(productNode);
+      int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+
+      int duration = billingPeriodValue * CommerceUtils.getNumBillingCyclesFromSubscriptionPlanNode(productNode);
+
+      args.put("billingPeriodValue", billingPeriodValue);
+      args.put("duration", duration);
+
+      // This string needs to match the correct translation template in v6 products-2.0-en-US.json.
+      StringBuilder i18nKeyBuilder = new StringBuilder("productPrice")
+          .append("__")
+          .append(hasMultiplePrices ? "multiplePrices" : "singlePrice")
+          .append("__")
+          .append(billingPeriodValue == 1 ? "1" : "n")
+          .append(StringUtils.capitalize(billingPeriodUnit.toLowerCase()) + "ly").append("__");
+
+      if (duration == 0) {
+        i18nKeyBuilder.append("indefinite");
+      } else {
+        i18nKeyBuilder.append("limited__")
+            .append(duration == 1 ? "1" : "n")
+            .append(StringUtils.capitalize(billingPeriodUnit.toLowerCase()) + "s");
+      }
+
+      String templateForPrice = StringUtils.defaultIfEmpty(
+          ctx.resolve(new String[] {"localizedStrings",
+              i18nKeyBuilder.toString()}).asText(), defaultSubscriptionPriceString(productNode));
+
+      if (hasMultiplePrices) {
+        args.put("fromText", templateForPrice);
+        args.put("formattedFromPrice", getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
+      }
+
+      if (CommerceUtils.isOnSale(productNode)) {
+        args.put("formattedSalePriceText", templateForPrice);
+        args.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
+      }
+
+      args.put("formattedNormalPriceText", templateForPrice);
+      args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
+    // TODO: This is shitty. The formatter should, if necessary, look up the English string and use it.
+    private static String defaultSubscriptionPriceString(JsonNode productNode) {
+      JsonNode billingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(productNode);
+
+      boolean hasMultiplePrices = CommerceUtils.hasVariedPrices(productNode);
+      int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      boolean billingPeriodPlural = billingPeriodValue > 1;
+      String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
+      int numBillingCycles = CommerceUtils.getNumBillingCyclesFromSubscriptionPlanNode(productNode);
+
+      StringBuilder sb = new StringBuilder()
+          .append(hasMultiplePrices ? "from " : "")
+          .append("{price} every ")
+          .append(billingPeriodPlural ? "{billingPeriodValue} " : "")
+          .append(billingPeriodUnit.toLowerCase())
+          .append(billingPeriodPlural ? "s" : "");
+
+      if (numBillingCycles > 0) {
+        sb.append(" for {duration} ")
+            .append(billingPeriodUnit.toLowerCase())
+            // TODO: this only works as long as the duration unit is the same as the billing period unit
+            .append("s");
+      }
+
+      return sb.toString();
+    }
+    
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {
       if (useCLDRMode(ctx)) {
         BigDecimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);

@@ -86,7 +86,13 @@ public class CommerceUtils {
     return node.asInt();
   }
 
-  public static JsonNode getFromPriceMoneyNode(JsonNode item) {
+  public static int getNumBillingCyclesFromSubscriptionPlanNode(JsonNode item) {
+    JsonNode structuredContent = item.path("structuredContent");
+    JsonNode node = structuredContent.path("subscriptionPlan").path("numBillingCycles");
+    return node.asInt();
+  }
+  
+  public static JsonNode getLowestPriceAmongVariants(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
     switch (type) {
@@ -126,8 +132,8 @@ public class CommerceUtils {
         return DEFAULT_MONEY_NODE;
     }
   }
-
-  public static JsonNode getNormalPriceMoneyNode(JsonNode item) {
+  
+  public static JsonNode getHighestPriceAmongVariants(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
