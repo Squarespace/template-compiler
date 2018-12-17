@@ -93,7 +93,9 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   public void testImage() {
     runner.run(
         "f-image-1.html",
-        "f-image-2.html"
+        "f-image-2.html",
+        "f-image-3.html",
+        "f-image-4.html"
         );
   }
 
@@ -111,7 +113,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testImageMeta() {
     runner.run(
-        "f-image-meta-1.html"
+        "f-image-meta-1.html",
+        "f-image-meta-2.html"
         );
   }
 

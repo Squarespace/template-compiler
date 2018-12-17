@@ -137,43 +137,43 @@ public class ContentFormatters implements FormatterRegistry {
   }
 
 
-  private abstract static class ImageMetaBaseFormatter extends BaseFormatter {
-
-    ImageMetaBaseFormatter(String identifier) {
-      super(identifier, false);
-    }
-
-    protected void outputImageMeta(JsonNode image, StringBuilder buf) {
-      if (image.isMissingNode()) {
-        return;
-      }
-
-      String focalPoint = getFocalPoint(image);
-      String origSize = image.path("originalSize").asText();
-      String assetUrl = image.path("assetUrl").asText();
-
-      String altText = getAltTextFromContentItem(image);
-
-      if (isLicensedAssetPreview(image)) {
-        buf.append("data-licensed-asset-preview=\"true\"").append(" ");
-      }
-
-      buf.append("data-src=\"").append(assetUrl);
-      buf.append("\" data-image=\"").append(assetUrl);
-      buf.append("\" data-image-dimensions=\"");
-      buf.append(origSize);
-      buf.append("\" data-image-focal-point=\"");
-      buf.append(focalPoint);
-      buf.append("\" alt=\"");
-      PluginUtils.escapeHtmlAttribute(altText, buf);
-      buf.append("\" ");
-    }
+  private static void outputImageMeta(JsonNode image, StringBuilder buf) {
+      outputImageMeta(image, buf, null);
   }
 
-  public static class ChildImageMetaFormatter extends ImageMetaBaseFormatter {
+  private static void outputImageMeta(JsonNode image, StringBuilder buf, String preferredAltText) {
+    if (image.isMissingNode()) {
+      return;
+    }
+
+    JsonNode componentKey = image.path("componentKey");
+    String focalPoint = getFocalPoint(image);
+    String origSize = image.path("originalSize").asText();
+    String assetUrl = image.path("assetUrl").asText();
+
+    String altText = preferredAltText != null ? preferredAltText : getAltTextFromContentItem(image);
+
+    if (isLicensedAssetPreview(image)) {
+      buf.append("data-licensed-asset-preview=\"true\" ");
+    }
+
+    if (!componentKey.isMissingNode()) {
+      buf.append("data-component-key=\"").append(componentKey.asText()).append("\" ");
+    }
+
+    buf.append("data-src=\"").append(assetUrl).append("\" ");
+    buf.append("data-image=\"").append(assetUrl).append("\" ");
+    buf.append("data-image-dimensions=\"").append(origSize).append("\" ");
+    buf.append("data-image-focal-point=\"").append(focalPoint).append("\" ");
+    buf.append("alt=\"");
+    PluginUtils.escapeHtmlAttribute(altText, buf);
+    buf.append("\" ");
+  }
+
+  public static class ChildImageMetaFormatter extends BaseFormatter {
 
     public ChildImageMetaFormatter() {
-      super("child-image-meta");
+      super("child-image-meta", false);
     }
 
     @Override
@@ -353,37 +353,21 @@ public class ContentFormatters implements FormatterRegistry {
       String id = node.path("id").asText();
       String altText = getAltText(ctx);
       String assetUrl = node.path("assetUrl").asText();
-      String focalPoint = getFocalPoint(node);
-      String originalSize = node.path("originalSize").asText();
 
       StringBuilder buf = new StringBuilder();
 
       buf.append("<noscript>");
-      buf.append("<img");
-      buf.append(" src=\"").append(assetUrl).append("\" ");
-      if (!altText.isEmpty()) {
-        buf.append(" alt=\"");
-        PluginUtils.escapeHtmlAttribute(altText, buf);
-        buf.append("\" ");
-      }
-      buf.append(" />");
+      buf.append("<img ");
+      buf.append("src=\"").append(assetUrl).append("\" ");
+      buf.append("alt=\"");
+      PluginUtils.escapeHtmlAttribute(altText, buf);
+      buf.append("\" ");
+      buf.append("/>");
       buf.append("</noscript>");
 
       buf.append("<img class=\"").append(cls).append("\" ");
-      if (!altText.isEmpty()) {
-        buf.append("alt=\"");
-        PluginUtils.escapeHtmlAttribute(altText, buf);
-        buf.append("\" ");
-      }
+      outputImageMeta(node, buf, altText);
 
-      if (isLicensedAssetPreview(node)) {
-        buf.append("data-licensed-asset-preview=\"true\"").append(" ");
-      }
-
-      buf.append("data-src=\"").append(assetUrl).append("\" ");
-      buf.append("data-image=\"").append(assetUrl).append("\" ");
-      buf.append("data-image-dimensions=\"").append(originalSize).append("\" ");
-      buf.append("data-image-focal-point=\"").append(focalPoint).append("\" ");
       buf.append("data-load=\"false\"").append(" ");
       buf.append("data-image-id=\"").append(id).append("\" ");
       buf.append("data-type=\"image\" ");
@@ -399,9 +383,9 @@ public class ContentFormatters implements FormatterRegistry {
       // this will be empty if this is not a block
       JsonNode blockInfo = ctx.resolve("info");
       if (blockInfo != null) {
-        JsonNode altText = blockInfo.get("altText");
-        if (altText != null && StringUtils.trimToNull(altText.asText()) != null) {
-          return altText.asText();
+        String altText = StringUtils.trimToNull(blockInfo.path("altText").asText());
+        if (altText != null) {
+          return altText;
         }
       }
 
@@ -468,10 +452,10 @@ public class ContentFormatters implements FormatterRegistry {
     }
   }
 
-  public static class ImageMetaFormatter extends ImageMetaBaseFormatter {
+  public static class ImageMetaFormatter extends BaseFormatter {
 
     public ImageMetaFormatter() {
-      super("image-meta");
+      super("image-meta", false);
     }
 
     @Override
@@ -532,10 +516,10 @@ public class ContentFormatters implements FormatterRegistry {
 
   }
 
-  public static class CoverImageMetaFormatter extends ImageMetaBaseFormatter {
+  public static class CoverImageMetaFormatter extends BaseFormatter {
 
     public CoverImageMetaFormatter() {
-      super("cover-image-meta");
+      super("cover-image-meta", false);
     }
 
     @Override
