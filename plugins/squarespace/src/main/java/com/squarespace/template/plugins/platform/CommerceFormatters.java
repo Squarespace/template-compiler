@@ -446,7 +446,7 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {
-      if (useCLDRMode(ctx)) {
+      if (CommerceUtils.useCLDRMode(ctx)) {
         BigDecimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
         String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
         CLDR.Locale locale = ctx.cldrLocale();
@@ -457,10 +457,6 @@ public class CommerceFormatters implements FormatterRegistry {
         CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
         return buf.toString();
       }
-    }
-
-    private static boolean useCLDRMode(Context ctx) {
-      return GeneralUtils.isTruthy(ctx.resolve(Constants.CLDR_MONEYFORMAT_KEY));
     }
   }
 

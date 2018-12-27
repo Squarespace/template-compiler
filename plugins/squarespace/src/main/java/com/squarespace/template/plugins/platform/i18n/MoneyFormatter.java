@@ -36,6 +36,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.plugins.platform.CommerceUtils;
 
 
 /**
@@ -82,9 +83,19 @@ public class MoneyFormatter extends BaseFormatter {
     JsonNode node = var.node();
     JsonNode decimal = node.path("decimalValue");
     JsonNode currency = node.path("currencyCode");
+
     if (decimal.isMissingNode() || currency.isMissingNode()) {
-      var.setMissing();
-      return;
+      // Check if we have a new money node and CLDR formatting is enabled.
+      if (CommerceUtils.useCLDRMode(ctx)) {
+        decimal = node.path("value");
+        currency = node.path("currency");
+      }
+
+      // No valid money node found.
+      if (decimal.isMissingNode() || currency.isMissingNode()) {
+        var.setMissing();
+        return;
+      }
     }
 
     CLDR.Currency code = CLDR.Currency.fromString(currency.asText());

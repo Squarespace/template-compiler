@@ -36,18 +36,17 @@ import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
 /**
- * Tests for the money formatter using the new money JSON structure.
+ * Tests for the money formatter using the legacy money JSON structure.
  */
-public class MoneyFormatterTest extends PlatformUnitTestBase {
+public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
 
   private static final MoneyFormatter MONEY = new MoneyFormatter();
   private final CodeMaker mk = maker();
 
   @Test
   public void testExecutor() throws CodeException {
-    String json = "{\"amt\": {\"value\": \"-15789.12\", \"currency\": \"USD\"}, "
-         + "\"website\": {\"useCLDRMoneyFormat\": true}}";
-    String template = "{amt|money style:short mode:significant}";
+    String json = "{\"decimalValue\": \"-15789.12\", \"currencyCode\": \"USD\"}";
+    String template = "{@|money style:short mode:significant}";
 
     assertEquals(executeLocale(template, json, CLDR.Locale.fr), "-15,8 k $US");
     assertEquals(executeLocale(template, json, CLDR.Locale.en_US), "-$15.8K");
@@ -128,54 +127,41 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     run(en_US, usd("1.57"), args, "0,001.57 USD");
   }
 
-  @Test
-  public void testNoCLDR() {
-    String args = " minInt:4";
-    run(en_US, usd("1.57", false), args, "");
-  }
-
   private static BigDecimal big(String n) {
     return new BigDecimal(n);
   }
 
   private static String usd(String n) {
-    return money(n, CLDR.Currency.USD, true);
+    return money(n, CLDR.Currency.USD);
   }
 
   private static String eur(String n) {
-    return money(n, CLDR.Currency.EUR, true);
+    return money(n, CLDR.Currency.EUR);
   }
 
   private static String usd(BigDecimal n) {
-    return money(n, CLDR.Currency.USD, true);
+    return money(n, CLDR.Currency.USD);
   }
 
   private static String eur(BigDecimal n) {
-    return money(n, CLDR.Currency.EUR, true);
+    return money(n, CLDR.Currency.EUR);
   }
 
-  private static String usd(String n, boolean useCLDR) {
-    return money(n, CLDR.Currency.USD, useCLDR);
-  }
-
-  private static String money(BigDecimal n, CLDR.Currency code, boolean useCLDR) {
-    ObjectNode m = moneyBase(code.name(), useCLDR);
-    m.put("value", n);
+  private static String money(BigDecimal n, CLDR.Currency code) {
+    ObjectNode m = moneyBase(code.name());
+    m.put("decimalValue", n);
     return m.toString();
   }
 
-  private static String money(String n, CLDR.Currency code, boolean useCLDR) {
-    ObjectNode m = moneyBase(code.name(), useCLDR);
-    m.put("value", n);
+  private static String money(String n, CLDR.Currency code) {
+    ObjectNode m = moneyBase(code.name());
+    m.put("decimalValue", n);
     return m.toString();
   }
 
-  private static ObjectNode moneyBase(String currencyCode, boolean useCLDR) {
+  private static ObjectNode moneyBase(String currencyCode) {
     ObjectNode obj = JsonUtils.createObjectNode();
-    obj.put("currency", currencyCode);
-
-    ObjectNode website = obj.putObject("website");
-    website.put("useCLDRMoneyFormat", useCLDR);
+    obj.put("currencyCode", currencyCode);
     return obj;
   }
 

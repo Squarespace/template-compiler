@@ -32,6 +32,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
+import com.squarespace.template.Constants;
+import com.squarespace.template.Context;
+import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
@@ -54,6 +57,10 @@ public class CommerceUtils {
       .put("value", "0");
 
   private CommerceUtils() {
+  }
+
+  public static boolean useCLDRMode(Context ctx) {
+    return GeneralUtils.isTruthy(ctx.resolve(Constants.CLDR_MONEYFORMAT_KEY));
   }
 
   public static ProductType getProductType(JsonNode item) {
