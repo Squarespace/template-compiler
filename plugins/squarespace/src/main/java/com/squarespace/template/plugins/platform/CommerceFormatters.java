@@ -323,7 +323,7 @@ public class CommerceFormatters implements FormatterRegistry {
       PER_YEAR.put(BILLING_PERIOD_WEEKLY, 52);
       PER_YEAR.put(BILLING_PERIOD_MONTHLY, 12);
     }
-    
+
     public ProductPriceFormatter() {
       super("product-price", false);
     }
@@ -449,7 +449,7 @@ public class CommerceFormatters implements FormatterRegistry {
         durationValue /= PER_YEAR.get(durationUnit);
         durationUnit = BILLING_PERIOD_YEARLY;
       }
-      
+
       StringBuilder sb = new StringBuilder()
           .append(hasMultiplePrices ? "from " : "")
           .append("{price} every ")
