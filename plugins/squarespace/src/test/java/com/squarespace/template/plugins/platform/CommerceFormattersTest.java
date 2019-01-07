@@ -180,7 +180,9 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-product-price-finite-subscription-weekly.html",
         "f-product-price-finite-subscription-bi-weekly.html",
         "f-product-price-finite-subscription-monthly.html",
-        "f-product-price-finite-subscription-bi-monthly.html");
+        "f-product-price-finite-subscription-bi-monthly.html",
+        "f-product-price-finite-subscription-bi-weekly-for-a-year.html",
+        "f-product-price-finite-subscription-monthly-for-a-year.html");
 
     runner.run("f-product-price-finite-subscription-from-weekly.html",
         "f-product-price-finite-subscription-from-bi-weekly.html",

@@ -317,8 +317,13 @@ public class CommerceFormatters implements FormatterRegistry {
     private Instruction template;
     private static final String BILLING_PERIOD_MONTHLY = "MONTH";
     private static final String BILLING_PERIOD_WEEKLY = "WEEK";
-
-
+    private static final String BILLING_PERIOD_YEARLY = "YEAR";
+    private static final Map<String, Integer> PER_YEAR = new HashMap<>();
+    static {
+      PER_YEAR.put(BILLING_PERIOD_WEEKLY, 52);
+      PER_YEAR.put(BILLING_PERIOD_MONTHLY, 12);
+    }
+    
     public ProductPriceFormatter() {
       super("product-price", false);
     }
@@ -379,10 +384,18 @@ public class CommerceFormatters implements FormatterRegistry {
       int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
       String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
 
-      int duration = billingPeriodValue * CommerceUtils.getNumBillingCyclesFromSubscriptionPlanNode(productNode);
+      int durationValue = billingPeriodValue * CommerceUtils.getNumBillingCyclesFromSubscriptionPlanNode(productNode);
+      String durationUnit = billingPeriodUnit;
+
+      // If the duration is a multiple of 52 weeks or 12 months, convert to years.
+      // Otherwise, use the billing period unit for the duration unit.
+      if (durationValue > 0 && PER_YEAR.containsKey(durationUnit) && durationValue % PER_YEAR.get(durationUnit) == 0) {
+        durationValue /= PER_YEAR.get(durationUnit);
+        durationUnit = BILLING_PERIOD_YEARLY;
+      }
 
       args.put("billingPeriodValue", billingPeriodValue);
-      args.put("duration", duration);
+      args.put("duration", durationValue);
 
       // This string needs to match the correct translation template in v6 products-2.0-en-US.json.
       StringBuilder i18nKeyBuilder = new StringBuilder("productPrice")
@@ -392,12 +405,12 @@ public class CommerceFormatters implements FormatterRegistry {
           .append(billingPeriodValue == 1 ? "1" : "n")
           .append(StringUtils.capitalize(billingPeriodUnit.toLowerCase()) + "ly").append("__");
 
-      if (duration == 0) {
+      if (durationValue == 0) {
         i18nKeyBuilder.append("indefinite");
       } else {
         i18nKeyBuilder.append("limited__")
-            .append(duration == 1 ? "1" : "n")
-            .append(StringUtils.capitalize(billingPeriodUnit.toLowerCase()) + "s");
+            .append(durationValue == 1 ? "1" : "n")
+            .append(StringUtils.capitalize(durationUnit.toLowerCase()) + "s");
       }
 
       String templateForPrice = StringUtils.defaultIfEmpty(
@@ -427,7 +440,16 @@ public class CommerceFormatters implements FormatterRegistry {
       boolean billingPeriodPlural = billingPeriodValue > 1;
       String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
       int numBillingCycles = CommerceUtils.getNumBillingCyclesFromSubscriptionPlanNode(productNode);
+      int durationValue = billingPeriodValue * numBillingCycles;
+      String durationUnit = billingPeriodUnit;
 
+      // If the duration is a multiple of 52 weeks or 12 months, convert to years.
+      // Otherwise, use the billing period unit for the duration unit.
+      if (durationValue > 0 && PER_YEAR.containsKey(durationUnit) && durationValue % PER_YEAR.get(durationUnit) == 0) {
+        durationValue /= PER_YEAR.get(durationUnit);
+        durationUnit = BILLING_PERIOD_YEARLY;
+      }
+      
       StringBuilder sb = new StringBuilder()
           .append(hasMultiplePrices ? "from " : "")
           .append("{price} every ")
@@ -437,9 +459,8 @@ public class CommerceFormatters implements FormatterRegistry {
 
       if (numBillingCycles > 0) {
         sb.append(" for {duration} ")
-            .append(billingPeriodUnit.toLowerCase())
-            // TODO: this only works as long as the duration unit is the same as the billing period unit
-            .append("s");
+            .append(durationUnit.toLowerCase())
+            .append(durationValue == 1 ? "" : "s");
       }
 
       return sb.toString();
