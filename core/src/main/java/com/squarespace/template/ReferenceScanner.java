@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.IfInst;
@@ -183,13 +182,13 @@ public class ReferenceScanner {
      */
     public ObjectNode report() {
       ObjectNode res = JsonUtils.createObjectNode();
-      res.put("instructions", convert(instructions));
-      res.put("formatters", convert(formatters));
-      res.put("predicates", convert(predicates));
-      res.put("variables", currentNode);
+      convert(res.putObject("instructions"), instructions);
+      convert(res.putObject("formatters"), formatters);
+      convert(res.putObject("predicates"), predicates);
+      res.set("variables", currentNode);
       res.put("textBytes", textBytes);
       // NOTE: this is temporary - phensley
-      res.put("ifInstructions", convert(ifVariants));
+      convert(res.putArray("ifInstructions"), ifVariants);
       return res;
     }
 
@@ -225,7 +224,7 @@ public class ReferenceScanner {
     public void addVariable(String name) {
       JsonNode node = currentNode.path(name);
       if (node.isMissingNode()) {
-        currentNode.put(name, NullNode.getInstance());
+        currentNode.putNull(name);
       }
     }
 
@@ -250,8 +249,7 @@ public class ReferenceScanner {
       if (node.isObject()) {
         obj = (ObjectNode)node;
       } else {
-        obj = JsonUtils.createObjectNode();
-        currentNode.put(name, obj);
+        obj = currentNode.putObject(name);
       }
       variables.push(currentNode);
       currentNode = obj;
@@ -264,20 +262,16 @@ public class ReferenceScanner {
       currentNode = variables.pop();
     }
 
-    private ObjectNode convert(Map<String, Integer> map) {
-      ObjectNode res = JsonUtils.createObjectNode();
+    private void convert(ObjectNode res, Map<String, Integer> map) {
       for (Entry<String, Integer> entry : map.entrySet()) {
         res.put(entry.getKey(), entry.getValue());
       }
-      return res;
     }
 
-    private ArrayNode convert(List<String> list) {
-      ArrayNode res = JsonUtils.createArrayNode();
+    private void convert(ArrayNode res, List<String> list) {
       for (String elem : list) {
         res.add(elem);
       }
-      return res;
     }
 
   }

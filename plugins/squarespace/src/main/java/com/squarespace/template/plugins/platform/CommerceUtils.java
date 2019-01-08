@@ -382,7 +382,7 @@ public class CommerceUtils {
       String optionName = ordering.path(i).asText();
       ObjectNode option = JsonUtils.createObjectNode();
       option.put("name", optionName);
-      option.put("values", JsonUtils.createArrayNode());
+      option.putArray("values");
       userDefinedOptions.add(option);
     }
 

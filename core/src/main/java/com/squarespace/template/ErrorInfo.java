@@ -180,8 +180,7 @@ public class ErrorInfo {
     obj.put("message", type.message(map));
 
     // Append any child errors that exist.
-    ArrayNode list = JsonUtils.createArrayNode();
-    obj.put("children", list);
+    ArrayNode list = obj.putArray("children");
     if (children != null) {
       for (ErrorInfo child : children) {
         list.add(child.toJson());
