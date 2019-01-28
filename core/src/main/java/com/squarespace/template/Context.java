@@ -17,17 +17,14 @@
 package com.squarespace.template;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
-import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SELF_RECURSION;
 import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -85,8 +82,6 @@ public class Context {
   private JsonNode rawInjectables;
 
   private Map<String, JsonNode> parsedInjectables;
-
-  private Set<String> partialsExecuting;
 
   private int partialDepth;
 
@@ -314,21 +309,6 @@ public class Context {
    * all recursion as an error.
    */
   public boolean enterPartial(String name) throws CodeExecuteException {
-    if (partialsExecuting == null) {
-      partialsExecuting = new HashSet<>();
-    }
-
-    // Prevent partials from recursing into themselves
-    if (!partialsExecuting.add(name)) {
-      ErrorInfo error = error(APPLY_PARTIAL_SELF_RECURSION).name(name);
-      if (safeExecution) {
-        addError(error);
-        return false;
-      } else {
-        throw new CodeExecuteException(error);
-      }
-    }
-
     // Limit maximum partial recursion depth
     partialDepth++;
     if (partialDepth > maxPartialDepth) {
@@ -349,7 +329,6 @@ public class Context {
    * Clears flag indicating we're executing inside a partial template.
    */
   public void exitPartial(String name) {
-    partialsExecuting.remove(name);
     partialDepth--;
   }
 

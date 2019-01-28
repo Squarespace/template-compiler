@@ -18,7 +18,6 @@ package com.squarespace.template.plugins;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
-import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SELF_RECURSION;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.COMPILE_PARTIAL_SYNTAX;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
@@ -238,11 +237,12 @@ public class CoreFormattersTest extends UnitTestBase {
         .json(input)
         .code(inst)
         .partialsMap(partials)
+        .maxPartialDepth(6)
         .safeExecution(true)
         .execute();
-    assertContext(ctx, "12");
+    assertContext(ctx, "121212");
     assertEquals(ctx.getErrors().size(), 1);
-    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_SELF_RECURSION);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
   }
 
   @Test
@@ -274,9 +274,9 @@ public class CoreFormattersTest extends UnitTestBase {
         .partialsMap(partials)
         .safeExecution(true)
         .execute();
-    assertContext(ctx, "1234");
+    assertContext(ctx, "1234123412341234");
     assertEquals(ctx.getErrors().size(), 1);
-    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_SELF_RECURSION);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
   }
 
   @Test

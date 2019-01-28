@@ -35,8 +35,9 @@ public enum ExecuteErrorType implements ErrorType {
   APPLY_PARTIAL_RECURSION_DEPTH(
       "Recursion through partial %(name)s exceeded maximum depth of %(data)s"),
 
-  APPLY_PARTIAL_SELF_RECURSION(
-      "Recursion into self while evaluating partial '%(name)s'"),
+// Self-recursion is allowed as long as it does not exceed the maximum depth
+//  APPLY_PARTIAL_SELF_RECURSION(
+//      "Recursion into self while evaluating partial '%(name)s'"),
 
   CODE_LIMIT_REACHED(
       "A %(name)s code limit was reached %(data)s"),

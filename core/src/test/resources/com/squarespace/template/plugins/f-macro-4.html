@@ -7,7 +7,7 @@
 {}
 
 :TEMPLATE
-{# mutual recursion of foo/bar macros will produce no output #}
+{# mutual recursion of foo/bar macros will produce some output until max partial depth is reached #}
 {.macro emit}{@}{.end}
 {.macro foo}{@|apply emit}{@|apply bar}{.end}
 {.macro bar}{@|apply foo}{.end}
@@ -15,4 +15,4 @@
 {number|apply foo}
 
 :OUTPUT
-1
+11111111
