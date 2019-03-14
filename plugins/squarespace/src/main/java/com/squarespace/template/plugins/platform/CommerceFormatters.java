@@ -52,6 +52,8 @@ import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
+import com.squarespace.template.plugins.platform.enums.ScarcityCalculationType;
+import com.squarespace.template.plugins.platform.enums.ScarcityFlagType;
 
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
@@ -80,6 +82,7 @@ public class CommerceFormatters implements FormatterRegistry {
     table.add(new SummaryFormFieldFormatter());
     table.add(new VariantDescriptorFormatter());
     table.add(new VariantsSelectFormatter());
+    table.add(new ProductScarcityFormatter());
   }
 
   protected static class AddToCartButtonFormatter extends BaseFormatter {
@@ -741,6 +744,56 @@ public class CommerceFormatters implements FormatterRegistry {
       map.put("2", GeneralUtils.localizeOrDefault(strings, KEY_STRONGLY_AGREE, "Strongly Agree"));
       return map;
     }
+  }
+
+  protected static class ProductScarcityFormatter extends BaseFormatter {
+
+    private Instruction template;
+
+    ProductScarcityFormatter() {
+      super("product-scarcity", false);
+    }
+
+    @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "product-scarcity.html");
+      this.template = compiler.compile(source.trim()).code();
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      JsonNode websiteSettings = ctx.resolve("websiteSettings");
+      ScarcityFlagType scarcityFlagType = getScarcityFlagType(args);
+
+      if (!CommerceUtils.isScarcityEnabled(websiteSettings, scarcityFlagType)) {
+        return;
+      }
+
+      Variable var = variables.first();
+      JsonNode product = var.node();
+
+      if (CommerceUtils.canDisplayScarcityMessages(websiteSettings, product)) {
+        ObjectNode templateVariables = JsonUtils.createObjectNode();
+
+        ScarcityCalculationType scarcityCalculationType = getScarcityCalculationType(args);
+
+        templateVariables
+            .put("variants", CommerceUtils.getScarceVariants(websiteSettings, product, scarcityCalculationType));
+        templateVariables.put("scarcityText", CommerceUtils.getScarcityText(websiteSettings, ctx));
+        templateVariables.put("showByDefault", scarcityCalculationType == ScarcityCalculationType.TOTAL_STOCK);
+
+        var.set(executeTemplate(ctx, template, templateVariables, false));
+      }
+    }
+
+    private ScarcityFlagType getScarcityFlagType(Arguments args) {
+      return ScarcityFlagType.fromString(args.isEmpty() ? "" : args.first());
+    }
+
+    private ScarcityCalculationType getScarcityCalculationType(Arguments args) {
+      return ScarcityCalculationType.fromString(args.count() > 1 ? args.get(1) : "");
+    }
+
   }
 
 }

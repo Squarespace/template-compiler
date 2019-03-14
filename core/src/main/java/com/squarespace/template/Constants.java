@@ -82,6 +82,22 @@ public class Constants {
       "localizedStrings", "productVariantSelectText"
   };
 
+  public static final String[] PRODUCT_SCARCITY_DEFAULT_TEXT = new String[] {
+      "localizedStrings", "productDefaultScarcityText"
+  };
+
+  public static final String[] PRODUCT_SCARCITY_MESSAGE_1 = new String[] {
+      "localizedStrings", "productScarcityMessage1"
+  };
+
+  public static final String[] PRODUCT_SCARCITY_MESSAGE_2 = new String[] {
+      "localizedStrings", "productScarcityMessage2"
+  };
+
+  public static final String[] PRODUCT_SCARCITY_MESSAGE_3 = new String[] {
+      "localizedStrings", "productScarcityMessage3"
+  };
+
   public static final String[] GIFT_CARD_VARIANT_SELECT_TEXT = new String[] {
       "localizedStrings", "giftCardVariantSelectText"
   };

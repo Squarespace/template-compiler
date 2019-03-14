@@ -1,0 +1,43 @@
+:empty-websiteSettings
+{}
+
+:all-enabled
+{
+  "storeSettings": {
+    "merchandisingSettings": {
+      "scarcityEnabledOnProductItems": true,
+      "scarcityEnabledOnProductBlocks": true
+    }
+  }
+}
+
+:product-items-enabled
+{
+  "storeSettings": {
+    "merchandisingSettings": {
+      "scarcityEnabledOnProductItems": true,
+      "scarcityEnabledOnProductBlocks": false
+    }
+  }
+}
+
+:product-blocks-enabled
+{
+  "storeSettings": {
+    "merchandisingSettings": {
+      "scarcityEnabledOnProductItems": false,
+      "scarcityEnabledOnProductBlocks": true
+    }
+  }
+}
+
+:all-disabled
+{
+  "storeSettings": {
+    "merchandisingSettings": {
+      "scarcityEnabledOnProductItems": false,
+      "scarcityEnabledOnProductBlocks": false
+    }
+  }
+}
+

@@ -1,0 +1,102 @@
+:physicalProduct-true
+{
+  "item": {
+    "structuredContent": {
+      "productType": 1,
+      "variants": [
+        {
+          "qtyInStock": 1
+        }
+      ]
+    }
+  },
+  "websiteSettings": {}
+}
+
+:physicalProductNoStock-false
+{
+  "item": {
+    "structuredContent": {
+      "productType": 1,
+      "variants": [
+        {
+          "qtyInStock": 0
+        }
+      ]
+    }
+  },
+  "websiteSettings": {}
+}
+
+
+:digitalProduct-false
+{
+  "item": {
+    "structuredContent": {
+      "productType": 2,
+      "variants": [
+        {
+          "qtyInStock": 1
+        }
+      ]
+    }
+  },
+  "websiteSettings": {}
+}
+
+:serviceProduct-true
+{
+  "item": {
+    "structuredContent": {
+      "productType": 3,
+      "variants": [
+        {
+          "qtyInStock": 1
+        }
+      ]
+    }
+  },
+  "websiteSettings": {
+    "storeSettings": {
+      "merchandisingSettings": {
+        "multipleQuantityAllowedForServices": true
+      }
+    }
+  }
+}
+
+:serviceProductNoMultipleQuantity-false
+{
+  "item": {
+    "structuredContent": {
+      "productType": 3,
+      "variants": [
+        {
+          "qtyInStock": 1
+        }
+      ]
+    }
+  },
+  "websiteSettings": {
+    "storeSettings": {
+      "merchandisingSettings": {
+        "multipleQuantityAllowedForServices": false
+      }
+    }
+  }
+}
+
+:giftcardProduct-false
+{
+  "item": {
+    "structuredContent": {
+      "productType": 4,
+      "variants": [
+        {
+          "qtyInStock": 1
+        }
+      ]
+    }
+  },
+  "websiteSettings": {}
+}

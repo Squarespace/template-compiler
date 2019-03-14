@@ -33,7 +33,10 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squarespace.template.UnitTestBase;
+import com.squarespace.template.plugins.platform.enums.ScarcityCalculationType;
+import com.squarespace.template.plugins.platform.enums.ScarcityFlagType;
 
 import net.javacrumbs.jsonunit.JsonAssert;
 
@@ -116,6 +119,68 @@ public class CommerceUtilsTest extends UnitTestBase {
       }
     }
     return tests;
+  }
+
+  @Test
+  public void testIsScarcityEnabled() {
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "test-is-scarcity-enabled.json");
+
+    JsonNode websiteSettings = jsonMap.get("empty-websiteSettings");
+    assertFalse(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_BLOCK));
+    assertFalse(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_ITEMS));
+
+    websiteSettings = jsonMap.get("all-disabled");
+    assertFalse(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_BLOCK));
+    assertFalse(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_ITEMS));
+
+    websiteSettings = jsonMap.get("product-items-enabled");
+    assertFalse(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_BLOCK));
+    assertTrue(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_ITEMS));
+
+    websiteSettings = jsonMap.get("product-blocks-enabled");
+    assertTrue(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_BLOCK));
+    assertFalse(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_ITEMS));
+
+    websiteSettings = jsonMap.get("all-enabled");
+    assertTrue(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_BLOCK));
+    assertTrue(CommerceUtils.isScarcityEnabled(websiteSettings, ScarcityFlagType.PRODUCT_ITEMS));
+  }
+
+  @Test
+  public void testCanDisplayScarcityMessage() {
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "test-can-display-scarcity-message.json");
+    for (String testKey : extractTests(jsonMap)) {
+      JsonNode node = jsonMap.get(testKey);
+      boolean result = CommerceUtils.canDisplayScarcityMessages(node.get("websiteSettings"), node.get("item"));
+      if (testKey.endsWith("-true")) {
+        assertTrue(result);
+      } else {
+        assertFalse(result);
+      }
+    }
+  }
+
+  @Test
+  public void testGetScarceVariants() {
+    Map<String, JsonNode> jsonMap = loadJson(getClass(), "test-get-scarce-variants.json");
+
+    JsonNode testContext = jsonMap.get("total-stock-with-unlimited-variant");
+    ArrayNode actual = CommerceUtils.getScarceVariants(testContext.get("websiteSettings"), testContext.get("item"),
+        ScarcityCalculationType.TOTAL_STOCK);
+    JsonNode expected = jsonMap.get("total-stock-with-unlimited-variant-expected");
+    JsonAssert.assertJsonEquals(actual.toString(), expected.toString());
+
+    testContext = jsonMap.get("per-variant-with-unlimited-variant");
+    actual = CommerceUtils.getScarceVariants(testContext.get("websiteSettings"), testContext.get("item"),
+        ScarcityCalculationType.PER_VARIANT);
+    expected = jsonMap.get("per-variant-with-unlimited-variant-expected");
+    JsonAssert.assertJsonEquals(actual.toString(), expected.toString());
+
+    testContext = jsonMap.get("per-variant-with-over-threshold-variants");
+    actual = CommerceUtils.getScarceVariants(testContext.get("websiteSettings"), testContext.get("item"),
+        ScarcityCalculationType.PER_VARIANT);
+    expected = jsonMap.get("per-variant-with-over-threshold-variants-expected");
+    JsonAssert.assertJsonEquals(actual.toString(), expected.toString());
   }
 
 }

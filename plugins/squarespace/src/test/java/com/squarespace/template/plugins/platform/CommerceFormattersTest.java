@@ -304,4 +304,13 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         );
   }
 
+  @Test
+  public void testProductScarcity() {
+    runner.run(
+        "f-scarcity-no-stock.html",
+        "f-scarcity-default-single-variant.html",
+        "f-scarcity-default-multiple-variants.html"
+    );
+  }
+
 }
