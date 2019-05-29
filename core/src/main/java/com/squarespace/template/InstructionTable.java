@@ -51,6 +51,7 @@ public class InstructionTable {
 
   static {
     add(".alternates", InstructionType.ALTERNATES_WITH, false);
+    add(".ctx", InstructionType.CTXVAR);
     add(".end", InstructionType.END);
     add(".if", InstructionType.IF);
     add(".inject", InstructionType.INJECT);

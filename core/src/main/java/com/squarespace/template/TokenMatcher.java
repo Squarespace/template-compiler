@@ -126,6 +126,10 @@ public class TokenMatcher {
     return match(Patterns.ARGUMENTS);
   }
 
+  public boolean equalsign() {
+    return match('=');
+  }
+
   public boolean formatter() {
     return match(Patterns.FORMATTER);
   }
@@ -172,6 +176,10 @@ public class TokenMatcher {
 
   public boolean whitespace() {
     return match(Patterns.WHITESPACE);
+  }
+
+  public boolean word() {
+    return match(Patterns.WORD);
   }
 
   public boolean wordSection() {

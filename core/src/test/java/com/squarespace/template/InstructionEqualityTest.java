@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.IfInst;
@@ -105,6 +106,21 @@ public class InstructionEqualityTest extends UnitTestBase {
 
     assertNotEquals(c1, mk.end());
     assertNotEquals(c1, mk.eof());
+  }
+
+  @Test
+  public void testCtxVarEquals() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+
+    CtxVarInst c1 = mk.ctxvar("foo", "foo=bar.baz", "quux=foo.1.bar.2");
+    CtxVarInst c2 = mk.ctxvar("foo", "foo=bar.baz", "quux=foo.1.bar.2");
+    assertEquals(c1, c2);
+
+    CtxVarInst c3 = mk.ctxvar("bar", "foo=bar.baz", "quux=foo.1.bar.2");
+    assertNotEquals(c1, c3);
+
+    CtxVarInst c4 = mk.ctxvar("foo", "foo.bar.quux", "quux=foo.1.bar.2");
+    assertNotEquals(c1, c4);
   }
 
   @Test

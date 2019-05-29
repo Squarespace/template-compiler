@@ -22,6 +22,7 @@ public enum InstructionType {
   ALTERNATES_WITH,
   BINDVAR,
   COMMENT,
+  CTXVAR,
   END,
   EOF,
   IF,

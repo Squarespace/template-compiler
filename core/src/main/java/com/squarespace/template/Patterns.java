@@ -89,7 +89,7 @@ public class Patterns {
       charClass(LOWERCASE | UPPERCASE | DIGIT | UNDERSCORE | DASH, CHAR_CLASSIFIER);
 
   /** Word, in formatter identifiers, variable names, etc */
-  private static final Recognizer WORD =
+  public static final Recognizer WORD =
       sequence(WORD_PREFIX, zeroOrMore(WORD_SUFFIX));
 
   /** Formatter name is just a word, e.g. "json-pretty". */

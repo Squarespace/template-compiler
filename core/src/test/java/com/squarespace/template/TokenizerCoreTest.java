@@ -19,6 +19,8 @@ package com.squarespace.template;
 import static com.squarespace.template.Operator.LOGICAL_AND;
 import static com.squarespace.template.Operator.LOGICAL_OR;
 import static com.squarespace.template.SyntaxErrorType.BINDVAR_EXPECTS_NAME;
+import static com.squarespace.template.SyntaxErrorType.CTXVAR_EXPECTS_BINDINGS;
+import static com.squarespace.template.SyntaxErrorType.CTXVAR_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.EOF_IN_COMMENT;
 import static com.squarespace.template.SyntaxErrorType.EXTRA_CHARS;
 import static com.squarespace.template.SyntaxErrorType.FORMATTER_ARGS_INVALID;
@@ -55,6 +57,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
@@ -163,6 +166,34 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     assertFailure("{## foo ", EOF_IN_COMMENT);
     assertFailure("{## foo }", EOF_IN_COMMENT);
+  }
+
+  @Test
+  public void testCtxVar() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+
+    assertResult("{.ctx @foo a=foo.bar b=baz}",
+        mk.ctxvar("@foo", "a=foo.bar", "b=baz"), mk.eof());
+
+    assertFailure("{.ctx}", WHITESPACE_EXPECTED);
+    assertFailure("{.ctx }", CTXVAR_EXPECTS_NAME);
+    assertFailure("{.ctx @foo}", WHITESPACE_EXPECTED);
+    assertFailure("{.ctx @foo }", CTXVAR_EXPECTS_BINDINGS);
+    assertFailure("{.ctx @foo a}", CTXVAR_EXPECTS_BINDINGS);
+    assertFailure("{.ctx @foo a=}", CTXVAR_EXPECTS_BINDINGS);
+
+    CtxVarInst c1 = mk.ctxvar("@foo", "a=b");
+
+    assertResult("{.ctx @foo a=b}", c1, mk.eof());
+    assertResult("{.ctx @foo a=b }", c1, mk.eof());
+    assertResult("{.ctx @foo a=b c}", c1, mk.eof());
+    assertResult("{.ctx @foo a=b c=}", c1, mk.eof());
+
+    CtxVarInst c2 = mk.ctxvar("@foo", "a=b", "c=d");
+
+    assertResult("{.ctx @foo a=b c=d}", c2, mk.eof());
+    assertResult("{.ctx @foo a=b c=d }", c2, mk.eof());
+    assertResult("{.ctx @foo a=b c=d e}", c2, mk.eof());
   }
 
   @Test

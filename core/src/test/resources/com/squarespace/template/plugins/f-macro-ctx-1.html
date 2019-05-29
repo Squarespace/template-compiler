@@ -1,0 +1,39 @@
+:JSON
+{
+  "content": {
+    "image": {
+      "assetUrl": "./foo.jpg",
+      "originalDimensions": {
+        "width": 1200,
+        "height": 600
+      }
+    }
+  },
+  "style": {
+    "foo": "xyz",
+    "bar": 123,
+    "focalPoint": {
+      "x": 0.2,
+      "y": 0.9
+    }
+  }
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro image-info}
+URL is {img.assetUrl}
+{dims.width}px wide by {dims.height}px high 
+focal point at ({focus.x},{focus.y})
+{.end}
+
+{.ctx @info dims=content.image.originalDimensions img=content.image focus=style.focalPoint}
+{@info|apply image-info}
+
+
+:OUTPUT
+URL is ./foo.jpg
+1200px wide by 600px high 
+focal point at (0.2,0.9)

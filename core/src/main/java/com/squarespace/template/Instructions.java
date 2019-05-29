@@ -27,6 +27,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 /**
@@ -303,6 +304,63 @@ public class Instructions {
       ReprEmitter.emit(this, buf);
     }
 
+  }
+
+  /**
+   * Instruction that creates a new context for passing to a partial template.
+   */
+  public static class CtxVarInst extends BaseInstruction {
+
+    private final String name;
+    private final List<Binding> bindings;
+
+    public CtxVarInst(String name, List<Binding> bindings) {
+      this.name = name;
+      this.bindings = bindings;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public List<Binding> getBindings() {
+      return bindings;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof CtxVarInst) {
+        CtxVarInst other = (CtxVarInst)obj;
+        return name.equals(other.name)
+            && Objects.equals(bindings, other.bindings);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.CTXVAR;
+    }
+
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      ObjectNode obj = JsonUtils.createObjectNode();
+      for (Binding binding : bindings) {
+        JsonNode node = ctx.resolve(binding.getReference());
+        obj.set(binding.getName(), node);
+      }
+      ctx.setVar(name, obj);
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf);
+    }
   }
 
   /**

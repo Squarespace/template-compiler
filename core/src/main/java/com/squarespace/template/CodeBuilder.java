@@ -115,6 +115,16 @@ public class CodeBuilder {
     return this;
   }
 
+  public CodeBuilder ctxvar(String name, List<Binding> bindings) throws CodeSyntaxException {
+    machine.accept(maker.ctxvar(name, bindings));
+    return this;
+  }
+
+  public CodeBuilder ctxvar(String name, String... bindings) throws CodeSyntaxException {
+    machine.accept(maker.ctxvar(name, bindings));
+    return this;
+  }
+
   /**
    * Builds a block {@link MacroInst} instruction and feeds it to the state machine.
    */

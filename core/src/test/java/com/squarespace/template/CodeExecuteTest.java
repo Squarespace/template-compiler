@@ -74,6 +74,24 @@ public class CodeExecuteTest extends UnitTestBase {
   }
 
   @Test
+  public void testCtxVar() throws CodeException {
+    RootInst root = builder()
+        .ctxvar("@foo", "src=image.src", "foc=style.focus", "unk=var.not.exist")
+        .var("@foo.src").text(" (")
+        .var("@foo.foc.x").text(",").var("@foo.foc.y")
+        .text(") ")
+        .var("@foo.unk").eof().build();
+
+    assertEquals(repr(root),
+        "{.ctx @foo src=image.src foc=style.focus unk=var.not.exist}"
+        + "{@foo.src} ({@foo.foc.x},{@foo.foc.y}) {@foo.unk}");
+
+    Context ctx = execute("{\"image\":{\"src\":\"./face.jpg\"},"
+        + "\"style\":{\"focus\":{\"x\":0.3,\"y\":0.7}}}", root);
+    assertContext(ctx, "./face.jpg (0.3,0.7) ");
+  }
+
+  @Test
   public void testLiterals() throws CodeException {
     RootInst root = builder().metaLeft().space().tab().newline().metaRight().eof().build();
     assertContext(execute("{}", root), "{ \t\n}");

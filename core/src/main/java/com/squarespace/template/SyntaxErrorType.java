@@ -32,6 +32,12 @@ public enum SyntaxErrorType implements ErrorType {
   BINDVAR_EXPECTS_NAME(
       "{.var} expects a local variable name (e.g. @foo), found '%(data)s'"),
 
+  CTXVAR_EXPECTS_NAME(
+      "{.ctx} expects a local variable name (e.g. @foo), found '%(data)s'"),
+
+  CTXVAR_EXPECTS_BINDINGS(
+      "{.ctx} expects one or more bindings (e.g. foo=bar.baz), found '%(data)s'"),
+
   DEAD_CODE_BLOCK(
       "This %(type)s block will never execute."),
 

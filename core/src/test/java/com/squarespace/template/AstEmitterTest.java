@@ -46,6 +46,7 @@ public class AstEmitterTest extends UnitTestBase {
     execute("ast-13.html");
     execute("ast-14.html");
     execute("ast-15.html");
+    execute("ast-16.html");
   }
 
   @Test

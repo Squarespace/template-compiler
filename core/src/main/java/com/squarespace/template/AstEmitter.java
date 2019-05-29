@@ -26,6 +26,7 @@ import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.BlockInst;
 import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
@@ -129,6 +130,15 @@ public class AstEmitter {
         obj.add(inst.getName());
         obj.add(variables(inst.getVariables()));
         obj.add(formatters(inst.getFormatters()));
+        return obj;
+      }
+
+      case CTXVAR:
+      {
+        ArrayNode obj = composite(raw);
+        CtxVarInst inst = (CtxVarInst) raw;
+        obj.add(inst.getName());
+        obj.add(bindings(inst.getBindings()));
         return obj;
       }
 
@@ -277,6 +287,24 @@ public class AstEmitter {
   }
 
   /**
+   * Encodes an array of bindings as a JSON array.
+   */
+  private static ArrayNode bindings(List<Binding> bindings) {
+    ArrayNode array = JsonUtils.createArrayNode();
+    for (Binding b : bindings) {
+      array.add(binding(b));
+    }
+    return array;
+  }
+
+  private static ArrayNode binding(Binding binding) {
+    ArrayNode array = JsonUtils.createArrayNode();
+    array.add(binding.getName());
+    array.add(variable(binding.getReference()));
+    return array;
+  }
+
+  /**
    * Encodes an array of variables as a JSON array.
    */
   private static ArrayNode variables(List<Object[]> variables) {
@@ -378,6 +406,9 @@ public class AstEmitter {
         put(InstructionType.ALTERNATES_WITH, opcode(19));
 
         // TODO: Struct and Atom are not yet implemented in the server compiler.
+
+        // New Ctxvar instruction
+        put(InstructionType.CTXVAR, opcode(22));
       }};
 
   private static IntNode opcode(int code) {

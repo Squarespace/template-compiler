@@ -24,13 +24,14 @@ import java.util.List;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
-import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.MacroInst;
+import com.squarespace.template.Instructions.MetaInst;
 import com.squarespace.template.Instructions.NewlineInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
@@ -115,6 +116,24 @@ public class CodeMaker {
 
   public CommentInst mcomment(String str, int start, int end) {
     return new CommentInst(new StringView(str, start, end), true);
+  }
+
+  public CtxVarInst ctxvar(String name, List<Binding> bindings) {
+    return new CtxVarInst(name, bindings);
+  }
+
+  public CtxVarInst ctxvar(String name, String... rawbindings) {
+    List<Binding> bindings = new ArrayList<>();
+    for (String raw : rawbindings) {
+      int i = raw.indexOf('=');
+      if (i != -1) {
+        String key = raw.substring(0, i);
+        String reference = raw.substring(i + 1);
+        Binding binding = new Binding(key, GeneralUtils.splitVariable(reference));
+        bindings.add(binding);
+      }
+    }
+    return new CtxVarInst(name, bindings);
   }
 
   public EndInst end() {

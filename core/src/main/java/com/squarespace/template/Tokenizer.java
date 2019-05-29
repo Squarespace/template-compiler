@@ -22,6 +22,8 @@ import static com.squarespace.template.Patterns.META_RIGHT_CHAR;
 import static com.squarespace.template.Patterns.NEWLINE_CHAR;
 import static com.squarespace.template.Patterns.POUND_CHAR;
 import static com.squarespace.template.SyntaxErrorType.BINDVAR_EXPECTS_NAME;
+import static com.squarespace.template.SyntaxErrorType.CTXVAR_EXPECTS_BINDINGS;
+import static com.squarespace.template.SyntaxErrorType.CTXVAR_EXPECTS_NAME;
 import static com.squarespace.template.SyntaxErrorType.EXTRA_CHARS;
 import static com.squarespace.template.SyntaxErrorType.FORMATTER_ARGS_INVALID;
 import static com.squarespace.template.SyntaxErrorType.FORMATTER_INVALID;
@@ -50,6 +52,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.squarespace.template.Instructions.BindVarInst;
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -349,6 +352,33 @@ public class Tokenizer {
           instruction.setFormatters(formatters);
           emitInstruction(instruction);
         }
+        return true;
+      }
+
+      case CTXVAR:
+      {
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        // Parse the variable name
+        if (!matcher.localVariable()) {
+          fail(error(CTXVAR_EXPECTS_NAME).data(matcher.remainder()));
+          return emitInvalid();
+        }
+        String name = matcher.consume().repr();
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        List<Binding> bindings = parseBindings();
+        if (bindings == null) {
+          fail(error(CTXVAR_EXPECTS_BINDINGS).data(matcher.remainder()));
+          return emitInvalid();
+        }
+
+        CtxVarInst instruction = maker.ctxvar(name, bindings);
+        emitInstruction(instruction);
         return true;
       }
 
@@ -695,6 +725,29 @@ public class Tokenizer {
       }
     }
     return vars;
+  }
+
+  private List<Binding> parseBindings() throws CodeSyntaxException {
+    List<Binding> bindings = new ArrayList<>();
+    while (matcher.word()) {
+      StringView name = matcher.consume();
+      if (!matcher.equalsign()) {
+        break;
+      }
+      matcher.skip();
+      if (!matcher.variable()) {
+        break;
+      }
+
+      Object[] reference = GeneralUtils.splitVariable(matcher.consume().repr());
+      Binding binding = new Binding(name.repr(), reference);
+      bindings.add(binding);
+      if (!matcher.whitespace()) {
+        break;
+      }
+      matcher.skip();
+    }
+    return bindings.isEmpty() ? null : bindings;
   }
 
   /**

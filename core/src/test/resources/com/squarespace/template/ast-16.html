@@ -1,0 +1,10 @@
+:SOURCE
+{.ctx @foo a=bar.baz b=biz.quux}
+
+:JSON
+[17, 1, [
+  [22, "@foo", [
+    ["a", ["bar", "baz"]],
+    ["b", ["biz", "quux"]]
+  ]]
+], 18]

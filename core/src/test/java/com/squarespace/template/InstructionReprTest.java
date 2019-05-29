@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
@@ -91,6 +92,18 @@ public class InstructionReprTest extends UnitTestBase {
 
     c1 = maker().mcomment("\nfoo\nbar\nbaz\n");
     assertEquals(c1.repr(), "{##\nfoo\nbar\nbaz\n##}");
+  }
+
+  @Test
+  public void testCtxVarRepr() {
+    CtxVarInst c1 = maker().ctxvar("@foo", "foo=bar.baz");
+    assertEquals(c1.repr(), "{.ctx @foo foo=bar.baz}");
+
+    CtxVarInst c2 = maker().ctxvar("@bar",
+        "a=foo.bar.baz.quux", "b=bar.baz.foo", "c=foo.quux.bar.baz");
+
+    assertEquals(c2.repr(),
+        "{.ctx @bar a=foo.bar.baz.quux b=bar.baz.foo c=foo.quux.bar.baz}");
   }
 
   @Test

@@ -21,6 +21,7 @@ import java.util.List;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
@@ -264,6 +265,23 @@ public class ReprEmitter {
     buf.append(".var ").append(inst.getName()).append(' ');
     emitVariables(inst.getVariables(), buf);
     emit(inst.getFormatters(), buf);
+    buf.append('}');
+  }
+
+  public static void emit(CtxVarInst inst, StringBuilder buf) {
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".ctx ").append(inst.getName()).append(' ');
+    List<Binding> bindings = inst.getBindings();
+    int size = bindings.size();
+    for (int i = 0; i < size; i++) {
+      if (i > 0) {
+        buf.append(' ');
+      }
+      Binding binding = bindings.get(i);
+      buf.append(binding.getName()).append('=');
+      emitNames(binding.getReference(), buf);
+    }
     buf.append('}');
   }
 
