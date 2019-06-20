@@ -210,7 +210,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-product-quick-view-1.html",
         "f-product-quick-view-2.html",
         "f-product-quick-view-3.html",
-        "f-product-quick-view-4.html"
+        "f-product-quick-view-4.html",
+        "f-product-quick-view-5.html"
         );
   }
 
