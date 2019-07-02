@@ -225,7 +225,9 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-product-status-5.html",
         "f-product-status-6.html",
         "f-product-status-7.html",
-        "f-product-status-8.html"
+        "f-product-status-8.html",
+        "f-product-status-9.html",
+        "f-product-status-10.html"
         );
   }
 

@@ -526,11 +526,21 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode node = var.node();
+
+      String productId = node.path("id").asText();
+      JsonNode productCtx = ctx.resolve("productMerchandisingContext");
+      String customSoldOutMessage = null;
+      if (productId != null && productCtx != null) {
+        customSoldOutMessage = productCtx.path(productId).path("customSoldOutText").asText();
+      }
+
       StringBuilder buf = new StringBuilder();
       if (CommerceUtils.isSoldOut(node)) {
-        String text = ctx.resolve(Constants.PRODUCT_SOLD_OUT_TEXT_KEY).asText();
+        String defaultSoldOutText = ctx.resolve(Constants.PRODUCT_SOLD_OUT_TEXT_KEY).asText();
+        String defaultSoldOutMessage = StringUtils.defaultIfEmpty(defaultSoldOutText, "sold out");
+        String soldOutMessage = StringUtils.defaultIfEmpty(customSoldOutMessage, defaultSoldOutMessage);
         buf.append("<div class=\"product-mark sold-out\">");
-        buf.append(StringUtils.defaultIfEmpty(text, "sold out"));
+        buf.append(soldOutMessage);
         buf.append("</div>");
         var.set(buf);
       } else if (CommerceUtils.isOnSale(node)) {
