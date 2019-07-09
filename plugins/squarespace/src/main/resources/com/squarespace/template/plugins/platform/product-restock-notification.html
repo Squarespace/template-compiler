@@ -1,0 +1,8 @@
+{.var @productId product.id}
+
+{.repeated section views}
+<form class="product-restock-notification" action="#" data-product-id="{@productId}" data-variant-id="{variantId}">
+  <input type="text" x-autocompletetype="email" spellcheck="false" name="email">
+  <input type="submit" value="{signUpText}">
+</form>
+{.end}

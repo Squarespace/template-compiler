@@ -105,6 +105,10 @@ public class Constants {
   public static final String[] CLDR_MONEYFORMAT_KEY = new String[] {
       "website", "useCLDRMoneyFormat" };
 
+  public static final String[] PRODUCT_RESTOCK_NOTIFICATION_SIGN_UP_TEXT = new String[] {
+      "localizedStrings", "productRestockNotificationSignUpText"
+  };
+
   public static final JsonNode MISSING_NODE = MissingNode.getInstance();
 
 }

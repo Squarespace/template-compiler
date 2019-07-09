@@ -81,6 +81,7 @@ public class CommerceFormatters implements FormatterRegistry {
     table.add(new VariantDescriptorFormatter());
     table.add(new VariantsSelectFormatter());
     table.add(new ProductScarcityFormatter());
+    table.add(new ProductRestockNotificationFormatter());
   }
 
   protected static class AddToCartButtonFormatter extends BaseFormatter {
@@ -793,6 +794,44 @@ public class CommerceFormatters implements FormatterRegistry {
         templateVariables.put("scarcityShownByDefault", contextForProduct.get("scarcityShownByDefault"));
         var.set(executeTemplate(ctx, template, templateVariables, false));
       }
+    }
+  }
+
+  protected static class ProductRestockNotificationFormatter extends BaseFormatter {
+
+    private Instruction template;
+
+    ProductRestockNotificationFormatter() {
+      super("product-restock-notification", false);
+    }
+
+    @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "product-restock-notification.html");
+      this.template = compiler.compile(source.trim()).code();
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode product = var.node();
+
+      JsonNode productCtx = ctx.resolve("productMerchandisingContext");
+      if (productCtx == null) {
+        return;
+      }
+
+      String productId = product.get("id").asText();
+      ObjectNode templateVariables = JsonUtils.createObjectNode();
+      templateVariables.set("product", product);
+      templateVariables.set("views", productCtx.path(productId).path("restockNotificationViews"));
+      templateVariables.set("signUpText", getSignUpText(ctx));
+      var.set(executeTemplate(ctx, template, templateVariables, false));
+    }
+
+    private static TextNode getSignUpText(Context ctx) {
+      String localizedSignUpText = ctx.resolve(Constants.PRODUCT_RESTOCK_NOTIFICATION_SIGN_UP_TEXT).asText();
+      return new TextNode(StringUtils.defaultIfEmpty(localizedSignUpText, "Sign Up"));
     }
   }
 

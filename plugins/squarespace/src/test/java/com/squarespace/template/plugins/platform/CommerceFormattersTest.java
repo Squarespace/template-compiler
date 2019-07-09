@@ -317,4 +317,12 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     );
   }
 
+  @Test
+  public void testProductRestockNotification() {
+    runner.run(
+        "f-product-restock-notification-1.html",
+        "f-product-restock-notification-2.html"
+    );
+  }
+
 }
