@@ -825,13 +825,8 @@ public class CommerceFormatters implements FormatterRegistry {
       ObjectNode templateVariables = JsonUtils.createObjectNode();
       templateVariables.set("product", product);
       templateVariables.set("views", productCtx.path(productId).path("restockNotificationViews"));
-      templateVariables.set("signUpText", getSignUpText(ctx));
-      var.set(executeTemplate(ctx, template, templateVariables, false));
-    }
-
-    private static TextNode getSignUpText(Context ctx) {
-      String localizedSignUpText = ctx.resolve(Constants.PRODUCT_RESTOCK_NOTIFICATION_SIGN_UP_TEXT).asText();
-      return new TextNode(StringUtils.defaultIfEmpty(localizedSignUpText, "Sign Up"));
+      templateVariables.set("messages", productCtx.path(productId).path("restockNotificationMessages"));
+      var.set(executeTemplate(ctx, template, templateVariables, true));
     }
   }
 

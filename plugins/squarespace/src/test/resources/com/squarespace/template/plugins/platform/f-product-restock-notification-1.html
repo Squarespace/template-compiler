@@ -5,6 +5,11 @@
   },
   "productMerchandisingContext": {
     "560c37c1a7c8465c4a71d99a": {
+      "restockNotificationMessages": {
+        "buttonText": "Sign Up",
+        "CTAText": "Get notified by email when this product is back in stock",
+        "placeholderText": "Your Email"
+      },
       "restockNotificationViews": [{
         "variantId": 2
       }]
@@ -16,7 +21,10 @@
 {item|product-restock-notification}
 
 :OUTPUT
-<form class="product-restock-notification" action="#" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="2">
-  <input type="text" x-autocompletetype="email" spellcheck="false" name="email">
-  <input type="submit" value="Sign Up">
-</form>
+<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="2">
+  <span class="product-restock-cta">Get notified by email when this product is back in stock</span>
+  <form class="product-restock-form" action="#">
+    <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="Your Email">
+    <input class="sqs-editable-button" type="submit" value="Sign Up">
+  </form>
+</div>

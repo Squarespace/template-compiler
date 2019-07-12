@@ -1,8 +1,14 @@
 {.var @productId product.id}
+{.var @buttonText messages.buttonText}
+{.var @CTAText messages.CTAText}
+{.var @placeholderText messages.placeholderText}
 
 {.repeated section views}
-<form class="product-restock-notification" action="#" data-product-id="{@productId}" data-variant-id="{variantId}">
-  <input type="text" x-autocompletetype="email" spellcheck="false" name="email">
-  <input type="submit" value="{signUpText}">
-</form>
+<div class="product-restock-notification" data-product-id="{@productId}" data-variant-id="{variantId}">
+  <span class="product-restock-cta">{@CTAText}</span>
+  <form class="product-restock-form" action="#">
+    <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="{@placeholderText}">
+    <input class="sqs-editable-button" type="submit" value="{@buttonText}">
+  </form>
+</div>
 {.end}
