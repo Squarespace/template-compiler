@@ -4,7 +4,7 @@
 {.var @placeholderText messages.placeholderText}
 
 {.repeated section views}
-<div class="product-restock-notification" data-product-id="{@productId}" data-variant-id="{variantId}">
+<div class="product-restock-notification" data-product-id="{@productId}" data-variant-id="{variantId}"{.if hiddenByDefault} hidden{.end}>
   <span class="product-restock-cta">{@CTAText}</span>
   <form class="product-restock-form" action="#">
     <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="{@placeholderText}">

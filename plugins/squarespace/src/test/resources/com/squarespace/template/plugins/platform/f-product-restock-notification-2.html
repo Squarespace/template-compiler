@@ -11,9 +11,9 @@
         "placeholderText": "Your Email"
       },
       "restockNotificationViews": [
-        { "variantId": 1 },
-        { "variantId": 2 },
-        { "variantId": 3 }
+        { "variantId": 1, "hiddenByDefault": true },
+        { "variantId": 2, "hiddenByDefault": true },
+        { "variantId": 3, "hiddenByDefault": true }
       ]
     }
   }
@@ -23,7 +23,7 @@
 {item|product-restock-notification}
 
 :OUTPUT
-<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="1">
+<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="1" hidden>
   <span class="product-restock-cta">Get notified by email when this product is back in stock</span>
   <form class="product-restock-form" action="#">
     <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="Your Email">
@@ -31,7 +31,7 @@
   </form>
 </div>
 
-<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="2">
+<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="2" hidden>
   <span class="product-restock-cta">Get notified by email when this product is back in stock</span>
   <form class="product-restock-form" action="#">
     <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="Your Email">
@@ -39,7 +39,7 @@
   </form>
 </div>
 
-<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="3">
+<div class="product-restock-notification" data-product-id="560c37c1a7c8465c4a71d99a" data-variant-id="3" hidden>
   <span class="product-restock-cta">Get notified by email when this product is back in stock</span>
   <form class="product-restock-form" action="#">
     <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="Your Email">
