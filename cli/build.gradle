@@ -19,7 +19,7 @@ task execJar(type: Jar, dependsOn: classes) {
   manifest {
     attributes 'Main-Class': "${mainClassName}"
   }
-  from files(sourceSets.main.output.classesDir)
+  from files(sourceSets.main.output.classesDirs)
   from files(sourceSets.main.output.resourcesDir)
   from {
     configurations.runtime.collect {
