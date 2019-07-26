@@ -16,11 +16,20 @@
 
 package com.squarespace.template;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -143,6 +152,34 @@ public class GeneralUtils {
     }
   }
 
+  /**
+   * List all resources that match the given glob pattern.
+   */
+  public static List<Path> listResources(Class<?> cls, String pattern) throws Exception {
+    PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+    Enumeration<URL> urls = cls.getClassLoader().getResources(resolveName(cls, "."));
+    List<Path> result = new ArrayList<>();
+    while (urls.hasMoreElements()) {
+      URL url = urls.nextElement();
+      if (!url.getProtocol().equals("file")) {
+        continue;
+      }
+
+      File dir = Paths.get(url.toURI()).toFile();
+      if (dir == null || !dir.isDirectory()) {
+        continue;
+      }
+
+      for (File file : dir.listFiles()) {
+        Path path = file.toPath();
+        if (matcher.matches(path)) {
+          result.add(path);
+        }
+      }
+    }
+    return result;
+  }
+
   private static ErrorInfo resourceLoadError(String path, String message) {
     ErrorInfo info = new ErrorInfo(ExecuteErrorType.RESOURCE_LOAD);
     info.name(path);
@@ -150,6 +187,24 @@ public class GeneralUtils {
     return info;
   }
 
+  private static String resolveName(Class<?> cls, String name) {
+    if (name == null) {
+      return name;
+    }
+    if (!name.startsWith("/")) {
+      while (cls.isArray()) {
+        cls = cls.getComponentType();
+      }
+      String baseName = cls.getName();
+      int index = baseName.lastIndexOf('.');
+      if (index != -1) {
+        name = baseName.substring(0, index).replace('.', '/') + "/" + name;
+      }
+    } else {
+      name = name.substring(1);
+    }
+    return name;
+  }
 
   /**
    * Map.getOrDefault only available in JDK 8., <s>For now we support JDK 7.</s>

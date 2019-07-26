@@ -28,6 +28,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.cldr.CLDR;
 
@@ -112,6 +114,21 @@ public class TestCaseParser extends UnitTestBase {
 
     @Override
     public void run(Compiler compiler) {
+      // Allow tests to be skipped for certain jdk versions
+      String major = getJavaMajorVersion();
+
+      // Execute the test for only the selected jdk versions
+      String jdk = properties.getProperty("jdk");
+      if (jdk != null && !listContains(major, jdk)) {
+        return;
+      }
+
+      // Skip the test for the selected jdk versions
+      String nojdk = properties.getProperty("nojdk");
+      if (nojdk != null && listContains(major, nojdk)) {
+        return;
+      }
+
       try {
         ObjectNode partialsMap = null;
         if (partials != null) {
@@ -136,6 +153,7 @@ public class TestCaseParser extends UnitTestBase {
         if (injectMap != null) {
           executor.injectablesMap(injectMap);
         }
+
 
         String locale = properties.getProperty("locale");
         if (locale != null) {
@@ -238,4 +256,16 @@ public class TestCaseParser extends UnitTestBase {
     return buf.toString();
   }
 
+  private static boolean listContains(String needle, String haystack) {
+    String major = getJavaMajorVersion();
+    long count = Arrays.stream(StringUtils.split(haystack, ','))
+        .map(s -> s.trim().equals(major))
+        .count();
+    return count != 0;
+  }
+
+  private static String getJavaMajorVersion() {
+    String version = System.getProperty("java.version");
+    return version.substring(0, version.indexOf('.'));
+  }
 }

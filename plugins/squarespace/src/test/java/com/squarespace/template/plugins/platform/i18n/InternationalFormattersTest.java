@@ -18,10 +18,8 @@ package com.squarespace.template.plugins.platform.i18n;
 
 import static com.squarespace.cldr.CLDR.Locale.en_US;
 import static com.squarespace.cldr.CLDR.Locale.fr;
+import static com.squarespace.template.GeneralUtils.listResources;
 import static org.testng.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -43,24 +41,24 @@ import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.Da
 
 public class InternationalFormattersTest extends PlatformUnitTestBase {
 
-  private static final String[] TESTED_CURRENCIES = {
-      "AUD",
-      "CAD",
-      "EUR",
-      "GBP",
-      "USD",
-      "JPY",
-      "SEK"
-  };
-
-  private static final String[] TESTED_LOCALES = {
-      "de_DE",
-      "en_UK",
-      "en_US",
-      "es_US",
-      "fr_FR",
-      "sv_SE"
-  };
+//  private static final String[] TESTED_CURRENCIES = {
+//      "AUD",
+//      "CAD",
+//      "EUR",
+//      "GBP",
+//      "USD",
+//      "JPY",
+//      "SEK"
+//  };
+//
+//  private static final String[] TESTED_LOCALES = {
+//      "de_DE",
+//      "en_UK",
+//      "en_US",
+//      "es_US",
+//      "fr_FR",
+//      "sv_SE"
+//  };
 
   private static final DateTimeFormatter DATETIME = new DateTimeFormatter();
   private static final DateTimeFieldFormatter DATETIMEFIELD = new DateTimeFieldFormatter();
@@ -138,14 +136,11 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testMoneyFormatter() throws Exception {
-    List<String> paths = new ArrayList<>();
-    for (String currency : TESTED_CURRENCIES) {
-      for (String locale : TESTED_LOCALES) {
-        paths.add("i18n-money-format-" + currency + "-" + locale + ".html");
-      }
-    }
-
-    runner.run(paths.toArray(new String[paths.size()]));
+    String[] files = listResources(InternationalFormattersTest.class, "**/*/i18n-money-format-*.html")
+        .stream()
+        .map(p -> p.getFileName().toString())
+        .toArray(String[]::new);
+    runner.run(files);
   }
 
   public void testExtraArgument() throws Exception {
