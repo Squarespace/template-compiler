@@ -1,0 +1,24 @@
+:PROPERTIES
+nojdk=8
+
+:JSON
+[
+  {
+    "currencyCode": "CAD",
+    "decimalValue": 1234.56
+  },
+  {
+    "currencyCode": "CAD",
+    "decimalValue": -1234.56
+  }
+]
+
+:TEMPLATE
+{.repeated section @}
+{@|i18n-money-format sv-SE}
+{.end}
+
+:OUTPUT
+1 234,56 C$
+
+-1 234,56 C$
