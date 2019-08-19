@@ -2,6 +2,7 @@
 {.var @buttonText messages.buttonText}
 {.var @CTAText messages.CTAText}
 {.var @placeholderText messages.placeholderText}
+{.var @mailingListDescription messages.mailingListDescription}
 
 {.repeated section views}
 <div class="product-restock-notification" data-product-id="{@productId}" data-variant-id="{variantId}"{.if hiddenByDefault} hidden{.end}>
@@ -10,5 +11,6 @@
     <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="{@placeholderText}">
     <input class="sqs-editable-button" type="submit" value="{@buttonText}">
   </form>
+{.if mailingListSignUpEnabled}  <label class="product-restock-mailing-list"><input type="checkbox" name="isJoinMailingList"{.if mailingListOptInByDefault} checked{.end}>{@mailingListDescription}</label>{.end}
 </div>
 {.end}

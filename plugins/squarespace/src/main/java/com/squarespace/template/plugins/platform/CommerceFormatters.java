@@ -826,6 +826,8 @@ public class CommerceFormatters implements FormatterRegistry {
       templateVariables.set("product", product);
       templateVariables.set("views", productCtx.path(productId).path("restockNotificationViews"));
       templateVariables.set("messages", productCtx.path(productId).path("restockNotificationMessages"));
+      templateVariables.set("mailingListSignUpEnabled", productCtx.path(productId).path("mailingListSignUpEnabled"));
+      templateVariables.set("mailingListOptInByDefault", productCtx.path(productId).path("mailingListOptInByDefault"));
       var.set(executeTemplate(ctx, template, templateVariables, true));
     }
   }

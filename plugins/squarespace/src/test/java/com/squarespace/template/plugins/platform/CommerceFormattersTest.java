@@ -321,7 +321,11 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   public void testProductRestockNotification() {
     runner.run(
         "f-product-restock-notification-1.html",
-        "f-product-restock-notification-2.html"
+        "f-product-restock-notification-2.html",
+        "f-product-restock-notification-3.html",
+        "f-product-restock-notification-4.html",
+        "f-product-restock-notification-5.html",
+        "f-product-restock-notification-6.html"
     );
   }
 
