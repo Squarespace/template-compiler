@@ -17,6 +17,7 @@
 package com.squarespace.template;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 
@@ -37,6 +38,10 @@ public abstract class SymbolTable<K, V> {
 
   public void setInUse() {
     this.inUse = true;
+  }
+
+  public Set<K> keys() {
+    return table.keySet();
   }
 
   public V get(K symbol) {

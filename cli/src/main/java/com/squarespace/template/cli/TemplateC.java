@@ -20,7 +20,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 
@@ -38,6 +41,8 @@ import com.squarespace.template.Instruction;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.PredicateTable;
 import com.squarespace.template.ReferenceScanner;
+import com.squarespace.template.StringView;
+import com.squarespace.template.SymbolTable;
 import com.squarespace.template.TreeEmitter;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
@@ -78,6 +83,10 @@ public class TemplateC {
       .description("Compile template files")
       .version(version);
 
+    parser.addArgument("--dump-plugins")
+      .action(Arguments.storeTrue())
+      .help("Dump the list of registered plugins");
+
     parser.addArgument("--version", "-v")
       .action(Arguments.version())
       .help("Show the version and exit");
@@ -103,12 +112,22 @@ public class TemplateC {
       .help("Preprocess the template");
 
     parser.addArgument("template")
-    .type(String.class)
-    .help("Template source");
+      .type(String.class)
+      .nargs("?")
+      .help("Template source");
 
     int exitCode = 1;
     try {
       Namespace res = parser.parseArgs(args);
+      if (res.getBoolean("dump_plugins")) {
+        dumpPlugins();
+        System.exit(0);
+      }
+      if (res.getString("template") == null) {
+        parser.printUsage();
+        System.err.println("error: too few arguments");
+        System.exit(exitCode);
+      }
       boolean preprocess = res.getBoolean("preprocess");
       if (res.getBoolean("stats")) {
         exitCode = stats(res.getString("template"), preprocess);
@@ -236,28 +255,42 @@ public class TemplateC {
   }
 
   protected Compiler compiler() {
-    FormatterTable formatterTable = new FormatterTable();
-    PredicateTable predicateTable = new PredicateTable();
+    return new Compiler(formatterTable(), predicateTable());
+  }
 
-    // core
-    formatterTable.register(new CoreFormatters());
-    predicateTable.register(new CorePredicates());
+  protected static FormatterTable formatterTable() {
+    FormatterTable t = new FormatterTable();
+    t.register(new CoreFormatters());
+    t.register(new CommerceFormatters());
+    t.register(new ContentFormatters());
+    t.register(new SocialFormatters());
+    t.register(new InternationalFormatters());
+    return t;
+  }
 
-    // TODO: dynamic classpath scan and registration of plugin jars.
+  protected static PredicateTable predicateTable() {
+    PredicateTable t = new PredicateTable();
+    t.register(new CorePredicates());
+    t.register(new CommercePredicates());
+    t.register(new ContentPredicates());
+    t.register(new SlidePredicates());
+    t.register(new SocialPredicates());
+    t.register(new InternationalPredicates());
+    return t;
+  }
 
-    // squarespace
-    formatterTable.register(new CommerceFormatters());
-    formatterTable.register(new ContentFormatters());
-    formatterTable.register(new SocialFormatters());
-    formatterTable.register(new InternationalFormatters());
+  protected static void dumpPlugins() {
+    List<String> names = new ArrayList<>();
+    names.addAll(pluginNames(formatterTable()));
+    names.addAll(pluginNames(predicateTable()));
+    Collections.sort(names);
+    for (String name : names) {
+      System.out.println(name);
+    }
+  }
 
-    predicateTable.register(new CommercePredicates());
-    predicateTable.register(new ContentPredicates());
-    predicateTable.register(new SlidePredicates());
-    predicateTable.register(new SocialPredicates());
-    predicateTable.register(new InternationalPredicates());
-
-    return new Compiler(formatterTable, predicateTable);
+  protected static List<String> pluginNames(SymbolTable<StringView, ?> table) {
+    return table.keys().stream().map(s -> s.toString()).collect(Collectors.toList());
   }
 
   protected static String readFile(String rawPath) throws IOException {
