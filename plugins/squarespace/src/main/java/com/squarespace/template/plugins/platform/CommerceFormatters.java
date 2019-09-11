@@ -508,7 +508,7 @@ public class CommerceFormatters implements FormatterRegistry {
       }
 
       StringBuilder buf = new StringBuilder();
-      buf.append("<span class=\"sqs-product-quick-view-button\" data-id=\"").append(id);
+      buf.append("<span class=\"sqs-product-quick-view-button\" role=\"button\" tabindex=\"0\" data-id=\"").append(id);
       buf.append("\" data-group=\"").append(group).append("\">");
       String text = ctx.resolve(Constants.PRODUCT_QUICK_VIEW_TEXT_KEY).asText();
       buf.append(StringUtils.defaultIfEmpty(text, "Quick View"));
