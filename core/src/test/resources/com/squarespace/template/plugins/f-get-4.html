@@ -1,0 +1,17 @@
+:JSON
+{ 
+	"id": "123", 
+	"key": "name", 
+	"objects": { 
+		"123": { 
+			"name": "Bob" 
+		} 
+	}
+}
+
+
+:TEMPLATE
+{objects|get id key}
+
+:OUTPUT
+Bob

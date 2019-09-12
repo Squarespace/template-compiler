@@ -560,7 +560,9 @@ public class Context {
     if (name instanceof String) {
       String strName = (String)name;
 
-      if (strName.startsWith("@")) {
+      if (strName.equals("@")) {
+        return frame.node();
+      } else if (strName.startsWith("@")) {
         boolean isIndex = name.equals("@index");
         if (isIndex || name.equals("@index0")) {
           if (frame.currentIndex != -1) {

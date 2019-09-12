@@ -1,0 +1,35 @@
+:JSON
+{
+  "selected": [
+    "123",
+    "456"
+  ],
+  "paths": {
+    "name": ["person", "name"],
+    "age": ["person", "age"]
+  },
+  "people": {
+    "123": {
+      "person": {
+        "name": "Bob",
+        "age": 19
+      }
+    },
+    "456": {
+      "person": {
+        "name": "Fred",
+        "age": 22
+      }
+    }
+  }
+}
+
+:TEMPLATE
+{.repeated section selected}
+{.var @name people|get @ paths.name}{.var @age people|get @ paths.age}
+{@name} is {@age} years{.end}
+
+:OUTPUT
+Bob is 19 years
+
+Fred is 22 years

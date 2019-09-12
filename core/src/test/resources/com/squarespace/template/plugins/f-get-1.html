@@ -1,0 +1,27 @@
+:JSON
+{
+  "items": [
+    { "id": "123" },
+    { "id": "456" }
+  ],
+  "one": {
+    "two": {
+      "123": {
+        "name": "Bob"
+      },
+      "456": {
+        "name": "Fred"
+      }
+    }
+  }
+}
+
+:TEMPLATE
+{.repeated section items}
+{.var @obj one.two|get @.id}{@obj.name}
+{.end}
+
+:OUTPUT
+Bob
+
+Fred

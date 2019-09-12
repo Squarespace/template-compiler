@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squarespace.compiler.text.EncodeUtils;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
@@ -46,6 +47,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
+import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.StringView;
@@ -70,6 +72,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new EncodeUriFormatter());
     table.add(new EncodeUriComponentFormatter());
     table.add(new FormatFormatter());
+    table.add(new GetFormatter());
     table.add(new HtmlFormatter());
     table.add(new HtmlAttrFormatter());
     table.add(new HtmlTagFormatter());
@@ -328,6 +331,56 @@ public class CoreFormatters implements FormatterRegistry {
     }
 
   }
+
+  /**
+   * GET - Indirect lookup of properties on objects.
+   *
+   */
+  public static class GetFormatter extends BaseFormatter {
+
+    public GetFormatter() {
+      super("get", true);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.atLeast(1);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable first = variables.first();
+      JsonNode tmp = first.node();
+      for (String arg : args.getArgs()) {
+        Object[] path = GeneralUtils.splitVariable(arg);
+        JsonNode node = ctx.resolve(path);
+
+        // Resolved node can be an array path
+        if (node.isArray()) {
+          ArrayNode arr = (ArrayNode)node;
+          for (int i = 0; i < arr.size(); i++) {
+            JsonNode elem = arr.get(i);
+            if (elem.isNumber()) {
+              tmp = tmp.path(elem.asInt());
+            } else if (elem.isTextual()) {
+              tmp = tmp.path(elem.asText());
+            }
+          }
+        } else if (node.isNumber()) {
+          tmp = tmp.path(node.asInt());
+        } else if (node.isTextual()) {
+          tmp = tmp.path(node.asText());
+        }
+
+        if (!tmp.isArray() && !tmp.isObject()) {
+          break;
+        }
+      }
+      first.set(tmp);
+    }
+
+  }
+
 
   /**
    * HTML - Escapes HTML characters & < > replacing them with the corresponding entity.
