@@ -1,0 +1,17 @@
+:JSON
+{
+  "foo": "bar"
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro name}
+{@} {@args} {@args.foo} {@args.bar}
+{.end}
+
+{foo|apply name}
+
+:OUTPUT
+bar
