@@ -1,0 +1,33 @@
+:JSON
+{
+  "accounts": [
+    { "url": "https://example.com/1", "name": "Example 1" },
+    { "url": "https://example.com/2", "name": "Example 2" }
+  ]
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro name}
+<a href="{url|htmlattr}" class="{@args.cls}">{name} - {@args.a}{@args.b}</a>
+{.end}
+
+{.repeated section accounts}
+{@|apply name cls:foo a:1 b:2}
+{@|apply name cls:bar a:3 b:4}
+{.end}
+
+:OUTPUT
+<a href="https://example.com/1" class="foo">Example 1 - 12</a>
+
+
+<a href="https://example.com/1" class="bar">Example 1 - 34</a>
+
+
+
+<a href="https://example.com/2" class="foo">Example 2 - 12</a>
+
+
+<a href="https://example.com/2" class="bar">Example 2 - 34</a>

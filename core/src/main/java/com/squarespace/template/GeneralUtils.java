@@ -41,6 +41,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.NumericNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 
@@ -110,7 +111,6 @@ public class GeneralUtils {
     }
   }
 
-
   /**
    * Executes a compiled instruction using the given context and JSON node.
    * Optionally hides all context above the JSON node, treating it as a root.
@@ -118,6 +118,20 @@ public class GeneralUtils {
    * produce their output.
    */
   public static JsonNode executeTemplate(Context ctx, Instruction inst, JsonNode node, boolean privateContext)
+      throws CodeExecuteException {
+    return executeTemplate(ctx, inst, node, privateContext, null);
+  }
+
+  /**
+   * Executes a compiled instruction using the given context and JSON node.
+   * Optionally hides all context above the JSON node, treating it as a root.
+   * This is a helper method for formatters which need to execute templates to
+   * produce their output.
+   * Optionally allows passing in an 'argvar' node which will be defined inside the
+   * template as '@args'.
+   */
+  public static JsonNode executeTemplate(Context ctx, Instruction inst, JsonNode node, boolean privateContext,
+        ObjectNode argvar)
       throws CodeExecuteException {
 
     // Temporarily swap the buffers to capture all output of the partial.
@@ -128,6 +142,9 @@ public class GeneralUtils {
       // temporary sub-context.
       ctx.push(node);
       ctx.frame().stopResolution(privateContext);
+      if (argvar != null) {
+        ctx.setVar("@args", argvar);
+      }
       ctx.execute(inst);
 
     } finally {

@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.compiler.text.EncodeUtils;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
@@ -49,6 +50,7 @@ import com.squarespace.template.Formatter;
 import com.squarespace.template.FormatterRegistry;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Patterns;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
@@ -104,7 +106,7 @@ public class CoreFormatters implements FormatterRegistry {
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
-      args.between(1, 2);
+      args.atLeast(1);
     }
 
     @Override
@@ -112,8 +114,27 @@ public class CoreFormatters implements FormatterRegistry {
       Variable var = variables.first();
       String name = args.first();
       boolean privateContext = false;
-      if (args.count() == 2) {
-        privateContext = args.get(1).equals("private");
+      ObjectNode argvar = null;
+      int count = args.count();
+      if (count > 1) {
+        argvar = JsonUtils.createObjectNode();
+        for (int i = 1; i < count; i++) {
+          String arg = args.get(i);
+
+          // Mark the context as private
+          if (arg.equals("private")) {
+            privateContext = true;
+            continue;
+          }
+
+          // Parse the colon-delimited arguments into key-values
+          int j = arg.indexOf(':');
+          if (j != -1) {
+            String k = arg.substring(0, j);
+            String v = arg.substring(j + 1);
+            argvar.put(k, v);
+          }
+        }
       }
       Instruction inst = null;
       try {
@@ -143,7 +164,7 @@ public class CoreFormatters implements FormatterRegistry {
       // execute it a second time and return a missing node.  Otherwise we execute the partial
       // template and return the result.
       if (ctx.enterPartial(name)) {
-        var.set(executeTemplate(ctx, inst, var.node(), privateContext));
+        var.set(executeTemplate(ctx, inst, var.node(), privateContext, argvar));
       } else {
         var.setMissing();
       }
