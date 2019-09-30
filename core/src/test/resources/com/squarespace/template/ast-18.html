@@ -1,0 +1,19 @@
+:SOURCE
+{.equal?|foo|"bar"}
+  branch 1
+{.or equal?|baz|"bar"}
+  branch 2
+{.or}
+  branch 3
+{.end}
+
+:JSON
+[17,1,[
+	[5,"equal?",["foo","\"bar\""],[
+		[0,"\n  branch 1\n"]
+	],[7,"equal?",["baz","\"bar\""],[
+		[0,"\n  branch 2\n"]
+	],[7,0,0,[
+		[0,"\n  branch 3\n"]
+	],3]]]
+],18]

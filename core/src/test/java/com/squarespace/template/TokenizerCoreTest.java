@@ -316,7 +316,10 @@ public class TokenizerCoreTest extends UnitTestBase {
   public void testPredicateArgs() throws CodeSyntaxException {
     CodeMaker mk = maker();
     String args = ":\"foo bar\":\"foo bar\"";
-    assertResult("{.equal?:" + args + "}", mk.predicate(EQUAL, mk.args(args)), mk.eof());
+    assertResult("{.equal?" + args + "}", mk.predicate(EQUAL, mk.args(args)), mk.eof());
+
+    args = "|\"foo bar\"|bar";
+    assertResult("{.equal?" + args + "}", mk.predicate(EQUAL, mk.args(args)), mk.eof());
   }
 
   @Test
