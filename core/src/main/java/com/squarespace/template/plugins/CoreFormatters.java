@@ -128,7 +128,7 @@ public class CoreFormatters implements FormatterRegistry {
           }
 
           // Parse the colon-delimited arguments into key-values
-          int j = arg.indexOf(':');
+          int j = arg.indexOf('=');
           if (j != -1) {
             String k = arg.substring(0, j);
             String v = arg.substring(j + 1);

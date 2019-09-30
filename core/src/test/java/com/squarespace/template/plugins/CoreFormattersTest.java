@@ -113,6 +113,7 @@ public class CoreFormattersTest extends UnitTestBase {
         "f-macro-7.html",
         "f-macro-8.html",
         "f-macro-9.html",
+        "f-macro-10.html",
         "f-macro-ctx-1.html"
     );
   }

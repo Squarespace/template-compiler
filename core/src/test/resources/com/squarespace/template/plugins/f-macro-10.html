@@ -1,0 +1,24 @@
+:JSON
+{
+	"foo": "hello",	
+	"object": {
+		"bar": "goodbye"
+	}
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro name}
+{foo} {bar}
+{@args|json}
+{@args.foo} {@args.bar}
+{.end}
+
+{.section object}{@|apply name foo=1 ignore bar=2 private ignoreme}{.end}
+
+:OUTPUT
+goodbye
+{"foo":"1","bar":"2"}
+1 2
