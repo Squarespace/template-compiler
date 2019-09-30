@@ -1,0 +1,14 @@
+:SOURCE
+{## foo
+  {.section baz}
+    {a.b.c}
+  {.end}
+bar ##}
+{# baz #}
+
+:JSON
+[17,1,[
+	[11," foo\n  {.section baz}\n    {a.b.c}\n  {.end}\nbar ",1],
+    [0, "\n"],
+    [11, " baz #", 0]
+],18]

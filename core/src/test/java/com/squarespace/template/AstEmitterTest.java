@@ -47,6 +47,7 @@ public class AstEmitterTest extends UnitTestBase {
     execute("ast-14.html");
     execute("ast-15.html");
     execute("ast-16.html");
+    execute("ast-17.html");
   }
 
   @Test
@@ -75,7 +76,7 @@ public class AstEmitterTest extends UnitTestBase {
 
     // TODO: improve the diff formatting.
     String diff = JsonDiff.asJson(expected, actual).toString();
-    assertEquals(actual.toString(), expected.toString(), diff);
+    assertEquals(actual.toString(), expected.toString(), path + ": " + diff);
   }
 
 }
