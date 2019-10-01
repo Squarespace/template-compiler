@@ -357,7 +357,7 @@ public class AstEmitter {
    * Returns a single zero if the list of arguments is empty.
    * Otherwise it returns an array containing the arguments:
    *
-   *   ["<arg1>", ... "<argN>"]
+   *   [["<arg1>", ... "<argN>"], "<delimiter>"]
    */
   private static JsonNode arguments(Arguments arguments) {
     int count = arguments.count();
@@ -368,7 +368,10 @@ public class AstEmitter {
     for (int i = 0; i < count; i++) {
       array.add(arguments.get(i));
     }
-    return array;
+    ArrayNode container = JsonUtils.createArrayNode();
+    container.add(array);
+    container.add(String.valueOf(arguments.getDelimiter()));
+    return container;
   }
 
   /**

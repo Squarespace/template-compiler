@@ -1,7 +1,10 @@
 :SOURCE
 {.inject @foo bar}
+{.inject @foo bar a b c}
 
 :JSON
 [17,1,[
-  [9, "@foo", "bar", 0]
+  [9,"@foo","bar",0],
+  [0,"\n"],
+  [9,"@foo","bar",[["a","b","c"], " "]]
 ],18]
