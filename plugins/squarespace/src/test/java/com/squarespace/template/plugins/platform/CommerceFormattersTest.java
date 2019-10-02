@@ -40,6 +40,7 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-add-to-cart-btn-2.html",
         "f-add-to-cart-btn-3.html",
         "f-add-to-cart-btn-4.html",
+        "f-add-to-cart-btn-5.html",
         "f-add-to-cart-btn-subscribable-attribute-false.html",
         "f-add-to-cart-btn-subscribable-attribute-true.html"
         );
@@ -313,7 +314,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-scarcity-context-missing.html",
         "f-scarcity-not-enabled.html",
         "f-scarcity-default-shown.html",
-        "f-scarcity-default-hidden.html"
+        "f-scarcity-default-hidden.html",
+        "f-scarcity-default-shown-escape-html.html"
     );
   }
 

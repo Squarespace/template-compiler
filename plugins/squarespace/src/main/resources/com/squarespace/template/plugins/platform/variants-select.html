@@ -10,7 +10,7 @@
     <div class="variant-select-wrapper">
       <select data-variant-option-name="{name|htmltag}">
         <option value="">{selectText|message variantName:name}</option>
-        {.repeated section values}<option value="{@|htmltag}">{@}</option>{.end}
+        {.repeated section values}<option value="{@|htmltag}">{@|htmltag}</option>{.end}
       </select>
     </div>
     </div>{.end}

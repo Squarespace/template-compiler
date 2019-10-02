@@ -6,11 +6,11 @@
 
 {.repeated section views}
 <div class="product-restock-notification" data-product-id="{@productId}" data-variant-id="{variantId}"{.if hiddenByDefault} hidden{.end}>
-  <span class="product-restock-cta">{@CTAText}</span>
+  <span class="product-restock-cta">{@CTAText|htmltag}</span>
   <form class="product-restock-form" action="#">
-    <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="{@placeholderText}">
-    <input class="sqs-editable-button" type="submit" value="{@buttonText}">
+    <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="{@placeholderText|htmlattr}">
+    <input class="sqs-editable-button" type="submit" value="{@buttonText|htmlattr}">
   </form>
-{.if mailingListSignUpEnabled}  <label class="product-restock-mailing-list"><input type="checkbox" name="isJoinMailingList"{.if mailingListOptInByDefault} checked{.end}>{@mailingListDescription}</label>{.end}
+{.if mailingListSignUpEnabled}  <label class="product-restock-mailing-list"><input type="checkbox" name="isJoinMailingList"{.if mailingListOptInByDefault} checked{.end}>{@mailingListDescription|htmltag}</label>{.end}
 </div>
 {.end}
