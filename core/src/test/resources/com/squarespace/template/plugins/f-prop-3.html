@@ -1,0 +1,30 @@
+:JSON
+{
+  "items": [
+    "foo",
+    "bar",
+    "baz"
+  ],
+  "object": {
+    "0": "foo"
+  }
+}
+
+
+:TEMPLATE
+{items|prop 2}
+{items|prop 1}
+{items|prop 0}
+-{items|prop foo}
+
+{object|prop 0}
+-{object|prop 1}
+
+:OUTPUT
+baz
+bar
+foo
+-
+
+foo
+-

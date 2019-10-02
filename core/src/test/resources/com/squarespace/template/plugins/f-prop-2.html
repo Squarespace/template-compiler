@@ -1,0 +1,19 @@
+:JSON
+{
+  "foo": {
+    "bar": {
+      "quux": {
+        "baz": "xyz"
+      }
+    }
+  }
+}
+
+
+:TEMPLATE
+{foo|prop bar quux baz}
+-{foo|prop x y z}
+
+:OUTPUT
+xyz
+-

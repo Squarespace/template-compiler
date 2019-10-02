@@ -85,6 +85,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new OutputFormatter());
     table.add(new LookupFormatter());
     table.add(new PluralizeFormatter());
+    table.add(new PropFormatter());
     table.add(new RawFormatter());
     table.add(new RoundFormatter());
     table.add(new SafeFormatter());
@@ -618,6 +619,81 @@ public class CoreFormatters implements FormatterRegistry {
     }
   }
 
+  /**
+   * PROP - Access properties on an object or array.
+   */
+  public static class PropFormatter extends BaseFormatter {
+
+    public PropFormatter() {
+      super("prop", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable first = variables.first();
+      JsonNode tmp = first.node();
+      int count = args.count();
+      for (int i = 0; i < count; i++) {
+        String arg = args.get(i);
+        Object[] obj = splitVariable(arg);
+        if (obj == null) {
+          tmp = Constants.MISSING_NODE;
+          break;
+        }
+
+        for (Object key : obj) {
+          // Adapt the argument to the type of node we're accessing
+          if (tmp instanceof ArrayNode && key instanceof Integer) {
+            tmp = tmp.path((int)key);
+          } else if (tmp instanceof ObjectNode) {
+            if (key instanceof Integer) {
+              key = ((Integer)key).toString();
+            }
+            tmp = tmp.path((String)key);
+          } else {
+            tmp = Constants.MISSING_NODE;
+            break;
+          }
+
+          if (tmp.isMissingNode()) {
+            break;
+          }
+
+        }
+
+        if (tmp.isMissingNode()) {
+          break;
+        }
+
+      }
+      first.set(tmp);
+    }
+  }
+
+  /*
+   *
+   * export class PropFormatter extends Formatter {
+  apply(args: string[], vars: Variable[], ctx: Context): void {
+    const first = vars[0];
+    let tmp = first.node;
+    for (const arg of args) {
+      const path = splitVariable(arg);
+      tmp = tmp.path(path);
+      if (tmp.type === Type.MISSING) {
+        break;
+      }
+    }
+    first.set(tmp);
+  }
+}
+
+
+   */
 
   /**
    * RAW

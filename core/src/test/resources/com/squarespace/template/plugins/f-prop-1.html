@@ -1,0 +1,21 @@
+:JSON
+{
+  "id": "123",
+  "which": "primary",
+	"objects": {
+		"123": {
+      "name": "Bob",
+      "emails": {
+        "primary": "bob@example.com",
+        "secondary": "foo@example.com"
+      }
+		}
+	}
+}
+
+
+:TEMPLATE
+{objects|get id|prop emails|get which}
+
+:OUTPUT
+bob@example.com

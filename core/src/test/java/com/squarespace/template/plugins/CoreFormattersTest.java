@@ -58,6 +58,7 @@ import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.LookupFormatter;
 import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
+import com.squarespace.template.plugins.CoreFormatters.PropFormatter;
 import com.squarespace.template.plugins.CoreFormatters.RawFormatter;
 import com.squarespace.template.plugins.CoreFormatters.RoundFormatter;
 import com.squarespace.template.plugins.CoreFormatters.SafeFormatter;
@@ -85,6 +86,7 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter OUTPUT = new OutputFormatter();
   private static final Formatter LOOKUP = new LookupFormatter();
   private static final Formatter PLURALIZE = new PluralizeFormatter();
+  private static final Formatter PROP = new PropFormatter();
   private static final Formatter RAW = new RawFormatter();
   private static final Formatter ROUND = new RoundFormatter();
   private static final Formatter SAFE = new SafeFormatter();
@@ -569,6 +571,32 @@ public class CoreFormattersTest extends UnitTestBase {
     // Too many args
     args = mk.args(":1:2:3:4");
     assertInvalidArgs(PLURALIZE, args);
+  }
+
+  @Test
+  public void testProp() throws CodeException {
+    CodeMaker mk = maker();
+
+    Arguments args = mk.args(" foo");
+    assertFormatter(PROP, args, "{ \"foo\": 123 }", "123");
+
+    args = mk.args(" bar");
+    assertFormatter(PROP, args, "{ \"bar\": \"123\" }", "123");
+
+    args = mk.args(" foo");
+    assertFormatter(PROP, args, "{ \"bar\": 123 }", "");
+
+    args = mk.args(" bar quux");
+    assertFormatter(PROP, args, "{ \"bar\": 123 }", "");
+
+    args = mk.args(" foo bar");
+    assertFormatter(PROP, args, "{}", "");
+
+    runner.run(
+        "f-prop-1.html",
+        "f-prop-2.html",
+        "f-prop-3.html"
+    );
   }
 
   @Test
