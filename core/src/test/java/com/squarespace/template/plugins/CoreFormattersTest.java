@@ -474,7 +474,8 @@ public class CoreFormattersTest extends UnitTestBase {
         "f-get-1.html",
         "f-get-2.html",
         "f-get-3.html",
-        "f-get-4.html"
+        "f-get-4.html",
+        "f-get-5.html"
     );
   }
 

@@ -44,6 +44,7 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.CodeSyntaxException;
+import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.Formatter;
@@ -360,12 +361,12 @@ public class CoreFormatters implements FormatterRegistry {
   public static class GetFormatter extends BaseFormatter {
 
     public GetFormatter() {
-      super("get", true);
+      super("get", false);
     }
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
-      args.atLeast(1);
+
     }
 
     @Override
@@ -375,25 +376,31 @@ public class CoreFormatters implements FormatterRegistry {
       for (String arg : args.getArgs()) {
         Object[] path = GeneralUtils.splitVariable(arg);
         JsonNode node = ctx.resolve(path);
+        if (node.isMissingNode()) {
+          tmp = Constants.MISSING_NODE;
+          break;
+        } else {
 
-        // Resolved node can be an array path
-        if (node.isArray()) {
-          ArrayNode arr = (ArrayNode)node;
-          for (int i = 0; i < arr.size(); i++) {
-            JsonNode elem = arr.get(i);
-            if (elem.isNumber()) {
-              tmp = tmp.path(elem.asInt());
-            } else if (elem.isTextual()) {
-              tmp = tmp.path(elem.asText());
+          // Resolved node can be an array path
+          if (node.isArray()) {
+            ArrayNode arr = (ArrayNode)node;
+            for (int i = 0; i < arr.size(); i++) {
+              JsonNode elem = arr.get(i);
+              if (elem.isNumber()) {
+                tmp = tmp.path(elem.asInt());
+              } else if (elem.isTextual()) {
+                tmp = tmp.path(elem.asText());
+              }
             }
+          } else if (node.isNumber()) {
+            tmp = tmp.path(node.asInt());
+          } else if (node.isTextual()) {
+            tmp = tmp.path(node.asText());
           }
-        } else if (node.isNumber()) {
-          tmp = tmp.path(node.asInt());
-        } else if (node.isTextual()) {
-          tmp = tmp.path(node.asText());
         }
 
-        if (!tmp.isArray() && !tmp.isObject()) {
+        // Once we hit a missing node, no point continuing
+        if (tmp.isMissingNode()) {
           break;
         }
       }

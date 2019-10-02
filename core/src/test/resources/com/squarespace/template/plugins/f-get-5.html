@@ -1,0 +1,31 @@
+:JSON
+{
+  "id": "123",
+  "valid": {
+    "123": "Bob"
+  },
+  "invalid": {
+    "123": null
+	}
+}
+
+
+:TEMPLATE
+{valid|get|json}
+{valid|get id|json}
+-{valid|get missing id|json}
+-{valid|get foo bar id|json}
+
+{invalid|get id|json}
+-{invalid|get missing id|json}
+-{invalid|get foo bar id|json}
+
+:OUTPUT
+{"123":"Bob"}
+"Bob"
+-
+-
+
+null
+-
+-
