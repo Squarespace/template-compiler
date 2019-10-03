@@ -138,6 +138,12 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testProductCheckout() {
+    runner.run(
+        "f-product-checkout-1.html"
+    );
+  }
+  @Test
   public void testProductPrice() {
     runner.run(
       "f-product-price-1.html",

@@ -1,0 +1,55 @@
+:JSON
+{
+  "item": {
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [
+        {"attributes": { "fit": "loose", "color": "blue" }},
+        {"attributes": { "fit": "slim", "color": "red" }}
+      ],
+      "variantOptionOrdering": ["color", "fit"]
+    }
+  }
+}
+
+:TEMPLATE
+{item|product-checkout}
+
+:OUTPUT
+<div class="product-variants" data-item-id="560c37c1a7c8465c4a71d99a" data-variants="[{&quot;attributes&quot;:{&quot;fit&quot;:&quot;loose&quot;,&quot;color&quot;:&quot;blue&quot;}},{&quot;attributes&quot;:{&quot;fit&quot;:&quot;slim&quot;,&quot;color&quot;:&quot;red&quot;}}]">
+    <div class="variant-option">
+    <div class="variant-option-title">color: </div>
+    <div class="variant-select-wrapper">
+      <select data-variant-option-name="color">
+        <option value="">Select color</option>
+        <option value="blue">blue</option><option value="red">red</option>
+      </select>
+    </div>
+    </div>
+    <div class="variant-option">
+    <div class="variant-option-title">fit: </div>
+    <div class="variant-select-wrapper">
+      <select data-variant-option-name="fit">
+        <option value="">Select fit</option>
+        <option value="loose">loose</option><option value="slim">slim</option>
+      </select>
+    </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="sqs-add-to-cart-button-wrapper">
+  <div class="sqs-add-to-cart-button sqs-suppress-edit-mode sqs-editable-button " role="button" tabindex="0" data-collection-id="" data-item-id="560c37c1a7c8465c4a71d99a" data-product-type="" data-use-custom-label="" data-original-label="Add To Cart" >
+    <div class="sqs-add-to-cart-button-inner">Add To Cart</div>
+  </div>
+</div>
