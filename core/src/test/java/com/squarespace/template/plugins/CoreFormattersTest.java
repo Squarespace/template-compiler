@@ -634,8 +634,15 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testSmartypants() throws CodeException {
-    assertFormatter(SMARTYPANTS, "\"Fred's\"", "Fred\u2019s");
-    assertFormatter(SMARTYPANTS, "\"\\\"foo\\\"\"", "\u201cfoo\u201d");
+    assertFormatter(SMARTYPANTS,
+        "\"Fred's and Bob's\"",
+        "Fred\u2019s and Bob\u2019s");
+    assertFormatter(SMARTYPANTS,
+        "\"\\\"foo\\\" and \\\"bar\\\"\"",
+        "\u201cfoo\u201d and \u201cbar\u201d");
+    assertFormatter(SMARTYPANTS,
+        "\"I spoke to Larry--the project\\nlead--about the issue\"",
+        "I spoke to Larry\u2014the project\nlead\u2014about the issue");
   }
 
   @Test
