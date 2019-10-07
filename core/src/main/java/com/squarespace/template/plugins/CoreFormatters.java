@@ -675,26 +675,6 @@ public class CoreFormatters implements FormatterRegistry {
     }
   }
 
-  /*
-   *
-   * export class PropFormatter extends Formatter {
-  apply(args: string[], vars: Variable[], ctx: Context): void {
-    const first = vars[0];
-    let tmp = first.node;
-    for (const arg of args) {
-      const path = splitVariable(arg);
-      tmp = tmp.path(path);
-      if (tmp.type === Type.MISSING) {
-        break;
-      }
-    }
-    first.set(tmp);
-  }
-}
-
-
-   */
-
   /**
    * RAW
    */
