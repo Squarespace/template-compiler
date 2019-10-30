@@ -816,8 +816,9 @@ public class CommerceFormatters implements FormatterRegistry {
       Variable var = variables.first();
       JsonNode product = var.node();
 
+      JsonNode websiteCtx = ctx.resolve("website");
       JsonNode productCtx = ctx.resolve("productMerchandisingContext");
-      if (productCtx == null) {
+      if (websiteCtx == null || productCtx == null) {
         return;
       }
 
@@ -828,6 +829,7 @@ public class CommerceFormatters implements FormatterRegistry {
       templateVariables.set("messages", productCtx.path(productId).path("restockNotificationMessages"));
       templateVariables.set("mailingListSignUpEnabled", productCtx.path(productId).path("mailingListSignUpEnabled"));
       templateVariables.set("mailingListOptInByDefault", productCtx.path(productId).path("mailingListOptInByDefault"));
+      templateVariables.set("captchaSiteKey", websiteCtx.path("captchaSettings").path("siteKey"));
       var.set(executeTemplate(ctx, template, templateVariables, true));
     }
   }

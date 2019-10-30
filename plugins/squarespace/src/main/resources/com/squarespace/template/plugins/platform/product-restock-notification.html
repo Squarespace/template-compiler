@@ -10,6 +10,7 @@
   <form class="product-restock-form" action="#">
     <input type="text" x-autocompletetype="email" spellcheck="false" name="email" placeholder="{@placeholderText|htmlattr}">
     <input class="sqs-editable-button" type="submit" value="{@buttonText|htmlattr}">
+{.if captchaSiteKey}    <div class="captcha-container"></div>{.end}
   </form>
 {.if mailingListSignUpEnabled}  <label class="product-restock-mailing-list"><input type="checkbox" name="isJoinMailingList"{.if mailingListOptInByDefault} checked{.end}>{@mailingListDescription|htmltag}</label>{.end}
 </div>
