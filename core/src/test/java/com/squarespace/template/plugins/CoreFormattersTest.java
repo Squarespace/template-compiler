@@ -56,6 +56,7 @@ import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.LookupFormatter;
+import com.squarespace.template.plugins.CoreFormatters.ModFormatter;
 import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PluralizeFormatter;
 import com.squarespace.template.plugins.CoreFormatters.PropFormatter;
@@ -85,6 +86,7 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter JSON_PRETTY = new JsonPrettyFormatter();
   private static final Formatter OUTPUT = new OutputFormatter();
   private static final Formatter LOOKUP = new LookupFormatter();
+  private static final Formatter MOD = new ModFormatter();
   private static final Formatter PLURALIZE = new PluralizeFormatter();
   private static final Formatter PROP = new PropFormatter();
   private static final Formatter RAW = new RawFormatter();
@@ -544,6 +546,22 @@ public class CoreFormattersTest extends UnitTestBase {
         .safeExecution(true)
         .execute();
     assertContext(ctx, "123");
+  }
+
+  @Test
+  public void testMod() throws CodeException {
+    CodeMaker mk = maker();
+    Arguments args = mk.args(" 3");
+    assertFormatter(MOD, args, "4", "1");
+    assertFormatter(MOD, args, "5", "2");
+    assertFormatter(MOD, args, "6", "0");
+
+    // Bad modulus defaults to 2
+    args = mk.args(" abc");
+    assertFormatter(MOD, args, "5", "1");
+
+    // Bad value defaults to 0
+    assertFormatter(MOD, args, "\"abc\"", "0");
   }
 
   @Test

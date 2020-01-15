@@ -84,6 +84,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new JsonPrettyFormatter());
     table.add(new OutputFormatter());
     table.add(new LookupFormatter());
+    table.add(new ModFormatter());
     table.add(new PluralizeFormatter());
     table.add(new PropFormatter());
     table.add(new RawFormatter());
@@ -580,6 +581,33 @@ public class CoreFormatters implements FormatterRegistry {
 
       Variable var = variables.first();
       var.set(result);
+    }
+  }
+
+  /**
+   * Mod - compute modulus of a value.
+   */
+  public static class ModFormatter extends BaseFormatter {
+
+    public ModFormatter() {
+      super("mod", false);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      long modulus = 2;
+      if (args.count() > 0) {
+        try {
+          String arg = args.get(0);
+          modulus = Long.parseLong(arg, 10);
+        } catch (NumberFormatException e) {
+          // NOOP, default to modulus = 2
+        }
+      }
+      Variable first = variables.first();
+      long value = first.node().asLong();
+      long result = value % modulus;
+      first.set(result);
     }
   }
 
