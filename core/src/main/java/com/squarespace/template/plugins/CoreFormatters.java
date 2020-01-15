@@ -595,18 +595,18 @@ public class CoreFormatters implements FormatterRegistry {
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
-      long modulus = 2;
+      long divisor = 2;
       if (args.count() > 0) {
         try {
           String arg = args.get(0);
-          modulus = Long.parseLong(arg, 10);
+          divisor = Long.parseLong(arg, 10);
         } catch (NumberFormatException e) {
-          // NOOP, default to modulus = 2
+          // NOOP, default to divisor = 2
         }
       }
       Variable first = variables.first();
       long value = first.node().asLong();
-      long result = value % modulus;
+      long result = value % divisor;
       first.set(result);
     }
   }
