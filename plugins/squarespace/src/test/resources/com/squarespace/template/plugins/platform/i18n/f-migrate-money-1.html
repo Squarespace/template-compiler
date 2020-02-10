@@ -1,0 +1,39 @@
+:JSON
+{
+	"amounts": [
+	  {
+	    "currencyCode": "USD",
+	    "decimalValue": 1234.56
+	  },
+	  {
+	    "currencyCode": "USD",
+	    "decimalValue": -1234.56
+	  },	  {
+	    "currencyCode": "AUD",
+	    "decimalValue": 1234.56
+	  },
+	  {
+	  	"currencyCode": "EUR",
+	  	"decimalValue": 1234.56
+	  }
+	]
+}
+
+:TEMPLATE
+{.repeated section amounts}
+{@|money style:accounting}
+{@|money style:accounting mode:significant}
+{.end}
+
+:OUTPUT
+$1,234.56
+$1,234.56
+
+($1,234.56)
+($1,234.56)
+
+A$1,234.56
+A$1,234.56
+
+€1,234.56
+€1,234.56

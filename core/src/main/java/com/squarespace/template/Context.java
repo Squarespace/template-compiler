@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.api.CLocale;
 
 
 /**
@@ -54,6 +55,8 @@ public class Context {
   private Locale javaLocale;
 
   private CLDR.Locale cldrLocale = DEFAULT_LOCALE;
+
+  private com.squarespace.cldrengine.CLDR cldrengine;
 
   private Compiler compiler;
 
@@ -93,14 +96,14 @@ public class Context {
   private StringBuilder buf;
 
   public Context(JsonNode node) {
-    this(node, new StringBuilder(), Locale.getDefault());
+    this(node, new StringBuilder(), Locale.US);
   }
 
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
     this.currentFrame = new Frame(null, node == null ? MissingNode.getInstance() : node);
     this.buf = buf == null ? new StringBuilder() : buf;
     this.javaLocale = locale == null ? Locale.getDefault() : locale;
-    // this.cldrLocale = ??? TODO: replace with lookup
+    this.cldrengine = com.squarespace.cldrengine.CLDR.get(this.javaLocale.toLanguageTag());
   }
 
   public boolean safeExecutionEnabled() {
@@ -121,6 +124,22 @@ public class Context {
 
   public CLDR.Locale cldrLocale() {
     return cldrLocale;
+  }
+
+  public com.squarespace.cldrengine.CLDR cldr() {
+    return cldrengine;
+  }
+
+  public void cldrengine(com.squarespace.cldrengine.CLDR cldr) {
+    this.cldrengine = cldr;
+  }
+
+  public void cldrengine(String id) {
+    this.cldrengine = com.squarespace.cldrengine.CLDR.get(id);
+  }
+
+  public void cldrengine(CLocale locale) {
+    this.cldrengine = com.squarespace.cldrengine.CLDR.get(locale);
   }
 
   /**

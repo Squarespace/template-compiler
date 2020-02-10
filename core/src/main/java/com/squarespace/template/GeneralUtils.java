@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.squarespace.cldrengine.api.Decimal;
 
 
 /**
@@ -73,6 +74,26 @@ public class GeneralUtils {
     }
     return n;
   }
+
+  /**
+   * Convert an opaque JSON node to Decimal using the most correct
+   * conversion method.
+   */
+  public static Decimal nodeToDecimal(JsonNode node) {
+    JsonNodeType type = node.getNodeType();
+    if (type == JsonNodeType.NUMBER) {
+      return numericToDecimal((NumericNode)node);
+
+    } else {
+      try {
+        return new Decimal(node.asText());
+      } catch (ArithmeticException | NumberFormatException e) {
+        // Fall through..
+      }
+    }
+    return null;
+  }
+
   /**
    * Convert an opaque JSON node to BigDecimal using the most correct
    * conversion method.
@@ -90,6 +111,25 @@ public class GeneralUtils {
       }
     }
     return null;
+  }
+
+  /**
+   * Convert a numeric JSON node to Decimal using the most correct
+   * conversion method.
+   */
+  private static Decimal numericToDecimal(NumericNode node) {
+    switch (node.numberType()) {
+      case INT:
+      case LONG:
+        return Decimal.coerce(node.asLong());
+      case FLOAT:
+      case DOUBLE:
+        return Decimal.coerce(node.asDouble());
+      case BIG_DECIMAL:
+      case BIG_INTEGER:
+      default:
+        return Decimal.coerce(node.decimalValue().toString());
+    }
   }
 
   /**

@@ -15,19 +15,13 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldr.numbers.CurrencyFormatStyle.ACCOUNTING;
-import static com.squarespace.cldr.numbers.CurrencyFormatStyle.CODE;
-import static com.squarespace.cldr.numbers.CurrencyFormatStyle.NAME;
-import static com.squarespace.cldr.numbers.CurrencyFormatStyle.SHORT;
-import static com.squarespace.cldr.numbers.CurrencyFormatStyle.SYMBOL;
-
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.numbers.CurrencyFormatOptions;
-import com.squarespace.cldr.numbers.CurrencySymbolWidth;
-import com.squarespace.cldr.numbers.NumberFormatter;
+import com.squarespace.cldrengine.CLDR;
+import com.squarespace.cldrengine.api.CurrencyFormatOptions;
+import com.squarespace.cldrengine.api.CurrencyFormatStyleType;
+import com.squarespace.cldrengine.api.CurrencySymbolWidthType;
+import com.squarespace.cldrengine.api.CurrencyType;
+import com.squarespace.cldrengine.api.Decimal;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -48,7 +42,6 @@ import com.squarespace.template.plugins.platform.CommerceUtils;
  *
  *   style:<name>     - pattern style:  symbol, accounting, name, code, short
  *   symbol:<type>    - currency symbol width: default, narrow
- *   mode:<name>      - formatting mode: default, significant, significant-maxfrac
  *   round:<name>     - rounding mode: default, ceil, floor, truncate
  *   group            - if present this enables digit grouping
  *   no-group         - if present this disables digit grouping
@@ -98,20 +91,24 @@ public class MoneyFormatter extends BaseFormatter {
       }
     }
 
-    CLDR.Currency code = CLDR.Currency.fromString(currency.asText());
+    CLDR cldr = ctx.cldr();
+    if (cldr == null) {
+      var.setMissing();
+      return;
+    }
+
+    String code = currency.asText();
     if (code == null) {
       var.setMissing();
       return;
     }
 
-    BigDecimal decimalValue = GeneralUtils.nodeToBigDecimal(decimal);
+    Decimal decimalValue = GeneralUtils.nodeToDecimal(decimal);
+    CurrencyType _currency = CurrencyType.fromString(code);
 
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
-    CLDR.Locale locale = ctx.cldrLocale();
-    NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
-    StringBuilder buf = new StringBuilder();
-    fmt.formatCurrency(decimalValue, code, buf, opts);
-    var.set(buf);
+    String result = cldr.Numbers.formatCurrency(decimalValue, _currency, opts);
+    var.set(result);
   }
 
   private CurrencyFormatOptions parseOptions(Arguments args) {
@@ -128,50 +125,18 @@ public class MoneyFormatter extends BaseFormatter {
       }
 
       if (arg.equals("style")) {
-        switch (value) {
-          case "accounting":
-            opts.setStyle(ACCOUNTING);
-            break;
-
-          case "code":
-            opts.setStyle(CODE);
-            break;
-
-          case "name":
-            opts.setStyle(NAME);
-            break;
-
-          case "short":
-            opts.setStyle(SHORT);
-            break;
-
-          case "symbol":
-          case "standard":
-            opts.setStyle(SYMBOL);
-            break;
-
-          default:
-            break;
+        opts.style(CurrencyFormatStyleType.fromString(value));
+        if (!opts.style.ok() && "standard".equals(value)) {
+          opts.style(CurrencyFormatStyleType.SYMBOL);
         }
-        continue;
 
       } else if (arg.equals("symbol")) {
-        switch (value) {
-          case "default":
-            opts.setSymbolWidth(CurrencySymbolWidth.DEFAULT);
-            break;
+        opts.symbolWidth(CurrencySymbolWidthType.fromString(value));
 
-          case "narrow":
-            opts.setSymbolWidth(CurrencySymbolWidth.NARROW);
-            break;
-
-          default:
-            break;
-        }
-        continue;
+      } else {
+        DecimalFormatter.setNumberOption(arg, value, opts);
       }
 
-      DecimalFormatter.setNumberOption(arg, value, opts);
     }
     return opts;
   }

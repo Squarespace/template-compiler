@@ -1,0 +1,48 @@
+:JSON
+{
+	"timestamps": [
+		1581361671000
+	]
+}
+
+:TEMPLATE
+{.repeated section timestamps}
+{@|datetime}
+{@|datetime MMMMd}
+{@|datetime MMMd}
+{@|datetime date:MMM}
+{@|datetime date:MMMMd}
+{@|datetime date:MMMd}
+{@|datetime date:d}
+{@|datetime date:full}
+{@|datetime date:long}
+{@|datetime date:long time:hmv}
+{@|datetime date:medium}
+{@|datetime date:short}
+{@|datetime date:yMMMEd}
+{@|datetime time:hm}
+{@|datetime y}
+{@|datetime yMMMM}
+{@|datetime yMMMd}
+{@|datetime yMMMd hm}
+{.end}
+
+:OUTPUT
+February 10, 2020
+February 10
+Feb 10
+Feb
+February 10
+Feb 10
+10
+Monday, February 10, 2020
+February 10, 2020
+February 10, 2020 at 2:07 PM ET
+Feb 10, 2020
+2/10/20
+Mon, Feb 10, 2020
+2:07 PM
+2020
+February 2020
+Feb 10, 2020
+Feb 10, 2020, 2:07 PM

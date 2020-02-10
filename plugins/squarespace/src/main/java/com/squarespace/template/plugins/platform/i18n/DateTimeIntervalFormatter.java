@@ -16,13 +16,10 @@
 
 package com.squarespace.template.plugins.platform.i18n;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.dates.CalendarFormatter;
-import com.squarespace.cldr.dates.DateTimeIntervalSkeleton;
+import com.squarespace.cldrengine.CLDR;
+import com.squarespace.cldrengine.api.CalendarDate;
+import com.squarespace.cldrengine.api.ContextType;
+import com.squarespace.cldrengine.api.DateIntervalFormatOptions;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -44,6 +41,9 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
+    DateIntervalFormatOptions options = DateIntervalFormatOptions.build();
+    setDateIntervalFormatOptions(options, args);
+    args.setOpaque(options);
   }
 
   @Override
@@ -53,34 +53,55 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
       return;
     }
 
-    String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
-    ZoneId zoneId = ZoneId.of(tzName);
+    Variable v1 = variables.get(0);
+    Variable v2 = variables.get(1);
 
-    Variable first = variables.first();
-    if (first.node().asLong() == 0) {
-      first.setMissing();
+    CLDR cldr = ctx.cldr();
+    if (cldr == null) {
+      v1.set("");
       return;
     }
 
-    ZonedDateTime start = parse(first, zoneId);
-    ZonedDateTime end = parse(variables.get(1), zoneId);
+    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+    CalendarDate start = cldr.Calendars.toGregorianDate(v1.node().asLong(0), zoneId);
+    CalendarDate end = cldr.Calendars.toGregorianDate(v2.node().asLong(0), zoneId);
+    DateIntervalFormatOptions options = (DateIntervalFormatOptions) args.getOpaque();
+    String result = cldr.Calendars.formatDateInterval(start, end, options);
+    v1.set(result);
+  }
 
-    DateTimeIntervalSkeleton skeleton = null;
-    if (!args.isEmpty()) {
-      String skel = args.first();
-      skeleton = DateTimeIntervalSkeleton.fromString(skel);
+  private static void setDateIntervalFormatOptions(DateIntervalFormatOptions options, Arguments args) {
+    for (String arg : args.getArgs()) {
+      int i = arg.indexOf(':');
+      if (i == -1) {
+        switch (arg) {
+          case "context":
+          case "skeleton":
+          case "date":
+          case "time":
+            break;
+          default:
+            options.skeleton(arg);
+            break;
+        }
+        continue;
+      }
+      String key = arg.substring(0, i);
+      String val = arg.substring(i + 1);
+      switch (key) {
+        case "context":
+          options.context(ContextType.fromString(val));
+          break;
+        case "skeleton":
+          options.skeleton(val);
+          break;
+        case "date":
+          options.date(val);
+          break;
+        case "time":
+          options.time(val);
+          break;
+      }
     }
-
-    CLDR.Locale locale = ctx.cldrLocale();
-    CalendarFormatter formatter = CLDR.get().getCalendarFormatter(locale);
-    StringBuilder buffer = new StringBuilder();
-    formatter.format(start, end, skeleton, buffer);
-    first.set(buffer);
   }
-
-  private ZonedDateTime parse(Variable var, ZoneId zoneId) {
-    long instant = var.node().asLong();
-    return ZonedDateTime.ofInstant(Instant.ofEpochMilli(instant), zoneId);
-  }
-
 }

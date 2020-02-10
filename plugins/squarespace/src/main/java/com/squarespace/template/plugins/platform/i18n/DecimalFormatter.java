@@ -15,15 +15,14 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import java.math.BigDecimal;
+import static com.squarespace.cldrengine.utils.StringUtils.isEmpty;
 
-import com.squarespace.cldr.CLDR;
-import com.squarespace.cldr.numbers.DecimalFormatOptions;
-import com.squarespace.cldr.numbers.DecimalFormatStyle;
-import com.squarespace.cldr.numbers.NumberFormatMode;
-import com.squarespace.cldr.numbers.NumberFormatOptions;
-import com.squarespace.cldr.numbers.NumberFormatter;
-import com.squarespace.cldr.numbers.NumberRoundMode;
+import com.squarespace.cldrengine.CLDR;
+import com.squarespace.cldrengine.api.Decimal;
+import com.squarespace.cldrengine.api.DecimalFormatOptions;
+import com.squarespace.cldrengine.api.DecimalFormatStyleType;
+import com.squarespace.cldrengine.api.NumberFormatOptions;
+import com.squarespace.cldrengine.api.RoundingModeType;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -41,7 +40,6 @@ import com.squarespace.template.Variables;
  *
  *   style:<name>     - pattern style:  decimal, short, long, percent, permille
  *                                      percent-scaled, permille-scaled
- *   mode:<name>      - formatting mode: default, significant, significant-maxfrac
  *   round:<name>     - rounding mode: default, ceil, floor, truncate
  *   group            - if present this enables digit grouping
  *
@@ -74,26 +72,29 @@ public class DecimalFormatter extends BaseFormatter {
   @Override
   public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
     Variable var = variables.first();
-    BigDecimal number = GeneralUtils.nodeToBigDecimal(var.node());
+    Decimal number = GeneralUtils.nodeToDecimal(var.node());
     if (number == null) {
       var.setMissing();
       return;
     }
 
+    CLDR cldr = ctx.cldr();
+    if (cldr == null) {
+      var.set("");
+      return;
+    }
+
     DecimalFormatOptions opts = (DecimalFormatOptions) args.getOpaque();
-    CLDR.Locale locale = ctx.cldrLocale();
-    NumberFormatter fmt = CLDR.get().getNumberFormatter(locale);
-    StringBuilder buf = new StringBuilder();
-    fmt.formatDecimal(number, buf, opts);
-    var.set(buf);
+    String result = cldr.Numbers.formatDecimal(number, opts);
+    var.set(result);
   }
 
   private DecimalFormatOptions parseOptions(Arguments args) {
     DecimalFormatOptions opts = new DecimalFormatOptions();
     int count = args.count();
-    String value = "";
     for (int i = 0; i < count; i++) {
       String arg = args.get(i);
+      String value = "";
       int index = arg.indexOf(':');
       if (index != -1) {
         value = arg.substring(index + 1);
@@ -101,43 +102,10 @@ public class DecimalFormatter extends BaseFormatter {
       }
 
       if (arg.equals("style")) {
-        switch (value) {
-          case "percent":
-            opts.setStyle(DecimalFormatStyle.PERCENT);
-            break;
-
-          case "percent-scaled":
-            opts.setStyle(DecimalFormatStyle.PERCENT_SCALED);
-            break;
-
-          case "permille":
-            opts.setStyle(DecimalFormatStyle.PERMILLE);
-            break;
-
-          case "permille-scaled":
-            opts.setStyle(DecimalFormatStyle.PERMILLE_SCALED);
-            break;
-
-          case "short":
-            opts.setStyle(DecimalFormatStyle.SHORT);
-            break;
-
-          case "long":
-            opts.setStyle(DecimalFormatStyle.LONG);
-            break;
-
-          case "standard":
-          case "decimal":
-            opts.setStyle(DecimalFormatStyle.DECIMAL);
-            break;
-
-          default:
-            break;
-        }
-        continue;
+        opts.style(DecimalFormatStyleType.fromString(value));
+      } else {
+        setNumberOption(arg, value, opts);
       }
-
-      setNumberOption(arg, value, opts);
     }
     return opts;
   }
@@ -145,85 +113,63 @@ public class DecimalFormatter extends BaseFormatter {
   /**
    * Interprets common options for DecimalFormatter and CurrencyFormatter.
    */
-  protected static void setNumberOption(String arg, String value, NumberFormatOptions<?> opts) {
+  protected static void setNumberOption(String arg, String value, NumberFormatOptions opts) {
     switch (arg) {
       case "group":
       case "grouping":
-        opts.setGrouping(true);
+        opts.group(isEmpty(value) || value.equals("true"));
         break;
 
       case "no-group":
       case "no-grouping":
-        opts.setGrouping(false);
-        break;
-
-      case "mode":
-        switch (value) {
-          case "significant":
-            opts.setFormatMode(NumberFormatMode.SIGNIFICANT);
-            break;
-
-          case "significant-maxfrac":
-          case "significant-maxFrac":
-            opts.setFormatMode(NumberFormatMode.SIGNIFICANT_MAXFRAC);
-            break;
-
-          case "default":
-          case "fractions":
-            opts.setFormatMode(NumberFormatMode.DEFAULT);
-            break;
-
-          default:
-            break;
-        }
+        opts.group(false);
         break;
 
       case "round":
       case "rounding":
+        RoundingModeType mode = null;
         switch (value) {
           case "ceil":
-            opts.setRoundMode(NumberRoundMode.CEIL);
+            mode = RoundingModeType.CEILING;
             break;
-
-          case "truncate": opts.setRoundMode(NumberRoundMode.TRUNCATE); break;
-
-          case "floor":
-            opts.setRoundMode(NumberRoundMode.FLOOR);
+          case "truncate":
+            mode = RoundingModeType.DOWN;
             break;
-
-          case "round":
-          case "default":
-          case "half-even":
-            opts.setRoundMode(NumberRoundMode.ROUND);
-
           default:
+            mode = RoundingModeType.fromString(value);
             break;
         }
+        opts.round(mode);
         break;
 
       case "minint":
       case "minInt":
-        opts.setMinimumIntegerDigits(clamp(toInt(value), 0, CLAMP_MAX));
+      case "minimumIntegerDigits":
+        opts.minimumIntegerDigits(clamp(toInt(value), 0, CLAMP_MAX));
         break;
 
       case "maxfrac":
       case "maxFrac":
-        opts.setMaximumFractionDigits(clamp(toInt(value), 0, CLAMP_MAX));
+      case "maximumFractionDigits":
+        opts.maximumFractionDigits(clamp(toInt(value), 0, CLAMP_MAX));
         break;
 
       case "minfrac":
       case "minFrac":
-        opts.setMinimumFractionDigits(clamp(toInt(value), 0, CLAMP_MAX));
+      case "minimumFractionDigits":
+        opts.minimumFractionDigits(clamp(toInt(value), 0, CLAMP_MAX));
         break;
 
       case "maxsig":
       case "maxSig":
-        opts.setMaximumSignificantDigits(clamp(toInt(value), 1, CLAMP_MAX));
+      case "maximumSignificantDigits":
+        opts.maximumSignificantDigits(clamp(toInt(value), 0, CLAMP_MAX));
         break;
 
       case "minsig":
       case "minSig":
-        opts.setMinimumSignificantDigits(clamp(toInt(value), 1, CLAMP_MAX));
+      case "minimumSignificantDigits":
+        opts.minimumSignificantDigits(clamp(toInt(value), 0, CLAMP_MAX));
         break;
 
       default:
