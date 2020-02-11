@@ -161,7 +161,8 @@ public class UnitUtils {
       return;
     }
 
-    DecimalFormatter.setNumberOption(arg, value, opts);
+    // TODO: fixme
+//    DecimalFormatter.setNumberOption(arg, value, opts);
   }
 
 }

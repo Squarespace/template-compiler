@@ -102,8 +102,7 @@ public class Context {
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
     this.currentFrame = new Frame(null, node == null ? MissingNode.getInstance() : node);
     this.buf = buf == null ? new StringBuilder() : buf;
-    this.javaLocale = locale == null ? Locale.getDefault() : locale;
-    this.cldrengine = com.squarespace.cldrengine.CLDR.get(this.javaLocale.toLanguageTag());
+    this.javaLocale = locale == null ? Locale.US : locale;
   }
 
   public boolean safeExecutionEnabled() {
@@ -127,6 +126,13 @@ public class Context {
   }
 
   public com.squarespace.cldrengine.CLDR cldr() {
+    if (cldrengine == null) {
+      String tag = this.javaLocale.toLanguageTag();
+      if (this.cldrLocale != null) {
+        tag = this.cldrLocale.expanded();
+      }
+      this.cldrengine = com.squarespace.cldrengine.CLDR.get(tag);
+    }
     return cldrengine;
   }
 

@@ -48,8 +48,13 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
     String json = "{\"decimalValue\": \"-15789.12\", \"currencyCode\": \"USD\"}";
     String template = "{@|money style:short mode:significant}";
 
-    assertEquals(executeLocale(template, json, CLDR.Locale.fr), "-15,8 k $US");
-    assertEquals(executeLocale(template, json, CLDR.Locale.en_US), "-$15.8K");
+    assertEquals(executeLocale(template, json, CLDR.Locale.fr), "-16 k $US");
+    assertEquals(executeLocale(template, json, CLDR.Locale.en_US), "-$16K");
+
+    // German compact forms omit the "XXX Tsd." form because the compact form using
+    // "Tsd." does not end up producing a shorter string than the full formatted
+    // amount, e.g. "15.789 $" vs "15 Tsd. $" - This is a decision made at the CLDR level.
+    assertEquals(executeLocale(template, json, CLDR.Locale.de_DE), "-15.789 $");
   }
 
   private String executeLocale(String template, String json, CLDR.Locale locale) throws CodeException {

@@ -114,10 +114,10 @@ public class MoneyFormatter extends BaseFormatter {
   private CurrencyFormatOptions parseOptions(Arguments args) {
     CurrencyFormatOptions opts = new CurrencyFormatOptions();
     int count = args.count();
-    String value = "";
     for (int i = 0; i < count; i++) {
       String arg = args.get(i);
 
+      String value = "";
       int index = arg.indexOf(':');
       if (index != -1) {
         value = arg.substring(index + 1);
