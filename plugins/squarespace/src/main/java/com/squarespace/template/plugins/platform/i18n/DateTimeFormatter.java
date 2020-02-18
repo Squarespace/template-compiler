@@ -140,13 +140,15 @@ public class DateTimeFormatter extends BaseFormatter {
               options.datetime(format);
             }
           } else {
-            copySkel(options, val);
+            // add skeleton fields
+            String skel = options.skeleton.get();
+            options.skeleton(skel == null ? val : skel + val);
           }
           break;
         }
 
         case "skeleton":
-          copySkel(options, val);
+          options.skeleton(val);
           break;
 
         case "wrap":
@@ -167,24 +169,24 @@ public class DateTimeFormatter extends BaseFormatter {
    * if any date, time, or datetime options were already set. If so,
    * convert them into skeletons and append.
    */
-  private static final void copySkel(DateFormatOptions opts, String val) {
-    String skel = opts.skeleton.get();
-    skel = skel == null ? val : skel + val;
-    if (opts.date.ok()) {
-      skel += skelFromDate(opts.date.get());
-    }
-    if (opts.time.ok()) {
-      skel += skelFromTime(opts.time.get());
-    }
-    if (opts.datetime.ok()) {
-      FormatWidthType type = opts.datetime.get();
-      skel += skelFromDate(type) + skelFromTime(type);
-    }
-    opts.skeleton(skel);
-    opts.date.clear();
-    opts.time.clear();
-    opts.datetime.clear();
-  }
+//  private static final void copySkel(DateFormatOptions opts, String val) {
+//    String skel = opts.skeleton.get();
+//    skel = skel == null ? val : skel + val;
+//    if (opts.date.ok()) {
+//      skel += skelFromDate(opts.date.get());
+//    }
+//    if (opts.time.ok()) {
+//      skel += skelFromTime(opts.time.get());
+//    }
+//    if (opts.datetime.ok()) {
+//      FormatWidthType type = opts.datetime.get();
+//      skel += skelFromDate(type) + skelFromTime(type);
+//    }
+//    opts.skeleton(skel);
+//    opts.date.clear();
+//    opts.time.clear();
+//    opts.datetime.clear();
+//  }
 
   private static final String skelFromDate(FormatWidthType type) {
     if (type != null) {

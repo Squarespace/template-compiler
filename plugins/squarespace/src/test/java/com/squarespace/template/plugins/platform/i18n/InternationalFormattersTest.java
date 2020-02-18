@@ -74,7 +74,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
     // DEFAULTING
 
-    assertEquals(format(en_US, DATETIME, mk.args(" xyz foo"), json), "11/2/2017");
+    assertEquals(format(en_US, DATETIME, mk.args(" xyz foo"), json), "2017, 14:26 EDT");
 
     // ENGLISH
 
@@ -110,7 +110,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
         "jeudi 2 novembre 2017 à 14:26");
 
     assertEquals(format(fr, DATETIME, mk.args(" time:hm date:short"), json), "02/11/2017 2:26 PM");
-    assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:hm"), json), "2 nov. 2017 2:26 PM");
+    assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:hm"), json), "2 nov. 2017 à 2:26 PM");
 
     assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
         "2 nov. 2017 14:26:57");
