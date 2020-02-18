@@ -121,14 +121,14 @@ public class GeneralUtils {
     switch (node.numberType()) {
       case INT:
       case LONG:
-        return Decimal.coerce(node.asLong());
+        return new Decimal(node.asLong());
       case FLOAT:
       case DOUBLE:
-        return Decimal.coerce(node.asDouble());
+        return new Decimal(node.asDouble());
       case BIG_DECIMAL:
       case BIG_INTEGER:
       default:
-        return Decimal.coerce(node.decimalValue().toString());
+        return new Decimal(node.decimalValue().toString());
     }
   }
 
