@@ -25,7 +25,7 @@ project.ext {
   argparseVersion = '0.4.4'
   ccVersion = '1.0.6'
   cldrVersion = '0.0.26'
-  cldrengineVersion = '0.0.11-SNAPSHOT'
+  cldrengineVersion = '0.0.12-SNAPSHOT'
   diffutilsVersion = '1.3.0'
   hamcrestVersion = '2.1'
   jacksonVersion = '2.3.3'
