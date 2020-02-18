@@ -54,7 +54,7 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
   public void testDecimal() {
     runner.run(
         "f-decimal-1.html",
-        "f-decimal-2.html",
+        // f-decimal-2 defunct
         "f-decimal-3.html"
     );
   }
@@ -62,31 +62,35 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testArguments() {
     String args = " ";
-    run(en_US, "8915.34567", " style:decimal", "8915.346");
-    run(en_US, "8915.34567", " style:percent", "891535%");
-    run(en_US, "8915.34567", " style:permille", "8915346‰");
+    run(en_US, "8915.34567", " style:decimal", "8,915.346");
+    run(en_US, "8915.34567", " style:percent", "891,535%");
+    run(en_US, "8915.34567", " style:permille", "8,915,346‰");
     run(en_US, "8915.34567", " style:short", "8.9K");
     run(en_US, "8915.34567", " style:long", "8.9 thousand");
-
-    args = " mode:significant";
     run(en_US, "89.34567", args, "89.346");
 
-    args += " minimumSignificantDigits: 1 maxSig:6";
+    args += " minimumSignificantDigits:1 maxSig:6";
     run(en_US, "89.34567", args, "89.3457");
   }
 
   @Test
   public void testRounding() {
-    String args = " style:decimal round:truncate minFrac:2";
+    String args;
+
+    args = " style:decimal round:truncate minFrac:2 maxFrac:2";
     run(en_US, "1.2345", args, "1.23");
     run(en_US, "1.5999", args, "1.59");
+
+    args = " style:decimal round:truncate minFrac:2";
+    run(en_US, "1.2345", args, "1.234");
+    run(en_US, "1.5999", args, "1.599");
 
     args = " style:decimal round:floor minFrac:2";
-    run(en_US, "1.2345", args, "1.23");
-    run(en_US, "1.5999", args, "1.59");
+    run(en_US, "1.2345", args, "1.234");
+    run(en_US, "1.5999", args, "1.599");
 
     args = " style:decimal round:half-even minFrac:2";
-    run(en_US, "1.2345", args, "1.23");
+    run(en_US, "1.2345", args, "1.234");
     run(en_US, "1.5999", args, "1.60");
   }
 
@@ -105,7 +109,7 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(es, "0", args, "0");
     run(es, "1", args, "1");
     run(es, "3.59", args, "3,59");
-    run(es, "1200", args, "1.200");
+    run(es, "1200", args, "1200");
     run(es, "-15789.12", args, "-15.789,12");
     run(es, "99999", args, "99.999");
     run(es, "-100200300.40", args, "-100.200.300,4");
@@ -118,7 +122,7 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(en_US, "10000000001", args, "10000000001");
 
     args = " style:decimal minFrac:4";
-    run(en_US, "-15789.12", args, "-15789.1200");
+    run(en_US, "-15789.12", args, "-15,789.1200");
 
     args = " style:decimal minInt:5 no-group";
     run(en_US, "123.45", args, "00123.45");
@@ -135,23 +139,23 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
 
   @Test
   public void testShort() {
-    String args = " style:short mode:significant";
+    String args = " style:short";
     run(en_US, "0", args, "0");
     run(en_US, "1", args, "1");
     run(en_US, "3.59", args, "3.6");
     run(en_US, "1200", args, "1.2K");
-    run(en_US, "-15789.12", args, "-15.8K");
+    run(en_US, "-15789.12", args, "-16K");
     run(en_US, "99999", args, "100K");
-    run(en_US, "-100200300.40", args, "-100.2M");
+    run(en_US, "-100200300.40", args, "-100M");
     run(en_US, "10000000001", args, "10B");
 
     run(de, "0", args, "0");
     run(de, "1", args, "1");
     run(de, "3.59", args, "3,6");
-    run(de, "1200", args, "1,2 Tsd.");
-    run(de, "-15789.12", args, "-15,8 Tsd.");
-    run(de, "99999", args, "100 Tsd.");
-    run(de, "-100200300.40", args, "-100,2 Mio.");
+    run(de, "1200", args, "1.200");
+    run(de, "-15789.12", args, "-15.789");
+    run(de, "99999", args, "99.999");
+    run(de, "-100200300.40", args, "-100 Mio.");
     run(de, "10000000001", args, "10 Mrd.");
 
     args += " minSig:3 maxSig:4";
@@ -173,9 +177,9 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(en_US, "3.59", args, "3.6");
     run(en_US, "1200", args, "1.2 thousand");
     run(en_US, "2000", args, "2 thousand");
-    run(en_US, "-15789.12", args, "-15.8 thousand");
+    run(en_US, "-15789.12", args, "-16 thousand");
     run(en_US, "99999", args, "100 thousand");
-    run(en_US, "-100200300.40", args, "-100.2 million");
+    run(en_US, "-100200300.40", args, "-100 million");
     run(en_US, "10000000001", args, "10 billion");
 
     run(fr, "0", args, "0");
@@ -183,9 +187,9 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(fr, "3.59", args, "3,6");
     run(fr, "1200", args, "1,2 millier");
     run(fr, "2000", args, "2 mille");
-    run(fr, "-15789.12", args, "-15,8 mille");
+    run(fr, "-15789.12", args, "-16 mille");
     run(fr, "99999", args, "100 mille");
-    run(fr, "-100200300.40", args, "-100,2 millions");
+    run(fr, "-100200300.40", args, "-100 millions");
     run(fr, "10000000001", args, "10 milliards");
 
     args += " minSig:3 maxSig:4";
@@ -209,9 +213,9 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     run(fr, "-100200300.40", args, "-100,2 millions");
     run(fr, "10000000001", args, "10,0 milliards");
 
-    args = " style:long mode:significant-maxfrac minSig:1 maxFrac:2";
-    run(en_US, "3.59", args, "3.59");
-    run(en_US, "3.519", args, "3.52");
+    args = " style:long minSig:2";
+    run(en_US, "3.59", args, "3.6");
+    run(en_US, "3.519", args, "3.5");
     run(en_US, "3.5999", args, "3.6");
   }
 
