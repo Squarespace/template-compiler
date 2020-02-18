@@ -29,11 +29,4 @@ public class MigrationTests  extends PlatformUnitTestBase {
         "f-migrate-money-1.html"
     );
   }
-
-  @Test
-  public void testProductPrice() {
-    runner.run(
-        "f-migrate-product-price-1.html"
-    );
-  }
 }

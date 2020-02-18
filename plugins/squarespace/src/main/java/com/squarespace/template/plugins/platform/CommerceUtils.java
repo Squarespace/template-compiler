@@ -18,7 +18,6 @@ package com.squarespace.template.plugins.platform;
 
 import static com.squarespace.template.GeneralUtils.isTruthy;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -31,7 +30,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.api.Decimal;
+import com.squarespace.cldrengine.decimal.DecimalConstants;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
@@ -49,7 +49,7 @@ public class CommerceUtils {
 
   private static final String DEFAULT_CURRENCY = "USD";
 
-  private static final BigDecimal DEFAULT_MONEY_AMOUNT = new BigDecimal(0);
+  private static final Decimal DEFAULT_MONEY_AMOUNT = DecimalConstants.ZERO;
 
   private static final JsonNode DEFAULT_MONEY_NODE = new ObjectMapper()
       .createObjectNode()
@@ -116,15 +116,15 @@ public class CommerceUtils {
         JsonNode moneyNode = isTruthy(first.path("onSale"))
             ? first.path("salePriceMoney")
             : first.path("priceMoney");
-        BigDecimal price = getAmountFromMoneyNode(moneyNode);
+        Decimal price = getAmountFromMoneyNode(moneyNode);
         for (int i = 1; i < variants.size(); i++) {
           JsonNode var = variants.get(i);
           JsonNode currentMoneyNode = isTruthy(var.path("onSale"))
               ? var.path("salePriceMoney")
               : var.path("priceMoney");
 
-          BigDecimal current = getAmountFromMoneyNode(currentMoneyNode);
-          if (current.compareTo(price) < 0) {
+          Decimal current = getAmountFromMoneyNode(currentMoneyNode);
+          if (current.compare(price) < 0) {
             price = current;
             moneyNode = currentMoneyNode;
           }
@@ -153,11 +153,11 @@ public class CommerceUtils {
           return DEFAULT_MONEY_NODE;
         }
         JsonNode moneyNode = variants.get(0).path("priceMoney");
-        BigDecimal price = getAmountFromMoneyNode(moneyNode);
+        Decimal price = getAmountFromMoneyNode(moneyNode);
         for (int i = 1; i < variants.size(); i++) {
           JsonNode currMoneyNode = variants.get(i).path("priceMoney");
-          BigDecimal curr = getAmountFromMoneyNode(currMoneyNode);
-          if (curr.compareTo(price) > 0) {
+          Decimal curr = getAmountFromMoneyNode(currMoneyNode);
+          if (curr.compare(price) > 0) {
             price = curr;
             moneyNode = currMoneyNode;
           }
@@ -183,13 +183,13 @@ public class CommerceUtils {
         if (variants.size() == 0) {
           return DEFAULT_MONEY_NODE;
         }
-        BigDecimal salePrice = null;
+        Decimal salePrice = null;
         JsonNode salePriceNode = null;
         for (int i = 0; i < variants.size(); i++) {
           JsonNode variant = variants.path(i);
           JsonNode priceMoney = variant.path("salePriceMoney");
-          BigDecimal price = getAmountFromMoneyNode(priceMoney);
-          if (isTruthy(variant.path("onSale")) && (salePriceNode == null || price.compareTo(salePrice) < 0)) {
+          Decimal price = getAmountFromMoneyNode(priceMoney);
+          if (isTruthy(variant.path("onSale")) && (salePriceNode == null || price.compare(salePrice) < 0)) {
             salePrice = price;
             salePriceNode = priceMoney;
           }
@@ -208,9 +208,9 @@ public class CommerceUtils {
     }
   }
 
-  public static BigDecimal getAmountFromMoneyNode(JsonNode moneyNode) {
+  public static Decimal getAmountFromMoneyNode(JsonNode moneyNode) {
     String value = StringUtils.trimToNull(moneyNode.path("value").asText());
-    return value == null ? DEFAULT_MONEY_AMOUNT : new BigDecimal(value);
+    return value == null ? DEFAULT_MONEY_AMOUNT : new Decimal(value);
   }
 
   public static String getCurrencyFromMoneyNode(JsonNode moneyNode) {
@@ -218,9 +218,9 @@ public class CommerceUtils {
     return currency == null ? DEFAULT_CURRENCY : currency;
   }
 
-  public static double getLegacyPriceFromMoneyNode(JsonNode moneyNode) {
-    BigDecimal price = getAmountFromMoneyNode(moneyNode);
-    return price.movePointRight(2).doubleValue();
+  public static Decimal getLegacyPriceFromMoneyNode(JsonNode moneyNode) {
+    Decimal price = getAmountFromMoneyNode(moneyNode);
+    return price.movePoint(2);
   }
 
   public static double getTotalStockRemaining(JsonNode item) {
@@ -334,7 +334,7 @@ public class CommerceUtils {
   /**
    * Format money using legacy currency formatter
    */
-  public static void writeLegacyMoneyString(double value, StringBuilder buf) {
+  public static void writeLegacyMoneyString(Decimal value, StringBuilder buf) {
     String formatted = PluginUtils.formatMoney(value, Locale.US);
     buf.append("<span class=\"sqs-money-native\">").append(formatted).append("</span>");
   }
@@ -342,9 +342,9 @@ public class CommerceUtils {
   /**
    * Format money using CLDR currency formatter
    */
-  public static String getCLDRMoneyString(BigDecimal amount, String currencyCode, CLDR.Locale locale) {
-    return PluginUtils.formatMoney(amount, currencyCode, locale);
-  }
+//  public static String getCLDRMoneyString(BigDecimal amount, String currencyCode, CLDR.Locale locale) {
+//    return PluginUtils.formatMoney(amount, currencyCode, locale);
+//  }
 
   public static void writeVariantFormat(JsonNode variant, StringBuilder buf) {
     ArrayNode optionValues = (ArrayNode) variant.get("optionValues");

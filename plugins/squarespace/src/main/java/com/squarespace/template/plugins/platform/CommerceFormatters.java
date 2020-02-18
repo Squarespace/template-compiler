@@ -20,7 +20,6 @@ import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.getOrDefault;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -33,7 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.api.Decimal;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeException;
@@ -139,7 +138,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      double subtotalCents = var.node().path("subtotalCents").doubleValue();
+      Decimal subtotalCents = new Decimal(var.node().path("subtotalCents").asText());
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-subtotal\">");
@@ -175,8 +174,8 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable item = variables.first();
       JsonNode moneyNode = CommerceUtils.getLowestPriceAmongVariants(item.node());
-      double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
-      item.set(legacyPrice);
+      Decimal legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      item.set(legacyPrice.toString());
     }
   };
 
@@ -193,7 +192,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      double value = var.node().asDouble();
+      Decimal value = new Decimal(var.node().asText());
       var.set(PluginUtils.formatMoney(value, Locale.US));
     }
   }
@@ -248,7 +247,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      double value = var.node().asDouble();
+      Decimal value = new Decimal(var.node().asText());
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeLegacyMoneyString(value, buf);
       var.set(buf);
@@ -287,8 +286,8 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable item = variables.first();
       JsonNode moneyNode = CommerceUtils.getHighestPriceAmongVariants(item.node());
-      double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
-      item.set(legacyPrice);
+      Decimal legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      item.set(legacyPrice.toString());
     }
   }
 
@@ -470,12 +469,11 @@ public class CommerceFormatters implements FormatterRegistry {
 
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {
       if (CommerceUtils.useCLDRMode(ctx)) {
-        BigDecimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
+        Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
         String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
-        CLDR.Locale locale = ctx.cldrLocale();
-        return CommerceUtils.getCLDRMoneyString(amount, currencyCode, locale);
+        return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
       } else {
-        double legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+        Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
         StringBuilder buf = new StringBuilder();
         CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
         return buf.toString();
@@ -600,8 +598,8 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode moneyNode = CommerceUtils.getSalePriceMoneyNode(var.node());
-      double legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
-      var.set(legacyPrice);
+      Decimal legacyPrice = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      var.set(legacyPrice.toString());
     }
   }
 
