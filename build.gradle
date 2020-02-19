@@ -29,7 +29,7 @@ project.ext {
   hamcrestVersion = '2.1'
   jacksonVersion = '2.3.3'
   jsonunitVersion = '1.25.0'
-  snifferVersion = '1.15'
+  snifferVersion = '1.16'
   testngVersion = '6.14.3'
   zjsonVersion = '0.3.6'
 
