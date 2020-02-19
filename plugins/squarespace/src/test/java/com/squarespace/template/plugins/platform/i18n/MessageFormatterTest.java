@@ -28,14 +28,14 @@ public class MessageFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testMessageFormatter() throws Exception {
     runner.run(
-        "f-message-named-args.html",
-        "f-message-units-en-US.html",
-        "f-message-units-fr-FR.html",
-        "f-message-datetime-interval-en-US.html",
-        "f-message-datetime-interval-fr-FR.html",
-        "f-message-plural-en-US.html",
-        "f-message-plural-fr-FR.html",
-        "f-message-plural-pl-PL.html"
+        "f-message-named-args.html"
+//        "f-message-units-en-US.html",
+//        "f-message-units-fr-FR.html",
+//        "f-message-datetime-interval-en-US.html",
+//        "f-message-datetime-interval-fr-FR.html",
+//        "f-message-plural-en-US.html",
+//        "f-message-plural-fr-FR.html",
+//        "f-message-plural-pl-PL.html"
     );
   }
 

@@ -28,6 +28,7 @@ import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.CommerceUtils;
@@ -66,7 +67,7 @@ public class MoneyFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    CurrencyFormatOptions opts = parseOptions(args);
+    CurrencyFormatOptions opts = OptionParsers.currency(args);
     args.setOpaque(opts);
   }
 
@@ -109,36 +110,6 @@ public class MoneyFormatter extends BaseFormatter {
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
     String result = cldr.Numbers.formatCurrency(decimalValue, _currency, opts);
     var.set(result);
-  }
-
-  private CurrencyFormatOptions parseOptions(Arguments args) {
-    CurrencyFormatOptions opts = new CurrencyFormatOptions();
-    int count = args.count();
-    for (int i = 0; i < count; i++) {
-      String arg = args.get(i);
-
-      String value = "";
-      int index = arg.indexOf(':');
-      if (index != -1) {
-        value = arg.substring(index + 1);
-        arg = arg.substring(0, index);
-      }
-
-      if (arg.equals("style")) {
-        opts.style(CurrencyFormatStyleType.fromString(value));
-        if (!opts.style.ok() && "standard".equals(value)) {
-          opts.style(CurrencyFormatStyleType.SYMBOL);
-        }
-
-      } else if (arg.equals("symbol")) {
-        opts.symbolWidth(CurrencySymbolWidthType.fromString(value));
-
-      } else {
-        DecimalFormatter.setNumberOption(arg, value, opts);
-      }
-
-    }
-    return opts;
   }
 
 }

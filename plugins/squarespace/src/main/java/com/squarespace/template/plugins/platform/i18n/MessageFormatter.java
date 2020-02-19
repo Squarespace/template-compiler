@@ -18,15 +18,16 @@ package com.squarespace.template.plugins.platform.i18n;
 import static com.squarespace.template.GeneralUtils.splitVariable;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squarespace.cldrengine.messageformat.evaluation.MessageArgs;
+import com.squarespace.cldrengine.api.MessageArgs;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.Frame;
-import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.MessageFormats;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.plugins.PluginDateUtils;
 
 
 /**
@@ -47,19 +48,14 @@ public class MessageFormatter extends BaseFormatter {
     Variable var = variables.first();
     JsonNode node = var.node();
 
+    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
     MessageArgs msgargs = messageArgs(args, ctx);
+    MessageFormats formats = ctx.messageFormatter();
+    formats.setTimeZone(zoneId);
 
-    // TODO:
-
-//    MessageArgs msgArgs = (MessageArgs) args.getOpaque();
-//    msgArgs.resetArgs();
-//    setContext(msgArgs, ctx);
-//    String message = node.asText();
-//    String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
-//    MessageFormat msgFormat = new MessageFormat(ctx.cldrLocale(), ZoneId.of(tzName), message);
-//    StringBuilder buf = new StringBuilder();
-//    msgFormat.format(msgArgs, buf);
-//    var.set(buf);
+    String message = node.asText();
+    String result = formats.formatter().format(message, msgargs);
+    var.set(result);
   }
 
   private static MessageArgs messageArgs(Arguments args, Context ctx) {

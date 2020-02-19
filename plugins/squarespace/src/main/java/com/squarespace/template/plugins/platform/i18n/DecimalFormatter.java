@@ -15,20 +15,16 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldrengine.utils.StringUtils.isEmpty;
-
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.Decimal;
 import com.squarespace.cldrengine.api.DecimalFormatOptions;
-import com.squarespace.cldrengine.api.DecimalFormatStyleType;
-import com.squarespace.cldrengine.api.NumberFormatOptions;
-import com.squarespace.cldrengine.api.RoundingModeType;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
+import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 
@@ -56,16 +52,13 @@ import com.squarespace.template.Variables;
  */
 public class DecimalFormatter extends BaseFormatter {
 
-  // Arbitrary value just to have an upper limit.
-  private static final int CLAMP_MAX = 50;
-
   public DecimalFormatter() {
     super("decimal", false);
   }
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    DecimalFormatOptions opts = parseOptions(args);
+    DecimalFormatOptions opts = OptionParsers.decimal(args);
     args.setOpaque(opts);
   }
 
@@ -87,102 +80,6 @@ public class DecimalFormatter extends BaseFormatter {
     DecimalFormatOptions opts = (DecimalFormatOptions) args.getOpaque();
     String result = cldr.Numbers.formatDecimal(number, opts);
     var.set(result);
-  }
-
-  private DecimalFormatOptions parseOptions(Arguments args) {
-    DecimalFormatOptions opts = new DecimalFormatOptions();
-    int count = args.count();
-    for (int i = 0; i < count; i++) {
-      String arg = args.get(i);
-      String value = "";
-      int index = arg.indexOf(':');
-      if (index != -1) {
-        value = arg.substring(index + 1);
-        arg = arg.substring(0, index);
-      }
-
-      if (arg.equals("style")) {
-        opts.style(DecimalFormatStyleType.fromString(value));
-      } else {
-        setNumberOption(arg, value, opts);
-      }
-    }
-    return opts;
-  }
-
-  /**
-   * Interprets common options for DecimalFormatter and CurrencyFormatter.
-   */
-  protected static void setNumberOption(String arg, String value, NumberFormatOptions opts) {
-    switch (arg) {
-      case "group":
-      case "grouping":
-        opts.group(isEmpty(value) || value.equals("true"));
-        break;
-
-      case "no-group":
-      case "no-grouping":
-        opts.group(false);
-        break;
-
-      case "round":
-      case "rounding":
-        RoundingModeType mode = null;
-        switch (value) {
-          case "ceil":
-            mode = RoundingModeType.CEILING;
-            break;
-          case "truncate":
-            mode = RoundingModeType.DOWN;
-            break;
-          default:
-            mode = RoundingModeType.fromString(value);
-            break;
-        }
-        opts.round(mode);
-        break;
-
-      case "minint":
-      case "minInt":
-      case "minimumIntegerDigits":
-        opts.minimumIntegerDigits(clamp(toInt(value), 0, CLAMP_MAX));
-        break;
-
-      case "maxfrac":
-      case "maxFrac":
-      case "maximumFractionDigits":
-        opts.maximumFractionDigits(clamp(toInt(value), 0, CLAMP_MAX));
-        break;
-
-      case "minfrac":
-      case "minFrac":
-      case "minimumFractionDigits":
-        opts.minimumFractionDigits(clamp(toInt(value), 0, CLAMP_MAX));
-        break;
-
-      case "maxsig":
-      case "maxSig":
-      case "maximumSignificantDigits":
-        opts.maximumSignificantDigits(clamp(toInt(value), 0, CLAMP_MAX));
-        break;
-
-      case "minsig":
-      case "minSig":
-      case "minimumSignificantDigits":
-        opts.minimumSignificantDigits(clamp(toInt(value), 0, CLAMP_MAX));
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  private static int toInt(String v) {
-    return (int) GeneralUtils.toLong(v, 0, v.length());
-  }
-
-  private static int clamp(int value, int min, int max) {
-    return value < min ? min : (value > max ? max : value);
   }
 
 }

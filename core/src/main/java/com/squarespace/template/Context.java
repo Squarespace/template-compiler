@@ -58,6 +58,8 @@ public class Context {
 
   private com.squarespace.cldrengine.CLDR cldrengine;
 
+  private MessageFormats messageformats;
+
   private Compiler compiler;
 
   private Frame currentFrame;
@@ -132,6 +134,13 @@ public class Context {
 //  public CLDR.Locale cldrLocale() {
 //    return cldrLocale;
 //  }
+
+  public MessageFormats messageFormatter() {
+    if (this.messageformats == null) {
+      this.messageformats = new MessageFormats(this.cldr());
+    }
+    return this.messageformats;
+  }
 
   public com.squarespace.cldrengine.CLDR cldr() {
     if (cldrengine == null) {

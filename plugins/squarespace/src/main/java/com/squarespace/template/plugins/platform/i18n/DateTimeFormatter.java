@@ -15,14 +15,13 @@ package com.squarespace.template.plugins.platform.i18n;
 
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CalendarDate;
-import com.squarespace.cldrengine.api.ContextType;
 import com.squarespace.cldrengine.api.DateFormatOptions;
-import com.squarespace.cldrengine.api.FormatWidthType;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginDateUtils;
@@ -71,8 +70,7 @@ public class DateTimeFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    DateFormatOptions options = new DateFormatOptions();
-    setDateFormatOptions(options, args);
+    DateFormatOptions options = OptionParsers.datetime(args);
     args.setOpaque(options);
   }
 
@@ -82,86 +80,10 @@ public class DateTimeFormatter extends BaseFormatter {
     long epoch = var.node().asLong();
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
     CLDR cldr = ctx.cldr();
-    if (cldr == null) {
-      var.set("");
-      return;
-    }
     DateFormatOptions options = (DateFormatOptions) args.getOpaque();
     CalendarDate date = cldr.Calendars.toGregorianDate(epoch, zoneId);
     String result = cldr.Calendars.formatDate(date, options);
     var.set(result);
-  }
-
-  private static void setDateFormatOptions(DateFormatOptions options, Arguments args) {
-    for (String arg : args.getArgs()) {
-      int i = arg.indexOf(':');
-      if (i == -1) {
-        switch (arg) {
-          case "date":
-            options.date(FormatWidthType.SHORT);
-            break;
-
-          case "time":
-            options.time(FormatWidthType.SHORT);
-            break;
-
-          default:
-            FormatWidthType format = FormatWidthType.fromString(arg);
-            if (format != null) {
-              options.datetime(format);
-            } else {
-              // add skeleton fields
-              String skel = options.skeleton.get();
-              options.skeleton(skel == null ? arg : skel + arg);
-            }
-            break;
-        }
-        continue;
-      }
-
-      String key = arg.substring(0, i);
-      String val = arg.substring(i + 1);
-
-      switch (key) {
-        case "context":
-          options.context(ContextType.fromString(val));
-          break;
-
-        case "date":
-        case "time":
-        case "datetime": {
-          FormatWidthType format = FormatWidthType.fromString(val);
-          if (format != null) {
-            if (key.equals("date")) {
-              options.date(format);
-            } else if (key.equals("time")) {
-              options.time(format);
-            } else {
-              options.datetime(format);
-            }
-          } else {
-            // add skeleton fields
-            String skel = options.skeleton.get();
-            options.skeleton(skel == null ? val : skel + val);
-          }
-          break;
-        }
-
-        case "skeleton":
-          options.skeleton(val);
-          break;
-
-        case "wrap":
-        case "wrapper":
-        case "wrapped": {
-          options.wrap(FormatWidthType.fromString(val));
-          break;
-        }
-
-        default:
-          break;
-      }
-    }
   }
 
 }

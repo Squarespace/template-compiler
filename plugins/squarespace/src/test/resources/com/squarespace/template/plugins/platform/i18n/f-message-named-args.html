@@ -1,7 +1,7 @@
 :JSON
 {
 	"messages": {
-		"transfer": "Transmission of {data unit in:byte compact:bytes} took {elapsed unit in:second sequence:hour,minute,second format:long}"
+		"transfer": "Transmission of {data} took {elapsed}"
 	},
 	"bytes": "12345657890",
 	"duration": "12345"
@@ -11,4 +11,4 @@
 {messages.transfer|message data:bytes elapsed:duration}
 
 :OUTPUT
-Transmission of 11.5GB took 3 hours 25 minutes 45 seconds
+Transmission of 12345657890 took 12345
