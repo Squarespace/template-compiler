@@ -141,6 +141,21 @@ public class MessageFormatsTest {
     assertEquals(actual, "February 19, 2020 at 11:29:35 AM");
   }
 
+  @Test
+  public void testInterval() {
+    String actual;
+    CLDR cldr = CLDR.get("en");
+    MessageFormats formats = new MessageFormats(cldr);
+    formats.setTimeZone("America/New_York");
+    String message = "{0;1 datetime-interval}";
+    long epoch = 1582129775000L;
+
+    long extra = 86400000 + 3600000;
+    MessageArgs args = args().add(new LongNode(epoch)).add(new LongNode(epoch + extra));
+    actual = formats.formatter().format(message, args);
+    assertEquals(actual, "Feb 19 – 20, 2020");
+  }
+
   private ObjectNode money(String value, String currency) {
     ObjectNode o = JsonUtils.createObjectNode();
     o.put("decimalValue", value);

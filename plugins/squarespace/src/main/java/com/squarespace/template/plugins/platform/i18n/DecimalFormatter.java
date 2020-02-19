@@ -72,11 +72,6 @@ public class DecimalFormatter extends BaseFormatter {
     }
 
     CLDR cldr = ctx.cldr();
-    if (cldr == null) {
-      var.set("");
-      return;
-    }
-
     DecimalFormatOptions opts = (DecimalFormatOptions) args.getOpaque();
     String result = cldr.Numbers.formatDecimal(number, opts);
     var.set(result);

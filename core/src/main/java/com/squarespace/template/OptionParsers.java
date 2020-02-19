@@ -4,11 +4,14 @@ import static com.squarespace.cldrengine.utils.StringUtils.isEmpty;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.squarespace.cldrengine.api.ContextType;
 import com.squarespace.cldrengine.api.CurrencyFormatOptions;
 import com.squarespace.cldrengine.api.CurrencyFormatStyleType;
 import com.squarespace.cldrengine.api.CurrencySymbolWidthType;
 import com.squarespace.cldrengine.api.DateFormatOptions;
+import com.squarespace.cldrengine.api.DateIntervalFormatOptions;
 import com.squarespace.cldrengine.api.DecimalFormatOptions;
 import com.squarespace.cldrengine.api.DecimalFormatStyleType;
 import com.squarespace.cldrengine.api.FormatWidthType;
@@ -25,7 +28,10 @@ public class OptionParsers {
   }
 
   public static DecimalFormatOptions decimal(List<String> args) {
-    DecimalFormatOptions opts = new DecimalFormatOptions();
+    DecimalFormatOptions options = new DecimalFormatOptions();
+    if (args == null) {
+      return options;
+    }
     int count = args.size();
     for (int i = 0; i < count; i++) {
       String arg = args.get(i);
@@ -37,12 +43,15 @@ public class OptionParsers {
       }
 
       if (arg.equals("style")) {
-        opts.style(DecimalFormatStyleType.fromString(value));
+        options.style(DecimalFormatStyleType.fromString(value));
+        if (!options.style.ok() && "standard".equals(value)) {
+          options.style(DecimalFormatStyleType.DECIMAL);
+        }
       } else {
-        numberOption(arg, value, opts);
+        numberOption(arg, value, options);
       }
     }
-    return opts;
+    return options;
   }
 
   public static CurrencyFormatOptions currency(Arguments args) {
@@ -50,13 +59,16 @@ public class OptionParsers {
   }
 
   public static CurrencyFormatOptions currency(List<String> args) {
-    CurrencyFormatOptions opts = new CurrencyFormatOptions();
+    CurrencyFormatOptions options = new CurrencyFormatOptions();
+    if (args == null) {
+      return options;
+    }
     int count = args.size();
     for (int i = 0; i < count; i++) {
       String arg = args.get(i);
-      currencyOption(arg, opts);
+      currencyOption(arg, options);
     }
-    return opts;
+    return options;
   }
 
   public static void currencyOption(String arg, CurrencyFormatOptions opts) {
@@ -155,6 +167,9 @@ public class OptionParsers {
 
   public static DateFormatOptions datetime(List<String> args) {
     DateFormatOptions options = DateFormatOptions.build();
+    if (args == null) {
+      return options;
+    }
     for (String arg : args) {
       int i = arg.indexOf(':');
       if (i == -1) {
@@ -227,6 +242,51 @@ public class OptionParsers {
     return options;
   }
 
+  public static DateIntervalFormatOptions datetimeInterval(Arguments args) {
+    return interval(args.getArgs());
+  }
+
+  public static DateIntervalFormatOptions interval(List<String> args) {
+    DateIntervalFormatOptions options = DateIntervalFormatOptions.build();
+    if (args == null) {
+      return options;
+    }
+    for (String arg : args) {
+      int i = arg.indexOf(':');
+      if (i == -1) {
+        switch (arg) {
+          case "context":
+          case "skeleton":
+          case "date":
+          case "time":
+            break;
+          default:
+            if (!StringUtils.isEmpty(arg)) {
+              options.skeleton(arg);
+            }
+            break;
+        }
+        continue;
+      }
+      String key = arg.substring(0, i);
+      String val = arg.substring(i + 1);
+      switch (key) {
+        case "context":
+          options.context(ContextType.fromString(val));
+          break;
+        case "skeleton":
+          options.skeleton(val);
+          break;
+        case "date":
+          options.date(val);
+          break;
+        case "time":
+          options.time(val);
+          break;
+      }
+    }
+    return options;
+  }
 
   private static int toInt(String v) {
     return (int) GeneralUtils.toLong(v, 0, v.length());

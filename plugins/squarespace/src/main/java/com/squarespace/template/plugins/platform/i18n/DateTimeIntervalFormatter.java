@@ -18,13 +18,13 @@ package com.squarespace.template.plugins.platform.i18n;
 
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CalendarDate;
-import com.squarespace.cldrengine.api.ContextType;
 import com.squarespace.cldrengine.api.DateIntervalFormatOptions;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginDateUtils;
@@ -41,8 +41,7 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    DateIntervalFormatOptions options = DateIntervalFormatOptions.build();
-    setDateIntervalFormatOptions(options, args);
+    DateIntervalFormatOptions options = OptionParsers.datetimeInterval(args);
     args.setOpaque(options);
   }
 
@@ -70,38 +69,5 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
     v1.set(result);
   }
 
-  private static void setDateIntervalFormatOptions(DateIntervalFormatOptions options, Arguments args) {
-    for (String arg : args.getArgs()) {
-      int i = arg.indexOf(':');
-      if (i == -1) {
-        switch (arg) {
-          case "context":
-          case "skeleton":
-          case "date":
-          case "time":
-            break;
-          default:
-            options.skeleton(arg);
-            break;
-        }
-        continue;
-      }
-      String key = arg.substring(0, i);
-      String val = arg.substring(i + 1);
-      switch (key) {
-        case "context":
-          options.context(ContextType.fromString(val));
-          break;
-        case "skeleton":
-          options.skeleton(val);
-          break;
-        case "date":
-          options.date(val);
-          break;
-        case "time":
-          options.time(val);
-          break;
-      }
-    }
-  }
+
 }

@@ -122,18 +122,19 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testDateTimeFieldFormatter() throws Exception {
-    String json = "1509647217000";
-    CodeMaker mk = maker();
-
-    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" dd"), json), "02");
-    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" MMMM"), json), "November");
-    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" EEE"), json), "Thu");
-    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" EEEE"), json), "Thursday");
-
-    assertEquals(format(fr, DATETIMEFIELD, mk.args(" dd"), json), "02");
-    assertEquals(format(fr, DATETIMEFIELD, mk.args(" MMMM"), json), "novembre");
-    assertEquals(format(fr, DATETIMEFIELD, mk.args(" EEE"), json), "jeu.");
-    assertEquals(format(fr, DATETIMEFIELD, mk.args(" EEEE"), json), "jeudi");
+    // DEPRECATED
+//    String json = "1509647217000";
+//    CodeMaker mk = maker();
+//
+//    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" dd"), json), "02");
+//    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" MMMM"), json), "November");
+//    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" EEE"), json), "Thu");
+//    assertEquals(format(en_US, DATETIMEFIELD, mk.args(" EEEE"), json), "Thursday");
+//
+//    assertEquals(format(fr, DATETIMEFIELD, mk.args(" dd"), json), "02");
+//    assertEquals(format(fr, DATETIMEFIELD, mk.args(" MMMM"), json), "novembre");
+//    assertEquals(format(fr, DATETIMEFIELD, mk.args(" EEE"), json), "jeu.");
+//    assertEquals(format(fr, DATETIMEFIELD, mk.args(" EEEE"), json), "jeudi");
   }
 
   @Test

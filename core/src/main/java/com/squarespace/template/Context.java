@@ -29,7 +29,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CLocale;
 
 
@@ -44,8 +44,6 @@ import com.squarespace.cldrengine.api.CLocale;
  */
 public class Context {
 
-  private static final CLDR.Locale DEFAULT_LOCALE = CLDR.Locale.en_US;
-
   private static final JsonNode DEFAULT_UNDEFINED = MissingNode.getInstance();
 
   private static final String META_LEFT = "{";
@@ -54,9 +52,7 @@ public class Context {
 
   private Locale javaLocale;
 
-  private CLDR.Locale cldrLocale;
-
-  private com.squarespace.cldrengine.CLDR cldrengine;
+  private CLDR cldrengine;
 
   private MessageFormats messageformats;
 
@@ -142,7 +138,7 @@ public class Context {
     return this.messageformats;
   }
 
-  public com.squarespace.cldrengine.CLDR cldr() {
+  public CLDR cldr() {
     if (cldrengine == null) {
       String tag = javaLocale != null ? this.javaLocale.toLanguageTag() : "en-US";
       this.cldrengine = com.squarespace.cldrengine.CLDR.get(tag);
@@ -150,16 +146,16 @@ public class Context {
     return cldrengine;
   }
 
-  public void cldrengine(com.squarespace.cldrengine.CLDR cldr) {
+  public void cldrengine(CLDR cldr) {
     this.cldrengine = cldr;
   }
 
   public void cldrengine(String id) {
-    this.cldrengine = com.squarespace.cldrengine.CLDR.get(id);
+    this.cldrengine = CLDR.get(id);
   }
 
   public void cldrengine(CLocale locale) {
-    this.cldrengine = com.squarespace.cldrengine.CLDR.get(locale);
+    this.cldrengine = CLDR.get(locale);
   }
 
   /**

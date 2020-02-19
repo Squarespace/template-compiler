@@ -18,8 +18,6 @@ package com.squarespace.template.plugins.platform.i18n;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CurrencyFormatOptions;
-import com.squarespace.cldrengine.api.CurrencyFormatStyleType;
-import com.squarespace.cldrengine.api.CurrencySymbolWidthType;
 import com.squarespace.cldrengine.api.CurrencyType;
 import com.squarespace.cldrengine.api.Decimal;
 import com.squarespace.template.Arguments;
@@ -93,11 +91,6 @@ public class MoneyFormatter extends BaseFormatter {
     }
 
     CLDR cldr = ctx.cldr();
-    if (cldr == null) {
-      var.setMissing();
-      return;
-    }
-
     String code = currency.asText();
     if (code == null) {
       var.setMissing();

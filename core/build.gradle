@@ -7,7 +7,6 @@ description = 'Template compiler core'
 
 dependencies {
   compile "com.squarespace.compiler:compiler-core:${ccVersion}"
-  compile "com.squarespace.cldr:cldr-runtime:${cldrVersion}"
   compile "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
   compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
   compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"

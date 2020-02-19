@@ -9,6 +9,7 @@ import com.squarespace.cldrengine.api.CalendarDate;
 import com.squarespace.cldrengine.api.CurrencyFormatOptions;
 import com.squarespace.cldrengine.api.CurrencyType;
 import com.squarespace.cldrengine.api.DateFormatOptions;
+import com.squarespace.cldrengine.api.DateIntervalFormatOptions;
 import com.squarespace.cldrengine.api.Decimal;
 import com.squarespace.cldrengine.api.DecimalFormatOptions;
 import com.squarespace.cldrengine.api.MessageArgConverter;
@@ -53,8 +54,10 @@ public class MessageFormats {
 
   private MessageFormatFuncMap formatters() {
     MessageFormatFuncMap map = new MessageFormatFuncMap();
+    map.put("money", this::currency);
     map.put("currency", this::currency);
     map.put("datetime", this::datetime);
+    map.put("datetime-interval", this::interval);
     map.put("number", this::decimal);
     map.put("decimal", this::decimal);
     return map;
@@ -100,6 +103,22 @@ public class MessageFormats {
     Decimal value = this.converter.asDecimal(node);
     DecimalFormatOptions opts = OptionParsers.decimal(options);
     return cldr.Numbers.formatDecimal(value, opts);
+  }
+
+  /**
+   * Datetime interval message formatter.
+   */
+  private String interval(List<Object> args, List<String> options) {
+    if (args.size() < 2) {
+      return "";
+    }
+
+    JsonNode v1 = (JsonNode) args.get(0);
+    JsonNode v2 = (JsonNode) args.get(1);
+    CalendarDate start = cldr.Calendars.toGregorianDate(v1.asLong(0), zoneId);
+    CalendarDate end = cldr.Calendars.toGregorianDate(v2.asLong(0), zoneId);
+    DateIntervalFormatOptions opts = OptionParsers.interval(options);
+    return cldr.Calendars.formatDateInterval(start, end, opts);
   }
 
   private static class ArgConverter extends DefaultMessageArgConverter {

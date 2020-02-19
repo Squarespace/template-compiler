@@ -15,16 +15,16 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldr.CLDR.Locale.en_US;
 import static org.testng.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.api.CurrencyType;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
@@ -48,21 +48,21 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
     String json = "{\"decimalValue\": \"-15789.12\", \"currencyCode\": \"USD\"}";
     String template = "{@|money style:short mode:significant}";
 
-    assertEquals(executeLocale(template, json, CLDR.Locale.fr), "-16 k $US");
-    assertEquals(executeLocale(template, json, CLDR.Locale.en_US), "-$16K");
+    assertEquals(executeLocale(template, json, "fr"), "-16 k $US");
+    assertEquals(executeLocale(template, json, "en-US"), "-$16K");
 
     // German compact forms omit the "XXX Tsd." form because the compact form using
     // "Tsd." does not end up producing a shorter string than the full formatted
     // amount, e.g. "15.789 $" vs "15 Tsd. $" - This is a decision made at the CLDR level.
-    assertEquals(executeLocale(template, json, CLDR.Locale.de_DE), "-15.789 $");
+    assertEquals(executeLocale(template, json, "de-DE"), "-15.789 $");
   }
 
-  private String executeLocale(String template, String json, CLDR.Locale locale) throws CodeException {
+  private String executeLocale(String template, String json, String locale) throws CodeException {
     Compiler compiler = compiler();
     Context ctx = compiler.newExecutor()
         .json(json)
         .template(template)
-        .cldrLocale(locale)
+        .locale(Locale.forLanguageTag(locale))
         .execute();
     return ctx.buffer().toString();
   }
@@ -70,66 +70,66 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
   @Test
   public void testBasics() {
     String args = " style:accounting group";
-    run(en_US, usd("23.98"), args, "$23.98");
-    run(en_US, usd("-1551.75"), args, "($1,551.75)");
+    run("en-US", usd("23.98"), args, "$23.98");
+    run("en-US", usd("-1551.75"), args, "($1,551.75)");
 
     args = " style:name mode:significant-maxfrac minSig:1";
-    run(en_US, usd("1"), args, "1 US dollar");
-    run(en_US, usd("-1551.75"), args, "-1,551.75 US dollars");
-    run(en_US, usd(big("-1551.75")), args, "-1,551.75 US dollars");
+    run("en-US", usd("1"), args, "1 US dollar");
+    run("en-US", usd("-1551.75"), args, "-1,551.75 US dollars");
+    run("en-US", usd(big("-1551.75")), args, "-1,551.75 US dollars");
 
-    run(en_US, eur("1"), args, "1 euro");
-    run(en_US, eur("-1551.75"), args, "-1,551.75 euros");
-    run(en_US, eur(big("-1551.75")), args, "-1,551.75 euros");
+    run("en-US", eur("1"), args, "1 euro");
+    run("en-US", eur("-1551.75"), args, "-1,551.75 euros");
+    run("en-US", eur(big("-1551.75")), args, "-1,551.75 euros");
   }
 
   @Test
   public void testLong() {
     String args = " style:name mode:significant group minSig:1";
-    run(en_US, usd("0.00"), args, "0 US dollars");
-    run(en_US, usd("1.00"), args, "1 US dollar");
-    run(en_US, usd("3.59"), args, "3.59 US dollars");
-    run(en_US, usd("1200"), args, "1,200 US dollars");
-    run(en_US, usd("-15789.12"), args, "-15,789.12 US dollars");
-    run(en_US, usd("99999.00"), args, "99,999 US dollars");
-    run(en_US, usd("-100200300.40"), args, "-100,200,300.4 US dollars");
-    run(en_US, usd("10000000001.00"), args, "10,000,000,001 US dollars");
+    run("en-US", usd("0.00"), args, "0 US dollars");
+    run("en-US", usd("1.00"), args, "1 US dollar");
+    run("en-US", usd("3.59"), args, "3.59 US dollars");
+    run("en-US", usd("1200"), args, "1,200 US dollars");
+    run("en-US", usd("-15789.12"), args, "-15,789.12 US dollars");
+    run("en-US", usd("99999.00"), args, "99,999 US dollars");
+    run("en-US", usd("-100200300.40"), args, "-100,200,300.4 US dollars");
+    run("en-US", usd("10000000001.00"), args, "10,000,000,001 US dollars");
   }
 
   @Test
   public void testSignificantDigits() {
     String args = " style:short";
-    run(en_US, usd("-1551.75"), args, "-$1.6K");
+    run("en-US", usd("-1551.75"), args, "-$1.6K");
 
     args = " style:short mode:significant-maxfrac maxfrac:0";
-    run(en_US, usd("-1551.75"), args, "-$2K");
+    run("en-US", usd("-1551.75"), args, "-$2K");
 
     args = " style:short mode:significant maxSig:3";
-    run(en_US, usd("-1551.75"), args, "-$1.55K");
+    run("en-US", usd("-1551.75"), args, "-$1.55K");
 
     args = " style:short mode:significant maxSig:4";
-    run(en_US, usd("-1551.75"), args, "-$1.552K");
+    run("en-US", usd("-1551.75"), args, "-$1.552K");
   }
 
   @Test
   public void testFractionDigits() {
     String args = " style:short mode:fractions minFrac:2";
-    run(en_US, usd("-1551.75"), args, "-$1.55K");
-    run(en_US, eur("-1551.75"), args, "-€1.55K");
+    run("en-US", usd("-1551.75"), args, "-$1.55K");
+    run("en-US", eur("-1551.75"), args, "-€1.55K");
 
     args = " style:short mode:fractions minFrac:3";
-    run(en_US, usd("-1551.75"), args, "-$1.552K");
-    run(en_US, eur("-1551.75"), args, "-€1.552K");
+    run("en-US", usd("-1551.75"), args, "-$1.552K");
+    run("en-US", eur("-1551.75"), args, "-€1.552K");
   }
 
   @Test
   public void testIntegerDigits() {
     String args = " minInt:4";
-    run(en_US, usd("1.57"), args, "$0,001.57");
-    run(en_US, usd("1.57"), args, "$0,001.57");
+    run("en-US", usd("1.57"), args, "$0,001.57");
+    run("en-US", usd("1.57"), args, "$0,001.57");
 
     args = " style:code minInt:4";
-    run(en_US, usd("1.57"), args, "0,001.57 USD");
+    run("en-US", usd("1.57"), args, "0,001.57 USD");
   }
 
   private static BigDecimal big(String n) {
@@ -137,29 +137,29 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
   }
 
   private static String usd(String n) {
-    return money(n, CLDR.Currency.USD);
+    return money(n, CurrencyType.USD);
   }
 
   private static String eur(String n) {
-    return money(n, CLDR.Currency.EUR);
+    return money(n, CurrencyType.EUR);
   }
 
   private static String usd(BigDecimal n) {
-    return money(n, CLDR.Currency.USD);
+    return money(n, CurrencyType.USD);
   }
 
   private static String eur(BigDecimal n) {
-    return money(n, CLDR.Currency.EUR);
+    return money(n, CurrencyType.EUR);
   }
 
-  private static String money(BigDecimal n, CLDR.Currency code) {
-    ObjectNode m = moneyBase(code.name());
+  private static String money(BigDecimal n, CurrencyType code) {
+    ObjectNode m = moneyBase(code.value());
     m.put("decimalValue", n);
     return m.toString();
   }
 
-  private static String money(String n, CLDR.Currency code) {
-    ObjectNode m = moneyBase(code.name());
+  private static String money(String n, CurrencyType code) {
+    ObjectNode m = moneyBase(code.value());
     m.put("decimalValue", n);
     return m.toString();
   }
@@ -170,7 +170,7 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
     return obj;
   }
 
-  private void run(CLDR.Locale locale, String json, String args, String expected) {
+  private void run(String locale, String json, String args, String expected) {
     try {
       String actual = format(locale, mk.args(args), json);
       Assert.assertEquals(actual, expected);
@@ -179,9 +179,9 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
     }
   }
 
-  private static String format(CLDR.Locale locale,  Arguments args, String json) throws CodeException {
+  private static String format(String locale,  Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
-    ctx.cldrLocale(locale);
+    ctx.javaLocale(Locale.forLanguageTag(locale));
     MONEY.validateArgs(args);
     Variables variables = new Variables("@", ctx.node());
     MONEY.apply(ctx, args, variables);
