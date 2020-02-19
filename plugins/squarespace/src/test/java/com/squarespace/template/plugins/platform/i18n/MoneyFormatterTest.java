@@ -15,16 +15,16 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldr.CLDR.Locale.en_US;
 import static org.testng.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.api.CurrencyType;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
@@ -40,6 +40,8 @@ import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
  */
 public class MoneyFormatterTest extends PlatformUnitTestBase {
 
+  private static final String en_US = "en-US";
+
   private static final MoneyFormatter MONEY = new MoneyFormatter();
   private final CodeMaker mk = maker();
 
@@ -49,16 +51,16 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
          + "\"website\": {\"useCLDRMoneyFormat\": true}}";
     String template = "{amt|money style:short mode:significant}";
 
-    assertEquals(executeLocale(template, json, CLDR.Locale.fr), "-16 k $US");
-    assertEquals(executeLocale(template, json, CLDR.Locale.en_US), "-$16K");
+    assertEquals(executeLocale(template, json, "fr"), "-16 k $US");
+    assertEquals(executeLocale(template, json, "en-US"), "-$16K");
   }
 
-  private String executeLocale(String template, String json, CLDR.Locale locale) throws CodeException {
+  private String executeLocale(String template, String json, String locale) throws CodeException {
     Compiler compiler = compiler();
     Context ctx = compiler.newExecutor()
         .json(json)
         .template(template)
-        .cldrLocale(locale)
+        .locale(Locale.forLanguageTag(locale))
         .execute();
     return ctx.buffer().toString();
   }
@@ -139,33 +141,33 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   }
 
   private static String usd(String n) {
-    return money(n, CLDR.Currency.USD, true);
+    return money(n, CurrencyType.USD, true);
   }
 
   private static String eur(String n) {
-    return money(n, CLDR.Currency.EUR, true);
+    return money(n, CurrencyType.EUR, true);
   }
 
   private static String usd(BigDecimal n) {
-    return money(n, CLDR.Currency.USD, true);
+    return money(n, CurrencyType.USD, true);
   }
 
   private static String eur(BigDecimal n) {
-    return money(n, CLDR.Currency.EUR, true);
+    return money(n, CurrencyType.EUR, true);
   }
 
   private static String usd(String n, boolean useCLDR) {
-    return money(n, CLDR.Currency.USD, useCLDR);
+    return money(n, CurrencyType.USD, useCLDR);
   }
 
-  private static String money(BigDecimal n, CLDR.Currency code, boolean useCLDR) {
+  private static String money(BigDecimal n, CurrencyType code, boolean useCLDR) {
     ObjectNode m = moneyBase(code.name(), useCLDR);
     m.put("value", n);
     return m.toString();
   }
 
-  private static String money(String n, CLDR.Currency code, boolean useCLDR) {
-    ObjectNode m = moneyBase(code.name(), useCLDR);
+  private static String money(String n, CurrencyType code, boolean useCLDR) {
+    ObjectNode m = moneyBase(code.value(), useCLDR);
     m.put("value", n);
     return m.toString();
   }
@@ -179,7 +181,7 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     return obj;
   }
 
-  private void run(CLDR.Locale locale, String json, String args, String expected) {
+  private void run(String locale, String json, String args, String expected) {
     try {
       String actual = format(locale, mk.args(args), json);
       Assert.assertEquals(actual, expected);
@@ -188,9 +190,9 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
     }
   }
 
-  private static String format(CLDR.Locale locale,  Arguments args, String json) throws CodeException {
+  private static String format(String locale,  Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
-    ctx.cldrLocale(locale);
+    ctx.javaLocale(Locale.forLanguageTag(locale));
     MONEY.validateArgs(args);
     Variables variables = new Variables("@", ctx.node());
     MONEY.apply(ctx, args, variables);

@@ -20,7 +20,6 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.cldr.CLDR;
 
 
 /**
@@ -36,7 +35,6 @@ public class CompilerExecutor {
   private ObjectNode injectablesMap;
   private StringBuilder buffer;
   private Locale locale;
-  private CLDR.Locale cldrLocale;
   private LoggingHook loggingHook;
   private CodeLimiter codeLimiter;
   private boolean safeExecution;
@@ -79,8 +77,8 @@ public class CompilerExecutor {
     if (codeLimiter != null) {
       ctx.setCodeLimiter(codeLimiter);
     }
-    if (cldrLocale != null) {
-      ctx.cldrLocale(cldrLocale);
+    if (locale != null) {
+      ctx.javaLocale(locale);
     }
 
     ctx.setMaxPartialDepth(maxPartialDepth);
@@ -167,14 +165,6 @@ public class CompilerExecutor {
    */
   public CompilerExecutor locale(Locale locale) {
     this.locale = locale;
-    return this;
-  }
-
-  /**
-   * CLDR locale to execute against, used by some formatters.
-   */
-  public CompilerExecutor cldrLocale(CLDR.Locale locale) {
-    this.cldrLocale = locale;
     return this;
   }
 

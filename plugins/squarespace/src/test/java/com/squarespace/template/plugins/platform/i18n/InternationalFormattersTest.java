@@ -16,15 +16,14 @@
 
 package com.squarespace.template.plugins.platform.i18n;
 
-import static com.squarespace.cldr.CLDR.Locale.en_US;
-import static com.squarespace.cldr.CLDR.Locale.fr;
 import static com.squarespace.template.GeneralUtils.listResources;
 import static org.testng.Assert.assertEquals;
+
+import java.util.Locale;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.squarespace.cldr.CLDR;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.CodeException;
@@ -40,6 +39,9 @@ import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.Da
 
 
 public class InternationalFormattersTest extends PlatformUnitTestBase {
+
+  private static final String en_US = "en-US";
+  private static final String fr = "fr";
 
 //  private static final String[] TESTED_CURRENCIES = {
 //      "AUD",
@@ -152,9 +154,8 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     }
   }
 
-  private String format(CLDR.Locale locale, Formatter impl, Arguments args, String json) throws CodeException {
-    Context ctx = new Context(JsonUtils.decode(json));
-    ctx.cldrLocale(locale);
+  private String format(String locale, Formatter impl, Arguments args, String json) throws CodeException {
+    Context ctx = new Context(JsonUtils.decode(json), Locale.forLanguageTag(locale));
     impl.validateArgs(args);
     Variables variables = new Variables("@", ctx.node());
     impl.apply(ctx, args, variables);

@@ -54,7 +54,7 @@ public class Context {
 
   private Locale javaLocale;
 
-  private CLDR.Locale cldrLocale = DEFAULT_LOCALE;
+  private CLDR.Locale cldrLocale;
 
   private com.squarespace.cldrengine.CLDR cldrengine;
 
@@ -96,7 +96,11 @@ public class Context {
   private StringBuilder buf;
 
   public Context(JsonNode node) {
-    this(node, new StringBuilder(), Locale.US);
+    this(node, new StringBuilder(), null);
+  }
+
+  public Context(JsonNode node, Locale locale) {
+    this(node, new StringBuilder(), locale);
   }
 
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
@@ -117,20 +121,21 @@ public class Context {
     return javaLocale;
   }
 
-  public void cldrLocale(CLDR.Locale locale) {
-    this.cldrLocale = locale;
+  public void javaLocale(Locale locale) {
+    this.javaLocale = locale;
   }
 
-  public CLDR.Locale cldrLocale() {
-    return cldrLocale;
-  }
+//  public void cldrLocale(CLDR.Locale locale) {
+//    this.cldrLocale = locale;
+//  }
+//
+//  public CLDR.Locale cldrLocale() {
+//    return cldrLocale;
+//  }
 
   public com.squarespace.cldrengine.CLDR cldr() {
     if (cldrengine == null) {
-      String tag = this.javaLocale.toLanguageTag();
-      if (this.cldrLocale != null) {
-        tag = this.cldrLocale.expanded();
-      }
+      String tag = javaLocale != null ? this.javaLocale.toLanguageTag() : "en-US";
       this.cldrengine = com.squarespace.cldrengine.CLDR.get(tag);
     }
     return cldrengine;

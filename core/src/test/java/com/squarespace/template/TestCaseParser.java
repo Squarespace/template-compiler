@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.cldr.CLDR;
+import com.squarespace.cldrengine.CLDR;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -158,9 +158,7 @@ public class TestCaseParser extends UnitTestBase {
         String locale = properties.getProperty("locale");
         if (locale != null) {
           java.util.Locale javaLocale = java.util.Locale.forLanguageTag(locale);
-          CLDR.Locale cldrLocale = CLDR.get().resolve(javaLocale);
           executor.locale(javaLocale);
-          executor.cldrLocale(cldrLocale);
         }
 
         Context ctx = executor.execute();

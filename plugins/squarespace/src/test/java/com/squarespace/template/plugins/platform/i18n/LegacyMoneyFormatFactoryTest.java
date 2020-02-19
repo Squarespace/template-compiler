@@ -16,14 +16,12 @@ import static com.squarespace.template.plugins.platform.i18n.LegacyMoneyFormatFa
 import static com.squarespace.template.plugins.platform.i18n.LegacyMoneyFormatFactory.STARTS_WITH_LETTER;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.cldr.CLDR;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
@@ -40,14 +38,18 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
   private static final Formatter LEGACY_MONEY = new LegacyMoneyFormatter();
   private final CodeMaker mk = maker();
 
-  private static final Map<String, CLDR.Locale> LOCALE_MAP = new HashMap<String, CLDR.Locale>() {{
-    put("de-DE", CLDR.Locale.de_DE);
-    put("en-UK", CLDR.Locale.en_GB);
-    put("en-US", CLDR.Locale.en_US);
-    put("es-US", CLDR.Locale.es_US);
-    put("fr-FR", CLDR.Locale.fr_FR);
-    put("sv-SE", CLDR.Locale.sv_SE);
-  }};
+//  private static final Map<String, CLDR.Locale> LOCALE_MAP = new HashMap<String, CLDR.Locale>() {{
+//    put("de-DE", CLDR.Locale.de_DE);
+//    put("en-UK", CLDR.Locale.en_GB);
+//    put("en-US", CLDR.Locale.en_US);
+//    put("es-US", CLDR.Locale.es_US);
+//    put("fr-FR", CLDR.Locale.fr_FR);
+//    put("sv-SE", CLDR.Locale.sv_SE);
+//  }};
+
+  private static final String[] LOCALES = new String[] {
+      "de-DE", "en-UK", "en-US", "es-US", "fr-FR", "sv-SE"
+  };
 
   private static final String[] CURRENCIES = new String[] {
       "AUD",
@@ -70,12 +72,12 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
   public void testCompatibility() throws Exception {
     System.out.printf("%-8s %-10s %15s %20s %20s\n", "LOCALE", "CURRENCY", "LEGACY", "CLDR (narrow)", "CLDR (std)");
     System.out.println("------------------------------------------------------------------------------");
-    for (String locale : LOCALE_MAP.keySet()) {
+    for (String locale : LOCALES) {
       for (String currency : CURRENCIES) {
         for (String n : NUMBERS) {
           String legacy = legacy(locale, currency, n);
-          String narrow = cldr(LOCALE_MAP.get(locale), currency, n, true);
-          String standard = cldr(LOCALE_MAP.get(locale), currency, n, false);
+          String narrow = cldr(locale, currency, n, true);
+          String standard = cldr(locale, currency, n, false);
           System.out.printf("%-8s %-10s %15s %20s %20s\n", locale, currency, legacy, narrow, standard);
         }
         System.out.println();
@@ -114,11 +116,11 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
     return variables.first().node().asText();
   }
 
-  private String cldr(CLDR.Locale locale, String currency, String number, boolean narrow) throws CodeException {
+  private String cldr(String tag, String currency, String number, boolean narrow) throws CodeException {
     Arguments args = mk.args(narrow ? " symbol:narrow" : " ");
     CLDR_MONEY.validateArgs(args);
-    Context ctx = new Context(moneyJson(number, currency));
-    ctx.cldrLocale(locale);
+    Locale locale = Locale.forLanguageTag(tag);
+    Context ctx = new Context(moneyJson(number, currency), new StringBuilder(), locale);
     Variables variables = new Variables("@", ctx.node());
     CLDR_MONEY.apply(ctx, args, variables);
     return variables.first().node().asText();
