@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2020 SQUARESPACE, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.squarespace.template;
 
 import java.util.List;
@@ -71,8 +87,16 @@ public class MessageFormats {
       return "";
     }
     JsonNode node = (JsonNode) args.get(0);
-    Decimal value = this.converter.asDecimal(node.path("decimalValue"));
-    String code = this.converter.asString(node.path("currencyCode"));
+
+    JsonNode decimalValue = node.path("decimalValue");
+    JsonNode currencyCode = node.path("currencyCode");
+    if (decimalValue.isMissingNode() || currencyCode.isMissingNode()) {
+      decimalValue = node.path("value");
+      currencyCode = node.path("currency");
+    }
+
+    Decimal value = this.converter.asDecimal(decimalValue);
+    String code = this.converter.asString(currencyCode);
     CurrencyType currency = CurrencyType.fromString(code);
     CurrencyFormatOptions opts = OptionParsers.currency(options);
     return cldr.Numbers.formatCurrency(value, currency, opts);

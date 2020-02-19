@@ -73,35 +73,35 @@ public class MoneyFormatter extends BaseFormatter {
   public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
     Variable var = variables.first();
     JsonNode node = var.node();
-    JsonNode decimal = node.path("decimalValue");
-    JsonNode currency = node.path("currencyCode");
+    JsonNode decimalValue = node.path("decimalValue");
+    JsonNode currencyNode = node.path("currencyCode");
 
-    if (decimal.isMissingNode() || currency.isMissingNode()) {
+    if (decimalValue.isMissingNode() || currencyNode.isMissingNode()) {
       // Check if we have a new money node and CLDR formatting is enabled.
       if (CommerceUtils.useCLDRMode(ctx)) {
-        decimal = node.path("value");
-        currency = node.path("currency");
+        decimalValue = node.path("value");
+        currencyNode = node.path("currency");
       }
 
       // No valid money node found.
-      if (decimal.isMissingNode() || currency.isMissingNode()) {
+      if (decimalValue.isMissingNode() || currencyNode.isMissingNode()) {
         var.setMissing();
         return;
       }
     }
 
     CLDR cldr = ctx.cldr();
-    String code = currency.asText();
+    String code = currencyNode.asText();
     if (code == null) {
       var.setMissing();
       return;
     }
 
-    Decimal decimalValue = GeneralUtils.nodeToDecimal(decimal);
-    CurrencyType _currency = CurrencyType.fromString(code);
+    Decimal decimal = GeneralUtils.nodeToDecimal(decimalValue);
+    CurrencyType currency = CurrencyType.fromString(code);
 
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
-    String result = cldr.Numbers.formatCurrency(decimalValue, _currency, opts);
+    String result = cldr.Numbers.formatCurrency(decimal, currency, opts);
     var.set(result);
   }
 
