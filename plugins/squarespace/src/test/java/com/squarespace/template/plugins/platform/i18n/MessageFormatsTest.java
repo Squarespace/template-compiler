@@ -119,6 +119,24 @@ public class MessageFormatsTest {
   }
 
   @Test
+  public void testPlural() {
+    String actual;
+    CLDR cldr = CLDR.get("en");
+    MessageFormats formats = new MessageFormats(cldr);
+    formats.setTimeZone("America/New_York");
+    String message = "you have {0} item{0 plural one{} other{s}} in your cart";
+
+    actual = formats.formatter().format(message, args().add(JsonUtils.decode("1")));
+    assertEquals(actual, "you have 1 item in your cart");
+
+    actual = formats.formatter().format(message, args().add(JsonUtils.decode("1.0")));
+    assertEquals(actual, "you have 1.0 items in your cart");
+
+    actual = formats.formatter().format(message, args().add(JsonUtils.decode("3")));
+    assertEquals(actual, "you have 3 items in your cart");
+  }
+
+  @Test
   public void testCurrency() {
     String actual;
     CLDR cldr = CLDR.get("en");

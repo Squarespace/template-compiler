@@ -164,6 +164,13 @@ public class MessageFormats {
           case OBJECT:
             return DecimalConstants.ZERO;
           case NUMBER:
+            if (node.isBigInteger() || node.isBigDecimal()) {
+              return new Decimal(node.asText());
+            }
+            if (node.isIntegralNumber()) {
+              return new Decimal(node.asLong());
+            }
+            return new Decimal(node.asText());
           case STRING:
           default:
             try {
@@ -190,9 +197,13 @@ public class MessageFormats {
           case NULL:
           case MISSING:
             return "";
+          case NUMBER:
+            if (node.isBigInteger() || node.isBigDecimal()) {
+              return node.asText();
+            }
+            return node.isIntegralNumber() ? Long.toString(node.longValue()) : Double.toString(node.doubleValue());
           case ARRAY:
           case OBJECT:
-          case NUMBER:
           case STRING:
           default:
             return node.asText();

@@ -83,7 +83,7 @@ public class MessageFormatter extends BaseFormatter {
       if (name != null) {
         res.add(name, value);
       }
-      res.add(raw);
+      res.add(value);
     }
     return res;
   }
