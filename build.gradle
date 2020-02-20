@@ -17,9 +17,9 @@ plugins {
   id 'org.kordamp.jdeps' version '0.2.0'
 }
 
-//task wrapper(type: Wrapper) {
-//  gradleVersion = '5.5.1'
-//}
+wrapper {
+  gradleVersion = '5.5.1'
+}
 
 project.ext {
   argparseVersion = '0.4.4'
