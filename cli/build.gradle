@@ -5,7 +5,6 @@ apply plugin: 'application'
 
 dependencies {
   compile project(':template-core')
-  compile project(':template-plugins-squarespace')
   compile "net.sourceforge.argparse4j:argparse4j:${argparseVersion}"
 
   testCompile project(path: ':template-core', configuration: 'tests')

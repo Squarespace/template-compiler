@@ -18,6 +18,7 @@ dependencies {
   testCompile "org.hamcrest:hamcrest-core:${hamcrestVersion}"
   testCompile "com.googlecode.java-diff-utils:diffutils:${diffutilsVersion}"
   testCompile "com.flipkart.zjsonpatch:zjsonpatch:${zjsonVersion}"
+  testCompile "net.javacrumbs.json-unit:json-unit:${jsonunitVersion}"
 }
 
 configurations {
