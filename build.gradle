@@ -103,6 +103,9 @@ clean {
 }
 
 release {
+  git {
+    requireBranch = ''
+  }
 }
 
 task makeCli(dependsOn: ':template-cli:makeCli') {
