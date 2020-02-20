@@ -33,7 +33,7 @@ import com.squarespace.cldrengine.api.MessageFormatFuncMap;
 import com.squarespace.cldrengine.api.MessageFormatter;
 import com.squarespace.cldrengine.api.MessageFormatterOptions;
 import com.squarespace.cldrengine.decimal.DecimalConstants;
-import com.squarespace.cldrengine.messageformat.evaluation.DefaultMessageArgConverter;
+import com.squarespace.cldrengine.message.DefaultMessageArgConverter;
 
 /**
  * Hooks custom formatting functions into the @phensley/cldr message formatter.
@@ -136,7 +136,6 @@ public class MessageFormats {
     if (args.size() < 2) {
       return "";
     }
-
     JsonNode v1 = (JsonNode) args.get(0);
     JsonNode v2 = (JsonNode) args.get(1);
     CalendarDate start = cldr.Calendars.toGregorianDate(v1.asLong(0), zoneId);
@@ -151,7 +150,7 @@ public class MessageFormats {
     public Decimal asDecimal(Object arg) {
       if (arg instanceof JsonNode) {
         JsonNode node = (JsonNode) arg;
-        JsonNode decimal = node.path("decimalValue");
+        JsonNode decimal = currency(node);
         if (!decimal.isMissingNode()) {
           return new Decimal(decimal.asText());
         }
@@ -191,6 +190,10 @@ public class MessageFormats {
     public String asString(Object arg) {
       if (arg instanceof JsonNode) {
         JsonNode node = (JsonNode) arg;
+        JsonNode decimal = currency(node);
+        if (!decimal.isMissingNode()) {
+          return decimal.asText();
+        }
         switch (node.getNodeType()) {
           case BOOLEAN:
             return node.asBoolean() ? "true" : "false";
@@ -214,6 +217,17 @@ public class MessageFormats {
       } catch (Exception e) {
         return "";
       }
+    }
+
+    /**
+     * If node is currency, return the value.
+     */
+    private JsonNode currency(JsonNode node) {
+      JsonNode decimal = node.path("decimalValue");
+      if (decimal.isMissingNode()) {
+        decimal = node.path("value");
+      }
+      return decimal;
     }
   }
 }

@@ -134,6 +134,14 @@ public class MessageFormatsTest {
 
     actual = formats.formatter().format(message, args().add(JsonUtils.decode("3")));
     assertEquals(actual, "you have 3 items in your cart");
+
+    ObjectNode money = money("1", "USD");
+    actual = formats.formatter().format(message, args().add(money));
+    assertEquals(actual, "you have 1 item in your cart");
+
+    money = newmoney("3", "USD");
+    actual = formats.formatter().format(message, args().add(money));
+    assertEquals(actual, "you have 3 items in your cart");
   }
 
   @Test
@@ -145,6 +153,10 @@ public class MessageFormatsTest {
     String message = "{0 currency style:standard}";
 
     ObjectNode money = money("12345.789", "USD");
+    actual = formats.formatter().format(message, args().add(money));
+    assertEquals(actual, "$12,345.79");
+
+    money = newmoney("12345.789", "USD");
     actual = formats.formatter().format(message, args().add(money));
     assertEquals(actual, "$12,345.79");
   }
@@ -190,6 +202,13 @@ public class MessageFormatsTest {
   }
 
   private ObjectNode money(String value, String currency) {
+    ObjectNode o = JsonUtils.createObjectNode();
+    o.put("decimalValue", value);
+    o.put("currencyCode", currency);
+    return o;
+  }
+
+  private ObjectNode newmoney(String value, String currency) {
     ObjectNode o = JsonUtils.createObjectNode();
     o.put("decimalValue", value);
     o.put("currencyCode", currency);
