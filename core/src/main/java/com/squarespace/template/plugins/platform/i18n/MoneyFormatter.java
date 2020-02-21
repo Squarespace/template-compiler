@@ -92,14 +92,8 @@ public class MoneyFormatter extends BaseFormatter {
 
     CLDR cldr = ctx.cldr();
     String code = currencyNode.asText();
-    if (code == null) {
-      var.setMissing();
-      return;
-    }
-
     Decimal decimal = GeneralUtils.nodeToDecimal(decimalValue);
     CurrencyType currency = CurrencyType.fromString(code);
-
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
     String result = cldr.Numbers.formatCurrency(decimal, currency, opts);
     var.set(result);

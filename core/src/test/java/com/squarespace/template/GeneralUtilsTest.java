@@ -17,7 +17,7 @@
 package com.squarespace.template;
 
 import static com.squarespace.template.GeneralUtils.isJsonStart;
-import static com.squarespace.template.GeneralUtils.toLong;
+import static com.squarespace.template.GeneralUtils.toPositiveLong;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -47,10 +47,10 @@ public class GeneralUtilsTest {
 
   @Test
   public void testToLong() {
-    assertEquals(toLong("12345", 0, 5), 12345);
-    assertEquals(toLong("12345xyz", 0, 8), 12345);
-    assertEquals(toLong("xyz", 0, 3), 0);
-    assertEquals(toLong("   ", 0, 3), 0);
+    assertEquals(toPositiveLong("12345", 0, 5), 12345);
+    assertEquals(toPositiveLong("12345xyz", 0, 8), 12345);
+    assertEquals(toPositiveLong("xyz", 0, 3), 0);
+    assertEquals(toPositiveLong("   ", 0, 3), 0);
   }
 
   @Test
