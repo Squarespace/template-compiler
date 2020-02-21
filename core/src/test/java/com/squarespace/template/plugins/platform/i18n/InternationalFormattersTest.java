@@ -80,6 +80,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
     // ENGLISH
 
+    assertEquals(format(en_US, DATETIME, mk.args(""), json), "November 2, 2017");
     assertEquals(format(en_US, DATETIME, mk.args(" short"), json), "11/2/17, 2:26 PM");
     assertEquals(format(en_US, DATETIME, mk.args(" long"), json), "November 2, 2017 at 2:26:57 PM EDT");
 
