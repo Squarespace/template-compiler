@@ -23,6 +23,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -107,6 +108,10 @@ public class TemplateC {
       .type(String.class)
       .help("JSON partials");
 
+    parser.addArgument("--locale", "-l")
+      .type(String.class)
+      .help("Language tag for a locale");
+
     parser.addArgument("--preprocess", "-P")
       .action(Arguments.storeTrue())
       .help("Preprocess the template");
@@ -140,6 +145,7 @@ public class TemplateC {
             res.getString("template"),
             res.getString("json"),
             res.getString("partials"),
+            res.getString("locale"),
             preprocess);
       }
 
@@ -158,7 +164,7 @@ public class TemplateC {
   /**
    * Compile a template against a given json tree and emit the result.
    */
-  protected int compile(String templatePath, String jsonPath, String partialsPath, boolean preprocess)
+  protected int compile(String templatePath, String jsonPath, String partialsPath, String locale, boolean preprocess)
       throws CodeException, IOException {
 
     String template = readFile(templatePath);
@@ -213,6 +219,7 @@ public class TemplateC {
     Context context = compiler().newExecutor()
         .code(code)
         .json(jsonTree)
+        .locale(Locale.forLanguageTag(locale))
         .safeExecution(true)
         .partialsMap((ObjectNode)partialsTree)
         .execute();
