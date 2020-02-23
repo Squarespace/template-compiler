@@ -112,7 +112,7 @@ subprojects {
           }
           pom {
               name = project.getName()
-              description = project.getDescription()
+              description = 'Squarespace template compiler'
               url = 'https://github.com/squarespace/template-compiler'
               licenses {
                   license {
