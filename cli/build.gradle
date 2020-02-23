@@ -43,11 +43,3 @@ task makeCli(type: Exec, dependsOn: execJar,
   executable 'bash'
   args '-c', "cat ${inputScript} ${inputArchive} >${destScript}; chmod ug+x ${destScript}"
 }
-
-artifacts {
-  archives sourcesJar
-  archives testJar
-  archives javadocJar
-  archives execJar
-}
-
