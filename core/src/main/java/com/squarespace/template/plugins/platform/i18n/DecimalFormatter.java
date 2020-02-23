@@ -31,24 +31,6 @@ import com.squarespace.template.Variables;
 
 /**
  * DECIMAL - Formatter for decimal numbers.
- *
- * Options:
- *
- *   style:<name>     - pattern style:  decimal, short, long, percent, permille
- *                                      percent-scaled, permille-scaled
- *   round:<name>     - rounding mode: default, ceil, floor, truncate
- *   group            - if present this enables digit grouping
- *
- * Used in default mode:
- *   minint:<int>     - in default mode, sets the minimum number of integer digit (zero pads)
- *   minfrac:<int>    - sets the minimum number of fraction digits
- *
- * Used in default and significant-maxfrac modes:
- *   maxfrac:<int>    - sets the maximum number of fraction digits
- *
- * Used in significant and significant-maxfrac modes:
- *   maxsig:<int>     - sets the maximum number of significant digits
- *   minsig:<int>     - sets the minimum number of significant digits
  */
 public class DecimalFormatter extends BaseFormatter {
 

@@ -36,26 +36,6 @@ import com.squarespace.template.plugins.platform.CommerceUtils;
  * MONEY - Formats the special money type, that has the following form:
  *
  *      {"decimalValue": "1.25", "currencyCode": "USD"}
- *
- * Options:
- *
- *   style:<name>     - pattern style:  symbol, accounting, name, code, short
- *   symbol:<type>    - currency symbol width: default, narrow
- *   round:<name>     - rounding mode: default, ceil, floor, truncate
- *   group            - if present this enables digit grouping
- *   no-group         - if present this disables digit grouping
- *
- * Used in default mode:
- *   minInt:<int>     - in default mode, sets the minimum number of integer digit (zero pads)
- *   minFrac:<int>    - sets the minimum number of fraction digits
- *
- * Used in default and significant-maxfrac modes:
- *   maxFrac:<int>    - sets the maximum number of fraction digits
- *
- * Used in significant and significant-maxfrac modes:
- *   maxSig:<int>     - sets the maximum number of significant digits
- *   minSig:<int>     - sets the minimum number of significant digits
- *
  */
 public class MoneyFormatter extends BaseFormatter {
 
