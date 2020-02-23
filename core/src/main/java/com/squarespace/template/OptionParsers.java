@@ -39,7 +39,9 @@ public class OptionParsers {
   // Arbitrary value just to have an upper limit.
   private static final int CLAMP_MAX = 50;
 
-  private OptionParsers() {}
+  private OptionParsers() {
+
+  }
 
   public static DecimalFormatOptions decimal(Arguments args) {
     return decimal(args.getArgs());
