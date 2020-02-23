@@ -48,7 +48,7 @@ gradle.taskGraph.whenReady { taskGraph ->
   }
   ext.isSign = taskGraph.allTasks.any { it instanceof Sign }
   if (isRelease && isUpload && isSign) {
-    def password = System.console().readPassword('\n\n\n===>  Signing key password: ')
+    def password = System.getenv('NEXUS_PASSWORD')
     allprojects { ext.'signing.password' = password }
   }
 }
