@@ -1,4 +1,4 @@
-import groovy.swing.SwingBuilder
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
   id 'me.champeau.gradle.jmh' version '0.5.0'
@@ -96,6 +96,24 @@ subprojects {
           html.destination file("${buildDir}/jacoco-report")
       }
   }
+
+  processResources {
+    from (sourceSets.main.resources.srcDirs) {
+      include '**/build.properties'
+      filter(ReplaceTokens, tokens: [
+        'build.version': project.version,
+        'build.date': buildDate.toString(),
+        'build.commit': buildCommit
+      ])
+    }
+
+    from (sourceSets.main.resources.srcDirs) {
+      exclude '**/build.properties'
+    }
+  }
+
+  // Ensure this always runs, to generate fresh build.properties
+  processResources.outputs.upToDateWhen { false }
 
   publishing {
     publications {
