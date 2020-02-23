@@ -45,7 +45,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 subprojects {
 
-  group = 'com.squarespace.template-test'
+  group = 'com.squarespace.template'
 
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
