@@ -58,13 +58,26 @@ public class MessageFormatter extends BaseFormatter {
     var.set(result);
   }
 
+  private static int delimiter(String arg) {
+    int len = arg.length();
+    for (int i = 0; i < len; i++) {
+      char c = arg.charAt(i);
+      if (c == ':' || c == '=') {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   private static MessageArgs messageArgs(Arguments args, Context ctx) {
     MessageArgs res = new MessageArgs();
     int count = args.count();
     for (int i = 0; i < count; i++) {
       String raw = args.get(i);
       String name = null;
-      int index = raw.indexOf(':');
+
+      // Either ':' or '=' can delimit key/value arguments
+      int index = delimiter(raw);
       if (index != -1) {
         // Map named argument
         name = raw.substring(0, index);
@@ -83,6 +96,7 @@ public class MessageFormatter extends BaseFormatter {
       if (name != null) {
         res.add(name, value);
       }
+      // Keyword arguments are also positional
       res.add(value);
     }
     return res;
