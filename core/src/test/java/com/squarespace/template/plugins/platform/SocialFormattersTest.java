@@ -48,7 +48,11 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
     String result = format(ACTIVATE_TWITTER_LINKS, json);
     assertTrue(result.contains("twitter.com/search/foo"));
     assertTrue(result.contains("twitter.com/search/bar"));
-  }
+
+    runner.run(
+       "f-activate-twitter-links-1.html"
+    );
+   }
 
   @Test
   public void testCommentLink() {

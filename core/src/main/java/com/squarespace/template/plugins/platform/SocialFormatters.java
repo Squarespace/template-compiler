@@ -75,7 +75,7 @@ public class SocialFormatters implements FormatterRegistry {
       );
 
   private static final String TWITTER_TWEETS_REPLACE =
-      "$1<a target=\"new\" href=\"http://www.twitter.com/$2/\">@$2</a>";
+      "$1<a target=\"new\" href=\"https://twitter.com/$2/\">@$2</a>";
 
   private static final Pattern TWITTER_HASHTAG_REGEX = Pattern.compile(
       "(^| )#([a-zA-Z0-9_]+)", Pattern.CASE_INSENSITIVE
@@ -99,8 +99,9 @@ public class SocialFormatters implements FormatterRegistry {
       // Hate using StringBuffer, but see Sun bug 5066679
       StringBuffer buf = new StringBuffer();
       while (matcher.find()) {
-        matcher.appendReplacement(buf, "<a target=\"new\" href=\"http://www.twitter.com/search/"
-            + GeneralUtils.urlEncode(matcher.group(2)) + "\">" + matcher.group(2) + "</a>");
+        matcher.appendReplacement(buf, matcher.group(1)
+            + "<a target=\"new\" href=\"https://twitter.com/search/"
+            + GeneralUtils.urlEncode(matcher.group(2)) + "?src=hash\">#" + matcher.group(2) + "</a>");
       }
       matcher.appendTail(buf);
       var.set(buf);
