@@ -100,7 +100,7 @@ public class SocialFormatters implements FormatterRegistry {
       StringBuffer buf = new StringBuffer();
       while (matcher.find()) {
         matcher.appendReplacement(buf, matcher.group(1)
-            + "<a target=\"new\" href=\"https://twitter.com/search/"
+            + "<a target=\"new\" href=\"https://twitter.com/hashtag/"
             + GeneralUtils.urlEncode(matcher.group(2)) + "?src=hash\">#" + matcher.group(2) + "</a>");
       }
       matcher.appendTail(buf);

@@ -46,8 +46,8 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   public void testActivateTwitterLinks() throws CodeException {
     String json = "\"#foo and #bar\"";
     String result = format(ACTIVATE_TWITTER_LINKS, json);
-    assertTrue(result.contains("twitter.com/search/foo"));
-    assertTrue(result.contains("twitter.com/search/bar"));
+    assertTrue(result.contains("twitter.com/hashtag/foo"));
+    assertTrue(result.contains("twitter.com/hashtag/bar"));
 
     runner.run(
        "f-activate-twitter-links-1.html"
