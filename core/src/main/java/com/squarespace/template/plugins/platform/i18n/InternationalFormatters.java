@@ -40,6 +40,7 @@ public class InternationalFormatters implements FormatterRegistry {
     table.add(new MoneyFormatter());
     table.add(new LegacyMoneyFormatter());
     table.add(new PluralFormatter());
+    table.add(new RelativeTimeFormatter());
     table.add(new UnitFormatter());
   }
 

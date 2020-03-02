@@ -26,13 +26,16 @@ import com.squarespace.cldrengine.api.ContextType;
 import com.squarespace.cldrengine.api.CurrencyFormatOptions;
 import com.squarespace.cldrengine.api.CurrencyFormatStyleType;
 import com.squarespace.cldrengine.api.CurrencySymbolWidthType;
+import com.squarespace.cldrengine.api.DateFieldWidthType;
 import com.squarespace.cldrengine.api.DateFormatOptions;
 import com.squarespace.cldrengine.api.DateIntervalFormatOptions;
 import com.squarespace.cldrengine.api.DecimalFormatOptions;
 import com.squarespace.cldrengine.api.DecimalFormatStyleType;
 import com.squarespace.cldrengine.api.FormatWidthType;
 import com.squarespace.cldrengine.api.NumberFormatOptions;
+import com.squarespace.cldrengine.api.RelativeTimeFormatOptions;
 import com.squarespace.cldrengine.api.RoundingModeType;
+import com.squarespace.cldrengine.api.TimePeriodField;
 
 public class OptionParsers {
 
@@ -80,6 +83,16 @@ public class OptionParsers {
   public static DateIntervalFormatOptions interval(List<String> args) {
     DateIntervalFormatOptions options = DateIntervalFormatOptions.build();
     parse(args, options, OptionParsers::intervalOption);
+    return options;
+  }
+
+  public static RelativeTimeFormatOptions relativetime(Arguments args) {
+    return relativetime(args.getArgs());
+  }
+
+  public static RelativeTimeFormatOptions relativetime(List<String> args) {
+    RelativeTimeFormatOptions options = RelativeTimeFormatOptions.build();
+    parse(args, options, OptionParsers::relativetimeOption);
     return options;
   }
 
@@ -270,6 +283,32 @@ public class OptionParsers {
         options.time(value);
         break;
       default:
+        break;
+    }
+  }
+
+  private static void relativetimeOption(String arg, String value, RelativeTimeFormatOptions options) {
+    switch (arg) {
+      case "context":
+        options.context(ContextType.fromString(value));
+        break;
+      case "dayOfWeek":
+        options.dayOfWeek("true".equals(value));
+        break;
+      case "field":
+        options.field(TimePeriodField.fromString(value));
+        break;
+      case "numericOnly":
+        options.numericOnly("true".equals(value));
+        break;
+      case "alwaysNow":
+        options.alwaysNow("true".equals(value));
+        break;
+      case "width":
+        options.width(DateFieldWidthType.fromString(value));
+        break;
+      default:
+        numberOption(arg, value, options);
         break;
     }
   }
