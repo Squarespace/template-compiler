@@ -208,6 +208,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     String now = Long.toString(System.currentTimeMillis() - (1000 * 15));
     String result = format(TIMESINCE, now);
     assertTrue(result.contains("less than a minute ago"));
+
+    runner.run("f-timesince-1.html");
   }
 
   @Test
