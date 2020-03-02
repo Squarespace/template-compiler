@@ -128,6 +128,8 @@ public class TestCaseParser extends UnitTestBase {
         return;
       }
 
+      String now = properties.getProperty("now");
+
       try {
         ObjectNode partialsMap = null;
         if (partials != null) {
@@ -145,7 +147,9 @@ public class TestCaseParser extends UnitTestBase {
             .code(code)
             .json(json)
             .safeExecution(true);
-
+        if (now != null) {
+          executor.now(Long.valueOf(now));
+        }
         if (partialsMap != null) {
           executor.partialsMap(partialsMap);
         }

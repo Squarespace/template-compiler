@@ -31,6 +31,7 @@ public class CompilerExecutor {
   private String template;
   private Instruction rootInstruction;
   private JsonNode rootNode;
+  private Long now;
   private ObjectNode partialsMap;
   private ObjectNode injectablesMap;
   private StringBuilder buffer;
@@ -80,7 +81,9 @@ public class CompilerExecutor {
     if (locale != null) {
       ctx.javaLocale(locale);
     }
-
+    if (now != null) {
+      ctx.now(now);
+    }
     ctx.setMaxPartialDepth(maxPartialDepth);
     ctx.execute(instruction);
     return ctx;
@@ -100,6 +103,11 @@ public class CompilerExecutor {
    */
   public CompilerExecutor code(Instruction instruction) {
     this.rootInstruction = instruction;
+    return this;
+  }
+
+  public CompilerExecutor now(Long now) {
+    this.now = now;
     return this;
   }
 

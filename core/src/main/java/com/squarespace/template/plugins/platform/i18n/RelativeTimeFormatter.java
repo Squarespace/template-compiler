@@ -20,11 +20,9 @@ public class RelativeTimeFormatter extends BaseFormatter {
   @Override
   public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
     int count = variables.count();
-
-    // TODO: add settable now() on context
-
     Variable v1 = variables.get(0);
-    long s = System.currentTimeMillis();
+    Long now = ctx.now();
+    long s = now == null ? System.currentTimeMillis() : now.longValue();
     long e = v1.node().asLong();
     if (count > 1) {
       s = e;

@@ -1,8 +1,15 @@
+:PROPERTIES
+now=1502298000000
+
 :JSON
 {
 	"dates": [
 		{"start": 1509647217000, "end": 1510641417000},
 		{"start": 1502298000000, "end": 1502305200000}
+	],
+	"timestamps": [
+		1502305200000,
+		1502258000000
 	]
 }
 
@@ -10,7 +17,12 @@
 :TEMPLATE
 {.repeated section dates}
 {start, end|relative-time}{.end}
+{.repeated section timestamps}
+{@|relative-time context=begin-sentence}{.end}
 
 :OUTPUT
 in 2 weeks
 in 2 hours
+
+in 2 hours
+11 hours ago

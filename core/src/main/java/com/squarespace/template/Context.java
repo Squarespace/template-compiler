@@ -86,6 +86,8 @@ public class Context {
 
   private int partialDepth;
 
+  private Long now = null;
+
   private LoggingHook loggingHook;
 
   private CodeLimiter codeLimiter = new NoopCodeLimiter();
@@ -121,6 +123,14 @@ public class Context {
 
   public void javaLocale(Locale locale) {
     this.javaLocale = locale;
+  }
+
+  public void now(Long value) {
+    this.now = value;
+  }
+
+  public Long now() {
+    return now;
   }
 
 //  public void cldrLocale(CLDR.Locale locale) {
