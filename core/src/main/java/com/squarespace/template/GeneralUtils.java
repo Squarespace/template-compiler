@@ -382,7 +382,7 @@ public class GeneralUtils {
    */
   public static String urlEncode(String val) {
     try {
-      return URLEncoder.encode(val, "UTF-8");
+      return URLEncoder.encode(val, "UTF-8").replace("+", "%20");
     } catch (UnsupportedEncodingException e) {
       return val;
     }
