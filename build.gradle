@@ -89,6 +89,22 @@ subprojects {
     withJavadocJar()
   }
 
+  task testJar(type: Jar, group: 'Build', dependsOn: 'javadoc') {
+    classifier 'tests'
+    from sourceSets.test.output
+  }
+
+  assemble.dependsOn testJar
+  testJar.dependsOn compileTestJava
+
+  configurations {
+    tests
+  }
+
+  artifacts {
+    tests testJar
+  }
+
   jacocoTestReport {
       reports {
           xml.enabled false
@@ -120,6 +136,7 @@ subprojects {
       mavenJava(MavenPublication) {
           artifactId = project.getName()
           from components.java
+          artifact testJar
           versionMapping {
               usage('java-api') {
                   fromResolutionOf('runtimeClasspath')
@@ -186,3 +203,4 @@ subprojects {
   }
 
 }
+
