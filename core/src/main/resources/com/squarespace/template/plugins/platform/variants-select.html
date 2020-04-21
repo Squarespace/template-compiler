@@ -12,7 +12,8 @@
         <option value="">{selectText|message variantName:name}</option>
         {.repeated section values}<option value="{@|htmltag}">{@|htmltag}</option>{.end}
       </select>
-    </div>
+    </div>{.repeated section values}
+    <div class="variant-box" value="{@|htmltag}">{@|htmltag}</div>{.end}
     </div>{.end}
   </div>
 {.end}
