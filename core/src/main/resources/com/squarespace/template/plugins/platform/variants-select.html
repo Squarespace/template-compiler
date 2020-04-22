@@ -12,8 +12,11 @@
         <option value="">{selectText|message variantName:name}</option>
         {.repeated section values}<option value="{@|htmltag}">{@|htmltag}</option>{.end}
       </select>
-    </div>{.repeated section values}
-    <div class="variant-box" value="{@|htmltag}">{@|htmltag}</div>{.end}
+    </div>
+    <div class="variant-radiobtn-wrapper">{.repeated section values}
+      <input type="radio" class="variant-radiobtn" value="{@|htmltag}" name="variant-option-{name}" id="variant-option-{name}-{@|htmltag}"/>
+      <label for="variant-option-{name}-{@|htmltag}">{@|htmltag}</label>{.end}
+    </div>
     </div>{.end}
   </div>
 {.end}
