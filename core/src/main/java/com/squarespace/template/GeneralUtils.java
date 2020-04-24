@@ -57,9 +57,9 @@ public class GeneralUtils {
   }
 
   /**
-   * Quick string to integer conversion.
+   * Quick string to integer conversion, clamping negative values to zero.
    */
-  public static long toLong(CharSequence seq, int pos, int length) {
+  public static long toPositiveLong(CharSequence seq, int pos, int length) {
     long n = 0;
     int i = pos;
     while (i < length) {
@@ -382,7 +382,7 @@ public class GeneralUtils {
    */
   public static String urlEncode(String val) {
     try {
-      return URLEncoder.encode(val, "UTF-8");
+      return URLEncoder.encode(val, "UTF-8").replace("+", "%20");
     } catch (UnsupportedEncodingException e) {
       return val;
     }

@@ -685,6 +685,8 @@ public class CoreFormattersTest extends UnitTestBase {
         .execute();
     assertEquals(ctx.getErrors().size(), 1);
     assertEquals(ctx.getErrors().get(0).getType(), SyntaxErrorType.FORMATTER_ARGS_INVALID);
+
+    runner.run("f-truncate-1.html");
   }
 
   @Test

@@ -58,13 +58,26 @@ public class MessageFormatter extends BaseFormatter {
     var.set(result);
   }
 
+  private static int delimiter(String arg) {
+    int len = arg.length();
+    for (int i = 0; i < len; i++) {
+      char c = arg.charAt(i);
+      if (c == ':' || c == '=') {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   private static MessageArgs messageArgs(Arguments args, Context ctx) {
     MessageArgs res = new MessageArgs();
     int count = args.count();
     for (int i = 0; i < count; i++) {
       String raw = args.get(i);
       String name = null;
-      int index = raw.indexOf(':');
+
+      // Either ':' or '=' can delimit key/value arguments
+      int index = delimiter(raw);
       if (index != -1) {
         // Map named argument
         name = raw.substring(0, index);
@@ -83,49 +96,9 @@ public class MessageFormatter extends BaseFormatter {
       if (name != null) {
         res.add(name, value);
       }
+      // Keyword arguments are also positional
       res.add(value);
     }
     return res;
   }
-
-  /**
-   * Set the context instance used to resolve the argument values on demand.
-   */
-//  private static void setContext(MessageArgs args, Context ctx) {
-//    int count = args.count();
-//    for (int i = 0; i < count; i++) {
-//      MsgArg arg = (MsgArg)args.get(i);
-//      arg.setContext(ctx);
-//    }
-//  }
-
-  /**
-   * Initialize the plural arguments array.
-   */
-//  private static MessageArgs messageArgs(Arguments arguments) {
-//    MessageArgs result = new MessageArgs();
-//    int count = arguments.count();
-//    for (int i = 0; i < count; i++) {
-//      String raw = arguments.get(i);
-//      String name = null;
-//
-//      // Check if this is a named argument, e.g. <name>:<context variable>
-//      int index = raw.indexOf(':');
-//      if (index != -1) {
-//        name = raw.substring(0, index);
-//        raw = raw.substring(index + 1);
-//      }
-//
-//      // Parse the context variable reference and append the argument.
-//      Object[] variable = splitVariable(raw);
-//      MsgArg arg = new MsgArg(variable);
-//      if (name == null) {
-//        result.add(arg);
-//      } else {
-//        result.add(name, arg);
-//      }
-//    }
-//    return result;
-//  }
-
 }

@@ -35,7 +35,6 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
-import com.squarespace.template.plugins.platform.i18n.InternationalFormatters.DateTimeFieldFormatter;
 
 
 public class InternationalFormattersTest extends PlatformUnitTestBase {
@@ -63,7 +62,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 //  };
 
   private static final DateTimeFormatter DATETIME = new DateTimeFormatter();
-  private static final DateTimeFieldFormatter DATETIMEFIELD = new DateTimeFieldFormatter();
+//  private static final DateTimeFieldFormatter DATETIMEFIELD = new DateTimeFieldFormatter();
   private static final LegacyMoneyFormatter MONEY_FORMATTER = new LegacyMoneyFormatter();
 
   private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), InternationalFormatters.class);
@@ -80,6 +79,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
     // ENGLISH
 
+    assertEquals(format(en_US, DATETIME, mk.args(""), json), "November 2, 2017");
     assertEquals(format(en_US, DATETIME, mk.args(" short"), json), "11/2/17, 2:26 PM");
     assertEquals(format(en_US, DATETIME, mk.args(" long"), json), "November 2, 2017 at 2:26:57 PM EDT");
 

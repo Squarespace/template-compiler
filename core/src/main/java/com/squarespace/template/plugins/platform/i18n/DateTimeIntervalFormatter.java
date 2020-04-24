@@ -41,7 +41,7 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    DateIntervalFormatOptions options = OptionParsers.datetimeInterval(args);
+    DateIntervalFormatOptions options = OptionParsers.interval(args);
     args.setOpaque(options);
   }
 
@@ -56,11 +56,6 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
     Variable v2 = variables.get(1);
 
     CLDR cldr = ctx.cldr();
-    if (cldr == null) {
-      v1.set("");
-      return;
-    }
-
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
     CalendarDate start = cldr.Calendars.toGregorianDate(v1.node().asLong(0), zoneId);
     CalendarDate end = cldr.Calendars.toGregorianDate(v2.node().asLong(0), zoneId);
