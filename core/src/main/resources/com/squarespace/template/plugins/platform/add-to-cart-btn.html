@@ -8,7 +8,7 @@
 {.var @subscribeText localizedStrings.productSubscribeText}
 {.var @isSubscribable @content.isSubscribable}
 
-<div class="sqs-add-to-cart-button-wrapper">
+<div class="sqs-add-to-cart-button-wrapper" data-animation-role="button">
   <div class="sqs-add-to-cart-button sqs-suppress-edit-mode sqs-editable-button {.if @fieldsFormId && @fieldsForm}use-form{.end}" role="button" tabindex="0" data-collection-id="{collectionId}" data-item-id="{id}" data-product-type="{@productType}" data-use-custom-label="{@useCustom}" {.if @isSubscribable}data-is-subscription="{@isSubscribable}" {.end}data-original-label="{.if @useCustom && @customButton}{@customButton|htmlattr}{.or}{.if @isSubscribable}{.if @subscribeText}{@subscribeText|htmlattr}{.or}Subscribe{.end}{.or}{.if @addToCartText}{@addToCartText|htmlattr}{.or}Add To Cart{.end}{.end}{.end}" {.if @fieldsFormId && @fieldsForm}data-form="{@fieldsForm|json|htmlattr}"{.end}>
     <div class="sqs-add-to-cart-button-inner">{.if @useCustom && @customButton}{@customButton|htmltag}{.or}{.if @isSubscribable}{.if @subscribeText}{@subscribeText|htmltag}{.or}Subscribe{.end}{.or}{.if @addToCartText}{@addToCartText|htmltag}{.or}Add To Cart{.end}{.end}{.end}</div>
   </div>
