@@ -174,8 +174,8 @@ subprojects {
       maven {
         def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
         def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-        def _username = OSS_USERNAME
-        def _password = OSS_PASSWORD
+        def _username = project.ext.properties.OSS_USERNAME
+        def _password = project.ext.properties.OSS_PASSWORD
 
         if (project.hasProperty('publish-internal')) {
           releasesRepoUrl = NEXUS_INTERNAL_RELEASE_URL
