@@ -13,7 +13,7 @@
         {.repeated section values}<option value="{@|htmltag}">{@|htmltag}</option>{.end}
       </select>
     </div>
-    <div class="variant-radiobtn-wrapper" data-variant-option-name="{name|htmltag}">{.repeated section values}
+    <div class="variant-radiobtn-wrapper" data-variant-option-name="{name|htmltag}" style="display:none">{.repeated section values}
       <input type="radio" class="variant-radiobtn" value="{@|htmltag}" name="variant-option-{name|htmltag}" id="variant-option-{name|htmltag}-{@|htmltag}"/>
       <label for="variant-option-{name|htmltag}-{@|htmltag}">{@|htmltag}</label>{.end}
     </div>
