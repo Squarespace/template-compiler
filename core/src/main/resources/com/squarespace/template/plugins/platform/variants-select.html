@@ -9,8 +9,8 @@
     <div class="variant-option-title">{name}: </div>
     <div class="variant-select-wrapper">
       <select data-variant-option-name="{name|htmltag}">
-        <option value="">{selectText|message variantName:name}</option>
-        {.repeated section values}<option value="{@|htmltag}">{@|htmltag}</option>{.end}
+        <option aria-label="{selectText|message variantName:name}" value="">{selectText|message variantName:name}</option>
+        {.repeated section values}<option aria-label="{@|htmltag}" value="{@|htmltag}">{@|htmltag}</option>{.end}
       </select>
     </div>
     </div>{.end}
