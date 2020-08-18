@@ -381,10 +381,11 @@ public class TokenizerCoreTest extends UnitTestBase {
 
     assertResult("{a, b, c, d|json}", mk.var(mk.vars("a", "b", "c", "d"), JSON), mk.eof());
     assertResult("{$a, @b, c.d.e|json}", mk.var(mk.vars("$a", "@b", "c.d.e"), JSON), mk.eof());
+    assertResult("{foo, bar}",mk.var(mk.vars("foo",  "bar")), mk.eof());
+    assertResult("{@foo.$bar , $foo.$bar}", mk.var(mk.vars("@foo.$bar", "$foo.$bar")), mk.eof());
 
     // Invalid forms
     assertResult("{foo||json}", mk.text("{foo||json}"), mk.eof());
-    assertResult("{foo, bar}", mk.text("{foo, bar}"), mk.eof());
     assertResult("{foo, bar||json}", mk.text("{foo, bar||json}"), mk.eof());
   }
 

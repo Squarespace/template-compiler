@@ -693,7 +693,6 @@ public class Tokenizer {
       return null;
     }
 
-    boolean requirePipe = false;
     StringView token = matcher.consume();
     Variables vars = new Variables(token.repr());
 
@@ -706,7 +705,6 @@ public class Tokenizer {
         return null;
       }
       vars.add(matcher.consume().repr());
-      requirePipe = true;
     }
 
     boolean matchedPipe = matcher.peek(0, '|');
@@ -717,13 +715,6 @@ public class Tokenizer {
       return null;
     }
 
-    // Multiple variable syntax is only allowed when passing variables to
-    // formatters, which requires a pipe character immediately after the last variable.
-    if (requirePipe) {
-      if (!matchedPipe) {
-        return null;
-      }
-    }
     return vars;
   }
 
