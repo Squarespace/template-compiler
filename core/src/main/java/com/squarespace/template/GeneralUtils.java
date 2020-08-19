@@ -38,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.NumericNode;
@@ -52,6 +53,7 @@ import com.squarespace.cldrengine.api.Decimal;
 public class GeneralUtils {
 
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
+  private static final PrettyPrinter PRETTY_PRINTER = new JsonPrettyPrinter();
 
   private GeneralUtils() {
   }
@@ -354,7 +356,7 @@ public class GeneralUtils {
   public static String jsonPretty(JsonNode node) throws IOException {
     StringBuilder buf = new StringBuilder();
     JsonGenerator gen = JSON_FACTORY.createGenerator(new StringBuilderWriter(buf));
-    gen.useDefaultPrettyPrinter();
+    gen.setPrettyPrinter(PRETTY_PRINTER);
     gen.setCodec(JsonUtils.getMapper());
     gen.writeTree(node);
     return buf.toString();
