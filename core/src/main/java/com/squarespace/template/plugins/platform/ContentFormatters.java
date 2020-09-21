@@ -725,9 +725,11 @@ public class ContentFormatters implements FormatterRegistry {
       if (!node.isNumber()) {
         buf.append("Invalid date.");
       } else {
+        Long _now = ctx.now();
+        long now = _now == null ? System.currentTimeMillis() : _now.longValue();
         long value = node.asLong();
         buf.append("<span class=\"timesince\" data-date=\"" + value + "\">");
-        PluginDateUtils.humanizeDate(value, false, buf);
+        PluginDateUtils.humanizeDate(value, now, false, buf);
         buf.append("</span>");
       }
       var.set(buf);
