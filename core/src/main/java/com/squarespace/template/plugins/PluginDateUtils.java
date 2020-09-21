@@ -80,12 +80,8 @@ public class PluginDateUtils {
     buf.append(" ago");
   }
 
-  public static void humanizeDate(long instantMs, boolean showSeconds, StringBuilder buf) {
-    humanizeDate(instantMs, System.currentTimeMillis(), TimeZone.getDefault().getID(), showSeconds, buf);
-  }
-
-  public static void humanizeDate(long instantMs, String tzId, boolean showSeconds, StringBuilder buf) {
-    humanizeDate(instantMs, System.currentTimeMillis(), tzId, showSeconds, buf);
+  public static void humanizeDate(long instantMs, long now, boolean showSeconds, StringBuilder buf) {
+    humanizeDate(instantMs, now, TimeZone.getDefault().getID(), showSeconds, buf);
   }
 
   public static void humanizeDate(long instantMs, long baseMs, String tzId, boolean showSeconds, StringBuilder buf) {
