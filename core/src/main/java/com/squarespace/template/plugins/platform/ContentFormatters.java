@@ -496,7 +496,7 @@ public class ContentFormatters implements FormatterRegistry {
         return;
       }
 
-      buf.append(" data-srcset=\"");
+      buf.append(" srcset=\"");
       for (int i = 0; i < limit; i++) {
         if (i > 0) {
           buf.append(',');
