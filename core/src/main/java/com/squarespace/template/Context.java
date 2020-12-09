@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CLocale;
+import com.squarespace.template.expr.ExprOptions;
 
 
 /**
@@ -92,6 +93,9 @@ public class Context {
 
   private CodeLimiter codeLimiter = new NoopCodeLimiter();
 
+  private boolean enableExpr = false;
+  private ExprOptions exprOptions = null;
+
   /* Holds the final output of the template execution */
   private StringBuilder buf;
 
@@ -115,6 +119,20 @@ public class Context {
 
   public List<ErrorInfo> getErrors() {
     return (errors == null) ? Collections.<ErrorInfo>emptyList() : errors;
+  }
+
+  /**
+   * Return the expression evaluation options.
+   */
+  public ExprOptions exprOptions() {
+    return exprOptions;
+  }
+
+  /**
+   * Set the options for expression evaluation.
+   */
+  public void exprOptions(ExprOptions options) {
+    this.exprOptions = options;
   }
 
   public Locale javaLocale() {
@@ -173,6 +191,28 @@ public class Context {
    */
   public void setSafeExecution() {
     this.safeExecution = true;
+  }
+
+  /**
+   * Enable the expression evaluation instruction EVAL.
+   */
+  public void setEnableExpr(boolean flag) {
+    this.enableExpr = flag;
+  }
+
+  public boolean getEnableExpr() {
+    return this.enableExpr;
+  }
+
+  /**
+   * Set the options governing expression evaluation.
+   */
+  public void setExprOptions(ExprOptions opts) {
+    this.exprOptions = opts;
+  }
+
+  public ExprOptions getExprOptions() {
+    return this.exprOptions;
   }
 
   /**
@@ -281,8 +321,13 @@ public class Context {
   public ErrorInfo error(ExecuteErrorType code) {
     ErrorInfo info = new ErrorInfo(code);
     info.code(code);
-    info.line(currentInstruction.getLineNumber());
-    info.offset(currentInstruction.getCharOffset());
+    if (currentInstruction != null) {
+      info.line(currentInstruction.getLineNumber());
+      info.offset(currentInstruction.getCharOffset());
+    } else {
+      info.line(0);
+      info.offset(0);
+    }
     return info;
   }
 

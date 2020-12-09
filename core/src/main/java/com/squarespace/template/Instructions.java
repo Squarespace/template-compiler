@@ -22,12 +22,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.template.expr.Expr;
+import com.squarespace.template.expr.Formats;
+import com.squarespace.template.expr.Tokens;
 
 
 /**
@@ -183,6 +187,7 @@ public class Instructions {
     /**
      * Returns the consequent block.
      */
+    @Override
     public Block getConsequent() {
       return consequent;
     }
@@ -193,6 +198,7 @@ public class Instructions {
      * For non-conditional blocks, like section, the alternate is simply the END
      * instruction, indicating a complete parse.
      */
+    @Override
     public void setAlternative(Instruction inst) {
       alternative = inst;
     }
@@ -200,6 +206,7 @@ public class Instructions {
     /**
      * Sets the alternative instruction.
      */
+    @Override
     public Instruction getAlternative() {
       return alternative;
     }
@@ -416,6 +423,145 @@ public class Instructions {
       // NO VISIBLE REPRESENTATION
     }
 
+  }
+  /**
+   * Eval instruction, evaluates an expression.
+   */
+  public static class EvalInst extends BaseInstruction {
+
+    /**
+     * Raw expression
+     */
+    private final String raw;
+
+    /**
+     * Debug mode.
+     */
+    private final boolean debug;
+
+    /**
+     * Parsed and assembled expression, ready for evaluation.
+     * The expression is parsed the first time it executes.
+     */
+    private Expr expr;
+
+    public EvalInst(String raw) {
+      this.debug = raw.startsWith("#");
+      if (this.debug) {
+        raw = raw.substring(1);
+      }
+      this.raw = raw;
+    }
+
+    /**
+     * Body of the expression.
+     */
+    public String body() {
+      return this.raw;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof EvalInst) {
+        EvalInst inst = (EvalInst) obj;
+        return this.raw.equals(inst.raw);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.EVAL;
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf);
+    }
+
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      List<String> errors;
+
+      if (this.expr == null) {
+
+        // Construct the expression. This tokenizes the input.
+        this.expr = new Expr(this.raw, ctx.getExprOptions());
+
+        // Build the expression. This assembles the expression in
+        // reverse polish notation so it can be evaluated later.
+        this.expr.build();
+
+        // Check if the expression has a parse error and emit it.
+        errors = this.expr.errors();
+        if (!errors.isEmpty()) {
+          for (String error : errors) {
+            ErrorInfo info = ctx.error(ExecuteErrorType.EXPRESSION_PARSE)
+                .data(error);
+            ctx.addError(info);
+          }
+        }
+      } else {
+        // Repeated evaluations, get a reference to the expression's
+        // errors list.
+        errors = this.expr.errors();
+      }
+
+      if (debug) {
+        ctx.buffer().append("EVAL");
+        Tokens.debug(this.expr.expressions(), ctx.buffer());
+      }
+
+      // Evaluate the expression against the current context and append
+      // any output. We only attempt to reduce the expression if there
+      // were no parse errors.
+      if (errors.isEmpty()) {
+        // Track the error count to detect if reduce produces an error.
+        int errs = errors.size();
+
+        // Create a temporary stack frame. This will collect local variables
+        // created by the expression. If reducing the expression produces an
+        // error, the local variables created by the expression will be discarded.
+        ctx.push(ctx.node());
+
+        // Reduce the expression
+        JsonNode result = this.expr.reduce(ctx);
+
+        // Collect all local variables created by the expression.
+        Map<String, JsonNode> vars = ctx.frame().getVars();
+
+        // Pop the temporary stack frame.
+        ctx.pop();
+
+        // If an error occurred during reduce we suppress the output. The
+        // temporary stack frame allows us to "undo" the effects of the
+        // evaluation, removing any local variables created by the
+        // invalid expression.
+        if (errors.size() == errs) {
+          // Reduce produced no errors, so retain the local variables.
+          if (vars != null) {
+            // Copy the local variables to the stack frame.
+            Frame frame = ctx.frame();
+            for (Map.Entry<String, JsonNode> var : vars.entrySet()) {
+              frame.setVar(var.getKey(), var.getValue());
+            }
+          }
+
+          // If the expression produced immediate output, emit it.
+          if (result != null) {
+            if (this.debug) {
+              ctx.buffer().append(" -> ");
+            }
+            emitJsonNode(ctx.buffer(), result);
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -1289,7 +1435,7 @@ public class Instructions {
         case FLOAT:
         case DOUBLE:
           double val = node.asDouble();
-          buf.append(Double.toString(val));
+          buf.append(Formats.number(val));
           break;
 
         default:

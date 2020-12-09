@@ -27,6 +27,7 @@ import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EofInst;
+import com.squarespace.template.Instructions.EvalInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
@@ -142,6 +143,10 @@ public class CodeMaker {
 
   public EofInst eof() {
     return new EofInst();
+  }
+
+  public EvalInst eval(String code) {
+    return new EvalInst(code);
   }
 
   public FormatterCall fmt(Formatter formatter) throws ArgumentsException {

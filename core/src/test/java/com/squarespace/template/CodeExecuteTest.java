@@ -178,7 +178,7 @@ public class CodeExecuteTest extends UnitTestBase {
 
     root = builder().var("@").eof().build();
     assertContext(execute("3.14159", root), "3.14159");
-    assertContext(execute("123.000", root), "123.0");
+    assertContext(execute("123.000", root), "123");
     assertContext(execute("null", root), "");
 
 

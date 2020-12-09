@@ -179,6 +179,16 @@ public class CompilerTest {
   }
 
   @Test
+  public void testEval() throws CodeException {
+    Context ctx = COMPILER.newExecutor()
+        .template("{.eval 2 + 3}")
+        .json("{}")
+        .execute();
+    assertEquals(ctx.getErrors().size(), 0);
+    assertEquals(ctx.buffer().toString(), "5");
+  }
+
+  @Test
   public void testLoggingHook() throws CodeException {
     final AtomicInteger count = new AtomicInteger();
     LoggingHook loggingHook = new LoggingHook() {

@@ -53,6 +53,7 @@ import java.util.List;
 
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CtxVarInst;
+import com.squarespace.template.Instructions.EvalInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -378,6 +379,22 @@ public class Tokenizer {
         }
 
         CtxVarInst instruction = maker.ctxvar(name, bindings);
+        emitInstruction(instruction);
+        return true;
+      }
+
+      case EVAL:
+      {
+        if (!skipWhitespace()) {
+          return emitInvalid();
+        }
+
+        // Instruction has a single argument, a free-form expression
+        StringView code = matcher.remainder();
+
+        // The expression will be parsed and assembled the first time
+        // the instruction is executed.
+        EvalInst instruction = maker.eval(code.toString());
         emitInstruction(instruction);
         return true;
       }

@@ -25,6 +25,7 @@ public enum InstructionType {
   CTXVAR,
   END,
   EOF,
+  EVAL,
   IF,
   INJECT,
   MACRO,

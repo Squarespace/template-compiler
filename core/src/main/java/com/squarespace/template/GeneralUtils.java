@@ -59,6 +59,13 @@ public class GeneralUtils {
   }
 
   /**
+   * Return true if the string argument is null or empty, false otherwise.
+   */
+  public static boolean isEmpty(String s) {
+    return s == null || s.isEmpty();
+  }
+
+  /**
    * Quick string to integer conversion, clamping negative values to zero.
    */
   public static long toPositiveLong(CharSequence seq, int pos, int length) {
@@ -68,7 +75,7 @@ public class GeneralUtils {
       char c = seq.charAt(i);
       if (c >= '0' && c <= '9') {
         n *= 10;
-        n += (int)(c - '0');
+        n += c - '0';
       } else {
         break;
       }
