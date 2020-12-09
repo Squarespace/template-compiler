@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.template.expr.ExprOptions;
 
 
 /**
@@ -40,6 +41,8 @@ public class CompilerExecutor {
   private CodeLimiter codeLimiter;
   private boolean safeExecution;
   private boolean preprocess;
+  private boolean enableExpr;
+  private ExprOptions exprOptions;
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
 
   CompilerExecutor(Compiler compiler) {
@@ -84,6 +87,10 @@ public class CompilerExecutor {
     if (now != null) {
       ctx.now(now);
     }
+    if (exprOptions != null) {
+      ctx.setExprOptions(exprOptions);
+    }
+    ctx.setEnableExpr(enableExpr);
     ctx.setMaxPartialDepth(maxPartialDepth);
     ctx.execute(instruction);
     return ctx;
@@ -206,6 +213,22 @@ public class CompilerExecutor {
    */
   public CompilerExecutor preprocess(boolean preprocess) {
     this.preprocess = preprocess;
+    return this;
+  }
+
+  /**
+   * Enable the EVAL expression instruction.
+   */
+  public CompilerExecutor enableExpr(boolean flag) {
+    this.enableExpr = flag;
+    return this;
+  }
+
+  /**
+   * Options for expression evaluation.
+   */
+  public CompilerExecutor exprOptions(ExprOptions opts) {
+    this.exprOptions = opts;
     return this;
   }
 

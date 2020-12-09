@@ -178,6 +178,10 @@ public class TemplateC {
       partials = readFile(partialsPath);
     }
 
+    if (locale == null) {
+      locale = "en-US";
+    }
+
     CompiledTemplate compiled = compiler().compile(template, true, preprocess);
 
     StringBuilder errorBuf = new StringBuilder();
@@ -222,6 +226,7 @@ public class TemplateC {
         .locale(Locale.forLanguageTag(locale))
         .safeExecution(true)
         .partialsMap((ObjectNode)partialsTree)
+        .enableExpr(true)
         .execute();
 
     // If compile was successful, print the output.

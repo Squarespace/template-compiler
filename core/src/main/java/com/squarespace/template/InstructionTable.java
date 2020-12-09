@@ -53,6 +53,7 @@ public class InstructionTable {
     add(".alternates", InstructionType.ALTERNATES_WITH, false);
     add(".ctx", InstructionType.CTXVAR);
     add(".end", InstructionType.END);
+    add(".eval", InstructionType.EVAL);
     add(".if", InstructionType.IF);
     add(".inject", InstructionType.INJECT);
     add(".macro", InstructionType.MACRO);

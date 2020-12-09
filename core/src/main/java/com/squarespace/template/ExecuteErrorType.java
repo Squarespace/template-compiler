@@ -45,6 +45,12 @@ public enum ExecuteErrorType implements ErrorType {
   COMPILE_PARTIAL_SYNTAX(
       "Compiling partial '%(name)s' raised errors:"),
 
+  EXPRESSION_PARSE(
+      "Error parsing expression: %(data)s"),
+
+  EXPRESSION_REDUCE(
+      "Error reducing expression: %(data)s"),
+
   GENERAL_ERROR(
       "Default error %(name)s: %(data)s"),
 

@@ -208,6 +208,16 @@ public class TokenizerCoreTest extends UnitTestBase {
   }
 
   @Test
+  public void testEval() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    assertResult("{.eval 1 + 2}", mk.eval("1 + 2"), mk.eof());
+    assertResult("{.eval }", mk.eval(""), mk.eof());
+
+    assertFailure("{.eval}", WHITESPACE_EXPECTED);
+    assertFailure("{.eval1+2}", INVALID_INSTRUCTION);
+  }
+
+  @Test
   public void testFormatter() throws CodeSyntaxException, ArgumentsException {
     CodeMaker mk = maker();
     Arguments args1 = mk.args(" a1 a2");

@@ -49,6 +49,9 @@ public class Frame {
     this.stopResolution = flag;
   }
 
+  /**
+   * Adds a variable to this frame.
+   */
   public void setVar(String name, JsonNode node) {
     if (variables == null) {
       variables = new HashMap<>(4);
@@ -56,10 +59,23 @@ public class Frame {
     variables.put(name, node);
   }
 
+  /**
+   * Returns a variable's value, or a missing node.
+   */
   public JsonNode getVar(String name) {
     return (variables == null) ? null : variables.get(name);
   }
 
+  /**
+   * Returns the map containing the local variables for this frame.
+   */
+  public Map<String, JsonNode> getVars() {
+    return this.variables;
+  }
+
+  /**
+   * Adds a macro to this frame.
+   */
   public void setMacro(String name, Instruction inst) {
     if (macros == null) {
       macros = new HashMap<>(4);

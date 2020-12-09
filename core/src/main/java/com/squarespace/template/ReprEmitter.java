@@ -23,6 +23,7 @@ import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
 import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.EndInst;
+import com.squarespace.template.Instructions.EvalInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
 import com.squarespace.template.Instructions.InjectInst;
@@ -106,6 +107,15 @@ public class ReprEmitter {
     buf.append('{');
     emitPreprocess(inst, buf);
     buf.append(".end}");
+  }
+
+  public static void emit(EvalInst inst, StringBuilder buf) {
+    buf.append('{');
+    emitPreprocess(inst, buf);
+    buf.append(".eval ");
+    buf.append(inst.body());
+    buf.append('}');
+
   }
 
   public static void emit(Arguments args, StringBuilder buf) {
