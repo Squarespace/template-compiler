@@ -42,6 +42,7 @@ public class CompilerExecutor {
   private boolean safeExecution;
   private boolean preprocess;
   private boolean enableExpr;
+  private boolean enableInclude;
   private ExprOptions exprOptions;
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
 
@@ -91,6 +92,7 @@ public class CompilerExecutor {
       ctx.setExprOptions(exprOptions);
     }
     ctx.setEnableExpr(enableExpr);
+    ctx.setEnableInclude(enableInclude);
     ctx.setMaxPartialDepth(maxPartialDepth);
     ctx.execute(instruction);
     return ctx;
@@ -221,6 +223,14 @@ public class CompilerExecutor {
    */
   public CompilerExecutor enableExpr(boolean flag) {
     this.enableExpr = flag;
+    return this;
+  }
+
+  /**
+   * Enable the INCLUDE instruction.
+   */
+  public CompilerExecutor enableInclude(boolean flag) {
+    this.enableInclude = flag;
     return this;
   }
 

@@ -26,6 +26,7 @@ import com.squarespace.template.Instructions.EndInst;
 import com.squarespace.template.Instructions.EvalInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
+import com.squarespace.template.Instructions.IncludeInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.LiteralInst;
 import com.squarespace.template.Instructions.MacroInst;
@@ -177,6 +178,12 @@ public class ReprEmitter {
     if (recurse) {
       emitBlock(inst, buf, recurse);
     }
+  }
+
+  public static void emit(IncludeInst inst, StringBuilder buf) {
+    buf.append("{.include");
+    emit(inst.getArguments(), buf);
+    buf.append('}');
   }
 
   public static void emit(InjectInst inst, StringBuilder buf, boolean recurse) {

@@ -253,6 +253,16 @@ public class TokenizerCoreTest extends UnitTestBase {
   }
 
   @Test
+  public void testInclude() throws CodeSyntaxException {
+    CodeMaker mk = maker();
+    assertResult("{.include foo.html output}", mk.include(mk.args(" foo.html output")), mk.eof());
+
+    assertResult("{.include}", mk.text("{.include}"), mk.eof());
+    assertResult("{.include }", mk.text("{.include }"), mk.eof());
+    assertResult("{.include a}", mk.include(mk.args(" a")), mk.eof());
+  }
+
+  @Test
   public void testIf() throws CodeSyntaxException {
     CodeMaker mk = maker();
     assertResult("{.if a}", mk.ifexpn(mk.strlist("a"), mk.oplist()), mk.eof());

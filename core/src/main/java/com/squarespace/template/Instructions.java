@@ -16,6 +16,7 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.ExecuteErrorType.INCLUDE_PARTIAL_SYNTAX;
 import static com.squarespace.template.GeneralUtils.splitVariable;
 
 import java.util.ArrayList;
@@ -711,6 +712,111 @@ public class Instructions {
     @Override
     public void repr(StringBuilder buf, boolean recurse) {
       ReprEmitter.emit(this, buf, recurse);
+    }
+  }
+
+  /**
+   * Used to include a partial template or macro.
+   */
+  public static class IncludeInst extends BaseInstruction {
+
+    private final Arguments args;
+    private final String name;
+    private boolean output;
+
+    IncludeInst(Arguments args) {
+      this.args = args;
+      this.name = args.isEmpty() ? "" : args.first();
+      for (int i = 1; i < args.count(); i++) {
+        String arg = args.get(i);
+        switch (arg) {
+          case "output":
+            this.output = true;
+            break;
+        }
+      }
+    }
+
+    public Arguments getArguments() {
+      return args;
+    }
+
+    @Override
+    public InstructionType getType() {
+      return InstructionType.INCLUDE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof IncludeInst) {
+        IncludeInst other = (IncludeInst) obj;
+        return args.equals(other.args);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public void invoke(Context ctx) throws CodeExecuteException {
+      // Refuse to evaluate the instruction if not explicitly enabled
+      if (!ctx.getEnableInclude()) {
+        return;
+      }
+
+      // Fetch the partial or macro code
+      Instruction code = null;
+      try {
+        code = ctx.getPartial(name);
+      } catch (CodeSyntaxException e) {
+        ErrorInfo parent = ctx.error(INCLUDE_PARTIAL_SYNTAX).name(name).data(e.getMessage());
+        parent.child(e.getErrorInfo());
+        throw new CodeExecuteException(parent);
+      }
+
+      if (code == null) {
+        ErrorInfo error = ctx.error(ExecuteErrorType.INCLUDE_PARTIAL_MISSING).name(name);
+        if (ctx.safeExecutionEnabled()) {
+          ctx.addError(error);
+          return;
+        } else {
+          throw new CodeExecuteException(error);
+        }
+      }
+
+      // By default we suppress output from the partial or macro
+      StringBuilder buf = null;
+      if (!output) {
+        buf = ctx.swapBuffer(new StringBuilder());
+      }
+
+      // Execute the partial or macro inline.
+      if (ctx.enterPartial(name)) {
+        InstructionType type = code.getType();
+        switch (type) {
+          case ROOT:
+            ((RootInst)code).invoke(ctx);
+            break;
+          case MACRO:
+            ((MacroInst)code).root().invoke(ctx);
+            break;
+          default:
+            break;
+        }
+        ctx.exitPartial(name);
+      }
+
+      if (!output && buf != null) {
+        ctx.swapBuffer(buf);
+      }
+    }
+
+    @Override
+    public void repr(StringBuilder buf, boolean recurse) {
+      ReprEmitter.emit(this, buf);
     }
   }
 

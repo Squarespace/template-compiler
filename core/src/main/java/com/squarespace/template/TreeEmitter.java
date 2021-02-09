@@ -26,8 +26,11 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import com.squarespace.template.Instructions.AlternatesWithInst;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CommentInst;
+import com.squarespace.template.Instructions.EvalInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
+import com.squarespace.template.Instructions.IncludeInst;
+import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.RepeatedInst;
 import com.squarespace.template.Instructions.SectionInst;
@@ -61,6 +64,7 @@ public class TreeEmitter {
     switch (type) {
       case ALTERNATES_WITH:
       case IF:
+      case MACRO:
       case OR_PREDICATE:
       case PREDICATE:
       case SECTION:
@@ -105,6 +109,20 @@ public class TreeEmitter {
         emitEscapedString(comment.getView(), buf);
         break;
 
+      case EVAL:
+        EvalInst eval = (EvalInst)inst;
+        buf.append(' ');
+        emitEscapedString(eval.body(), buf);
+        break;
+
+      case INCLUDE:
+      {
+        IncludeInst include = (IncludeInst) inst;
+        buf.append(' ');
+        emitArgs(include.getArguments(), buf);
+        break;
+      }
+
       case IF:
       {
         if (inst instanceof IfInst) {
@@ -122,6 +140,18 @@ public class TreeEmitter {
             }
           }
         }
+        break;
+      }
+
+      case INJECT:
+      {
+        InjectInst inject = (InjectInst) inst;
+        buf.append(' ');
+        emitEscapedString(inject.variable(), buf);
+        buf.append(' ');
+        emitEscapedString(inject.filename(), buf);
+        buf.append(' ');
+        emitArgs(inject.arguments(), buf);
         break;
       }
 
@@ -193,7 +223,10 @@ public class TreeEmitter {
   }
 
   private static void emitEscapedString(StringView view, StringBuilder buf) {
-    String raw = view.toString();
+    emitEscapedString(view.toString(), buf);
+  }
+
+  private static void emitEscapedString(String raw, StringBuilder buf) {
     int length = raw.length();
     int maxLen = Math.min(40, length);
     buf.append("(len=").append(length).append(") ");

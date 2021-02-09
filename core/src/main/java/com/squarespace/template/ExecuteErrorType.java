@@ -54,6 +54,12 @@ public enum ExecuteErrorType implements ErrorType {
   GENERAL_ERROR(
       "Default error %(name)s: %(data)s"),
 
+  INCLUDE_PARTIAL_SYNTAX(
+      "Include partial '%(name)s' raised an error: %(data)s"),
+
+  INCLUDE_PARTIAL_MISSING(
+      "Attempt to include partial '%(name)s' which could not be found."),
+
   RESOURCE_LOAD(
       "Failed to load resource %(name)s: %(data)s"),
 
@@ -71,10 +77,12 @@ public enum ExecuteErrorType implements ErrorType {
     this.messageFormat = new MapFormat(messageFormat, NULL_PLACEHOLDER);
   }
 
+  @Override
   public String prefix(Map<String, Object> params) {
     return this.prefixFormat.apply(params);
   }
 
+  @Override
   public String message(Map<String, Object> params) {
     return messageFormat.apply(params);
   }

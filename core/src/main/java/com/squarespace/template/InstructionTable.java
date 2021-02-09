@@ -55,6 +55,7 @@ public class InstructionTable {
     add(".end", InstructionType.END);
     add(".eval", InstructionType.EVAL);
     add(".if", InstructionType.IF);
+    add(".include", InstructionType.INCLUDE);
     add(".inject", InstructionType.INJECT);
     add(".macro", InstructionType.MACRO);
     add(".meta-left", InstructionType.META_LEFT);

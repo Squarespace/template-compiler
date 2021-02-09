@@ -27,6 +27,7 @@ public enum InstructionType {
   EOF,
   EVAL,
   IF,
+  INCLUDE,
   INJECT,
   MACRO,
   META_LEFT,

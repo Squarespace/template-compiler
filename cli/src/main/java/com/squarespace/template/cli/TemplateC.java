@@ -227,6 +227,7 @@ public class TemplateC {
         .safeExecution(true)
         .partialsMap((ObjectNode)partialsTree)
         .enableExpr(true)
+        .enableInclude(true)
         .execute();
 
     // If compile was successful, print the output.

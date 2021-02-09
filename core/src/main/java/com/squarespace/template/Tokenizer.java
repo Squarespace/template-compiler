@@ -54,6 +54,7 @@ import java.util.List;
 import com.squarespace.template.Instructions.BindVarInst;
 import com.squarespace.template.Instructions.CtxVarInst;
 import com.squarespace.template.Instructions.EvalInst;
+import com.squarespace.template.Instructions.IncludeInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
@@ -415,6 +416,28 @@ public class Tokenizer {
 
       case IF:
         return parseIfExpression();
+
+      case INCLUDE: {
+        // this instruction accepts space-delimited arguments
+        if (!matcher.space()) {
+          return emitInvalid();
+        }
+
+        if (!matcher.arguments()) {
+          return emitInvalid();
+        }
+
+        StringView rawArgs = matcher.consume();
+        Arguments args = new Arguments(rawArgs);
+        if (args.count() < 1) {
+          return emitInvalid();
+        }
+
+        IncludeInst instruction = maker.include(args);
+        emitInstruction(instruction);
+        return true;
+      }
+
 
       case INJECT:
       {

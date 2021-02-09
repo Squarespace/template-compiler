@@ -95,6 +95,7 @@ public class Context {
 
   private boolean enableExpr = false;
   private ExprOptions exprOptions = null;
+  private boolean enableInclude = false;
 
   /* Holds the final output of the template execution */
   private StringBuilder buf;
@@ -202,6 +203,14 @@ public class Context {
 
   public boolean getEnableExpr() {
     return this.enableExpr;
+  }
+
+  public void setEnableInclude(boolean flag) {
+    this.enableInclude = flag;
+  }
+
+  public boolean getEnableInclude() {
+    return this.enableInclude;
   }
 
   /**

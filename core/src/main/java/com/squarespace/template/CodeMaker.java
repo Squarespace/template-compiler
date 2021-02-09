@@ -30,6 +30,7 @@ import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.EvalInst;
 import com.squarespace.template.Instructions.IfInst;
 import com.squarespace.template.Instructions.IfPredicateInst;
+import com.squarespace.template.Instructions.IncludeInst;
 import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.MetaInst;
@@ -183,6 +184,10 @@ public class CodeMaker {
     IfPredicateInst res = new IfPredicateInst(predicate, args);
     predicate.validateArgs(args);
     return res;
+  }
+
+  public IncludeInst include(Arguments args) {
+    return new IncludeInst(args);
   }
 
   public InjectInst inject(String variable, String path) {
