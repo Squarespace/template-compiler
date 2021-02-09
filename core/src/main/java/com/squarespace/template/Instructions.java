@@ -514,7 +514,7 @@ public class Instructions {
       }
 
       if (debug) {
-        ctx.buffer().append("EVAL");
+        ctx.buffer().append("EVAL=");
         Tokens.debug(this.expr.expressions(), ctx.buffer());
       }
 
