@@ -1,5 +1,11 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
 plugins {
   id 'me.champeau.gradle.jmh' version '0.5.0'
   id 'net.researchgate.release' version '2.6.0'
@@ -10,8 +16,15 @@ plugins {
   id 'signing'
 }
 
+allprojects {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+}
+
 wrapper {
-  gradleVersion = '6.2'
+  gradleVersion = '6.5'
 }
 
 project.ext {
@@ -49,11 +62,6 @@ subprojects {
 
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
-
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
 
   apply plugin: 'me.champeau.gradle.jmh'
   apply plugin: 'java'
