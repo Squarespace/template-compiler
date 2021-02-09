@@ -21,6 +21,7 @@ allprojects {
     mavenLocal()
     mavenCentral()
   }
+
 }
 
 wrapper {
@@ -60,15 +61,15 @@ subprojects {
 
   group = 'com.squarespace.template'
 
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
-
   apply plugin: 'me.champeau.gradle.jmh'
   apply plugin: 'java'
   apply plugin: 'eclipse'
   apply plugin: 'jacoco'
   apply plugin: 'maven-publish'
   apply plugin: 'signing'
+
+  sourceCompatibility = 8
+  targetCompatibility = 8
 
   jmh {
     jmhVersion '1.23'
