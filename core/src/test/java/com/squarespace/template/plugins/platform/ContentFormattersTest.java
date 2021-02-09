@@ -95,7 +95,9 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
         "f-image-1.html",
         "f-image-2.html",
         "f-image-3.html",
-        "f-image-4.html"
+        "f-image-4.html",
+        "f-image-5.html",
+        "f-image-6.html"
         );
   }
 

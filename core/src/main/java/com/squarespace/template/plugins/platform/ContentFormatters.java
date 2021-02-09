@@ -58,6 +58,8 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
  */
 public class ContentFormatters implements FormatterRegistry {
 
+  public static final int MAX_ALT_TEXT_LENGTH = 1000;
+
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
     table.add(new AbsUrlFormatter(Constants.BASE_URL_KEY));
@@ -274,7 +276,7 @@ public class ContentFormatters implements FormatterRegistry {
     if (isTruthy(body)) {
       String text = PluginUtils.removeTags(body.asText());
       if (text.length() > 0) {
-        return text;
+        return text.substring(0, Math.min(text.length(), MAX_ALT_TEXT_LENGTH));
       }
     }
 

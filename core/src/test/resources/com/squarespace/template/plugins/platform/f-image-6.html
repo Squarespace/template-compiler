@@ -1,0 +1,23 @@
+:COMMENTS
+should print truncated alt text from image.body if title is missing and body length is more than 1000 characters
+
+:JSON
+{
+  "img": {
+    "id": "560c37c1a7c8465c4a71d99a",
+    "title": "",
+    "originalSize": 1000,
+    "assetUrl": "/foo/bar.jpg",
+    "mediaFocalPoint": {"x": 0.3, "y": 0.7},
+    "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean condimentum duis egestas felis placerat quisque nulla vestibulum aenean posuere vivamus diam semper aenean Consectetuer. Pede senectus sagittis turpis nulla, ultrices ultrices laoreet integer parturient tristique aliquet. Suscipit Id libero magna tempor in porttitor sagittis at, metus tempor dapibus vestibulum, mollis sed lacus Risus rutrum pede hendrerit semper felis primis fames nam et. Phasellus nulla dapibus dictum. Leo cum suscipit. Sed maecenas vitae senectus auctor ipsum. Cursus erat, habitant lacus diam blandit odio fermentum faucibus euismod porttitor a hymenaeos lobortis vulputate nullam vestibulum euismod neque nullam Donec fermentum varius egestas justo. Natoque ipsum penatibus magnis nunc odio. Aenean, gravida et. Habitant. Curae; augue. Nullam pulvinar ligula magna auctor etiam bibendum dictum. Blandit parturient mollis at. Neque auctor penatibus metus. Erat viverra puribus. THIS DOES NOT SHOW UP"
+},
+  "info": {
+    "something": "else"
+  }
+}
+
+:TEMPLATE
+{img|image foo-bar-image}
+
+:OUTPUT
+<noscript><img src="/foo/bar.jpg" alt="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean condimentum duis egestas felis placerat quisque nulla vestibulum aenean posuere vivamus diam semper aenean Consectetuer. Pede senectus sagittis turpis nulla, ultrices ultrices laoreet integer parturient tristique aliquet. Suscipit Id libero magna tempor in porttitor sagittis at, metus tempor dapibus vestibulum, mollis sed lacus Risus rutrum pede hendrerit semper felis primis fames nam et. Phasellus nulla dapibus dictum. Leo cum suscipit. Sed maecenas vitae senectus auctor ipsum. Cursus erat, habitant lacus diam blandit odio fermentum faucibus euismod porttitor a hymenaeos lobortis vulputate nullam vestibulum euismod neque nullam Donec fermentum varius egestas justo. Natoque ipsum penatibus magnis nunc odio. Aenean, gravida et. Habitant. Curae; augue. Nullam pulvinar ligula magna auctor etiam bibendum dictum. Blandit parturient mollis at. Neque auctor penatibus metus. Erat viverra puribus." /></noscript><img class="foo-bar-image" data-src="/foo/bar.jpg" data-image="/foo/bar.jpg" data-image-dimensions="1000" data-image-focal-point="0.3,0.7" alt="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean condimentum duis egestas felis placerat quisque nulla vestibulum aenean posuere vivamus diam semper aenean Consectetuer. Pede senectus sagittis turpis nulla, ultrices ultrices laoreet integer parturient tristique aliquet. Suscipit Id libero magna tempor in porttitor sagittis at, metus tempor dapibus vestibulum, mollis sed lacus Risus rutrum pede hendrerit semper felis primis fames nam et. Phasellus nulla dapibus dictum. Leo cum suscipit. Sed maecenas vitae senectus auctor ipsum. Cursus erat, habitant lacus diam blandit odio fermentum faucibus euismod porttitor a hymenaeos lobortis vulputate nullam vestibulum euismod neque nullam Donec fermentum varius egestas justo. Natoque ipsum penatibus magnis nunc odio. Aenean, gravida et. Habitant. Curae; augue. Nullam pulvinar ligula magna auctor etiam bibendum dictum. Blandit parturient mollis at. Neque auctor penatibus metus. Erat viverra puribus." data-load="false" data-image-id="560c37c1a7c8465c4a71d99a" data-type="image" />
