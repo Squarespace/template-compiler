@@ -1,17 +1,12 @@
 package com.squarespace.template.expr;
 
-import java.text.DecimalFormat;
+import com.squarespace.template.dtoa.DToA;
+import com.squarespace.template.v8dtoa.FastDtoa;
 
 /**
  * Miscellaneous formatting and parsing functions.
  */
 public class Formats {
-
-  // Format for fully-expanded decimal representation with up to 20 decimal digits.
-  private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#0.####################");
-
-  // Format for an exponential representation with up to 20 decimal digits.
-  private static final DecimalFormat EXP_FORMAT = new DecimalFormat("0.####################E0");
 
   private Formats() { }
 
@@ -45,24 +40,25 @@ public class Formats {
     return valid ? r : Double.NaN;
   }
 
-  /**
-   * Format a number with the same output as JavaScript.
-   */
-  public static String number(double n) {
-    if (Double.isNaN(n)) {
-      return "NaN";
-    }
-    if (Double.isInfinite(n)) {
-      return n > 0 ? "Infinity" : "-Infinity";
-    }
+  public static String number(double d) {
+    if (Double.isNaN(d))
+        return "NaN";
+    if (d == Double.POSITIVE_INFINITY)
+        return "Infinity";
+    if (d == Double.NEGATIVE_INFINITY)
+        return "-Infinity";
+    if (d == 0.0)
+        return "0";
 
-    // If the number is too large or too small to represent with all digits
-    // expanded, display an exponential format.
-    if ((n >= 1e21) || (n > 0 && n <= 1e-21) || (n < 0 && n >= -1e-21) || (n <= -1e21)) {
-      return fixExponent(EXP_FORMAT.format(n));
+    // V8 FastDtoa can't convert all numbers, so try it first but
+    // fall back to old DToA in case it fails
+    String result = FastDtoa.numberToString(d);
+    if (result != null) {
+        return result;
     }
-    // Display expanded decimal digits
-    return DECIMAL_FORMAT.format(n);
+    StringBuilder buffer = new StringBuilder();
+    DToA.JS_dtostr(buffer, DToA.DTOSTR_STANDARD, 0, d);
+    return buffer.toString();
   }
 
   /**
@@ -83,39 +79,4 @@ public class Formats {
     return n < 16 ? n : -1;
   }
 
-  /**
-   * Correct Java's exponential format to match JavaScript's output.
-   * This is not a general method, it is only called by the number()
-   * formatting method which ensures the string represents a finite
-   * number that was formatted using EXP_FORMAT above.
-   */
-  private static String fixExponent(String s) {
-    int i = s.indexOf('E');
-    if (i == -1) {
-      return s;
-    }
-
-    String base = s.substring(0, i);
-    String exp = s.substring(i);
-
-    // Trim trailing zeros from base
-    int len = base.length();
-    int k = len;
-    for (int j = len - 1; j >= 0; j--) {
-      char c = base.charAt(j);
-      if (c != '0') {
-        break;
-      }
-      k = j;
-    }
-
-    // Assemble the final format
-    StringBuilder buf = new StringBuilder();
-    buf.append(base.substring(0, k));
-    buf.append('e');
-    boolean negative = exp.charAt(1) == '-';
-    buf.append(negative ? '-' : '+');
-    buf.append(exp.substring(negative ? 2 : 1));
-    return buf.toString();
-  }
 }

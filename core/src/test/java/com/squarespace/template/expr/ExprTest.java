@@ -382,7 +382,6 @@ public class ExprTest {
 
   @Test
   public void testStringErrors() {
-    Context c = new Context(JsonUtils.decode("{}"));
     Expr e;
 
     e = new Expr("'");
@@ -881,15 +880,25 @@ public class ExprTest {
     assertEquals(reduce("str(1e20)", c), new TextNode("100000000000000000000"));
     assertEquals(reduce("str(1e21)", c), new TextNode("1e+21"));
     assertEquals(reduce("str(1e300)", c), new TextNode("1e+300"));
+
+    // small magnitude
+    assertEquals(reduce("str(1e-5)", c), new TextNode("0.00001"));
+    assertEquals(reduce("str(1e-6)", c), new TextNode("0.000001"));
+    assertEquals(reduce("str(1e-7)", c), new TextNode("1e-7"));
+    assertEquals(reduce("str(1e-20)", c), new TextNode("1e-20"));
+    assertEquals(reduce("str(1e-21)", c), new TextNode("1e-21"));
+    assertEquals(reduce("str(1e-300)", c), new TextNode("1e-300"));
+
+    // negative large magnitude
     assertEquals(reduce("str(-1e20)", c), new TextNode("-100000000000000000000"));
     assertEquals(reduce("str(-1e21)", c), new TextNode("-1e+21"));
     assertEquals(reduce("str(-1e300)", c), new TextNode("-1e+300"));
 
-    // small magnitude
-    assertEquals(reduce("str(1e-20)", c), new TextNode("0.00000000000000000001"));
-    assertEquals(reduce("str(1e-21)", c), new TextNode("1e-21"));
-    assertEquals(reduce("str(1e-300)", c), new TextNode("1e-300"));
-    assertEquals(reduce("str(-1e-20)", c), new TextNode("-0.00000000000000000001"));
+    // negative small magnitude
+    assertEquals(reduce("str(-1e-5)", c), new TextNode("-0.00001"));
+    assertEquals(reduce("str(-1e-6)", c), new TextNode("-0.000001"));
+    assertEquals(reduce("str(-1e-7)", c), new TextNode("-1e-7"));
+    assertEquals(reduce("str(-1e-20)", c), new TextNode("-1e-20"));
     assertEquals(reduce("str(-1e-21)", c), new TextNode("-1e-21"));
     assertEquals(reduce("str(-1e-300)", c), new TextNode("-1e-300"));
   }
