@@ -337,14 +337,13 @@ public class CoreFormattersTest extends UnitTestBase {
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "2013-11-15 07:30:30 EST");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "2013-11-15 04:30:30 PST");
 
-    String r1 = formatDate("%a %d %b %Y %I:%M:%S %p %Z", NOV_15_2013_123030_UTC, tzNewYork);
+    String r1 = formatDate("%a, %b %d, %Y %I:%M:%S %p %Z", NOV_15_2013_123030_UTC, tzNewYork);
     String r2 = formatDate("%c", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
 
-    r1 = formatDate("%a %d %b %Y %I:%M:%S %p %Z", MAY_13_2013_010000_UTC, tzNewYork);
+    r1 = formatDate("%a, %b %d, %Y %I:%M:%S %p %Z", MAY_13_2013_010000_UTC, tzNewYork);
     r2 = formatDate("%c", MAY_13_2013_010000_UTC, tzNewYork);
     assertEquals(r1, r2);
-
 
     r1 = formatDate("%F", NOV_15_2013_123030_UTC, tzLosAngeles);
     r2 = formatDate("%Y-%m-%d", NOV_15_2013_123030_UTC, tzLosAngeles);

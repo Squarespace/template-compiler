@@ -266,11 +266,11 @@ public class PluginDateUtils {
     switch (type) {
       case FULL:
         buf.append(date.dayOfWeek().getAsShortText(locale));
-        buf.append(' ');
-        leftPad(date.dayOfMonth().get(), '0', 2, buf);
-        buf.append(' ');
+        buf.append(", ");
         buf.append(date.monthOfYear().getAsShortText(locale));
         buf.append(' ');
+        buf.append(date.dayOfMonth().get());
+        buf.append(", ");
         buf.append(date.year().get());
         buf.append(' ');
         leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), '0', 2, buf);

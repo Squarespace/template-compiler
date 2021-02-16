@@ -265,12 +265,16 @@ public class PluginDateUtilsTest {
   @Test
   public void testAggregateFields() throws CodeException {
     String r1 = formatDate("%c", NOV_15_2013_123030_UTC, TZ_NY);
-    String r2 = formatDate("%a %d %b %Y %I:%M:%S %p %Z", NOV_15_2013_123030_UTC, TZ_NY);
+    String r2 = formatDate("%a, %b %d, %Y %I:%M:%S %p %Z", NOV_15_2013_123030_UTC, TZ_NY);
     assertEquals(r1, r2);
 
     r1 = formatDate("%c", MAY_13_2013_010000_UTC, TZ_NY);
-    r2 = formatDate("%a %d %b %Y %I:%M:%S %p %Z", MAY_13_2013_010000_UTC, TZ_NY);
+    r2 = formatDate("%a, %b %d, %Y %I:%M:%S %p %Z", MAY_13_2013_010000_UTC, TZ_NY);
     assertEquals(r1, r2);
+
+    long base = MAY_13_2013_010000_UTC - (86400000 * 5);
+    r1 = formatDate("%c", base, TZ_NY);
+    assertEquals(r1, "Tue, May 7, 2013 09:00:00 PM EDT");
 
     r1 = formatDate("%F", NOV_15_2013_123030_UTC, TZ_LA);
     r2 = formatDate("%Y-%m-%d", NOV_15_2013_123030_UTC, TZ_LA);
