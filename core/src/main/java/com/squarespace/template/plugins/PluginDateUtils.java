@@ -18,15 +18,17 @@ package com.squarespace.template.plugins;
 
 import static com.squarespace.template.plugins.PluginUtils.leftPad;
 
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.squarespace.cldrengine.CLDR;
+import com.squarespace.cldrengine.api.Bundle;
+import com.squarespace.cldrengine.api.GregorianDate;
+import com.squarespace.cldrengine.internal.CalendarFields;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 
@@ -34,6 +36,19 @@ import com.squarespace.template.Context;
 public class PluginDateUtils {
 
   private static final String DEFAULT_TIMEZONEID = "America/New_York";
+
+  private static final String[] SHORT_DAYS = new String[] {
+    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+  };
+  private static final String[] LONG_DAYS = new String[] {
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+  };
+  private static final String[] SHORT_MONTHS = new String[] {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  };
+  private static final String[] LONG_MONTHS = new String[] {
+      "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+  };
 
   private PluginDateUtils() {
   }
@@ -154,15 +169,18 @@ public class PluginDateUtils {
   /**
    * Takes a strftime()-compatible format string and outputs the properly formatted date.
    */
-  public static void formatDate(Locale locale, String fmt, long instant, String tzName, StringBuilder buf) {
-    DateTimeZone zone = null;
-    try {
-      zone = DateTimeZone.forID(tzName);
-    } catch (IllegalArgumentException e) {
-      zone = DateTimeZone.getDefault();
+  public static void formatDate(CLDR cldr, String fmt, long instant, String tzName, StringBuilder buf) {
+    GregorianDate d = GregorianDate.fromUnixEpoch(instant, tzName, 0, 0);
+    CalendarFields fields = null;
+    Bundle bundle = null;
+    if (cldr != null) {
+      fields = cldr.Schema.Gregorian.standAlone;
+      bundle = cldr.General.bundle();
     }
-//    GregorianDate date = GregorianDate.fromUnixEpoch(instant, tzName, 0, 0);
-    DateTime date = new DateTime(instant, zone);
+    _formatDate(bundle, fields, fmt, d, buf);
+  }
+
+  private static void _formatDate(Bundle bundle, CalendarFields fields, String fmt, GregorianDate d, StringBuilder buf) {
     int index = 0;
     int len = fmt.length();
     while (index < len) {
@@ -174,88 +192,212 @@ public class PluginDateUtils {
       }
       char c2 = fmt.charAt(index);
       switch (c2) {
-        case 'A': buf.append(date.dayOfWeek().getAsText(locale)); break;
-        case 'a': buf.append(date.dayOfWeek().getAsShortText(locale)); break;
-        case 'B': buf.append(date.monthOfYear().getAsText(locale)); break;
-        case 'b': buf.append(date.monthOfYear().getAsShortText(locale)); break;
-        case 'C': leftPad(date.centuryOfEra().get(), '0', 2, buf); break;
-        case 'c': formatAggregate(DateTimeAggregate.FULL, locale, date, buf); break;
-        case 'D': formatAggregate(DateTimeAggregate.MMDDYY, locale, date, buf); break;
-        case 'd': leftPad(date.dayOfMonth().get(), '0', 2, buf); break;
-        case 'e': leftPad(date.dayOfMonth().get(), ' ', 2, buf); break;
-        case 'F': formatAggregate(DateTimeAggregate.YYYYMMDD, locale, date, buf); break;
-        case 'G': buf.append(date.year().get()); break;
-        case 'g': leftPad(date.yearOfCentury().get(), '0', 2, buf); break;
-        case 'H': leftPad(date.hourOfDay().get(), '0', 2, buf); break;
-        case 'h': buf.append(date.monthOfYear().getAsShortText(locale)); break;
-        case 'I': leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), '0', 2, buf); break;
-        case 'j': leftPad(date.dayOfYear().get(), '0', 3, buf); break;
-        case 'k': leftPad(date.get(DateTimeFieldType.clockhourOfDay()), ' ', 2, buf); break;
-        case 'l': leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), ' ', 2, buf); break;
-        case 'M': leftPad(date.minuteOfHour().get(), '0', 2, buf); break;
-        case 'm': leftPad(date.monthOfYear().get(), '0', 2, buf); break;
-        case 'n': buf.append('\n'); break;
-        case 'N': leftPad(date.get(DateTimeFieldType.millisOfSecond()) * 1000000, '0', 9, buf); break;
-        case 'P': buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "am" : "pm"); break;
-        case 'p': buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM"); break;
-        case 'q': buf.append(((date.monthOfYear().get() - 1) / 3) + 1); break;
-        case 'r': formatAggregate(DateTimeAggregate.H12, locale, date, buf); break;
-        case 'R': formatAggregate(DateTimeAggregate.H240_M0, locale, date, buf); break;
-        case 'S': leftPad(date.secondOfMinute().get(), '0', 2, buf); break;
-        case 's': buf.append(instant / 1000); break;
-        case 't': buf.append('\t'); break;
-        case 'T':
-          // Equivalent of %H:%M:%S
-          formatAggregate(DateTimeAggregate.H240_M0, locale, date, buf);
-          buf.append(':');
-          leftPad(date.secondOfMinute().get(), '0', 2, buf);
-          break;
-
-        case 'U':
-          // TODO: fix week-of-year number
-          break;
-
-        case 'u': buf.append(date.dayOfWeek().get()); break;
-
-        case 'V':
-          // TODO: fix week-of-year number
-          break;
-
-        case 'v':
-          // Equivalent of %e-%b-%Y
-          leftPad(date.dayOfMonth().get(), ' ', 2, buf);
-          buf.append('-');
-          buf.append(date.monthOfYear().getAsShortText());
-          buf.append('-');
-          buf.append(date.getYear());
-          break;
-
-        case 'W':
-          // TODO: fix week-of-year number
-          break;
-
-        case 'w': buf.append(date.dayOfWeek().get()); break;
-        case 'X': formatAggregate(DateTimeAggregate.HHMMSSP, locale, date, buf); break;
-        case 'x': formatAggregate(DateTimeAggregate.MMDDYYYY, locale, date, buf); break;
-        case 'Y': buf.append(date.getYear()); break;
-        case 'y': leftPad(date.getYearOfCentury(), '0', 2, buf); break;
-
-        case 'Z':
-          // Note: Joda's nameKey happens to be the same as the shortName. Making
-          // this change to workaround Joda https://github.com/JodaOrg/joda-time/issues/288
-          buf.append(zone.getNameKey(date.getMillis()));
-          break;
-
-        case 'z':
-          int offset = date.getZone().getOffset(instant) / 60000;
-          int hours = (int)Math.floor(offset / 60);
-          int minutes = (hours * 60) - offset;
-          if (offset < 0) {
-            buf.append('-');
+        // %a     locale's abbreviated weekday name (e.g., Sun)
+        case 'a': {
+          if (bundle != null) {
+            String name = fields.weekdays.get(bundle, "abbreviated", Long.toString(d.dayOfWeek()));
+            buf.append(name);
+          } else {
+            buf.append(SHORT_DAYS[(int)d.dayOfWeek() - 1]);
           }
-          leftPad(Math.abs(hours), '0', 2, buf);
-          leftPad(Math.abs(minutes), '0', 2, buf);
           break;
+        }
+
+        // %A     locale's full weekday name (e.g., Sunday)
+        case 'A': {
+          if (bundle != null) {
+            String name = fields.weekdays.get(bundle, "wide", Long.toString(d.dayOfWeek()));
+            buf.append(name);
+          } else {
+            buf.append(LONG_DAYS[(int)d.dayOfWeek() - 1]);
+          }
+          break;
+        }
+
+        // %b     locale's abbreviated month name (e.g., Jan)
+        case 'b': {
+          if (bundle != null) {
+            String name = fields.months.get(bundle, "abbreviated", Long.toString(d.month()));
+            buf.append(name);
+          } else {
+            buf.append(SHORT_MONTHS[(int)d.month() - 1]);
+          }
+          break;
+        }
+
+        // %B     locale's full month name (e.g., January)
+        case 'B': {
+          if (bundle != null) {
+            String name = fields.months.get(bundle, "wide", Long.toString(d.month()));
+            buf.append(name);
+          } else {
+            buf.append(LONG_MONTHS[(int)d.month() - 1]);
+          }
+          break;
+        }
+
+        // %c     locale's date and time (e.g., Thu Mar  3 23:05:25 2005)
+        case 'c':
+          _formatDate(bundle, fields, "%a, %b " + d.dayOfMonth() + ", %Y %i:%M:%S %p %Z", d, buf);
+          break;
+
+        // %C     century; like %Y, except omit last two digits (e.g., 20)
+        case 'C': leftPad(d.year() / 100, '0', 2, buf); break;
+
+        // %d     day of month (e.g., 01)
+        case 'd': leftPad(d.dayOfMonth(), '0', 2, buf); break;
+
+        // %D     date; same as %m/%d/%y
+        case 'D': _formatDate(bundle, fields, "%m/%d/%y", d, buf); break;
+
+        // %e     day of month, space padded; same as %_d
+        case 'e': leftPad(d.dayOfMonth(), ' ', 2, buf); break;
+
+        // %F     full date; same as %Y-%m-%d
+        case 'F': _formatDate(bundle, fields, "%Y-%m-%d", d, buf); break;
+
+        // %g     last two digits of year of ISO week number (see %G)
+        case 'g': leftPad(d.yearOfWeekOfYearISO() % 100, '0', 2, buf); break;
+
+        // %G     year of ISO week number (see %V); normally useful only with %V
+        case 'G': leftPad(d.yearOfWeekOfYearISO(), '0', 4, buf); break;
+
+        // %h     same as %b
+        case 'h': {
+          if (bundle != null) {
+            String name = fields.months.get(bundle, "abbreviated", Long.toString(d.month()));
+            buf.append(name);
+          } else {
+            buf.append(SHORT_MONTHS[(int)d.month() - 1]);
+          }
+          break;
+        }
+
+        // %H     hour (00..23)
+        case 'H': leftPad(d.hourOfDay(), '0', 2, buf); break;
+
+        // %i     hour (1..12), unpadded
+        case 'i': {
+          long h = d.hour();
+          buf.append(h == 0 ? 12 : h);
+          break;
+        }
+
+        // %I     hour (01..12), zero-padded
+        case 'I': {
+          long h = d.hour();
+          leftPad(h == 0 ? 12 : h, '0', 2, buf);
+          break;
+        }
+
+        // %j     day of year (001..366)
+        case 'j': leftPad(d.dayOfYear(), '0', 3, buf); break;
+
+        // %k     hour, space padded ( 0..23); same as %H
+        case 'k': leftPad(d.hourOfDay(), ' ', 2, buf); break;
+
+        // %l     hour, space padded ( 1..12); same as %I
+        case 'l': {
+          int h = (int)d.hour();
+          leftPad(h == 0 ? 12 : h, ' ', 2, buf);
+          break;
+        }
+
+        // %m     month (01..12)
+        case 'm': leftPad(d.month(), '0', 2, buf); break;
+
+        // %M     minute (00..59)
+        case 'M': leftPad(d.minute(), '0', 2, buf); break;
+
+        // %n     a newline
+        case 'n': buf.append('\n'); break;
+
+        // %N     nanoseconds (000000000..999999999)
+        case 'N': leftPad(d.milliseconds() * 1000000, '0', 9, buf); break;
+
+        // %p     locale's equivalent of either AM or PM; blank if not known
+        case 'p': buf.append(d.isAM() ? "AM" : "PM"); break;
+
+        // %P     like %p, but lower case
+        case 'P': buf.append(d.isAM() ? "am" : "pm"); break;
+
+        // %q     quarter of year (1..4)
+        case 'q': {
+          long q = ((d.month() - 1) / 3) + 1;
+          buf.append(q);
+          break;
+        }
+
+        // %r     locale's 12-hour clock time (e.g., 11:11:04 PM)
+        case 'r': {
+          int h = (int)d.hour();
+          buf.append(h == 0 ? 12 : h);
+          _formatDate(bundle, fields, ":%M:%S %p", d, buf);
+          break;
+        }
+
+        // %R     24-hour hour and minute; same as %H:%M
+        case 'R': _formatDate(bundle, fields, "%H:%M", d, buf); break;
+
+        // %s     seconds since 1970-01-01 00:00:00 UTC
+        case 's': buf.append(d.unixEpoch() / 1000); break;
+
+        // %S     second (00..60)
+        case 'S': leftPad(d.second(), '0', 2, buf); break;
+
+        // %t     a tab
+        case 't': buf.append('\t'); break;
+
+        // %T     time; same as %H:%M:%S
+        case 'T': _formatDate(bundle, fields, "%H:%M:%S", d, buf); break;
+
+        // %u     day of week (1..7); 1 is Monday
+        case 'u': {
+          int wk = (int)d.dayOfWeek() - 1;
+          buf.append(wk == 0 ? 7 : wk);
+          break;
+        }
+
+        // %U     week number of year, with Sunday as first day of week (00..53)
+        case 'U': leftPad(d.weekOfYear(), '0', 2, buf); break;
+
+        // Undocumented
+        case 'v': _formatDate(bundle, fields, "%e-%b-%Y", d, buf); break;
+
+        // %V     ISO week number, with Monday as first day of week (01..53)
+        case 'V': leftPad(d.weekOfYearISO(), '0', 2, buf); break;
+
+        // %w     day of week (0..6); 0 is Sunday
+        case 'w': buf.append(d.dayOfWeek() - 1); break;
+
+        // %W     week number of year, with Monday as first day of week (00..53)
+        case 'W': leftPad(d.weekOfYear(), '0', 2, buf); break;
+
+        // %x     locale's date representation (e.g., 12/31/1999)
+        case 'x': _formatDate(bundle, fields, "%m/%d/%Y", d, buf); break;
+
+        // %X     locale's time representation (e.g., 23:13:48)
+        case 'X': _formatDate(bundle, fields, "%I:%M:%S %p", d, buf); break;
+
+        // %y     last two digits of year (00..99)
+        case 'y':
+          leftPad(d.year() % 100, '0', 2, buf); break;
+
+        // %Y     year
+        case 'Y': buf.append(d.year()); break;
+
+        // %z     +hhmm numeric time zone (e.g., -0400)
+        case 'z': {
+          TZC t = new TZC(d.timeZoneOffset());
+          buf.append(t.negative ? '-' : '+');
+          leftPad(t.hours, '0', 2, buf);
+          buf.append(':');
+          leftPad(t.minutes, '0', 2, buf);
+          break;
+        }
+
+        // %Z     alphabetic time zone abbreviation (e.g., EDT)
+        case 'Z': buf.append(d.timeZoneAbbr()); break;
 
         default:
           // no match, emit literals.
@@ -265,82 +407,19 @@ public class PluginDateUtils {
     }
   }
 
-  private static void formatAggregate(DateTimeAggregate type, Locale locale, DateTime date, StringBuilder buf) {
-    switch (type) {
-      case FULL:
-        buf.append(date.dayOfWeek().getAsShortText(locale));
-        buf.append(", ");
-        buf.append(date.monthOfYear().getAsShortText(locale));
-        buf.append(' ');
-        buf.append(date.dayOfMonth().get());
-        buf.append(", ");
-        buf.append(date.year().get());
-        buf.append(' ');
-        buf.append(date.get(DateTimeFieldType.clockhourOfHalfday()));
-//        leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), '0', 2, buf);
-        buf.append(':');
-        leftPad(date.minuteOfHour().get(), '0', 2, buf);
-        buf.append(':');
-        leftPad(date.secondOfMinute().get(), '0', 2, buf);
-        buf.append(' ');
-        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
-        buf.append(' ');
-        buf.append(date.getZone().getNameKey(date.getMillis()));
-        break;
+  private static class TZC {
+    private final boolean negative;
+    private final int hours;
+    private final int minutes;
 
-      case H12: {
-        buf.append(date.get(DateTimeFieldType.clockhourOfHalfday()));
-        buf.append(':');
-        leftPad(date.getMinuteOfHour(), '0', 2, buf);
-        buf.append(':');
-        leftPad(date.getSecondOfMinute(), '0', 2, buf);
-        buf.append(' ');
-        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
-        break;
+    TZC(int offset) {
+      this.negative = offset < 0;
+      if (negative) {
+        offset *= -1;
       }
-
-      case H240_M0:
-        leftPad(date.get(DateTimeFieldType.clockhourOfDay()), '0', 2, buf);
-        buf.append(':');
-        leftPad(date.minuteOfHour().get(), '0', 2, buf);
-        break;
-
-      case HHMMSSP:
-        leftPad(date.get(DateTimeFieldType.hourOfHalfday()), '0', 2, buf);
-        buf.append(':');
-        leftPad(date.getMinuteOfHour(), '0', 2, buf);
-        buf.append(':');
-        leftPad(date.getSecondOfMinute(), '0', 2, buf);
-        buf.append(' ');
-        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
-        break;
-
-      case MMDDYY:
-        leftPad(date.getMonthOfYear(), '0', 2, buf);
-        buf.append('/');
-        leftPad(date.dayOfMonth().get(), '0', 2, buf);
-        buf.append('/');
-        leftPad(date.yearOfCentury().get(), '0', 2, buf);
-        break;
-
-      case MMDDYYYY:
-        leftPad(date.getMonthOfYear(), '0', 2, buf);
-        buf.append('/');
-        leftPad(date.dayOfMonth().get(), '0', 2, buf);
-        buf.append('/');
-        buf.append(date.getYear());
-        break;
-
-      case YYYYMMDD:
-        buf.append(date.year().get());
-        buf.append('-');
-        leftPad(date.monthOfYear().get(), '0', 2, buf);
-        buf.append('-');
-        leftPad(date.dayOfMonth().get(), '0', 2, buf);
-        break;
-
-      default:
-        break;
+      offset /= 60000;
+      this.hours = offset / 60;
+      this.minutes = offset % 60;
     }
   }
 

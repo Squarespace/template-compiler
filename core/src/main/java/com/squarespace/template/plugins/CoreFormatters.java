@@ -247,7 +247,7 @@ public class CoreFormatters implements FormatterRegistry {
       String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
       long instant = var.node().asLong();
       StringBuilder buf = new StringBuilder();
-      formatDate(ctx.javaLocale(), (String)args.getOpaque(), instant, tzName, buf);
+      formatDate(ctx.cldr(), (String)args.getOpaque(), instant, tzName, buf);
       var.set(buf);
     }
 

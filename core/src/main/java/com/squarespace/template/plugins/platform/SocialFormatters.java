@@ -19,7 +19,6 @@ package com.squarespace.template.plugins.platform;
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -195,9 +194,9 @@ public class SocialFormatters implements FormatterRegistry {
       buf.append("http://www.google.com/calendar/event?action=TEMPLATE&text=");
       buf.append(GeneralUtils.urlEncode(node.path("title").asText()));
       buf.append("&dates=");
-      PluginDateUtils.formatDate(Locale.US, CALENDAR_DATE_FORMAT, start, "UTC", buf);
+      PluginDateUtils.formatDate(ctx.cldr(), CALENDAR_DATE_FORMAT, start, "UTC", buf);
       buf.append("/");
-      PluginDateUtils.formatDate(Locale.US, CALENDAR_DATE_FORMAT, end, "UTC", buf);
+      PluginDateUtils.formatDate(ctx.cldr(), CALENDAR_DATE_FORMAT, end, "UTC", buf);
       if (node.has("location")) {
         String location = getLocationString(node.get("location"));
         if (StringUtils.trimToNull(location) != null) {

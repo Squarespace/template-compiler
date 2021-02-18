@@ -337,11 +337,11 @@ public class CoreFormattersTest extends UnitTestBase {
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "2013-11-15 07:30:30 EST");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "2013-11-15 04:30:30 PST");
 
-    String r1 = formatDate("%a, %b %d, %Y %I:%M:%S %p %Z", NOV_15_2013_123030_UTC, tzNewYork);
+    String r1 = formatDate("%a, %b %d, %Y %i:%M:%S %p %Z", NOV_15_2013_123030_UTC, tzNewYork);
     String r2 = formatDate("%c", NOV_15_2013_123030_UTC, tzNewYork);
     assertEquals(r1, r2);
 
-    r1 = formatDate("%a, %b %d, %Y %I:%M:%S %p %Z", MAY_13_2013_010000_UTC, tzNewYork);
+    r1 = formatDate("%a, %b %d, %Y %i:%M:%S %p %Z", MAY_13_2013_010000_UTC, tzNewYork);
     r2 = formatDate("%c", MAY_13_2013_010000_UTC, tzNewYork);
     assertEquals(r1, r2);
 
@@ -376,10 +376,10 @@ public class CoreFormattersTest extends UnitTestBase {
 
     // Timezone short names and offsets
     format = "%Z %z";
-    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork), "EDT -0400");
-    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzLosAngeles), "PDT -0700");
-    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "EST -0500");
-    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "PST -0800");
+    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork), "EDT -04:00");
+    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzLosAngeles), "PDT -07:00");
+    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "EST -05:00");
+    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "PST -08:00");
 
     // TODO: Week of Year (Joda doesn't support the full range of week-of-year calculations)
 //    format = "%U %V %W";
