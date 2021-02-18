@@ -129,6 +129,7 @@ public class PluginDateUtils {
 
   enum DateTimeAggregate {
     FULL,
+    H12,
     H240_M0,
     HHMMSSP,
     MMDDYY,
@@ -160,6 +161,7 @@ public class PluginDateUtils {
     } catch (IllegalArgumentException e) {
       zone = DateTimeZone.getDefault();
     }
+//    GregorianDate date = GregorianDate.fromUnixEpoch(instant, tzName, 0, 0);
     DateTime date = new DateTime(instant, zone);
     int index = 0;
     int len = fmt.length();
@@ -193,8 +195,11 @@ public class PluginDateUtils {
         case 'M': leftPad(date.minuteOfHour().get(), '0', 2, buf); break;
         case 'm': leftPad(date.monthOfYear().get(), '0', 2, buf); break;
         case 'n': buf.append('\n'); break;
+        case 'N': leftPad(date.get(DateTimeFieldType.millisOfSecond()) * 1000000, '0', 9, buf); break;
         case 'P': buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "am" : "pm"); break;
         case 'p': buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM"); break;
+        case 'q': buf.append(((date.monthOfYear().get() - 1) / 3) + 1); break;
+        case 'r': formatAggregate(DateTimeAggregate.H12, locale, date, buf); break;
         case 'R': formatAggregate(DateTimeAggregate.H240_M0, locale, date, buf); break;
         case 'S': leftPad(date.secondOfMinute().get(), '0', 2, buf); break;
         case 's': buf.append(instant / 1000); break;
@@ -208,14 +213,12 @@ public class PluginDateUtils {
 
         case 'U':
           // TODO: fix week-of-year number
-          leftPad(date.weekOfWeekyear().get(), '0', 2, buf);
           break;
 
         case 'u': buf.append(date.dayOfWeek().get()); break;
 
         case 'V':
           // TODO: fix week-of-year number
-          leftPad(date.weekOfWeekyear().get(), '0', 2, buf);
           break;
 
         case 'v':
@@ -273,7 +276,8 @@ public class PluginDateUtils {
         buf.append(", ");
         buf.append(date.year().get());
         buf.append(' ');
-        leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), '0', 2, buf);
+        buf.append(date.get(DateTimeFieldType.clockhourOfHalfday()));
+//        leftPad(date.get(DateTimeFieldType.clockhourOfHalfday()), '0', 2, buf);
         buf.append(':');
         leftPad(date.minuteOfHour().get(), '0', 2, buf);
         buf.append(':');
@@ -283,6 +287,17 @@ public class PluginDateUtils {
         buf.append(' ');
         buf.append(date.getZone().getNameKey(date.getMillis()));
         break;
+
+      case H12: {
+        buf.append(date.get(DateTimeFieldType.clockhourOfHalfday()));
+        buf.append(':');
+        leftPad(date.getMinuteOfHour(), '0', 2, buf);
+        buf.append(':');
+        leftPad(date.getSecondOfMinute(), '0', 2, buf);
+        buf.append(' ');
+        buf.append(date.get(DateTimeFieldType.halfdayOfDay()) == 0 ? "AM" : "PM");
+        break;
+      }
 
       case H240_M0:
         leftPad(date.get(DateTimeFieldType.clockhourOfDay()), '0', 2, buf);
