@@ -454,12 +454,25 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testEscapeUri() throws CodeException {
-    assertFormatter(ENCODE_URI, "\"<=%>\"", "%3c=%25%3e");
+    assertFormatter(ENCODE_URI, "\"<=%>\"", "%3C=%25%3E");
+    assertFormatter(ENCODE_URI, "\"-_.!~*() ;/?:@&=+$,#\"", "-_.!~*()%20;/?:@&=+$,#");
+    assertFormatter(ENCODE_URI,
+        "\"http://www.google.ru/support/jobs/bin/static.py?page=why-ru.html&sid=liveandwork\"",
+        "http://www.google.ru/support/jobs/bin/static.py?page=why-ru.html&sid=liveandwork");
   }
 
   @Test
   public void testEscapeUriComponent() throws CodeException {
-    assertFormatter(ENCODE_URI_COMPONENT, "\"<=%>\"", "%3c%3d%25%3e");
+    assertFormatter(ENCODE_URI_COMPONENT, "\"<=%>\"", "%3C%3D%25%3E");
+    assertFormatter(ENCODE_URI_COMPONENT, "\"커피와 차\"", "%EC%BB%A4%ED%94%BC%EC%99%80%20%EC%B0%A8");
+    assertFormatter(ENCODE_URI_COMPONENT, "\"http://unipro.ru\"", "http%3A%2F%2Funipro.ru");
+    assertFormatter(ENCODE_URI_COMPONENT,
+        "\"http://www.google.ru/support/jobs/bin/static.py?page=why-ru.html&sid=liveandwork\"",
+        "http%3A%2F%2Fwww.google.ru%2Fsupport%2Fjobs%2Fbin%2Fstatic.py%3Fpage%3Dwhy-ru.html%26sid%3Dliveandwork");
+    assertFormatter(ENCODE_URI_COMPONENT, "\"http://en.wikipedia.org/wiki/UTF-8#Description\"",
+        "http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FUTF-8%23Description");
+
+    assertFormatter(ENCODE_URI_COMPONENT, "\"-_.!~*() ;/?@&=+$,#\"", "-_.!~*()%20%3B%2F%3F%40%26%3D%2B%24%2C%23");
   }
 
   @Test

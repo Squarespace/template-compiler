@@ -38,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.compiler.text.EncodeUtils;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
@@ -315,7 +314,6 @@ public class CoreFormatters implements FormatterRegistry {
     }
 
   }
-
 
   /**
    * FORMAT - Substitutes positional arguments in a format string.
