@@ -258,8 +258,8 @@ public class PluginDateUtilsTest {
     assertEquals(formatDate("%z", MAY_13_2013_010000_UTC, TZ_NY), "-04:00");
     assertEquals(formatDate("%z", NOV_15_2013_123030_UTC, TZ_LA), "-08:00");
 
-    // Literals
-    assertEquals(formatDate("%%", JAN_01_1970_071510_UTC, TZ_UTC), "%%");
+    // Escapes
+    assertEquals(formatDate("%%", JAN_01_1970_071510_UTC, TZ_UTC), "%");
     assertEquals(formatDate("%,", MAY_13_2013_010000_UTC, TZ_NY), "%,");
   }
 

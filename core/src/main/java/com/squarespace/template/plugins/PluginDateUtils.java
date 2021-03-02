@@ -399,6 +399,9 @@ public class PluginDateUtils {
         // %Z     alphabetic time zone abbreviation (e.g., EDT)
         case 'Z': buf.append(d.timeZoneAbbr()); break;
 
+        // escape
+        case '%': buf.append('%'); break;
+
         default:
           // no match, emit literals.
           buf.append(c1).append(c2);

@@ -370,6 +370,9 @@ public class CoreFormattersTest extends UnitTestBase {
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzNewYork), "EST -05:00");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "PST -08:00");
 
+    format = "%Y %% %d";
+    assertEquals(formatDate(format, NOV_15_2013_123030_UTC, tzLosAngeles), "2013 % 15");
+
     // TODO: Week of Year (Joda doesn't support the full range of week-of-year calculations)
 //    format = "%U %V %W";
 //    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, tzNewYork), "20");
