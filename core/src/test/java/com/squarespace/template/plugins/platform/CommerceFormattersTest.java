@@ -35,62 +35,37 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testAddToCartButton() {
-    runner.run(
-        "f-add-to-cart-btn-1.html",
-        "f-add-to-cart-btn-2.html",
-        "f-add-to-cart-btn-3.html",
-        "f-add-to-cart-btn-4.html",
-        "f-add-to-cart-btn-5.html",
-        "f-add-to-cart-btn-subscribable-attribute-false.html",
-        "f-add-to-cart-btn-subscribable-attribute-true.html"
-        );
+    runner.exec("f-add-to-cart-btn-%N.html");
   }
 
   @Test
   public void testBookkeeperMoneyFormat() {
-    runner.run(
-        "f-bookkeeper-money-format-1.html"
-        );
+    runner.exec("f-bookkeeper-money-format-%N.html");
   }
 
   @Test
   public void testCartQuantity() {
-    runner.run(
-        "f-cart-quantity-1.html",
-        "f-cart-quantity-2.html"
-        );
+    runner.exec("f-cart-quantity-%N.html");
   }
 
   @Test
   public void testCartSubtotal() {
-    runner.run(
-        "f-cart-subtotal-1.html"
-        );
+    runner.exec("f-cart-subtotal-%N.html");
   }
 
   @Test
   public void testCartUrl() {
-    runner.run(
-        "f-cart-url-1.html"
-        );
+    runner.exec("f-cart-url-%N.html");
   }
 
   @Test
   public void testFromPrice() {
-    runner.run(
-        "f-from-price-1.html",
-        "f-from-price-2.html",
-        "f-from-price-3.html",
-        "f-from-price-4.html",
-        "f-from-price-5.html",
-        "f-from-price-6.html",
-        "f-from-price-7.html"
-        );
+    runner.exec("f-from-price-%N.html");
   }
 
   @Test
   public void testMoneyFormatCamel() {
-    runner.run("f-money-format-camel-1.html");
+    runner.exec("f-money-format-camel-%N.html");
   }
 
   @Test
@@ -103,60 +78,32 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     assertFormatter(MONEY_DASH_FORMAT, "100000", "1,000.00");
     assertFormatter(MONEY_DASH_FORMAT, "100003", "1,000.03");
     assertFormatter(MONEY_DASH_FORMAT, "1241313", "12,413.13");
-    runner.run(
-        "f-money-format-1.html",
-        "f-money-format-2.html"
-        );
+    runner.exec("f-money-format-%N.html");
   }
 
   @Test
   public void testMoneyString() {
-    runner.run(
-        "f-money-string-1.html"
-        );
+    runner.exec("f-money-string-%N.html");
   }
 
   @Test
   public void testPercentageFormat() {
-    runner.run(
-        "f-percentage-format-1.html",
-        "f-percentage-format-2.html"
-        );
+    runner.exec("f-percentage-format-%N.html");
   }
 
   @Test
   public void testNormalPrice() {
-    runner.run(
-        "f-normal-price-1.html",
-        "f-normal-price-2.html",
-        "f-normal-price-3.html",
-        "f-normal-price-4.html",
-        "f-normal-price-5.html",
-        "f-normal-price-6.html",
-        "f-normal-price-7.html"
-        );
+    runner.exec("f-normal-price-%N.html");
   }
 
   @Test
   public void testProductCheckout() {
-    runner.run(
-        "f-product-checkout-1.html"
-    );
+    runner.exec("f-product-checkout-%N.html");
   }
+
   @Test
   public void testProductPrice() {
-    runner.run(
-      "f-product-price-1.html",
-      "f-product-price-2.html",
-      "f-product-price-3.html",
-      "f-product-price-4.html",
-      "f-product-price-5.html",
-      "f-product-price-6.html",
-      "f-product-price-7.html",
-      "f-product-price-8.html",
-      "f-product-price-9.html",
-      "f-product-price-10.html"
-      );
+    runner.exec("f-product-price-%N.html");
   }
 
   @Test
@@ -213,53 +160,22 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testProductQuickView() {
-    runner.run(
-        "f-product-quick-view-1.html",
-        "f-product-quick-view-2.html",
-        "f-product-quick-view-3.html",
-        "f-product-quick-view-4.html",
-        "f-product-quick-view-5.html"
-        );
+    runner.exec("f-product-quick-view-%N.html");
   }
 
   @Test
   public void testProductStatus() {
-    runner.run(
-        "f-product-status-1.html",
-        "f-product-status-2.html",
-        "f-product-status-3.html",
-        "f-product-status-4.html",
-        "f-product-status-5.html",
-        "f-product-status-6.html",
-        "f-product-status-7.html",
-        "f-product-status-8.html",
-        "f-product-status-9.html",
-        "f-product-status-10.html"
-        );
+    runner.exec("f-product-status-%N.html");
   }
 
   @Test
   public void testQuantityInput() {
-    runner.run(
-        "f-quantity-input-1.html",
-        "f-quantity-input-2.html",
-        "f-quantity-input-3.html",
-        "f-quantity-input-4.html",
-        "f-quantity-input-5.html"
-        );
+    runner.exec("f-quantity-input-%N.html");
   }
 
   @Test
   public void testSalePrice() {
-    runner.run(
-        "f-sale-price-1.html",
-        "f-sale-price-2.html",
-        "f-sale-price-3.html",
-        "f-sale-price-4.html",
-        "f-sale-price-5.html",
-        "f-sale-price-6.html",
-        "f-sale-price-7.html"
-        );
+    runner.exec("f-sale-price-%N.html");
   }
 
   @Test
@@ -298,20 +214,13 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testVariantDescriptor() {
-    runner.run(
-        "f-variant-descriptor-1.html",
-        "f-variant-descriptor-2.html"
-        );
+    runner.exec("f-variant-descriptor-%N.html");
   }
 
   @Test
   public void testVariantsSelect() {
-    runner.run(
-        "f-variants-select-1.html",
-        "f-variants-select-2.html",
-        "f-variants-select-3.html",
-        "f-variants-select-subscription.html"
-        );
+    runner.exec("f-variants-select-%N.html");
+    runner.exec("f-variants-select-subscription.html");
   }
 
   @Test
@@ -327,14 +236,7 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testProductRestockNotification() {
-    runner.run(
-        "f-product-restock-notification-1.html",
-        "f-product-restock-notification-2.html",
-        "f-product-restock-notification-3.html",
-        "f-product-restock-notification-4.html",
-        "f-product-restock-notification-5.html",
-        "f-product-restock-notification-6.html"
-    );
+    runner.exec("f-product-restock-notification-%N.html");
   }
 
 }

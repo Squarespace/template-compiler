@@ -25,12 +25,7 @@ public class PreprocessTest extends UnitTestBase {
 
   @Test
   public void testPreprocess() {
-    runner.run(
-        "preprocessor-1.html",
-        "preprocessor-2.html",
-        "preprocessor-3.html",
-        "preprocessor-4.html"
-    );
+    runner.exec("preprocessor-%N.html");
   }
 
 }

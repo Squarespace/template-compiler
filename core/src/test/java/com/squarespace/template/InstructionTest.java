@@ -25,14 +25,11 @@ public class InstructionTest extends UnitTestBase {
 
   @Test
   public void testInject() {
-    runner.run(
-        "f-inject-1.html",
-        "f-inject-2.html"
-    );
+    runner.exec("f-inject-%N.html");
   }
 
   @Test
   public void testVariableRefs() {
-    runner.run("variable-refs.html");
+    runner.exec("variable-refs-%N.html");
   }
 }

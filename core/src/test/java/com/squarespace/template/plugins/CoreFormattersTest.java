@@ -102,24 +102,13 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testApply() {
-    runner.run("f-apply-1.html");
+    runner.exec("f-apply-%N.html");
   }
 
   @Test
   public void testApplyMacros() {
-    runner.run(
-        "f-macro-1.html",
-        "f-macro-2.html",
-        "f-macro-3.html",
-        "f-macro-4.html",
-        "f-macro-5.html",
-        "f-macro-6.html",
-        "f-macro-7.html",
-        "f-macro-8.html",
-        "f-macro-9.html",
-        "f-macro-10.html",
-        "f-macro-ctx-1.html"
-    );
+    runner.exec("f-macro-%N.html");
+    runner.exec("f-macro-ctx-%N.html");
   }
 
   @Test
@@ -477,22 +466,12 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testFormat() throws CodeException {
-    runner.run(
-        "f-format-1.html",
-        "f-format-2.html",
-        "f-format-3.html"
-    );
+    runner.exec("f-format-%N.html");
   }
 
   @Test
   public void testGet() throws CodeException {
-    runner.run(
-        "f-get-1.html",
-        "f-get-2.html",
-        "f-get-3.html",
-        "f-get-4.html",
-        "f-get-5.html"
-    );
+    runner.exec("f-get-%N.html");
   }
 
   @Test
@@ -522,16 +501,8 @@ public class CoreFormattersTest extends UnitTestBase {
 
     assertFormatter(JSON_PRETTY, "{ \"a\":  3.14159 }", "{\n  \"a\": 3.14159\n}");
 
-    runner.run(
-        "f-json-1.html",
-        "f-json-2.html",
-        "f-json-3.html",
-        "f-json-4.html",
-        "f-json-5.html",
-
-        "f-json-pretty-1.html",
-        "f-json-pretty-2.html"
-    );
+    runner.exec("f-json-%N.html");
+    runner.exec("f-json-pretty-%N.html");
   }
 
   @Test
@@ -622,11 +593,7 @@ public class CoreFormattersTest extends UnitTestBase {
     args = mk.args(" foo bar");
     assertFormatter(PROP, args, "{}", "");
 
-    runner.run(
-        "f-prop-1.html",
-        "f-prop-2.html",
-        "f-prop-3.html"
-    );
+    runner.exec("f-prop-%N.html");
   }
 
   @Test
@@ -698,7 +665,7 @@ public class CoreFormattersTest extends UnitTestBase {
     assertEquals(ctx.getErrors().size(), 1);
     assertEquals(ctx.getErrors().get(0).getType(), SyntaxErrorType.FORMATTER_ARGS_INVALID);
 
-    runner.run("f-truncate-1.html");
+    runner.exec("f-truncate-%N.html");
   }
 
   @Test

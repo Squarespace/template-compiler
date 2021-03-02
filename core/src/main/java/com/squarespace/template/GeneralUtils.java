@@ -21,16 +21,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -218,32 +219,34 @@ public class GeneralUtils {
     }
   }
 
-  /**
-   * List all resources that match the given glob pattern.
-   */
-  public static List<Path> listResources(Class<?> cls, String pattern) throws Exception {
-    PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
-    Enumeration<URL> urls = cls.getClassLoader().getResources(resolveName(cls, "."));
-    List<Path> result = new ArrayList<>();
-    while (urls.hasMoreElements()) {
-      URL url = urls.nextElement();
-      if (!url.getProtocol().equals("file")) {
-        continue;
-      }
-
-      File dir = Paths.get(url.toURI()).toFile();
-      if (dir == null || !dir.isDirectory()) {
-        continue;
-      }
-
-      for (File file : dir.listFiles()) {
-        Path path = file.toPath();
-        if (matcher.matches(path)) {
-          result.add(path);
+  public static List<Path> list(Class<?> cls, Predicate<Path> predicate) {
+    try {
+      Enumeration<URL> urls = cls.getClassLoader().getResources(resolveName(cls, "."));
+      List<Path> result = new ArrayList<>();
+      while (urls.hasMoreElements()) {
+        URL url = urls.nextElement();
+        if (!url.getProtocol().equals("file")) {
+          continue;
+        }
+        File dir = Paths.get(url.toURI()).toFile();
+        if (dir == null || !dir.isDirectory()) {
+          continue;
+        }
+        for (File file : dir.listFiles()) {
+          Path path = file.toPath();
+          if (predicate.test(path)) {
+            result.add(path.getFileName());
+          }
         }
       }
+      if (result.isEmpty()) {
+        throw new RuntimeException("No files matched predicate");
+      }
+      Collections.sort(result);
+      return result;
+    } catch (IOException | URISyntaxException e) {
+      throw new RuntimeException("Failed to list resources", e);
     }
-    return result;
   }
 
   private static ErrorInfo resourceLoadError(String path, String message) {

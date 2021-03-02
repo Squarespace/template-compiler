@@ -18,10 +18,14 @@ package com.squarespace.template;
 
 import static com.squarespace.template.GeneralUtils.loadResource;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import com.squarespace.template.TestCaseParser.TestCase;
 
@@ -45,6 +49,25 @@ public class TestSuiteRunner {
     this.resourceClass = resourceClass;
   }
 
+  public void exec(String pattern) {
+    // Match numeric pattern in filename
+    Predicate<String> predicate = Pattern.compile("^" + pattern.replace("%N", "\\d+") + "$").asPredicate();
+
+    // List all files relative to the resource class that match the numeric pattern
+    List<Path> paths = GeneralUtils.list(this.resourceClass, p -> predicate.test(p.getFileName().toString()));
+
+    Map<String, AssertionError> errors = new HashMap<>();
+    for (Path path : paths) {
+      String file = path.toString();
+      if (filesSeen.contains(file)) {
+        throw new AssertionError("Already processed file " + path);
+      }
+      runOne(file, errors);
+      filesSeen.add(file);
+    }
+    assertPass(errors);
+  }
+
   public void run(String... paths) {
     Map<String, AssertionError> errors = new HashMap<>();
     for (String path : paths) {
@@ -59,10 +82,10 @@ public class TestSuiteRunner {
 
   private void runOne(String path, Map<String, AssertionError> errors) {
     try {
+      System.out.println("Running " + path);
       String source = loadResource(resourceClass, path);
       TestCase testCase = parser.parseTest(source);
       testCase.run(compiler);
-
     } catch (AssertionError e) {
       errors.put(path, e);
     } catch (CodeException e) {
