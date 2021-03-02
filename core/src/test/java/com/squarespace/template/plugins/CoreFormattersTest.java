@@ -671,6 +671,8 @@ public class CoreFormattersTest extends UnitTestBase {
   @Test
   public void testUrlEncode() throws CodeException {
     assertFormatter(URL_ENCODE, "\"\u201ca b\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
+    assertFormatter(URL_ENCODE, "\"“😍”\"", "%E2%80%9C%F0%9F%98%8D%E2%80%9D");
+    assertFormatter(URL_ENCODE, "\"\\u201ca b\\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
   }
 
   protected static String getDateTestJson(long timestamp, String tzId) {
