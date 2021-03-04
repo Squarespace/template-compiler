@@ -532,7 +532,7 @@ public class Tokenizer {
   }
 
   private boolean skipWhitespace() throws CodeSyntaxException {
-    boolean result = matcher.space();
+    boolean result = matcher.whitespace();
     if (!result) {
       fail(error(WHITESPACE_EXPECTED).data(matcher.remainder()));
     }
