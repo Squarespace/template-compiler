@@ -87,12 +87,18 @@ public class MessageFormats {
       return "";
     }
     JsonNode node = (JsonNode) args.get(0);
+    if (node == null) {
+      return "";
+    }
 
     JsonNode decimalValue = node.path("decimalValue");
     JsonNode currencyCode = node.path("currencyCode");
     if (decimalValue.isMissingNode() || currencyCode.isMissingNode()) {
       decimalValue = node.path("value");
       currencyCode = node.path("currency");
+    }
+    if (decimalValue.isMissingNode() || currencyCode.isMissingNode()) {
+      return "";
     }
 
     Decimal value = this.converter.asDecimal(decimalValue);
@@ -110,6 +116,9 @@ public class MessageFormats {
       return "";
     }
     JsonNode node = (JsonNode) args.get(0);
+    if (node == null) {
+      return "";
+    }
     long epoch = node.asLong();
     CalendarDate date = cldr.Calendars.toGregorianDate(epoch, zoneId);
     DateFormatOptions opts = OptionParsers.datetime(options);
@@ -124,6 +133,9 @@ public class MessageFormats {
       return "";
     }
     JsonNode node = (JsonNode) args.get(0);
+    if (node == null) {
+      return "";
+    }
     Decimal value = this.converter.asDecimal(node);
     DecimalFormatOptions opts = OptionParsers.decimal(options);
     return cldr.Numbers.formatDecimal(value, opts);
@@ -138,6 +150,9 @@ public class MessageFormats {
     }
     JsonNode v1 = (JsonNode) args.get(0);
     JsonNode v2 = (JsonNode) args.get(1);
+    if (v1 == null || v2 == null) {
+      return "";
+    }
     CalendarDate start = cldr.Calendars.toGregorianDate(v1.asLong(0), zoneId);
     CalendarDate end = cldr.Calendars.toGregorianDate(v2.asLong(0), zoneId);
     DateIntervalFormatOptions opts = OptionParsers.interval(options);
