@@ -813,20 +813,17 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode product = var.node();
-
       JsonNode websiteCtx = ctx.resolve("website");
       JsonNode productCtx = ctx.resolve("productMerchandisingContext");
-      if (websiteCtx == null || productCtx == null) {
-        return;
-      }
 
       String productId = product.get("id").asText();
+      JsonNode productNode = productCtx.path(productId);
       ObjectNode templateVariables = JsonUtils.createObjectNode();
       templateVariables.set("product", product);
-      templateVariables.set("views", productCtx.path(productId).path("restockNotificationViews"));
-      templateVariables.set("messages", productCtx.path(productId).path("restockNotificationMessages"));
-      templateVariables.set("mailingListSignUpEnabled", productCtx.path(productId).path("mailingListSignUpEnabled"));
-      templateVariables.set("mailingListOptInByDefault", productCtx.path(productId).path("mailingListOptInByDefault"));
+      templateVariables.set("views", productNode.path("restockNotificationViews"));
+      templateVariables.set("messages", productNode.path("restockNotificationMessages"));
+      templateVariables.set("mailingListSignUpEnabled", productNode.path("mailingListSignUpEnabled"));
+      templateVariables.set("mailingListOptInByDefault", productNode.path("mailingListOptInByDefault"));
       templateVariables.set("captchaSiteKey", websiteCtx.path("captchaSettings").path("siteKey"));
       var.set(executeTemplate(ctx, template, templateVariables, true));
     }
