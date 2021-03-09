@@ -39,7 +39,7 @@ public class BenchmarkSupport implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = GeneralUtils.loadResource(BenchmarkSupport.class, "embedded.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override

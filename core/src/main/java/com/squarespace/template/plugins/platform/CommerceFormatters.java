@@ -94,7 +94,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(CommerceFormatters.class, "add-to-cart-btn.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override
@@ -565,7 +565,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(CommerceFormatters.class, "quantity-input.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override
@@ -629,7 +629,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(CommerceFormatters.class, "variants-select.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override

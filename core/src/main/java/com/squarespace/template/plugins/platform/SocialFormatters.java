@@ -118,7 +118,7 @@ public class SocialFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(SocialFormatters.class, "comments.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override
@@ -153,7 +153,7 @@ public class SocialFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(SocialFormatters.class, "comment-link.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override
@@ -242,7 +242,7 @@ public class SocialFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(SocialFormatters.class, "like-button.html");
-      this.template = compiler.compile(source).code();
+      this.template = compiler.compile(source.trim()).code();
     }
 
     @Override

@@ -114,7 +114,7 @@ public class ContentFormatters implements FormatterRegistry {
     @Override
     public void initialize(Compiler compiler) throws CodeException {
       String source = loadResource(ContentFormatters.class, "audio-player.html");
-      template = compiler.compile(source).code();
+      template = compiler.compile(source.trim()).code();
     }
 
     @Override
