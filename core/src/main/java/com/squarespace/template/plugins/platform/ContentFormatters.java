@@ -267,22 +267,10 @@ public class ContentFormatters implements FormatterRegistry {
   }
 
   private static String getAltTextFromContentItem(JsonNode contentItemNode) {
-    JsonNode title = contentItemNode.path("title");
-    if (isTruthy(title)) {
-      return title.asText();
-    }
 
-    JsonNode body = contentItemNode.path("body");
-    if (isTruthy(body)) {
-      String text = PluginUtils.removeTags(body.asText());
-      if (text.length() > 0) {
-        return text.substring(0, Math.min(text.length(), MAX_ALT_TEXT_LENGTH));
-      }
-    }
-
-    JsonNode filename = contentItemNode.path("filename");
-    if (isTruthy(filename)) {
-      return filename.asText();
+    JsonNode altText = contentItemNode.path("altText");
+    if (isTruthy(altText)) {
+      return altText.asText();
     }
 
     return "";
