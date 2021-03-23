@@ -58,8 +58,6 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
  */
 public class ContentFormatters implements FormatterRegistry {
 
-  public static final int MAX_ALT_TEXT_LENGTH = 1000;
-
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
     table.add(new AbsUrlFormatter(Constants.BASE_URL_KEY));
