@@ -505,6 +505,10 @@ public class ContentFormatters implements FormatterRegistry {
         }
         buf.append(assetUrl).append("?format=").append(variants[i]).append(" ").append(variants[i]);
       }
+
+      buf.append(',');
+      buf.append(assetUrl).append("?format=original");
+
       buf.append("\"");
     }
 
