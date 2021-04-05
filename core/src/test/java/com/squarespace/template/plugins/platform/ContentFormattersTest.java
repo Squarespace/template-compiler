@@ -123,7 +123,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testSrcSet() {
     runner.run(
-        "f-image-src-set-1.html"
+        "f-image-src-set-1.html",
+        "f-image-src-set-2.html"
         );
   }
 
