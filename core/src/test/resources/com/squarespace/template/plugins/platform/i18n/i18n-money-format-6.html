@@ -1,0 +1,36 @@
+:JSON
+[
+  {
+    "currencyCode": "SEK",
+    "decimalValue": 1234.56
+  },
+  {
+    "currencyCode": "SEK",
+    "decimalValue": -1234.56
+  }
+]
+
+:TEMPLATE
+{.repeated section @}
+de_DE {@|i18n-money-format de_DE}
+en_UK {@|i18n-money-format en_UK}
+en_US {@|i18n-money-format en_US}
+es_US {@|i18n-money-format es_US}
+fr_FR {@|i18n-money-format fr_FR}
+sv_SE {@|i18n-money-format sv_SE}
+{.end}
+
+:OUTPUT
+de_DE 1.234,56 kr
+en_UK kr 1,234.56
+en_US kr 1,234.56
+es_US kr 1,234.56
+fr_FR 1 234,56 kr
+sv_SE 1 234,56 kr
+
+de_DE -1.234,56 kr
+en_UK kr -1,234.56
+en_US kr -1,234.56
+es_US kr -1,234.56
+fr_FR -1 234,56 kr
+sv_SE -1 234,56 kr

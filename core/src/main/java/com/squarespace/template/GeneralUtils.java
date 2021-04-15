@@ -219,6 +219,16 @@ public class GeneralUtils {
     }
   }
 
+  public static boolean resourceExists(Class<?> cls, String fileName) {
+    try {
+      String name = resolveName(cls, fileName);
+      Enumeration<URL> urls = cls.getClassLoader().getResources(name);
+      return urls.hasMoreElements();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to list resources", e);
+    }
+  }
+
   public static List<Path> list(Class<?> cls, Predicate<Path> predicate) {
     try {
       Enumeration<URL> urls = cls.getClassLoader().getResources(resolveName(cls, "."));

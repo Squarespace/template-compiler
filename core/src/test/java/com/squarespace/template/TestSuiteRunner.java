@@ -18,14 +18,10 @@ package com.squarespace.template;
 
 import static com.squarespace.template.GeneralUtils.loadResource;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import com.squarespace.template.TestCaseParser.TestCase;
 
@@ -50,20 +46,35 @@ public class TestSuiteRunner {
   }
 
   public void exec(String pattern) {
-    // Match numeric pattern in filename
-    Predicate<String> predicate = Pattern.compile("^" + pattern.replace("%N", "\\d+") + "$").asPredicate();
-
-    // List all files relative to the resource class that match the numeric pattern
-    List<Path> paths = GeneralUtils.list(this.resourceClass, p -> predicate.test(p.getFileName().toString()));
-
     Map<String, AssertionError> errors = new HashMap<>();
-    for (Path path : paths) {
-      String file = path.toString();
-      if (filesSeen.contains(file)) {
-        throw new AssertionError("Already processed file " + path);
+
+    // Single file, just run it
+    if (!pattern.contains("%N")) {
+      runOne(pattern, errors);
+      assertPass(errors);
+      return;
+    }
+
+    // Replace pattern with increasing integers until resource file is not found
+    boolean found = false;
+    int i = 1;
+    while (true) {
+      String fileName = pattern.replace("%N", Integer.toString(i));
+      if (!GeneralUtils.resourceExists(resourceClass, fileName)) {
+        break;
       }
-      runOne(file, errors);
-      filesSeen.add(file);
+      found = true;
+
+      if (filesSeen.contains(fileName)) {
+        throw new AssertionError("Already processed file " + fileName);
+      }
+      runOne(fileName, errors);
+      filesSeen.add(fileName);
+      i++;
+    }
+
+    if (!found) {
+      throw new RuntimeException("No test files matched pattern: " + pattern);
     }
     assertPass(errors);
   }

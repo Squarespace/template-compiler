@@ -18,8 +18,6 @@ package com.squarespace.template.plugins.platform.i18n;
 
 import static org.testng.Assert.assertEquals;
 
-import java.nio.file.FileSystems;
-import java.nio.file.PathMatcher;
 import java.util.Locale;
 
 import org.testng.Assert;
@@ -31,7 +29,6 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
-import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.StringView;
 import com.squarespace.template.TestSuiteRunner;
@@ -141,12 +138,7 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testMoneyFormatter() {
-    PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*/i18n-money-format-*.html");
-    String[] files = GeneralUtils.list(InternationalFormattersTest.class, p -> matcher.matches(p))
-        .stream()
-        .map(p -> p.getFileName().toString())
-        .toArray(String[]::new);
-    runner.run(files);
+    runner.exec("i18n-money-format-%N.html");
   }
 
   public void testExtraArgument() throws Exception {
