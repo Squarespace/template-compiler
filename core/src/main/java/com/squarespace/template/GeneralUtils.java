@@ -19,6 +19,7 @@ package com.squarespace.template;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
@@ -33,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -213,9 +212,21 @@ public class GeneralUtils {
       if (stream == null) {
         throw new CodeExecuteException(resourceLoadError(path, "not found"));
       }
-      return IOUtils.toString(stream, "UTF-8");
+      return streamToString(stream);
     } catch (IOException e) {
       throw new CodeExecuteException(resourceLoadError(path, e.toString()));
+    }
+  }
+
+  public static String streamToString(InputStream stream) throws IOException {
+    try (InputStreamReader reader = new InputStreamReader(stream, "UTF-8")) {
+      StringBuilder buf = new StringBuilder();
+      char[] buffer = new char[4096];
+      int n = 0;
+      while (-1 != (n = reader.read(buffer))) {
+        buf.append(buffer, 0, n);
+      }
+      return buf.toString();
     }
   }
 

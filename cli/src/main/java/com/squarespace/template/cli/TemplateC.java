@@ -18,15 +18,12 @@ package com.squarespace.template.cli;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -307,8 +304,8 @@ public class TemplateC {
   }
 
   protected static String readFile(String rawPath) throws IOException {
-    try (Reader reader = new InputStreamReader(new FileInputStream(rawPath), "UTF-8")) {
-      return IOUtils.toString(reader);
+    try (InputStream stream = new FileInputStream(rawPath)) {
+      return GeneralUtils.streamToString(stream);
     }
   }
 

@@ -5,7 +5,6 @@ dependencies {
   compile "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
   compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
   compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-  compile 'commons-io:commons-io:2.1'
   compile 'joda-time:joda-time:2.3'
   compile 'org.apache.commons:commons-lang3:3.1'
 

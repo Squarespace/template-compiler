@@ -28,8 +28,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
@@ -195,7 +193,7 @@ public class UnitTestBase {
 
   public static String readFile(Path path) throws IOException {
     try (InputStream input = Files.newInputStream(path)) {
-      return IOUtils.toString(input, "UTF-8");
+      return GeneralUtils.streamToString(input);
     }
   }
 
