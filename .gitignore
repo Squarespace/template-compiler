@@ -15,4 +15,5 @@ out/
 .idea
 *.swp
 *.iml
+*.bat
 
