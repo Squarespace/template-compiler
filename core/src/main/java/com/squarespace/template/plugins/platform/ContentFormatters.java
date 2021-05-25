@@ -268,7 +268,7 @@ public class ContentFormatters implements FormatterRegistry {
 
     JsonNode altText = contentItemNode.path("altText");
     if (isTruthy(altText)) {
-      return altText.asText();
+      return PluginUtils.removeTags(altText.asText());
     }
 
     return "";
@@ -339,7 +339,7 @@ public class ContentFormatters implements FormatterRegistry {
       String cls = (args.count() == 1) ? args.first() : "thumb-image";
 
       String id = node.path("id").asText();
-      String altText = getAltText(ctx);
+      String altText = getAltTextFromContentItem(ctx.node());
       String assetUrl = node.path("assetUrl").asText();
 
       StringBuilder buf = new StringBuilder();
@@ -361,24 +361,6 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("data-type=\"image\" ");
       buf.append("/>");
       var.set(buf);
-    }
-
-    private String getAltText(Context ctx) {
-      // For image blocks, caption is stored on the block and not the item.
-      // need to reach out via the context to see if it exist first,
-      // before falling back on the data on the item
-
-      // this will be empty if this is not a block
-      JsonNode blockInfo = ctx.resolve("info");
-      if (blockInfo != null) {
-        String altText = StringUtils.trimToNull(blockInfo.path("altText").asText());
-        if (altText != null) {
-          return altText;
-        }
-      }
-
-      JsonNode image = ctx.node();
-      return getAltTextFromContentItem(image);
     }
   }
 
