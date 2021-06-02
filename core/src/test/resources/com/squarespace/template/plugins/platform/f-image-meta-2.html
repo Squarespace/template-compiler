@@ -7,7 +7,8 @@ should print data-component-key, and default to empty alt text
   "assetUrl": "/foo/bar.jpg",
   "licensedAssetPreview": {},
   "mediaFocalPoint": {"x": 0.3, "y": 0.7},
-  "componentKey": "baz"
+  "componentKey": "baz",
+  "altText": "alt text"
 }
 
 
@@ -15,4 +16,4 @@ should print data-component-key, and default to empty alt text
 {@|image-meta 1}
 
 :OUTPUT
-data-licensed-asset-preview="true" data-component-key="baz" data-src="/foo/bar.jpg" data-image="/foo/bar.jpg" data-image-dimensions="1000" data-image-focal-point="0.3,0.7" alt=""
+data-licensed-asset-preview="true" data-component-key="baz" data-src="/foo/bar.jpg" data-image="/foo/bar.jpg" data-image-dimensions="1000" data-image-focal-point="0.3,0.7" alt="alt text"
