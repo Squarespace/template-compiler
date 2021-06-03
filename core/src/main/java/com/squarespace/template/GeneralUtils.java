@@ -429,7 +429,7 @@ public class GeneralUtils {
       return !node.asText().equals("");
     }
     if (node.isNumber() || node.isBoolean()) {
-      return node.asLong() != 0;
+      return node.asDouble() != 0;
     }
     if (node.isMissingNode() || node.isNull()) {
       return false;
