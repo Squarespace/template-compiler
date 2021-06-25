@@ -58,6 +58,8 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
  */
 public class ContentFormatters implements FormatterRegistry {
 
+  public static final int MAX_ALT_TEXT_LENGTH = 1000;
+
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
     table.add(new AbsUrlFormatter(Constants.BASE_URL_KEY));
@@ -265,10 +267,22 @@ public class ContentFormatters implements FormatterRegistry {
   }
 
   private static String getAltTextFromContentItem(JsonNode contentItemNode) {
+    JsonNode title = contentItemNode.path("title");
+    if (isTruthy(title)) {
+      return title.asText();
+    }
 
-    JsonNode altText = contentItemNode.path("altText");
-    if (isTruthy(altText)) {
-      return PluginUtils.removeTags(altText.asText());
+    JsonNode body = contentItemNode.path("body");
+    if (isTruthy(body)) {
+      String text = PluginUtils.removeTags(body.asText());
+      if (text.length() > 0) {
+        return text.substring(0, Math.min(text.length(), MAX_ALT_TEXT_LENGTH));
+      }
+    }
+
+    JsonNode filename = contentItemNode.path("filename");
+    if (isTruthy(filename)) {
+      return filename.asText();
     }
 
     return "";
@@ -339,7 +353,7 @@ public class ContentFormatters implements FormatterRegistry {
       String cls = (args.count() == 1) ? args.first() : "thumb-image";
 
       String id = node.path("id").asText();
-      String altText = getAltTextFromContentItem(ctx.node());
+      String altText = getAltText(ctx);
       String assetUrl = node.path("assetUrl").asText();
 
       StringBuilder buf = new StringBuilder();
@@ -361,6 +375,24 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("data-type=\"image\" ");
       buf.append("/>");
       var.set(buf);
+    }
+
+    private String getAltText(Context ctx) {
+      // For image blocks, caption is stored on the block and not the item.
+      // need to reach out via the context to see if it exist first,
+      // before falling back on the data on the item
+
+      // this will be empty if this is not a block
+      JsonNode blockInfo = ctx.resolve("info");
+      if (blockInfo != null) {
+        String altText = StringUtils.trimToNull(blockInfo.path("altText").asText());
+        if (altText != null) {
+          return altText;
+        }
+      }
+
+      JsonNode image = ctx.node();
+      return getAltTextFromContentItem(image);
     }
   }
 
