@@ -539,7 +539,7 @@ public class CommerceFormatters implements FormatterRegistry {
         String defaultSoldOutMessage = StringUtils.defaultIfEmpty(defaultSoldOutText, "sold out");
         String soldOutMessage = StringUtils.defaultIfEmpty(customSoldOutMessage, defaultSoldOutMessage);
         buf.append("<div class=\"product-mark sold-out\">");
-        buf.append(soldOutMessage);
+        PluginUtils.escapeHtmlAttribute(soldOutMessage, buf);
         buf.append("</div>");
         var.set(buf);
       } else if (CommerceUtils.isOnSale(node)) {
