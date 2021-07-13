@@ -1,6 +1,10 @@
 {.var @quantityLabel localizedStrings.productQuantityInputLabel}
+{##
+  We use aria-label for the input below since we didn't want to change the div above and potentially break user sites.
+  And it was hard to guarantee unique ids for using aria-labelledby
+##}
 
 <div class="product-quantity-input" data-item-id="{id}" data-animation-role="content">
   <div class="quantity-label">{.if @quantityLabel}{@quantityLabel}{.or}Quantity{.end}:</div>
-  <input size="4" max="9999" min="1" value="1" type="number" step="1"></input>
+  <input aria-label="{.if @quantityLabel}{@quantityLabel}{.or}Quantity{.end}" size="4" max="9999" min="1" value="1" type="number" step="1"></input>
 </div>
