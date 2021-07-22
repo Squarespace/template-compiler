@@ -102,6 +102,10 @@ public class Constants {
       "localizedStrings", "giftCardVariantSelectText"
   };
 
+  public static final String[] GIFT_CARD_VALUE_DISPLAY_TEXT = new String[] {
+      "localizedStrings", "giftCardValueDisplayText"
+  };
+
   public static final String[] CLDR_MONEYFORMAT_KEY = new String[] {
       "website", "useCLDRMoneyFormat" };
 
