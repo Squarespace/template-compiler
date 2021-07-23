@@ -1,18 +1,19 @@
 :JSON
 {
   "localizedStrings": {
-    "giftCardValueDisplayText": "Value Display Text",
+    "giftCardValueDisplayText": "Test Value",
     "giftCardVariantSelectText": "Get foobar"
   },
   "item": {
-    "id": "560c37c1a7c8465c4a71d99a",
-    "structuredContent": {
-      "productType": 4,
-      "variants": [
-        {"attributes": { "Value": "$25.00", "Value": "$50.00" }}
-      ],
-      "variantOptionOrdering": ["Value"]
-    }
+  "id": "560c37c1a7c8465c4a71d99a",
+  "structuredContent": {
+    "productType": 4,
+    "variants": [
+      {"attributes": { "Value": "25" }},
+      {"attributes": { "Value": "50" }}
+    ],
+  "variantOptionOrdering": ["Value"]
+  }
   }
 }
 
@@ -20,20 +21,20 @@
 {item|variants-select}
 
 :OUTPUT
-<div class="product-variants" data-item-id="560c37c1a7c8465c4a71d99a" data-variants="[{&quot;attributes&quot;:{&quot;Value&quot;:&quot;50&quot;},{&quot;Value&quot;:&quot;25&quot;}}]" data-animation-role="content">
+<div class="product-variants" data-item-id="560c37c1a7c8465c4a71d99a" data-variants="[{&quot;attributes&quot;:{&quot;Value&quot;:&quot;25&quot;}},{&quot;attributes&quot;:{&quot;Value&quot;:&quot;50&quot;}}]" data-animation-role="content">
     <div class="variant-option">
-        <div class="variant-option-title">Value Display Text: </div>
-        <div class="variant-select-wrapper">
-            <select aria-label="Get foobar" data-variant-option-name="Value">
-                <option value="">Get foobar</option>
-                <option value="$25.00">$25.00</option><option value="$50.00">$50.00</option>
-            </select>
-        </div>
-        <div class="variant-radiobtn-wrapper" data-variant-option-name="Value">
-            <input type="radio" class="variant-radiobtn" value="$25.00" name="variant-option-Value" id="variant-option-Value-$25.00"/>
-            <label for="variant-option-Value-$25.00">$25.00</label>
-            <input type="radio" class="variant-radiobtn" value="$50.00" name="variant-option-Value" id="variant-option-Value-$50.00"/>
-            <label for="variant-option-Value-$50.00">$50.00</label>
-        </div>
+    <div class="variant-option-title">Test Value: </div>
+    <div class="variant-select-wrapper">
+      <select aria-label="Get foobar" data-variant-option-name="Value">
+        <option value="">Get foobar</option>
+        <option value="25">25</option><option value="50">50</option>
+      </select>
     </div>
-</div>
+    <div class="variant-radiobtn-wrapper" data-variant-option-name="Value">
+      <input type="radio" class="variant-radiobtn" value="25" name="variant-option-Value" id="variant-option-Value-25"/>
+      <label for="variant-option-Value-25">25</label>
+      <input type="radio" class="variant-radiobtn" value="50" name="variant-option-Value" id="variant-option-Value-50"/>
+      <label for="variant-option-Value-50">50</label>
+    </div>
+    </div>
+  </div>
