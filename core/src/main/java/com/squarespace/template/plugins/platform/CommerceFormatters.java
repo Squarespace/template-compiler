@@ -646,13 +646,13 @@ public class CommerceFormatters implements FormatterRegistry {
 
       ObjectNode obj = JsonUtils.createObjectNode();
       obj.set("item", node);
-      obj.set("displayName", getDisplayName(ctx, node));
+      obj.set("displayName", getDisplayText(ctx, node));
       obj.set("options", options);
       obj.set("selectText", getSelectText(ctx, node));
       var.set(executeTemplate(ctx, template, obj, false));
     }
 
-    private static TextNode getDisplayName(Context ctx, JsonNode node) {
+    private static TextNode getDisplayText(Context ctx, JsonNode node) {
       ProductType productType = CommerceUtils.getProductType(node);
       // Gift Cards have variants forcibly named "Value" by default (as opposed to a merchant-defined variant name) and
       // this string must be translated before being displayed on the front-end.
