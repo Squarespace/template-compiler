@@ -621,6 +621,7 @@ public class CommerceFormatters implements FormatterRegistry {
   protected static class VariantsSelectFormatter extends BaseFormatter {
 
     private Instruction template;
+    private static final TextNode NAME_NODE = new TextNode("{name}");
 
     public VariantsSelectFormatter() {
       super("variants-select", false);
@@ -659,9 +660,8 @@ public class CommerceFormatters implements FormatterRegistry {
       if (productType == ProductType.GIFT_CARD) {
         String localizedDisplayName = ctx.resolve(Constants.GIFT_CARD_VALUE_DISPLAY_TEXT).asText();
         return new TextNode(StringUtils.defaultIfEmpty(localizedDisplayName, "Value"));
-      } else {
-        return new TextNode(StringUtils.defaultString("{name}"));
       }
+      return NAME_NODE;
     }
 
     private static TextNode getSelectText(Context ctx, JsonNode node) {
