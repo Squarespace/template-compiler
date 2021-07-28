@@ -647,7 +647,7 @@ public class CommerceFormatters implements FormatterRegistry {
 
       ObjectNode obj = JsonUtils.createObjectNode();
       obj.set("item", node);
-      obj.set("displayName", getDisplayText(ctx, node));
+      obj.set("displayText", getDisplayText(ctx, node));
       obj.set("options", options);
       obj.set("selectText", getSelectText(ctx, node));
       var.set(executeTemplate(ctx, template, obj, false));

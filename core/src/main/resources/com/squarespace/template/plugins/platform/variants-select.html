@@ -6,7 +6,7 @@
 
   <div class="product-variants" data-item-id="{item.id}" data-variants="{@variants|json|htmltag}"{.if @isSubscribable} data-is-subscribable="true" data-subscription-plan="{@subscriptionPlan|json|htmltag}"{.end} data-animation-role="content">{.repeated section options}
     <div class="variant-option">
-    <div class="variant-option-title">{displayName|message name:name|htmltag}: </div>
+    <div class="variant-option-title">{displayText|message name:name|htmltag}: </div>
     <div class="variant-select-wrapper">
       <select aria-label="{selectText|message variantName:name}" data-variant-option-name="{name|htmltag}">
         <option value="">{selectText|message variantName:name}</option>
