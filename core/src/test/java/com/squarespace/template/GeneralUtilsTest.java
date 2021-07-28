@@ -17,6 +17,7 @@
 package com.squarespace.template;
 
 import static com.squarespace.template.GeneralUtils.isJsonStart;
+import static com.squarespace.template.GeneralUtils.splitVariable;
 import static com.squarespace.template.GeneralUtils.toPositiveLong;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -43,6 +44,21 @@ public class GeneralUtilsTest {
     } catch (CodeException e) {
       // expected
     }
+  }
+
+  @Test
+  public void testSplitVariable() {
+    assertEquals(splitVariable("@"), null);
+    assertEquals(splitVariable("@index"), new Object[] { "@index" });
+    assertEquals(splitVariable("@index0"), new Object[] { "@index0" });
+    assertEquals(splitVariable("a"), new Object[] { "a" });
+    assertEquals(splitVariable("a.b.c"), new Object[] { "a", "b", "c" });
+    assertEquals(splitVariable("a.1.b.2"), new Object[] { "a", 1, "b", 2 });
+    assertEquals(splitVariable("0.1.2"), new Object[] { 0, 1, 2 });
+
+    // too large an integer
+    String large = "333333333333333333333333333333";
+    assertEquals(splitVariable(large), new Object[] { large });
   }
 
   @Test

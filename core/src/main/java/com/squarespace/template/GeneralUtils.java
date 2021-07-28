@@ -405,7 +405,16 @@ public class GeneralUtils {
     // Each segment of the key path can be either a String or an Integer.
     Object[] keys = new Object[parts.length];
     for (int i = 0, len = parts.length; i < len; i++) {
-      keys[i] = allDigits(parts[i]) ? Integer.parseInt(parts[i], 10) : parts[i];
+      Object key = parts[i];
+      if (allDigits(parts[i])) {
+        try {
+          key = Integer.parseInt(parts[i], 10);
+        } catch (NumberFormatException e) {
+          // Integer too large, treat as a string key.
+          // fall through..
+        }
+      }
+      keys[i] = key;
     }
     return keys;
   }
