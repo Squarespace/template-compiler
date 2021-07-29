@@ -1,0 +1,40 @@
+:JSON
+{
+  "localizedStrings": {
+    "giftCardValueDisplayText": "Test Value",
+    "giftCardVariantSelectText": "Get foobar"
+  },
+  "item": {
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "productType": 1,
+      "variants": [
+        {"attributes": { "Color": "Blue" }},
+        {"attributes": { "Color": "Pink" }}
+      ],
+      "variantOptionOrdering": ["Color"]
+    }
+  }
+}
+
+:TEMPLATE
+{item|variants-select}
+
+:OUTPUT
+<div class="product-variants" data-item-id="560c37c1a7c8465c4a71d99a" data-variants="[{&quot;attributes&quot;:{&quot;Color&quot;:&quot;Blue&quot;}},{&quot;attributes&quot;:{&quot;Color&quot;:&quot;Pink&quot;}}]" data-animation-role="content">
+    <div class="variant-option">
+    <div class="variant-option-title">Color: </div>
+    <div class="variant-select-wrapper">
+      <select aria-label="Select Color" data-variant-option-name="Color">
+        <option value="">Select Color</option>
+        <option value="Blue">Blue</option><option value="Pink">Pink</option>
+      </select>
+    </div>
+    <div class="variant-radiobtn-wrapper" data-variant-option-name="Color">
+      <input type="radio" class="variant-radiobtn" value="Blue" name="variant-option-Color" id="variant-option-Color-Blue"/>
+      <label for="variant-option-Color-Blue">Blue</label>
+      <input type="radio" class="variant-radiobtn" value="Pink" name="variant-option-Color" id="variant-option-Color-Pink"/>
+      <label for="variant-option-Color-Pink">Pink</label>
+    </div>
+    </div>
+  </div>

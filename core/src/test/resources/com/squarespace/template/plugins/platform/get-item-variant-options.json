@@ -80,4 +80,21 @@
     {"name": "color", "values": ["blue", "red"]}
 ]
 
+:getItemVariant-6
+{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "structuredContent": {
+      "variants": [
+        {"attributes": { "Value": "25" }},
+        {"attributes": { "Value": "50" }}
+      ],
+    "variantOptionOrdering": ["Value"]
+  }
+}
+
+:getItemVariant-6-expected
+[
+    {"name": "Value", "values": ["25", "50"]}
+]
+
 
