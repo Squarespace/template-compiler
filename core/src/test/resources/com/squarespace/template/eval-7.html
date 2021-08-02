@@ -1,0 +1,39 @@
+:TEMPLATE
+# LT
+{.eval 1 < 2}
+{.eval 2 < 2}
+{.eval 3 < 2}
+
+{.eval 0 < "1"}
+{.eval 0 < "0x01"}
+{.eval 5 < "1"}
+{.eval 5 < "0x01"}
+
+{.eval 0 < true}
+{.eval 0 < false}
+
+{.eval "a" < "b"}
+{.eval "a" < "a"}
+{.eval "b" < "a"}
+
+
+:JSON
+{}
+
+:OUTPUT
+# LT
+true
+false
+false
+
+true
+true
+false
+false
+
+true
+false
+
+true
+false
+false

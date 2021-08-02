@@ -1,0 +1,16 @@
+:TEMPLATE
+
+# variables, ASN
+{.eval @a = 2; @b = 5 * 7.2; @c = @a * @b; @c}
+
+:JSON
+{
+    "a": {
+        "b": true
+    }
+}
+
+:OUTPUT
+
+# variables, ASN
+72

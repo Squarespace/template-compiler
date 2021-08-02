@@ -1,0 +1,35 @@
+:TEMPLATE
+# SEQ
+{.eval 1 === 1}
+{.eval 1 === 2}
+{.eval 1 === NaN}
+{.eval NaN === NaN}
+
+{.eval true === 1}
+{.eval false === 1}
+{.eval "1" === 1}
+
+# SNEQ
+{.eval 1 !== 1}
+{.eval 1 !== 2}
+{.eval "1" !== 1}
+
+
+:JSON
+{}
+
+:OUTPUT
+# SEQ
+true
+false
+false
+false
+
+false
+false
+false
+
+# SNEQ
+false
+true
+true
