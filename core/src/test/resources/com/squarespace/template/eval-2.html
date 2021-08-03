@@ -1,0 +1,83 @@
+:TEMPLATE
+
+# BNOT
+{.eval ~1}
+{.eval ~2}
+
+# ADD
+{.eval 1+2}
+{.eval 1 + 2}
+{.eval 1 + -3}
+{.eval 2 + ~2}
+
+# SUB
+{.eval 1-2}
+{.eval -1 - -4}
+{.eval 3 + 4 - 5}
+
+# MUL, DIV
+{.eval 3 * 8}
+{.eval 3 * 8 / 6}
+{.eval 3 / 8 * 6}
+{.eval a.b.c * -2}
+
+# BOR
+{.eval 0x02 | 0x01}
+
+# BAND
+{.eval 0x02 & 0x01}
+{.eval 0x02 & 0x02}
+{.eval 0x02 & 0x07}
+{.eval 0x03 & 0x07}
+
+# BXOR
+{.eval 0x02 ^ 0x01}
+{.eval 0x02 ^ 0x02}
+{.eval 0x02 ^ 0x03}
+
+
+:JSON
+{
+    "a": {
+        "b": {
+            "c": 3
+        },
+        "d": true
+    }
+}
+
+:OUTPUT
+# BNOT
+-2
+-3
+
+# ADD
+3
+3
+-2
+-1
+
+# SUB
+-1
+3
+2
+
+# MUL, DIV
+24
+4
+2.25
+-6
+
+# BOR
+3
+
+# BAND
+0
+2
+2
+3
+
+# BXOR
+3
+0
+1

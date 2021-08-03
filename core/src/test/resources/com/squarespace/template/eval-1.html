@@ -1,0 +1,61 @@
+:TEMPLATE
+
+# no operators
+blank -> {.eval }
+
+# stack
+{.eval 1}
+{.eval 1 2 3 4 5}
+{.eval 3, 2, 1}
+{.eval 'a' 'b' 'c'}
+{.eval true; false; true}
+
+# numbers
+{.eval 0.1}
+{.eval 1.}
+{.eval 0x111111111111111111111}
+{.eval 1e20}
+{.eval -2}
+{.eval +5}
+{.eval +17; +17}
+{.eval 0x07a}
+
+# strings
+{.eval 'abc'}
+{.eval '\u2018foobar\u2019'}
+{.eval "\u00ce\u00fe\u0266\u00f2\u00f1\u00ea"}
+
+:JSON
+{
+    "a": {
+        "b": {
+            "c": 3
+        }
+    }
+}
+
+:OUTPUT
+# no operators
+blank -> 
+
+# stack
+1
+5
+1
+c
+true
+
+# numbers
+0.1
+1
+1.2895208742556044e+24
+100000000000000000000
+-2
+5
+17
+122
+
+# strings
+abc
+‘foobar’
+Îþɦòñê

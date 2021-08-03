@@ -969,27 +969,26 @@ public class Expr {
             continue;
           }
 
-          // Unicode character ecape 4-6 digits '\\u{0000[00]}'
+          // Unicode character escape 4 or 8 digits '\u0000' or '\U00000000'
           case 'u':
           case 'U': {
 
             // Skip over escape
             i += 2;
 
-            // a unicode escape can contain 4 to 6 characters.
-            int lim = i + 6;
+            // a unicode escape can contain 4 or 8 characters.
+            int lim = i + (c == 'u' ? 4 : 8);
 
             // find end of hex char sequence
             int k = hexi(str, i, lim < len ? lim : len);
-            int m = k - i;
 
-            // we don't accept unicode escapes of less than 4 characters.
-            if (m < 4) {
+            // escape sequence end must match limit
+            if (k != lim) {
               this.errors.add(E_INVALID_UNICODE);
               return -1;
             }
 
-            // Decode range of chars as 4- or 6-digit hex number
+            // Decode range of chars as 4- or 8-digit hex number
             int code = Integer.parseInt(str.substring(i, k), 16);
 
             // Eliminate unwanted ascii control byte here. Also eliminate

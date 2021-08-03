@@ -1,0 +1,34 @@
+:TEMPLATE
+
+# LNOT
+{.eval !true}
+{.eval !false}
+{.eval !2}
+{.eval !!a.b}
+{.eval !!!!a.b}
+
+# AND, OR
+{.eval true && true}
+{.eval true && false}
+{.eval true && (false || true)}
+
+:JSON
+{
+    "a": {
+        "b": true
+    }
+}
+
+:OUTPUT
+
+# LNOT
+false
+true
+false
+true
+true
+
+# AND, OR
+true
+false
+true

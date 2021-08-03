@@ -1,0 +1,23 @@
+:TEMPLATE
+
+# mixed types
+{.eval 5 + a}
+{.eval a + 5}
+{.eval true + 2}
+
+# conversions
+{.eval 5 + num(a)}
+
+:JSON
+{
+    "a": "-6.5"
+}
+
+:OUTPUT
+# mixed types
+5-6.5
+-6.55
+3
+
+# conversions
+-1.5

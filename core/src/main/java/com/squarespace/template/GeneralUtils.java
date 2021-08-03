@@ -438,7 +438,8 @@ public class GeneralUtils {
       return !node.asText().equals("");
     }
     if (node.isNumber() || node.isBoolean()) {
-      return node.asDouble() != 0;
+      double n = node.asDouble();
+      return !Double.isNaN(n) && n != 0;
     }
     if (node.isMissingNode() || node.isNull()) {
       return false;

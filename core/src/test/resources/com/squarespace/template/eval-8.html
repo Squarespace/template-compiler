@@ -1,0 +1,30 @@
+:TEMPLATE
+
+# LTE
+{.eval 1 <= 0}
+{.eval 1 <= 1}
+{.eval 1 <= 2}
+
+{.eval 0 <= true}
+{.eval 0 <= false}
+
+{.eval "a" <= "b"}
+{.eval "a" <= "a"}
+{.eval "b" <= "a"}
+
+:JSON
+{}
+
+:OUTPUT
+
+# LTE
+false
+true
+true
+
+true
+true
+
+true
+true
+false

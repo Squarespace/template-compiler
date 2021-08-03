@@ -320,12 +320,12 @@ public class ExprTest {
 
     // unicode escapes
     assertEquals(reduce("\"\\u2019\"", c), new TextNode("\u2019"));
-    assertEquals(reduce("\"\\u1f600\"", c), new TextNode("\uD83D\uDE00"));
-    assertEquals(reduce("\"\\u01f600\\U01f600\"", c), new TextNode("\uD83D\uDE00\uD83D\uDE00"));
+    assertEquals(reduce("\"\\U0001f600\"", c), new TextNode("\uD83D\uDE00"));
+    assertEquals(reduce("\"\\U0001f600\\U0001f600\"", c), new TextNode("\uD83D\uDE00\uD83D\uDE00"));
 
     // unicode escape out-of-range replacement
     assertEquals(reduce("\"\\u0003\\u000f\\u0019\\u0021\"", c), new TextNode("   !"));
-    assertEquals(reduce("\"\\u222222\"", c), new TextNode(" "));
+    assertEquals(reduce("\"\\U00222222\"", c), new TextNode(" "));
 
     // ascii control code replacement
     assertEquals(reduce("\"\\u0000\\u0001\\u0018\\u0019\"", c), new TextNode("    "));

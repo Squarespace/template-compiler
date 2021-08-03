@@ -1,0 +1,57 @@
+:TEMPLATE
+
+# POW
+{.eval 2 ** 3}
+{.eval 2 ** (4 ** 3)}
+{.eval 2 ** 64}
+
+# MOD
+{.eval 5 % 3}
+{.eval 10 % 5}
+{.eval 5 % -5}
+{.eval 5 % -4}
+{.eval 5 % -3}
+{.eval 5 % -2}
+{.eval 5 % -1}
+{.eval 5 % 0}
+{.eval 5 % 1}
+{.eval 5 % 2}
+{.eval 5 % 3}
+{.eval 5 % 4}
+{.eval 5 % 5}
+
+# SHL
+{.eval 100 << 2}
+
+# SHR
+{.eval 100 >> 2}
+
+:JSON
+{}
+
+:OUTPUT
+# POW
+8
+18446744073709552000
+18446744073709552000
+
+# MOD
+2
+0
+0
+1
+2
+1
+0
+NaN
+0
+1
+2
+1
+0
+
+# SHL
+400
+
+# SHR
+25

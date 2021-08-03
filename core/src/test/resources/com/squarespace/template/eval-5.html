@@ -1,0 +1,33 @@
+:TEMPLATE
+# EQ
+{.eval 1 == 1}
+{.eval 1 == 2}
+{.eval 1 == NaN}
+{.eval NaN == NaN}
+{.eval true == 1}
+{.eval false == 1}
+{.eval "1" == 1}
+
+# NEQ
+{.eval 1 != 1}
+{.eval 1 != 2}
+{.eval "1" != 1}
+
+:JSON
+{}
+
+:OUTPUT
+
+# EQ
+true
+false
+false
+false
+true
+false
+true
+
+# NEQ
+false
+true
+false
