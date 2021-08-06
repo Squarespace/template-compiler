@@ -105,6 +105,7 @@ public class Expr {
   public Expr(String raw) {
     this(raw, null);
   }
+
   /**
    * Construct an expression from the given string and options.
    * Construction will only tokenize the input.
@@ -598,6 +599,7 @@ public class Expr {
           Token top = this.tokens.top();
           if (top != null &&
               top.type == ExprTokenType.VARIABLE &&
+              ((VarToken)top).name != null &&
               ((VarToken)top).name.length == 1) {
             // Check if name corresponds to a valid built-in function, and
             // convert the name to a function call token.
@@ -820,7 +822,7 @@ public class Expr {
             Object[] raw = GeneralUtils.splitVariable(str.substring(i, end));
             i = end;
 
-            if (raw.length == 1 && raw[0] instanceof String) {
+            if (raw != null && raw.length == 1 && raw[0] instanceof String) {
               // Names for constants. These names can conflict with references to
               // context variables on the immediate node, e.g. { "pi": "apple" }.
               // To disambiguate, use references of the form "@.pi" or bind
@@ -988,8 +990,11 @@ public class Expr {
               return -1;
             }
 
-            // Decode range of chars as 4- or 8-digit hex number
-            int code = Integer.parseInt(str.substring(i, k), 16);
+            // Decode range of chars as 4- or 8-digit hex number. It is possible
+            // for an 8-digit hex value to exceed the range of int, so we parse
+            // as long and then constrain with a conditional.
+            String repr = str.substring(i, k);
+            long code = Long.parseLong(repr, 16);
 
             // Eliminate unwanted ascii control byte here. Also eliminate
             // out of range invalid Unicode characters.

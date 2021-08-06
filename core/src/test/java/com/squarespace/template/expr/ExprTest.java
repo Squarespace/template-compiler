@@ -296,6 +296,20 @@ public class ExprTest {
   }
 
   @Test
+  public void testReferences() {
+    Context c = new Context(JsonUtils.decode("{\"a\": 123}"));
+
+    assertEquals(reduce("@", c), null);
+    assertEquals(reduce("@.a", c), new DoubleNode(123));
+  }
+
+  @Test
+  public void testInvalidEscapes() {
+    Context c = new Context(JsonUtils.decode("{}"));
+    assertEquals(reduce("'\\UA0000000'", c), new TextNode(" "));
+  }
+
+  @Test
   public void testStrings() {
     Context c = new Context(JsonUtils.decode("{}"));
 
