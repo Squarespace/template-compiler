@@ -1,0 +1,21 @@
+:COMMENTS
+should print alt text from the item if blockType is image, even if alt text on item is empty
+
+:JSON
+{
+  "img":{
+    "id": "560c37c1a7c8465c4a71d99a",
+    "title": "This should not be used, as the info.altText field should override",
+    "originalSize": 1000,
+    "assetUrl": "/foo/bar.jpg",
+    "mediaFocalPoint": {"x": 0.3, "y": 0.7},
+    "altText": ""
+  },
+  "blockType": 5
+}
+
+:TEMPLATE
+{img|image foo-bar-image}
+
+:OUTPUT
+<noscript><img src="/foo/bar.jpg" alt="" /></noscript><img class="foo-bar-image" data-src="/foo/bar.jpg" data-image="/foo/bar.jpg" data-image-dimensions="1000" data-image-focal-point="0.3,0.7" alt="" data-load="false" data-image-id="560c37c1a7c8465c4a71d99a" data-type="image" />

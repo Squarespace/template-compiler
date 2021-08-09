@@ -1,5 +1,5 @@
 :COMMENTS
-should print alt text from the info document
+should print alt text from the item if blockType is image
 
 :JSON
 {
@@ -8,11 +8,10 @@ should print alt text from the info document
     "title": "This should not be used, as the info.altText field should override",
     "originalSize": 1000,
     "assetUrl": "/foo/bar.jpg",
-    "mediaFocalPoint": {"x": 0.3, "y": 0.7}
-  },
-  "info": {
+    "mediaFocalPoint": {"x": 0.3, "y": 0.7},
     "altText": "baz"
-  }
+  },
+  "blockType": 5
 }
 
 :TEMPLATE
