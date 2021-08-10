@@ -50,6 +50,7 @@ import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginDateUtils;
 import com.squarespace.template.plugins.PluginUtils;
+import com.squarespace.template.plugins.platform.enums.BlockType;
 import com.squarespace.template.plugins.platform.enums.RecordType;
 
 
@@ -153,7 +154,7 @@ public class ContentFormatters implements FormatterRegistry {
     String origSize = image.path("originalSize").asText();
     String assetUrl = image.path("assetUrl").asText();
 
-    String altText = preferredAltText != null ? preferredAltText : getAltTextFromContentItem(image);
+    String altText = preferredAltText != null ? preferredAltText : computeAltTextFromContentItemFields(image);
 
     if (isLicensedAssetPreview(image)) {
       buf.append("data-licensed-asset-preview=\"true\" ");
@@ -266,7 +267,7 @@ public class ContentFormatters implements FormatterRegistry {
     return focalPoint;
   }
 
-  private static String getAltTextFromContentItem(JsonNode contentItemNode) {
+  private static String computeAltTextFromContentItemFields(JsonNode contentItemNode) {
     JsonNode title = contentItemNode.path("title");
     if (isTruthy(title)) {
       return title.asText();
@@ -378,21 +379,17 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     private String getAltText(Context ctx) {
-      // For image blocks, caption is stored on the block and not the item.
-      // need to reach out via the context to see if it exist first,
-      // before falling back on the data on the item
+      // Content Items for image blocks were populated with an altText value with a migration. See CMS-33805.
+      // For those, the Content Item value should always be used even if it is empty.
+      JsonNode blockType = ctx.resolve("blockType");
 
-      // this will be empty if this is not a block
-      JsonNode blockInfo = ctx.resolve("info");
-      if (blockInfo != null) {
-        String altText = StringUtils.trimToNull(blockInfo.path("altText").asText());
-        if (altText != null) {
-          return altText;
-        }
+      if (!blockType.isMissingNode() && blockType.asInt() == BlockType.IMAGE.code()) {
+        JsonNode altText = ctx.node().path("altText");
+        return StringUtils.trim(altText.asText());
       }
 
       JsonNode image = ctx.node();
-      return getAltTextFromContentItem(image);
+      return computeAltTextFromContentItemFields(image);
     }
   }
 
