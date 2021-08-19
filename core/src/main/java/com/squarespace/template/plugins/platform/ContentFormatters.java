@@ -60,6 +60,7 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
 public class ContentFormatters implements FormatterRegistry {
 
   public static final int MAX_ALT_TEXT_LENGTH = 1000;
+  private static final String[] SQUARESPACE_SIZES = {"100w", "300w", "500w", "750w", "1000w", "1500w", "2500w"};
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
@@ -467,7 +468,6 @@ public class ContentFormatters implements FormatterRegistry {
   }
 
   public static class ImageMetaSrcSetFormatter extends BaseFormatter {
-    private String[] SQUARESPACE_SIZES = {"100w", "300w", "500w", "750w", "1000w", "1500w", "2500w"};
 
     public ImageMetaSrcSetFormatter() {
       super("image-srcset", false);
@@ -503,28 +503,21 @@ public class ContentFormatters implements FormatterRegistry {
         }
         buf.append(assetUrl).append("?format=").append(variants[i]).append(" ").append(variants[i]);
       }
-      addOriginalImageFormat(buf, variants, limit, assetUrl);
 
-      buf.append("\"");
-    }
-
-    /**
-     * Not all images will have complete list of Squarespace sizes due to original uploaded image is already too small. So no compression
-     * or smaller image size is produced.
-     * For these cases, we want to use the original image for missing sizes by setting the next size to use original image.
-     */
-    public void addOriginalImageFormat(StringBuilder buf, String[] variants, int limit, String assetUrl) {
       String lastVariant = variants[limit - 1];
-      if (lastVariant.equals(SQUARESPACE_SIZES[SQUARESPACE_SIZES.length - 1])) {
-        return;
-      }
-      for (int i = 0; i < SQUARESPACE_SIZES.length - 1; i++) {
-        if (SQUARESPACE_SIZES[i].equals(lastVariant)) {
-          buf.append(',');
-          buf.append(assetUrl).append("?format=original").append(" ").append(SQUARESPACE_SIZES[i + 1]);
-          return;
+      if (!lastVariant.equals(SQUARESPACE_SIZES[SQUARESPACE_SIZES.length - 1])) {
+        // If the largest variant is not the largest available resolution.
+        for (int i = SQUARESPACE_SIZES.length - 2; i >= 0; i--) {
+          if (lastVariant.equals(SQUARESPACE_SIZES[i])) {
+            // Append the original image as the next size up
+            buf.append(',');
+            buf.append(assetUrl).append("?format=original").append(' ').append(SQUARESPACE_SIZES[i + 1]);
+            break;
+          }
         }
       }
+
+      buf.append("\"");
     }
 
     @Override
