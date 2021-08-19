@@ -125,7 +125,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   public void testSrcSet() {
     runner.run(
         "f-image-src-set-1.html",
-        "f-image-src-set-2.html"
+        "f-image-src-set-2.html",
+        "f-image-src-set-3.html"
         );
   }
 

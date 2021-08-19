@@ -467,6 +467,7 @@ public class ContentFormatters implements FormatterRegistry {
   }
 
   public static class ImageMetaSrcSetFormatter extends BaseFormatter {
+    private String[] SQUARESPACE_SIZES = {"100w", "300w", "500w", "750w", "1000w", "1500w", "2500w"};
 
     public ImageMetaSrcSetFormatter() {
       super("image-srcset", false);
@@ -502,11 +503,28 @@ public class ContentFormatters implements FormatterRegistry {
         }
         buf.append(assetUrl).append("?format=").append(variants[i]).append(" ").append(variants[i]);
       }
-
-      buf.append(',');
-      buf.append(assetUrl).append("?format=original");
+      addOriginalImageFormat(buf, variants, limit, assetUrl);
 
       buf.append("\"");
+    }
+
+    /**
+     * Not all images will have complete list of Squarespace sizes due to original uploaded image is already too small. So no compression
+     * or smaller image size is produced.
+     * For these cases, we want to use the original image for missing sizes by setting the next size to use original image.
+     */
+    public void addOriginalImageFormat(StringBuilder buf, String[] variants, int limit, String assetUrl) {
+      String lastVariant = variants[limit - 1];
+      if (lastVariant.equals(SQUARESPACE_SIZES[SQUARESPACE_SIZES.length - 1])) {
+        return;
+      }
+      for (int i = 0; i < SQUARESPACE_SIZES.length - 1; i++) {
+        if (SQUARESPACE_SIZES[i].equals(lastVariant)) {
+          buf.append(',');
+          buf.append(assetUrl).append("?format=original").append(" ").append(SQUARESPACE_SIZES[i + 1]);
+          return;
+        }
+      }
     }
 
     @Override
