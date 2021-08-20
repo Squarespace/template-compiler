@@ -60,6 +60,7 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
 public class ContentFormatters implements FormatterRegistry {
 
   public static final int MAX_ALT_TEXT_LENGTH = 1000;
+  private static final String[] SQUARESPACE_SIZES = {"100w", "300w", "500w", "750w", "1000w", "1500w", "2500w"};
 
   @Override
   public void registerFormatters(SymbolTable<StringView, Formatter> table) {
@@ -503,8 +504,18 @@ public class ContentFormatters implements FormatterRegistry {
         buf.append(assetUrl).append("?format=").append(variants[i]).append(" ").append(variants[i]);
       }
 
-      buf.append(',');
-      buf.append(assetUrl).append("?format=original");
+      String lastVariant = variants[limit - 1];
+      if (!lastVariant.equals(SQUARESPACE_SIZES[SQUARESPACE_SIZES.length - 1])) {
+        // If the largest variant is not the largest available resolution.
+        for (int i = SQUARESPACE_SIZES.length - 2; i >= 0; i--) {
+          if (lastVariant.equals(SQUARESPACE_SIZES[i])) {
+            // Append the original image as the next size up
+            buf.append(',');
+            buf.append(assetUrl).append("?format=original").append(' ').append(SQUARESPACE_SIZES[i + 1]);
+            break;
+          }
+        }
+      }
 
       buf.append("\"");
     }
