@@ -1,0 +1,12 @@
+:JSON
+{
+  "assetUrl": "/foo/bar.jpg",
+  "systemDataVariants": "150w,350w"
+}
+
+
+:TEMPLATE
+{@|image-srcset 1}
+
+:OUTPUT
+srcset="/foo/bar.jpg?format=150w 150w,/foo/bar.jpg?format=350w 350w"
