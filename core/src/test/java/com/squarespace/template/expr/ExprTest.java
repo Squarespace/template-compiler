@@ -261,6 +261,21 @@ public class ExprTest {
   }
 
   @Test
+  public void testBuildErrors() {
+    Expr e;
+
+    // passes non-operator token to cond1
+    e = new Expr("str(str(e.q;s))+str(e)");
+    e.build();
+    assertTrue(e.errors().get(0).contains("left paren"));
+
+    // passes non-operator token to cond2
+    e = new Expr("1num(*(&@c;=@z~;1~");
+    e.build();
+    assertTrue(e.errors().get(0).contains("left paren"));
+  }
+
+  @Test
   public void testReduceErrors() {
     Context c = new Context(JsonUtils.decode("{}"));
 

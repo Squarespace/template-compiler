@@ -547,11 +547,12 @@ public class Expr {
 
   /**
    * Condition for build() method.
-   *
-   * Note: this is only ever called with an OperatorToken.
    */
   private boolean cond1(Token t) {
     if (t == null) {
+      return false;
+    }
+    if (!(t instanceof OperatorToken)) {
       return false;
     }
     Operator o = ((OperatorToken)t).value;
@@ -560,11 +561,12 @@ public class Expr {
 
   /**
    * Condition for build() method.
-   *
-   * Note: this is only ever called with an OperatorToken.
    */
   private boolean cond2(Token t, int prec) {
     if (t == null) {
+      return false;
+    }
+    if (!(t instanceof OperatorToken)) {
       return false;
     }
     Operator o = ((OperatorToken)t).value;
