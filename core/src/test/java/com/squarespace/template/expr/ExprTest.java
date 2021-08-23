@@ -466,6 +466,12 @@ public class ExprTest {
     assertEquals(e.tokens().elems(), asList(num(1), ASN, num(1)));
     e.build();
     assertEquals(e.reduce(c), null);
+
+    // '@' cannot be assigned
+    e = new Expr("@ = 1");
+    assertEquals(e.tokens().elems(), asList(varn("@"), ASN, num(1)));
+    e.build();
+    assertEquals(e.reduce(c), null);
   }
 
   @Test

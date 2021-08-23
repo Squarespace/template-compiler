@@ -281,7 +281,7 @@ public class Expr {
               // Make sure the arguments to the assignment are valid
               if (a != null && a.type == ExprTokenType.VARIABLE && b != null) {
                 Object[] name = ((VarToken)a).name;
-                if (name.length == 1 && name[0] instanceof String && ((String)name[0]).charAt(0) == '@') {
+                if (name != null && name.length == 1 && name[0] instanceof String && ((String)name[0]).charAt(0) == '@') {
                   // Set the variable in the context.
                   ctx.setVar((String)name[0], asnode(b));
                 }
