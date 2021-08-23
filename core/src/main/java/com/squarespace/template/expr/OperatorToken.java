@@ -14,7 +14,7 @@ public class OperatorToken extends Token {
 
   @Override
     public boolean equals(Object obj) {
-      if (obj instanceof OperatorToken) {
+      if (obj != null && obj instanceof OperatorToken) {
         return value.type == ((OperatorToken)obj).value.type;
       }
       return false;

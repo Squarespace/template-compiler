@@ -172,6 +172,18 @@ public class ExprTest {
     assertEquals(debug("null == false || null != true"),
         "[[null false <equality> null true <inequality> <logical or>]]");
     assertEquals(Tokens.debugToken(null), "undefined");
+
+    // multiple expressions
+    assertEquals(debug("3 * 2; 4 * 3; 8 * 4"), "[[3 2 <multiply>], [4 3 <multiply>], [8 4 <multiply>]]");
+  }
+
+  @Test
+  public void testToString() {
+    Expr e;
+
+    e = new Expr("5 * 3 / 2");
+    e.build();
+    assertEquals(e.toString(), "Expression[\"5 * 3 / 2\"]");
   }
 
   @Test
@@ -327,7 +339,7 @@ public class ExprTest {
     assertEquals(reduce("\"\\a\\b\\c\\n\\t\\r\\f\"", c), new TextNode("abc\n\t\r\f"));
 
     // hex escapes
-    assertEquals(reduce("\"\\x20\\x7d\\x22\\x27\"", c), new TextNode(" }\"'"));
+    assertEquals(reduce("\"\\x0a\\x09\\x20\\x7d\\x22\\x27\"", c), new TextNode("\n\t }\"'"));
 
     // ascii control code replacement
     assertEquals(reduce("\"\\x00\\x01\\x02\\x19\\x18\"", c), new TextNode("     "));
@@ -336,6 +348,7 @@ public class ExprTest {
     assertEquals(reduce("\"\\u2019\"", c), new TextNode("\u2019"));
     assertEquals(reduce("\"\\U0001f600\"", c), new TextNode("\uD83D\uDE00"));
     assertEquals(reduce("\"\\U0001f600\\U0001f600\"", c), new TextNode("\uD83D\uDE00\uD83D\uDE00"));
+    assertEquals(reduce("\"\\u000a\\u0009\\u0020\\u007d\\u0022\\u0027\"", c), new TextNode("\n\t }\"'"));
 
     // unicode escape out-of-range replacement
     assertEquals(reduce("\"\\u0003\\u000f\\u0019\\u0021\"", c), new TextNode("   !"));
@@ -370,6 +383,9 @@ public class ExprTest {
     assertTrue(e.errors().get(0).contains("Unexpected char"));
 
     e = new Expr("0x");
+    assertTrue(e.errors().get(0).contains("hex number"));
+
+    e = new Expr("0X");
     assertTrue(e.errors().get(0).contains("hex number"));
 
     e = new Expr("1..2");
@@ -436,7 +452,7 @@ public class ExprTest {
   public void testAssignment() {
     Expr e;
 
-    Context c = new Context(JsonUtils.decode("{}"));
+    Context c = new Context(JsonUtils.createObjectNode());
     c.setVar("@c", new DoubleNode(3));
 
     e = new Expr("@a = 6; @b = 2 * @a; @b / @c");
@@ -470,6 +486,22 @@ public class ExprTest {
     // '@' cannot be assigned
     e = new Expr("@ = 1");
     assertEquals(e.tokens().elems(), asList(varn("@"), ASN, num(1)));
+    e.build();
+    assertEquals(e.reduce(c), null);
+
+    e = new Expr("@=@=@=3");
+    e.build();
+    assertEquals(e.reduce(c), null);
+
+    e = new Expr("=@");
+    e.build();
+    assertEquals(e.reduce(c), null);
+
+    e = new Expr("5=@");
+    e.build();
+    assertEquals(e.reduce(c), null);
+
+    e = new Expr("5=5");
     e.build();
     assertEquals(e.reduce(c), null);
   }
@@ -602,6 +634,7 @@ public class ExprTest {
 
     assertEquals(reduce("5 / 2", c), new DoubleNode(2.5));
     assertEquals(reduce("\"foo\" / 2", c), new DoubleNode(Double.NaN));
+    assertEquals(reduce("5 / 0", c), new DoubleNode(Double.NaN));
   }
 
   @Test
@@ -730,6 +763,8 @@ public class ExprTest {
     // and
     assertEquals(reduce("true && true", c), BooleanNode.TRUE);
     assertEquals(reduce("true && false", c), BooleanNode.FALSE);
+    assertEquals(reduce("false && true", c), BooleanNode.FALSE);
+    assertEquals(reduce("false && false", c), BooleanNode.FALSE);
     assertEquals(reduce("1 && 1", c), BooleanNode.TRUE);
     assertEquals(reduce("1 && 2", c), BooleanNode.TRUE);
     assertEquals(reduce("1 && 0", c), BooleanNode.FALSE);
@@ -833,6 +868,11 @@ public class ExprTest {
 
     // missing nodes will reduce to null
     assertEquals(reduce("missing", c), NullNode.getInstance());
+
+    // invalid function reference
+    assertEquals(reduce("@(3)", c), new DoubleNode(3));
+    assertEquals(reduce("@.a(3)", c), new DoubleNode(3));
+    assertEquals(reduce("@.@(3)", c), new DoubleNode(3));
   }
 
   @Test

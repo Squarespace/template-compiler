@@ -451,7 +451,10 @@ public class Expr {
       return;
     }
 
+    // Output stack containing final RPN expression
     List<Token> out = new ArrayList<>();
+
+    // Stack used to shunt operator tokens during expression construction
     Stack<Token> ops = new Stack<>();
 
     for (Token t : this.tokens.elems()) {
@@ -544,13 +547,12 @@ public class Expr {
 
   /**
    * Condition for build() method.
+   *
+   * Note: this is only ever called with an OperatorToken.
    */
   private boolean cond1(Token t) {
     if (t == null) {
       return false;
-    }
-    if (t.type != ExprTokenType.OPERATOR) {
-      return true;
     }
     Operator o = ((OperatorToken)t).value;
     return o.type != OperatorType.LPRN;
@@ -558,13 +560,12 @@ public class Expr {
 
   /**
    * Condition for build() method.
+   *
+   * Note: this is only ever called with an OperatorToken.
    */
   private boolean cond2(Token t, int prec) {
     if (t == null) {
       return false;
-    }
-    if (t.type != ExprTokenType.OPERATOR) {
-      return true;
     }
     Operator o = ((OperatorToken)t).value;
     return o.type != OperatorType.LPRN && (o.prec > prec ||
@@ -604,7 +605,7 @@ public class Expr {
             // Check if name corresponds to a valid built-in function, and
             // convert the name to a function call token.
             Object name = ((VarToken)top).name[0];
-            if (name instanceof String && FUNCTIONS.containsKey(name)) {
+            if (FUNCTIONS.containsKey(name)) {
               this.tokens.top(new CallToken((String)name));
             } else {
               this.errors.add("Invalid function: " + name);
@@ -824,8 +825,8 @@ public class Expr {
 
             if (raw != null && raw.length == 1 && raw[0] instanceof String) {
               // Names for constants. These names can conflict with references to
-              // context variables on the immediate node, e.g. { "pi": "apple" }.
-              // To disambiguate, use references of the form "@.pi" or bind
+              // context variables on the immediate node, e.g. { "PI": "apple" }.
+              // To disambiguate, use references of the form "@.PI" or bind
               // local variables before calling the expression.
               String name = (String)raw[0];
               Token value = CONSTANTS.get(name);
