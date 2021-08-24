@@ -552,7 +552,7 @@ public class Expr {
     if (t == null) {
       return false;
     }
-    if (!(t instanceof OperatorToken)) {
+    if (t.type != ExprTokenType.OPERATOR) {
       return false;
     }
     Operator o = ((OperatorToken)t).value;
@@ -566,7 +566,7 @@ public class Expr {
     if (t == null) {
       return false;
     }
-    if (!(t instanceof OperatorToken)) {
+    if (t.type != ExprTokenType.OPERATOR) {
       return false;
     }
     Operator o = ((OperatorToken)t).value;
