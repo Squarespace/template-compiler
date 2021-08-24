@@ -423,6 +423,9 @@ public class Tokenizer {
           return emitInvalid();
         }
 
+        // TODO: the line below will never fail since it looks for at least 1 character,
+        // and the matcher is currently pointing at the space above, since it's the
+        // argument delimiter.
         if (!matcher.arguments()) {
           return emitInvalid();
         }
