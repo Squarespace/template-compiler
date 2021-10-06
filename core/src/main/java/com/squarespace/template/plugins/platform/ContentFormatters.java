@@ -162,25 +162,24 @@ public class ContentFormatters implements FormatterRegistry {
     return "";
   }
 
-  private static String getAltText(Context ctx) {
+  private static String getAltText(Context ctx, JsonNode image) {
     // Content Items for image blocks were populated with an altText value with a migration. See CMS-33805.
     // For those, the Content Item value should always be used even if it is empty.
     JsonNode blockType = ctx.resolve("blockType");
 
     if (!blockType.isMissingNode() && blockType.asInt() == BlockType.IMAGE.code()) {
-      JsonNode altText = ctx.node().path("altText");
+      JsonNode altText = image.path("altText");
       return StringUtils.trim(altText.asText());
     }
 
-    JsonNode image = ctx.node();
     return computeAltTextFromContentItemFields(image);
   }
 
-  private static void outputImageMeta(JsonNode image, StringBuilder buf) {
-      outputImageMeta(image, buf, null);
+  private static void outputImageMeta(JsonNode image, Context ctx, StringBuilder buf) {
+    outputImageMeta(image, ctx, buf, null);
   }
 
-  private static void outputImageMeta(JsonNode image, StringBuilder buf, String preferredAltText) {
+  private static void outputImageMeta(JsonNode image, Context ctx, StringBuilder buf, String preferredAltText) {
     if (image.isMissingNode()) {
       return;
     }
@@ -190,7 +189,7 @@ public class ContentFormatters implements FormatterRegistry {
     String origSize = image.path("originalSize").asText();
     String assetUrl = image.path("assetUrl").asText();
 
-    String altText = preferredAltText != null ? preferredAltText : computeAltTextFromContentItemFields(image);
+    String altText = preferredAltText != null ? preferredAltText : getAltText(ctx, image);
 
     if (isLicensedAssetPreview(image)) {
       buf.append("data-licensed-asset-preview=\"true\" ");
@@ -236,12 +235,10 @@ public class ContentFormatters implements FormatterRegistry {
       int index = (Integer)args.getOpaque();
       JsonNode child = var.node().path("items").path(index);
       StringBuilder buf = new StringBuilder();
-      String altText = getAltText(ctx);
-      outputImageMeta(child, buf, altText);
+      outputImageMeta(child, ctx, buf);
       var.set(buf);
     }
   }
-
 
   private static final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
 
@@ -369,7 +366,7 @@ public class ContentFormatters implements FormatterRegistry {
       String cls = (args.count() == 1) ? args.first() : "thumb-image";
 
       String id = node.path("id").asText();
-      String altText = getAltText(ctx);
+      String altText = getAltText(ctx, node);
       String assetUrl = node.path("assetUrl").asText();
 
       StringBuilder buf = new StringBuilder();
@@ -384,7 +381,7 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("</noscript>");
 
       buf.append("<img class=\"").append(cls).append("\" ");
-      outputImageMeta(node, buf, altText);
+      outputImageMeta(node, ctx, buf, altText);
 
       buf.append("data-load=\"false\"").append(" ");
       buf.append("data-image-id=\"").append(id).append("\" ");
@@ -463,8 +460,7 @@ public class ContentFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      String altText = getAltText(ctx);
-      outputImageMeta(var.node(), buf, altText);
+      outputImageMeta(var.node(), ctx, buf);
       var.set(buf);
     }
   }
@@ -542,7 +538,7 @@ public class ContentFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      outputImageMeta(var.node().path("coverImage"), buf);
+      outputImageMeta(var.node().path("coverImage"), ctx, buf);
       var.set(buf);
     }
   };
