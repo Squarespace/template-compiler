@@ -140,6 +140,41 @@ public class ContentFormatters implements FormatterRegistry {
     }
   }
 
+  private static String computeAltTextFromContentItemFields(JsonNode contentItemNode) {
+    JsonNode title = contentItemNode.path("title");
+    if (isTruthy(title)) {
+      return title.asText();
+    }
+
+    JsonNode body = contentItemNode.path("body");
+    if (isTruthy(body)) {
+      String text = PluginUtils.removeTags(body.asText());
+      if (text.length() > 0) {
+        return text.substring(0, Math.min(text.length(), MAX_ALT_TEXT_LENGTH));
+      }
+    }
+
+    JsonNode filename = contentItemNode.path("filename");
+    if (isTruthy(filename)) {
+      return filename.asText();
+    }
+
+    return "";
+  }
+
+  private static String getAltText(Context ctx) {
+    // Content Items for image blocks were populated with an altText value with a migration. See CMS-33805.
+    // For those, the Content Item value should always be used even if it is empty.
+    JsonNode blockType = ctx.resolve("blockType");
+
+    if (!blockType.isMissingNode() && blockType.asInt() == BlockType.IMAGE.code()) {
+      JsonNode altText = ctx.node().path("altText");
+      return StringUtils.trim(altText.asText());
+    }
+
+    JsonNode image = ctx.node();
+    return computeAltTextFromContentItemFields(image);
+  }
 
   private static void outputImageMeta(JsonNode image, StringBuilder buf) {
       outputImageMeta(image, buf, null);
@@ -201,7 +236,8 @@ public class ContentFormatters implements FormatterRegistry {
       int index = (Integer)args.getOpaque();
       JsonNode child = var.node().path("items").path(index);
       StringBuilder buf = new StringBuilder();
-      outputImageMeta(child, buf);
+      String altText = getAltText(ctx);
+      outputImageMeta(child, buf, altText);
       var.set(buf);
     }
   }
@@ -266,28 +302,6 @@ public class ContentFormatters implements FormatterRegistry {
       focalPoint = node.path("x").asDouble() + "," + node.path("y").asDouble();
     }
     return focalPoint;
-  }
-
-  private static String computeAltTextFromContentItemFields(JsonNode contentItemNode) {
-    JsonNode title = contentItemNode.path("title");
-    if (isTruthy(title)) {
-      return title.asText();
-    }
-
-    JsonNode body = contentItemNode.path("body");
-    if (isTruthy(body)) {
-      String text = PluginUtils.removeTags(body.asText());
-      if (text.length() > 0) {
-        return text.substring(0, Math.min(text.length(), MAX_ALT_TEXT_LENGTH));
-      }
-    }
-
-    JsonNode filename = contentItemNode.path("filename");
-    if (isTruthy(filename)) {
-      return filename.asText();
-    }
-
-    return "";
   }
 
   public static class HeightFormatter extends BaseFormatter {
@@ -379,19 +393,6 @@ public class ContentFormatters implements FormatterRegistry {
       var.set(buf);
     }
 
-    private String getAltText(Context ctx) {
-      // Content Items for image blocks were populated with an altText value with a migration. See CMS-33805.
-      // For those, the Content Item value should always be used even if it is empty.
-      JsonNode blockType = ctx.resolve("blockType");
-
-      if (!blockType.isMissingNode() && blockType.asInt() == BlockType.IMAGE.code()) {
-        JsonNode altText = ctx.node().path("altText");
-        return StringUtils.trim(altText.asText());
-      }
-
-      JsonNode image = ctx.node();
-      return computeAltTextFromContentItemFields(image);
-    }
   }
 
   public static class ImageColorFormatter extends BaseFormatter {
@@ -462,7 +463,8 @@ public class ContentFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      outputImageMeta(var.node(), buf);
+      String altText = getAltText(ctx);
+      outputImageMeta(var.node(), buf, altText);
       var.set(buf);
     }
   }
