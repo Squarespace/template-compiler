@@ -59,7 +59,7 @@ import com.squarespace.template.plugins.platform.enums.RecordType;
  */
 public class ContentFormatters implements FormatterRegistry {
 
-  public static final int MAX_ALT_TEXT_LENGTH = 1000;
+  public static final int MAX_ALT_TEXT_LENGTH = 250;
   private static final String[] SQUARESPACE_SIZES = {"100w", "300w", "500w", "750w", "1000w", "1500w", "2500w"};
 
   @Override
