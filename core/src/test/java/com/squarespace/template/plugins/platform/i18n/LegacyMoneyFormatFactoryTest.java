@@ -70,6 +70,10 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
    */
   @Test
   public void testCompatibility() throws Exception {
+    if (!isJava8()) {
+      // Skip test on JDK 9+
+      return;
+    }
     System.out.printf("%-8s %-10s %15s %20s %20s\n", "LOCALE", "CURRENCY", "LEGACY", "CLDR (narrow)", "CLDR (std)");
     System.out.println("------------------------------------------------------------------------------");
     for (String locale : LOCALES) {

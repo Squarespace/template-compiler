@@ -138,15 +138,19 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testMoneyFormatter() {
-    runner.exec("i18n-money-format-%N.html");
+    if (isJava8()) {
+      runner.exec("i18n-money-format-%N.html");
+    }
   }
 
   public void testExtraArgument() throws Exception {
-    try {
-      MONEY_FORMATTER.validateArgs(new Arguments(new StringView(" en-US bad-arg")));
-      Assert.fail("expected ArgumentsException, too many arguments passed");
-    } catch (ArgumentsException e) {
-      // fall through
+    if (isJava8()) {
+      try {
+        MONEY_FORMATTER.validateArgs(new Arguments(new StringView(" en-US bad-arg")));
+        Assert.fail("expected ArgumentsException, too many arguments passed");
+      } catch (ArgumentsException e) {
+        // fall through
+      }
     }
   }
 

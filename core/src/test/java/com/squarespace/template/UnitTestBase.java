@@ -115,6 +115,14 @@ public class UnitTestBase {
     return NumberFormat.getInstance().format(num);
   }
 
+  /**
+   * Run legacy tests on Java 8 only.
+   */
+  public static boolean isJava8() {
+    String version = System.getProperty("java.version");
+    return version.startsWith("1.8");
+  }
+
   public List<ErrorType> errorTypes(List<ErrorInfo> errors) {
     List<ErrorType> actual = new ArrayList<>(errors.size());
     for (ErrorInfo error : errors) {
