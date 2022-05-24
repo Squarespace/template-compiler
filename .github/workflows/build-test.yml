@@ -7,7 +7,7 @@ on:
     - main
 
 jobs:
-  gradle:
+  build:
     strategy:
       matrix:
         os: [ubuntu-latest]
