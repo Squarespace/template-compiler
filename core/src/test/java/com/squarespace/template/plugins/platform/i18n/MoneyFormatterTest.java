@@ -48,7 +48,7 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testExecutor() throws CodeException {
     String json = "{\"amt\": {\"value\": \"-15789.12\", \"currency\": \"USD\"}, "
-         + "\"website\": {\"useCLDRMoneyFormat\": true}}";
+         + "\"featureFlags\": {\"useCLDRMoneyFormat\": true}}";
     String template = "{amt|money style:short mode:significant}";
 
     assertEquals(executeLocale(template, json, "fr"), "-16 k $US");
