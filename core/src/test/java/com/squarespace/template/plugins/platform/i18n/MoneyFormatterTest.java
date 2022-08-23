@@ -178,6 +178,8 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
 
     ObjectNode website = obj.putObject("website");
     website.put("useCLDRMoneyFormat", useCLDR);
+    ObjectNode flags = obj.putObject("featureFlags");
+    flags.put("useCLDRMoneyFormat", useCLDR);
     return obj;
   }
 
