@@ -21,6 +21,8 @@ import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.loadResource;
 import static com.squarespace.template.plugins.PluginUtils.slugify;
 
+import java.text.DecimalFormat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +73,7 @@ public class ContentFormatters implements FormatterRegistry {
     table.add(new ColorWeightFormatter());
     table.add(new CoverImageMetaFormatter());
     table.add(new HeightFormatter());
+    table.add(new HslaColorFormatter());
     table.add(new HumanizeDurationFormatter());
     table.add(new ImageFormatter());
     table.add(new ImageColorFormatter());
@@ -317,6 +320,44 @@ public class ContentFormatters implements FormatterRegistry {
         int height = Integer.parseInt(parts[1]);
         var.set(height);
       }
+    }
+  };
+
+  public static class HslaColorFormatter extends BaseFormatter {
+
+    public HslaColorFormatter() {
+      super("hslaColor", false);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+
+      int hue = node.path("hue").asInt();
+      double saturation = node.path("saturation").asDouble();
+      double lightness = node.path("lightness").asDouble();
+      double alpha = node.path("alpha").asDouble();
+      if (saturation <= 1) {
+        saturation *= 100;
+      }
+      if (lightness <= 1) {
+        lightness *= 100;
+      }
+
+      DecimalFormat format = new DecimalFormat("0.#");
+
+      StringBuilder buf = new StringBuilder();
+      buf.append("hsla(");
+      buf.append(hue);
+      buf.append(", ");
+      buf.append(format.format(saturation));
+      buf.append("%, ");
+      buf.append(format.format(lightness));
+      buf.append("%, ");
+      buf.append(format.format(alpha));
+      buf.append(")");
+      var.set(buf);
     }
   };
 
