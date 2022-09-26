@@ -73,7 +73,7 @@ public class ContentFormatters implements FormatterRegistry {
     table.add(new ColorWeightFormatter());
     table.add(new CoverImageMetaFormatter());
     table.add(new HeightFormatter());
-    table.add(new HslaColorFormatter());
+    table.add(new WebsiteColorFormatter());
     table.add(new HumanizeDurationFormatter());
     table.add(new ImageFormatter());
     table.add(new ImageColorFormatter());
@@ -323,40 +323,78 @@ public class ContentFormatters implements FormatterRegistry {
     }
   };
 
-  public static class HslaColorFormatter extends BaseFormatter {
+  public static class WebsiteColorFormatter extends BaseFormatter {
 
-    public HslaColorFormatter() {
-      super("hslaColor", false);
+    public WebsiteColorFormatter() {
+      super("website-color", false);
     }
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode node = var.node();
+      boolean hasAlphaValue = false;
 
       int hue = node.path("hue").asInt();
       double saturation = node.path("saturation").asDouble();
       double lightness = node.path("lightness").asDouble();
-      double alpha = node.path("alpha").asDouble();
-      if (saturation <= 1) {
-        saturation *= 100;
+      JsonNode alphaNode = node.path("alpha");
+      Double alpha = null;
+      if (!alphaNode.isMissingNode()) {
+        hasAlphaValue = true;
+        alpha = alphaNode.asDouble();
       }
-      if (lightness <= 1) {
+
+      String errorMessage = "";
+
+      if (hue < 0 || hue > 360) {
+        errorMessage += "Hue value is out of bounds. It should be between 0 and 360. ";
+      }
+
+      if (saturation >= 0 && saturation <= 1) {
+        saturation *= 100;
+      } else {
+        errorMessage += "Saturation value is out of bounds. It should be between 0 and 1. ";
+      }
+
+      if (lightness >= 0 && lightness <= 1) {
         lightness *= 100;
+      } else {
+        errorMessage += "Lightness value is out of bounds. It should be between 0 and 1. ";
+      }
+
+      if (alpha != null && (alpha < 0 || alpha > 1)) {
+        errorMessage += "Alpha value is out of bounds. It should be between 0 and 1.";
+      }
+
+      if (errorMessage != "") {
+        var.set(errorMessage);
+        return;
       }
 
       DecimalFormat format = new DecimalFormat("0.#");
 
       StringBuilder buf = new StringBuilder();
-      buf.append("hsla(");
+      if (hasAlphaValue) {
+        buf.append("hsla(");
+      } else {
+        buf.append("hsl(");
+      }
+
       buf.append(hue);
       buf.append(", ");
       buf.append(format.format(saturation));
       buf.append("%, ");
       buf.append(format.format(lightness));
-      buf.append("%, ");
-      buf.append(format.format(alpha));
-      buf.append(")");
+
+      if (hasAlphaValue) {
+        buf.append("%, ");
+        buf.append(format.format(alpha));
+        buf.append(")");
+      } else {
+        buf.append("%)");
+      }
+
       var.set(buf);
     }
   };
