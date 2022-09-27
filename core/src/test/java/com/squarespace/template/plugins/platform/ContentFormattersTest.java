@@ -229,4 +229,30 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     assertFormatter(HEIGHT, json, "200");
   }
 
+  @Test
+  public void testWebsiteColor() throws CodeException {
+    String template = "{valid-hsla|website-color}";
+    String validHslaJson = "{\"valid-hsla\": {\"hue\": 200, \"saturation\": 0.3, \"lightness\": 0.5, \"alpha\": 0.9}}";
+    Instruction code = compiler().compile(template).code();
+    Context ctx = compiler().newExecutor().code(code).json(validHslaJson).execute();
+    String result = eval(ctx);
+    assertEquals(result, "hsla(200, 30%, 50%, 0.9)");
+
+    template = "{valid-hsl|website-color}";
+    String validHslJson = "{\"valid-hsl\": {\"hue\": 110, \"saturation\": 0.9, \"lightness\": 1}}";
+    code = compiler().compile(template).code();
+    ctx = compiler().newExecutor().code(code).json(validHslJson).execute();
+    result = eval(ctx);
+    assertEquals(result, "hsl(110, 90%, 100%)");
+
+    template = "{invalid-hsla|website-color}";
+    String invalidHslaJson = "{\"invalid-hsla\": {\"hue\": 400, \"saturation\": -0.3, \"lightness\": 5, \"alpha\": 3}}";
+    code = compiler().compile(template).code();
+    ctx = compiler().newExecutor().code(code).json(invalidHslaJson).execute();
+    result = eval(ctx);
+    assertEquals(result, "Hue value is out of bounds. It should be between 0 and 360. "
+        + "Saturation value is out of bounds. It should be between 0 and 1. "
+        + "Lightness value is out of bounds. It should be between 0 and 1. "
+        + "Alpha value is out of bounds. It should be between 0 and 1.");
+  }
 }
