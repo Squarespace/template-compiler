@@ -335,7 +335,7 @@ public class ContentFormatters implements FormatterRegistry {
       JsonNode node = var.node();
       boolean hasAlphaValue = false;
 
-      int hue = node.path("hue").asInt();
+      double hue = node.path("hue").asDouble();
       double saturation = node.path("saturation").asDouble();
       double lightness = node.path("lightness").asDouble();
       JsonNode alphaNode = node.path("alpha");
@@ -381,7 +381,7 @@ public class ContentFormatters implements FormatterRegistry {
         buf.append("hsl(");
       }
 
-      buf.append(hue);
+      buf.append(format.format(hue));
       buf.append(", ");
       buf.append(format.format(saturation));
       buf.append("%, ");
