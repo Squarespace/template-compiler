@@ -36,6 +36,7 @@ import com.squarespace.template.plugins.platform.ContentFormatters.ResizedWidthF
 import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForHeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForWidthFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.TimesinceFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.WebsiteColorFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.WidthFormatter;
 
 
@@ -59,6 +60,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   private static final Formatter TIMESINCE = new TimesinceFormatter();
 
   private static final Formatter WIDTH = new WidthFormatter();
+
+  private static final Formatter WEBSITE_COLOR = new WebsiteColorFormatter();
 
   private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), ContentFormattersTest.class);
 
@@ -231,32 +234,17 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testWebsiteColor() throws CodeException {
-    String template = "{valid-hsla|website-color}";
-    String validHslaJson = "{\"valid-hsla\": {\"hue\": 200, \"saturation\": 0.3, \"lightness\": 0.5, \"alpha\": 0.9}}";
-    Instruction code = compiler().compile(template).code();
-    Context ctx = compiler().newExecutor().code(code).json(validHslaJson).execute();
-    String result = eval(ctx);
-    assertEquals(result, "hsla(200, 30%, 50%, 0.9)");
+    String validHslaJson = "{\"hue\": 200, \"saturation\": 0.3, \"lightness\": 0.5, \"alpha\": 0.9}";
+    assertFormatter(WEBSITE_COLOR, validHslaJson, "hsla(200, 30%, 50%, 0.9)");
 
-    template = "{valid-hsl|website-color}";
-    String validHslJson = "{\"valid-hsl\": {\"hue\": 110, \"saturation\": 0.9, \"lightness\": 1}}";
-    code = compiler().compile(template).code();
-    ctx = compiler().newExecutor().code(code).json(validHslJson).execute();
-    result = eval(ctx);
-    assertEquals(result, "hsl(110, 90%, 100%)");
+    String validHslJson = "{\"hue\": 110, \"saturation\": 0.9, \"lightness\": 1}";
+    assertFormatter(WEBSITE_COLOR, validHslJson, "hsl(110, 90%, 100%)");
 
-    template = "{missing-hsla|website-color}";
-    String missingHslaJson = "{\"missing-hsla\": {\"saturation\": 0.2, \"lightness\": 0, \"alpha\": 0.1}}";
-    code = compiler().compile(template).code();
-    ctx = compiler().newExecutor().code(code).json(missingHslaJson).execute();
-    result = eval(ctx);
-    assertEquals(result, "Missing an H/S/L value.");
+    String missingHslaJson = "{\"saturation\": 0.9, \"lightness\": 1}";
+    assertFormatter(WEBSITE_COLOR, missingHslaJson, "Missing an H/S/L value.");
 
-    template = "{invalid-hsla|website-color}";
-    String invalidHslaJson = "{\"invalid-hsla\": {\"hue\": 400, \"saturation\": -0.3, \"lightness\": 5, \"alpha\": 3}}";
-    code = compiler().compile(template).code();
-    ctx = compiler().newExecutor().code(code).json(invalidHslaJson).execute();
-    result = eval(ctx);
-    assertEquals(result, "Hue out of bounds. Saturation out of bounds. Lightness out of bounds. Alpha out of bounds.");
+    String invalidHslaJson = "{\"hue\": 400, \"saturation\": -0.3, \"lightness\": 5, \"alpha\": 3}";
+    assertFormatter(WEBSITE_COLOR, invalidHslaJson, "Hue out of bounds. Saturation out of bounds. "
+        + "Lightness out of bounds. Alpha out of bounds.");
   }
 }
