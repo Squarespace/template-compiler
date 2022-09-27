@@ -36,6 +36,7 @@ import com.squarespace.template.plugins.platform.ContentFormatters.ResizedWidthF
 import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForHeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForWidthFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.TimesinceFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.WebsiteColorFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.WidthFormatter;
 
 
@@ -59,6 +60,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   private static final Formatter TIMESINCE = new TimesinceFormatter();
 
   private static final Formatter WIDTH = new WidthFormatter();
+
+  private static final Formatter WEBSITE_COLOR = new WebsiteColorFormatter();
 
   private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), ContentFormattersTest.class);
 
@@ -229,4 +232,19 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     assertFormatter(HEIGHT, json, "200");
   }
 
+  @Test
+  public void testWebsiteColor() throws CodeException {
+    String validHslaJson = "{\"hue\": 200, \"saturation\": 0.3, \"lightness\": 0.5, \"alpha\": 0.9}";
+    assertFormatter(WEBSITE_COLOR, validHslaJson, "hsla(200, 30%, 50%, 0.9)");
+
+    String validHslJson = "{\"hue\": 110, \"saturation\": 0.9, \"lightness\": 1}";
+    assertFormatter(WEBSITE_COLOR, validHslJson, "hsl(110, 90%, 100%)");
+
+    String missingHslaJson = "{\"saturation\": 0.9, \"lightness\": 1}";
+    assertFormatter(WEBSITE_COLOR, missingHslaJson, "Missing an H/S/L value.");
+
+    String invalidHslaJson = "{\"hue\": 400, \"saturation\": -0.3, \"lightness\": 5, \"alpha\": 3}";
+    assertFormatter(WEBSITE_COLOR, invalidHslaJson, "Hue out of bounds. Saturation out of bounds. "
+        + "Lightness out of bounds. Alpha out of bounds.");
+  }
 }

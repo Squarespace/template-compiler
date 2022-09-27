@@ -21,6 +21,8 @@ import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.loadResource;
 import static com.squarespace.template.plugins.PluginUtils.slugify;
 
+import java.text.DecimalFormat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +73,7 @@ public class ContentFormatters implements FormatterRegistry {
     table.add(new ColorWeightFormatter());
     table.add(new CoverImageMetaFormatter());
     table.add(new HeightFormatter());
+    table.add(new WebsiteColorFormatter());
     table.add(new HumanizeDurationFormatter());
     table.add(new ImageFormatter());
     table.add(new ImageColorFormatter());
@@ -317,6 +320,90 @@ public class ContentFormatters implements FormatterRegistry {
         int height = Integer.parseInt(parts[1]);
         var.set(height);
       }
+    }
+  };
+
+  public static class WebsiteColorFormatter extends BaseFormatter {
+
+    public WebsiteColorFormatter() {
+      super("website-color", false);
+    }
+
+    private final DecimalFormat format = new DecimalFormat("0.#");
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+      boolean hasAlphaValue = false;
+      String errorMessage = "";
+
+      JsonNode hueNode = node.path("hue");
+      JsonNode saturationNode = node.path("saturation");
+      JsonNode lightnessNode = node.path("lightness");
+      if (hueNode.isMissingNode() || saturationNode.isMissingNode() || lightnessNode.isMissingNode()) {
+        errorMessage = "Missing an H/S/L value.";
+        var.set(errorMessage);
+        return;
+      }
+
+      double hue = hueNode.asDouble();
+      double saturation = saturationNode.asDouble();
+      double lightness = lightnessNode.asDouble();
+      JsonNode alphaNode = node.path("alpha");
+      Double alpha = null;
+      if (!alphaNode.isMissingNode()) {
+        hasAlphaValue = true;
+        alpha = alphaNode.asDouble();
+      }
+
+      if (hue < 0 || hue > 360) {
+        errorMessage += "Hue out of bounds. ";
+      }
+
+      if (saturation >= 0 && saturation <= 1) {
+        saturation *= 100;
+      } else {
+        errorMessage += "Saturation out of bounds. ";
+      }
+
+      if (lightness >= 0 && lightness <= 1) {
+        lightness *= 100;
+      } else {
+        errorMessage += "Lightness out of bounds. ";
+      }
+
+      if (alpha != null && (alpha < 0 || alpha > 1)) {
+        errorMessage += "Alpha out of bounds.";
+      }
+
+      if (!errorMessage.isEmpty()) {
+        var.set(errorMessage);
+        return;
+      }
+
+      StringBuilder buf = new StringBuilder();
+      if (hasAlphaValue) {
+        buf.append("hsla(");
+      } else {
+        buf.append("hsl(");
+      }
+
+      buf.append(format.format(hue));
+      buf.append(", ");
+      buf.append(format.format(saturation));
+      buf.append("%, ");
+      buf.append(format.format(lightness));
+
+      if (hasAlphaValue) {
+        buf.append("%, ");
+        buf.append(format.format(alpha));
+        buf.append(")");
+      } else {
+        buf.append("%)");
+      }
+
+      var.set(buf);
     }
   };
 
