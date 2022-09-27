@@ -245,14 +245,18 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     result = eval(ctx);
     assertEquals(result, "hsl(110, 90%, 100%)");
 
+    template = "{missing-hsla|website-color}";
+    String missingHslaJson = "{\"missing-hsla\": {\"saturation\": 0.2, \"lightness\": 0, \"alpha\": 0.1}}";
+    code = compiler().compile(template).code();
+    ctx = compiler().newExecutor().code(code).json(missingHslaJson).execute();
+    result = eval(ctx);
+    assertEquals(result, "Missing an H/S/L value.");
+
     template = "{invalid-hsla|website-color}";
     String invalidHslaJson = "{\"invalid-hsla\": {\"hue\": 400, \"saturation\": -0.3, \"lightness\": 5, \"alpha\": 3}}";
     code = compiler().compile(template).code();
     ctx = compiler().newExecutor().code(code).json(invalidHslaJson).execute();
     result = eval(ctx);
-    assertEquals(result, "Hue value is out of bounds. It should be between 0 and 360. "
-        + "Saturation value is out of bounds. It should be between 0 and 1. "
-        + "Lightness value is out of bounds. It should be between 0 and 1. "
-        + "Alpha value is out of bounds. It should be between 0 and 1.");
+    assertEquals(result, "Hue out of bounds. Saturation out of bounds. Lightness out of bounds. Alpha out of bounds.");
   }
 }
