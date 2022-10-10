@@ -246,5 +246,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     String invalidHslaJson = "{\"hue\": 400, \"saturation\": -0.3, \"lightness\": 5, \"alpha\": 3}";
     assertFormatter(WEBSITE_COLOR, invalidHslaJson, "Hue out of bounds. Saturation out of bounds. "
         + "Lightness out of bounds. Alpha out of bounds.");
+
+    String validHslaJsonDecimals = "{\"hue\": 0.956, \"saturation\": 0.9554, \"lightness\": 0.9567, \"alpha\": 0.555}";
+    assertFormatter(WEBSITE_COLOR, validHslaJsonDecimals, "hsla(0.96, 95.54%, 95.67%, 0.56)");
   }
 }
