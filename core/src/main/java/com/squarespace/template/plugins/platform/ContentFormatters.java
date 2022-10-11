@@ -329,7 +329,7 @@ public class ContentFormatters implements FormatterRegistry {
       super("website-color", false);
     }
 
-    private final DecimalFormat format = new DecimalFormat("0.#");
+    private final DecimalFormat format = new DecimalFormat("0.##");
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
