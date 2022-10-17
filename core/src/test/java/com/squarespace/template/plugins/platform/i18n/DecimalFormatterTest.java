@@ -56,7 +56,8 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
     runner.run(
         "f-decimal-1.html",
         // f-decimal-2 defunct
-        "f-decimal-3.html"
+        "f-decimal-3.html",
+        "f-decimal-multi-locale-1.html"
     );
   }
 

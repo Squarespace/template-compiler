@@ -27,6 +27,7 @@ import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.OptionParsers;
+import com.squarespace.template.Options;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.platform.CommerceUtils;
@@ -45,7 +46,7 @@ public class MoneyFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    CurrencyFormatOptions opts = OptionParsers.currency(args);
+    Options<CurrencyFormatOptions> opts = OptionParsers.currency(args);
     args.setOpaque(opts);
   }
 
@@ -70,12 +71,13 @@ public class MoneyFormatter extends BaseFormatter {
       }
     }
 
-    CLDR cldr = ctx.cldr();
+    @SuppressWarnings("unchecked")
+    Options<CurrencyFormatOptions> opts = (Options<CurrencyFormatOptions>) args.getOpaque();
+    CLDR cldr = ctx.localeManager().get(opts.localeName()).cldr();
     String code = currencyNode.asText();
     Decimal decimal = GeneralUtils.nodeToDecimal(decimalValue);
     CurrencyType currency = CurrencyType.fromString(code);
-    CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
-    String result = cldr.Numbers.formatCurrency(decimal, currency, opts);
+    String result = cldr.Numbers.formatCurrency(decimal, currency, opts.inner());
     var.set(result);
   }
 

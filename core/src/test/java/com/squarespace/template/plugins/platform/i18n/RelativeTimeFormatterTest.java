@@ -27,6 +27,9 @@ public class RelativeTimeFormatterTest extends PlatformUnitTestBase {
 
   @Test
   public void testRelativeTime() {
-    runner.run("f-relative-time-1.html");
+    runner.run(
+      "f-relative-time-1.html",
+      "f-relative-time-multi-locale-1.html"
+    );
   }
 }

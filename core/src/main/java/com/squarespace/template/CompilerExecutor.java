@@ -16,10 +16,13 @@
 
 package com.squarespace.template;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.cldrengine.api.Pair;
 import com.squarespace.template.expr.ExprOptions;
 
 
@@ -37,6 +40,7 @@ public class CompilerExecutor {
   private ObjectNode injectablesMap;
   private StringBuilder buffer;
   private Locale locale;
+  private List<Pair<String, Locale>> locales;
   private LoggingHook loggingHook;
   private CodeLimiter codeLimiter;
   private boolean safeExecution;
@@ -84,6 +88,11 @@ public class CompilerExecutor {
     }
     if (locale != null) {
       ctx.javaLocale(locale);
+    }
+    if (locales != null) {
+      for (Pair<String, Locale> entry : locales) {
+        ctx.localeManager().addLocale(entry._1, entry._2);
+      }
     }
     if (now != null) {
       ctx.now(now);
@@ -182,6 +191,17 @@ public class CompilerExecutor {
    */
   public CompilerExecutor locale(Locale locale) {
     this.locale = locale;
+    return this;
+  }
+
+  /**
+   * Additional named locales that can be selected by formatters.
+   */
+  public CompilerExecutor locale(String name, Locale locale) {
+    if (this.locales == null) {
+      this.locales = new ArrayList<>(2);
+    }
+    this.locales.add(Pair.of(name, locale));
     return this;
   }
 

@@ -25,6 +25,7 @@ import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.OptionParsers;
+import com.squarespace.template.Options;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 
@@ -40,7 +41,7 @@ public class DecimalFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    DecimalFormatOptions opts = OptionParsers.decimal(args);
+    Options<DecimalFormatOptions> opts = OptionParsers.decimal(args);
     args.setOpaque(opts);
   }
 
@@ -53,9 +54,10 @@ public class DecimalFormatter extends BaseFormatter {
       return;
     }
 
-    CLDR cldr = ctx.cldr();
-    DecimalFormatOptions opts = (DecimalFormatOptions) args.getOpaque();
-    String result = cldr.Numbers.formatDecimal(number, opts);
+    @SuppressWarnings("unchecked")
+    Options<DecimalFormatOptions> opts = (Options<DecimalFormatOptions>) args.getOpaque();
+    CLDR cldr = ctx.localeManager().get(opts.localeName()).cldr();
+    String result = cldr.Numbers.formatDecimal(number, opts.inner());
     var.set(result);
   }
 

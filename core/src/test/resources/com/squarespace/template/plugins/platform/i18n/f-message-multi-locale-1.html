@@ -1,0 +1,20 @@
+:PROPERTIES
+locale=user:es other:ko
+
+:JSON
+{
+  "messages": {
+    "transfer": "Transmission will occur at {t datetime time:long}"
+  },
+  "timestamp": 12345657890
+}
+
+:TEMPLATE
+{messages.transfer|message t:timestamp}
+{messages.transfer|message locale:user t:timestamp}
+{messages.transfer|message locale:other t:timestamp}
+
+:OUTPUT
+Transmission will occur at 5:20:57 PM EDT
+Transmission will occur at 17:20:57 GMT-4
+Transmission will occur at PM 5시 20분 57초 GMT-4

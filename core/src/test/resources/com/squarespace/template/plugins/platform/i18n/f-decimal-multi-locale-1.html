@@ -1,0 +1,28 @@
+:PROPERTIES
+locale=en user:es other:ko
+
+:JSON
+{
+  "n": "123456789.12345"
+}
+
+:TEMPLATE
+{n|decimal group}
+{n|decimal style:short group}
+
+{n|decimal locale:user group}
+{n|decimal locale:user style:short group}
+
+{n|decimal locale:other group}
+{n|decimal locale:other style:short group}
+
+
+:OUTPUT
+123,456,789.123
+123M
+
+123.456.789,123
+123 M
+
+123,456,789.123
+1.2억

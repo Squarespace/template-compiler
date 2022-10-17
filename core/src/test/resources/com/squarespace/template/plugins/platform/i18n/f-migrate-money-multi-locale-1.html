@@ -1,0 +1,73 @@
+:PROPERTIES
+locale=en user:es other:ko
+
+:JSON
+{
+	"amounts": [
+	  {
+	    "currencyCode": "USD",
+	    "decimalValue": 123456
+	  },
+	  {
+	    "currencyCode": "USD",
+	    "decimalValue": -123456
+	  },	  {
+	    "currencyCode": "AUD",
+	    "decimalValue": 123456
+	  },
+	  {
+	  	"currencyCode": "EUR",
+	  	"decimalValue": 123456
+	  }
+	]
+}
+
+:TEMPLATE
+{.repeated section amounts}
+{@|money}
+{@|money style:accounting}
+
+{@|money locale:user}
+{@|money style:accounting locale:user}
+
+{@|money locale:other}
+{@|money style:accounting locale:other}
+{.end}
+
+:OUTPUT
+$123,456.00
+$123,456.00
+
+123.456,00 US$
+123.456,00 US$
+
+US$123,456.00
+US$123,456.00
+
+-$123,456.00
+($123,456.00)
+
+-123.456,00 US$
+-123.456,00 US$
+
+-US$123,456.00
+(US$123,456.00)
+
+A$123,456.00
+A$123,456.00
+
+123.456,00 AUD
+123.456,00 AUD
+
+AU$123,456.00
+AU$123,456.00
+
+€123,456.00
+€123,456.00
+
+123.456,00 €
+123.456,00 €
+
+€123,456.00
+€123,456.00
+

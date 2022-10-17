@@ -157,11 +157,21 @@ public class TestCaseParser extends UnitTestBase {
           executor.injectablesMap(injectMap);
         }
 
-
         String locale = properties.getProperty("locale");
         if (locale != null) {
-          java.util.Locale javaLocale = java.util.Locale.forLanguageTag(locale);
-          executor.locale(javaLocale);
+          // Supports named locales of the form "name:tag".
+          String[] parts = locale.split("\\s+");
+          for (String part : parts) {
+            String name = LocaleManager.DEFAULT;
+            String value = part;
+            int i = part.indexOf(':');
+            if (i != -1) {
+               name = part.substring(0, i);
+               value = part.substring(i + 1);
+            }
+            java.util.Locale javaLocale = java.util.Locale.forLanguageTag(value);
+            executor.locale(name, javaLocale);
+          }
         }
 
         Context ctx = executor.execute();
