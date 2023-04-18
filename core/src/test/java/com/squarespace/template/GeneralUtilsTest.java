@@ -108,7 +108,7 @@ public class GeneralUtilsTest {
   }
 
   @Test
-  public void testGetDeep() {
+  public void testGetNodeAtPath() {
     ObjectNode arrItem = JsonUtils.createObjectNode();
     arrItem.put("id", "node-1");
 
@@ -118,18 +118,18 @@ public class GeneralUtilsTest {
     ObjectNode container = JsonUtils.createObjectNode();
     container.set("arr", arr);
 
-    assertEquals(GeneralUtils.getDeep(container, null), Constants.MISSING_NODE);
+    assertEquals(GeneralUtils.getNodeAtPath(container, null), Constants.MISSING_NODE);
 
     Object[] path = splitVariable("some.0.nonexistent.field");
-    assertEquals(GeneralUtils.getDeep(container, path), Constants.MISSING_NODE);
+    assertEquals(GeneralUtils.getNodeAtPath(container, path), Constants.MISSING_NODE);
 
     path = new Object[0];
-    assertEquals(GeneralUtils.getDeep(container, path), container);
+    assertEquals(GeneralUtils.getNodeAtPath(container, path), container);
 
     path = splitVariable("arr");
-    assertEquals(GeneralUtils.getDeep(container, path), arr);
+    assertEquals(GeneralUtils.getNodeAtPath(container, path), arr);
 
     path = splitVariable("arr.0.id");
-    assertEquals(GeneralUtils.getDeep(container, path).asText(), "node-1");
+    assertEquals(GeneralUtils.getNodeAtPath(container, path).asText(), "node-1");
   }
 }

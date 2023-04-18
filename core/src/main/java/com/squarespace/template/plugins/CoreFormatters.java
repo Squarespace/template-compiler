@@ -24,7 +24,7 @@ import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
 import static com.squarespace.template.GeneralUtils.splitVariable;
-import static com.squarespace.template.GeneralUtils.getDeep;
+import static com.squarespace.template.GeneralUtils.getNodeAtPath;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
@@ -539,10 +539,13 @@ public class CoreFormatters implements FormatterRegistry {
 
   }
 
+  /**
+   * KEY_BY - maps an array of objects by the value for each at the given path
+   */
   public static class KeyByFormatter extends BaseFormatter {
 
     public KeyByFormatter() {
-      super("key-by", false);
+      super("key-by", true);
     }
 
     @Override
@@ -562,10 +565,10 @@ public class CoreFormatters implements FormatterRegistry {
         Object[] splitPath = splitVariable(path);
 
         for (JsonNode node : nodes) {
-          JsonNode val = getDeep(node, splitPath);
+          JsonNode nodeAtPath = getNodeAtPath(node, splitPath);
 
-          if (!val.isMissingNode()) {
-            keyByMap.put(val.toString(), node);
+          if (!nodeAtPath.isMissingNode()) {
+            keyByMap.put(nodeAtPath.toString(), node);
           }
         }
       }
@@ -702,7 +705,10 @@ public class CoreFormatters implements FormatterRegistry {
       int count = args.count();
       for (int i = 0; i < count; i++) {
         Object[] path = splitVariable(args.get(i));
-        tmp = getDeep(tmp, path);
+        tmp = getNodeAtPath(tmp, path);
+        if (tmp.isMissingNode()) {
+          break;
+        }
       }
       first.set(tmp);
     }

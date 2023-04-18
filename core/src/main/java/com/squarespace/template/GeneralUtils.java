@@ -477,7 +477,7 @@ public class GeneralUtils {
     return true;
   }
 
-  public static JsonNode getDeep(JsonNode node, Object[] path) {
+  public static JsonNode getNodeAtPath(JsonNode node, Object[] path) {
     if (path == null) {
       return Constants.MISSING_NODE;
     }
