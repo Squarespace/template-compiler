@@ -535,6 +535,8 @@ public class CoreFormattersTest extends UnitTestBase {
         "[{ \"test\": [{ \"deep\": 1 }] }, { \"test\": [{ \"deep\": 2 }] }]",
         JsonUtils.decode("{\"1\":{\"test\":[{\"deep\":1}]},\"2\":{\"test\":[{\"deep\":2}]}}")
     );
+
+    runner.exec("f-key-by-%N.html");
   }
 
   @Test

@@ -1,0 +1,25 @@
+:JSON
+{
+    "people": [
+        {
+            "name": "Bob",
+            "emails": {
+                "primary": "bob@example.com",
+                "secondary": "bob2@example.com"
+            }
+        },
+        {
+            "name": "Joe",
+            "emails": {
+                "primary": "joe@example.com",
+                "secondary": "joe2@example.com"
+            }
+        }
+    ]
+}
+
+:TEMPLATE
+{people|key-by name|prop Bob.emails.primary}
+
+:OUTPUT
+bob@example.com
