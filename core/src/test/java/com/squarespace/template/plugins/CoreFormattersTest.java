@@ -55,6 +55,7 @@ import com.squarespace.template.plugins.CoreFormatters.HtmlFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
+import com.squarespace.template.plugins.CoreFormatters.KeyByFormatter;
 import com.squarespace.template.plugins.CoreFormatters.LookupFormatter;
 import com.squarespace.template.plugins.CoreFormatters.ModFormatter;
 import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
@@ -84,6 +85,7 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter HTMLTAG = new HtmlTagFormatter();
   private static final Formatter JSON = new JsonFormatter();
   private static final Formatter JSON_PRETTY = new JsonPrettyFormatter();
+  private static final Formatter KEY_BY = new KeyByFormatter();
   private static final Formatter OUTPUT = new OutputFormatter();
   private static final Formatter LOOKUP = new LookupFormatter();
   private static final Formatter MOD = new ModFormatter();
@@ -506,6 +508,33 @@ public class CoreFormattersTest extends UnitTestBase {
 
     runner.exec("f-json-%N.html");
     runner.exec("f-json-pretty-%N.html");
+  }
+
+  @Test
+  public void testKeyBy() throws CodeException {
+    CodeMaker mk = maker();
+
+    Arguments args = mk.args(" id");
+    assertFormatterRaw(KEY_BY, args, "{}", JsonUtils.decode("{}"));
+
+    args = mk.args(" id");
+    assertFormatterRaw(KEY_BY, args, "[]", JsonUtils.decode("{}"));
+
+    args = mk.args(" id");
+    assertFormatterRaw(
+        KEY_BY,
+        args,
+        "[{ \"id\": 1 }, { \"id\": 2 }, { \"invalid\": 4 }]",
+        JsonUtils.decode("{\"1\":{\"id\":1},\"2\":{\"id\":2}}")
+    );
+
+    args = mk.args(" test.0.deep");
+    assertFormatterRaw(
+        KEY_BY,
+        args,
+        "[{ \"test\": [{ \"deep\": 1 }] }, { \"test\": [{ \"deep\": 2 }] }]",
+        JsonUtils.decode("{\"1\":{\"test\":[{\"deep\":1}]},\"2\":{\"test\":[{\"deep\":2}]}}")
+    );
   }
 
   @Test

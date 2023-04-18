@@ -42,9 +42,11 @@ import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.NumericNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.cldrengine.api.Decimal;
+import com.squarespace.template.Constants;
 
 
 /**
@@ -475,4 +477,31 @@ public class GeneralUtils {
     return true;
   }
 
+  public static JsonNode getDeep(JsonNode node, Object[] path) {
+    if (path == null) {
+      return Constants.MISSING_NODE;
+    }
+
+    JsonNode tmp = node;
+
+    for (Object key : path) {
+      // Adapt the argument to the type of node we're accessing
+      if (tmp instanceof ArrayNode && key instanceof Integer) {
+        tmp = tmp.path((int)key);
+      } else if (tmp instanceof ObjectNode) {
+        if (key instanceof Integer) {
+          key = ((Integer)key).toString();
+        }
+        tmp = tmp.path((String)key);
+      } else {
+        tmp = Constants.MISSING_NODE;
+      }
+
+      if (tmp.isMissingNode()) {
+        break;
+      }
+    }
+
+    return tmp;
+  }
 }

@@ -24,6 +24,7 @@ import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
 import static com.squarespace.template.GeneralUtils.splitVariable;
+import static com.squarespace.template.GeneralUtils.getDeep;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
@@ -538,6 +539,41 @@ public class CoreFormatters implements FormatterRegistry {
 
   }
 
+  public static class KeyByFormatter extends BaseFormatter {
+
+    public KeyByFormatter() {
+      super("key-by", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.exactly(1);
+    }
+
+    @Override
+    public void apply(final Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable first = variables.first();
+      JsonNode firstNode = first.node();
+      String path = args.first();
+      ObjectNode keyByMap = JsonUtils.createObjectNode();
+
+      if (firstNode.isArray() && path.length() > 0) {
+        ArrayNode nodes = (ArrayNode)firstNode;
+        Object[] splitPath = splitVariable(path);
+
+        for (JsonNode node : nodes) {
+          JsonNode val = getDeep(node, splitPath);
+
+          if (!val.isMissingNode()) {
+            keyByMap.put(val.toString(), node);
+          }
+        }
+      }
+
+      first.set(keyByMap);
+    }
+  }
+
 
   /**
    * OUTPUT
@@ -665,37 +701,8 @@ public class CoreFormatters implements FormatterRegistry {
       JsonNode tmp = first.node();
       int count = args.count();
       for (int i = 0; i < count; i++) {
-        String arg = args.get(i);
-        Object[] obj = splitVariable(arg);
-        if (obj == null) {
-          tmp = Constants.MISSING_NODE;
-          break;
-        }
-
-        for (Object key : obj) {
-          // Adapt the argument to the type of node we're accessing
-          if (tmp instanceof ArrayNode && key instanceof Integer) {
-            tmp = tmp.path((int)key);
-          } else if (tmp instanceof ObjectNode) {
-            if (key instanceof Integer) {
-              key = ((Integer)key).toString();
-            }
-            tmp = tmp.path((String)key);
-          } else {
-            tmp = Constants.MISSING_NODE;
-            break;
-          }
-
-          if (tmp.isMissingNode()) {
-            break;
-          }
-
-        }
-
-        if (tmp.isMissingNode()) {
-          break;
-        }
-
+        Object[] path = splitVariable(args.get(i));
+        tmp = getDeep(tmp, path);
       }
       first.set(tmp);
     }

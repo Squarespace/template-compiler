@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 
@@ -104,5 +105,31 @@ public class GeneralUtilsTest {
     assertEquals(GeneralUtils.ifString(node, "000"), "000");
     node = NullNode.getInstance();
     assertEquals(GeneralUtils.ifString(node, "000"), "000");
+  }
+
+  @Test
+  public void testGetDeep() {
+    ObjectNode arrItem = JsonUtils.createObjectNode();
+    arrItem.put("id", "node-1");
+
+    ArrayNode arr = JsonUtils.createArrayNode();
+    arr.add(arrItem);
+
+    ObjectNode container = JsonUtils.createObjectNode();
+    container.set("arr", arr);
+
+    assertEquals(GeneralUtils.getDeep(container, null), Constants.MISSING_NODE);
+
+    Object[] path = splitVariable("some.0.nonexistent.field");
+    assertEquals(GeneralUtils.getDeep(container, path), Constants.MISSING_NODE);
+
+    path = new Object[0];
+    assertEquals(GeneralUtils.getDeep(container, path), container);
+
+    path = splitVariable("arr");
+    assertEquals(GeneralUtils.getDeep(container, path), arr);
+
+    path = splitVariable("arr.0.id");
+    assertEquals(GeneralUtils.getDeep(container, path).asText(), "node-1");
   }
 }
