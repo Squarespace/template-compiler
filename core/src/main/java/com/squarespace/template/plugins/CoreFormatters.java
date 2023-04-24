@@ -24,6 +24,7 @@ import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
 import static com.squarespace.template.GeneralUtils.splitVariable;
+import static com.squarespace.template.GeneralUtils.getNodeAtPath;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
@@ -81,6 +82,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new IterFormatter());
     table.add(new JsonFormatter());
     table.add(new JsonPrettyFormatter());
+    table.add(new KeyByFormatter());
     table.add(new OutputFormatter());
     table.add(new LookupFormatter());
     table.add(new ModFormatter());
@@ -538,6 +540,44 @@ public class CoreFormatters implements FormatterRegistry {
 
   }
 
+  /**
+   * KEY_BY - maps an array of objects by the value for each at the given path
+   */
+  public static class KeyByFormatter extends BaseFormatter {
+
+    public KeyByFormatter() {
+      super("key-by", true);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.exactly(1);
+    }
+
+    @Override
+    public void apply(final Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable first = variables.first();
+      JsonNode firstNode = first.node();
+      String path = args.first();
+      ObjectNode keyByMap = JsonUtils.createObjectNode();
+
+      if (firstNode.isArray() && path.length() > 0) {
+        ArrayNode nodes = (ArrayNode)firstNode;
+        Object[] splitPath = splitVariable(path);
+
+        for (JsonNode node : nodes) {
+          JsonNode nodeAtPath = getNodeAtPath(node, splitPath);
+
+          if (!nodeAtPath.isMissingNode()) {
+            keyByMap.put(nodeAtPath.asText(), node);
+          }
+        }
+      }
+
+      first.set(keyByMap);
+    }
+  }
+
 
   /**
    * OUTPUT
@@ -665,37 +705,11 @@ public class CoreFormatters implements FormatterRegistry {
       JsonNode tmp = first.node();
       int count = args.count();
       for (int i = 0; i < count; i++) {
-        String arg = args.get(i);
-        Object[] obj = splitVariable(arg);
-        if (obj == null) {
-          tmp = Constants.MISSING_NODE;
-          break;
-        }
-
-        for (Object key : obj) {
-          // Adapt the argument to the type of node we're accessing
-          if (tmp instanceof ArrayNode && key instanceof Integer) {
-            tmp = tmp.path((int)key);
-          } else if (tmp instanceof ObjectNode) {
-            if (key instanceof Integer) {
-              key = ((Integer)key).toString();
-            }
-            tmp = tmp.path((String)key);
-          } else {
-            tmp = Constants.MISSING_NODE;
-            break;
-          }
-
-          if (tmp.isMissingNode()) {
-            break;
-          }
-
-        }
-
+        Object[] path = splitVariable(args.get(i));
+        tmp = getNodeAtPath(tmp, path);
         if (tmp.isMissingNode()) {
           break;
         }
-
       }
       first.set(tmp);
     }

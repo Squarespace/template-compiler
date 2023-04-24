@@ -169,25 +169,36 @@ public class UnitTestBase {
     assertEquals(result, expected);
   }
 
-
   public String format(Formatter impl, String json) throws CodeException {
     return format(impl, EMPTY_ARGUMENTS, json);
   }
 
   public String format(Formatter impl, Arguments args, String json) throws CodeException {
+    return formatRaw(impl, args, json).asText();
+  }
+
+  public JsonNode formatRaw(Formatter impl, Arguments args, String json) throws CodeException {
     Context ctx = new Context(JsonUtils.decode(json));
     impl.validateArgs(args);
     Variables variables = new Variables("var", ctx.node());
     impl.apply(ctx, args, variables);
-    return variables.first().node().asText();
+    return variables.first().node();
   }
 
   public void assertFormatter(Formatter impl, String json, String expected) throws CodeException {
-    assertEquals(format(impl, EMPTY_ARGUMENTS, json), expected);
+    assertFormatter(impl, EMPTY_ARGUMENTS, json, expected);
   }
 
   public void assertFormatter(Formatter impl, Arguments args, String json, String expected) throws CodeException {
     assertEquals(format(impl, args, json), expected);
+  }
+
+  public void assertFormatterRaw(Formatter impl, String json, JsonNode expected) throws CodeException {
+    assertFormatterRaw(impl, EMPTY_ARGUMENTS, json, expected);
+  }
+
+  public void assertFormatterRaw(Formatter impl, Arguments args, String json, JsonNode expected) throws CodeException {
+    assertEquals(formatRaw(impl, args, json), expected);
   }
 
   public void assertInvalidArgs(Formatter impl, Arguments args) {
