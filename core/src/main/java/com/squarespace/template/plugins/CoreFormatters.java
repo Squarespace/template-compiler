@@ -82,6 +82,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new IterFormatter());
     table.add(new JsonFormatter());
     table.add(new JsonPrettyFormatter());
+    table.add(new KeyByFormatter());
     table.add(new OutputFormatter());
     table.add(new LookupFormatter());
     table.add(new ModFormatter());
@@ -568,7 +569,7 @@ public class CoreFormatters implements FormatterRegistry {
           JsonNode nodeAtPath = getNodeAtPath(node, splitPath);
 
           if (!nodeAtPath.isMissingNode()) {
-            keyByMap.put(nodeAtPath.toString(), node);
+            keyByMap.put(nodeAtPath.asText(), node);
           }
         }
       }
