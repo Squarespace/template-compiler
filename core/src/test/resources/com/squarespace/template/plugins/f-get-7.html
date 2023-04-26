@@ -1,0 +1,22 @@
+:JSON
+{
+  "references": [
+    { "id": "123", "key": "name" },
+    { "id": "456", "key": "color" }
+  ],
+    "objects": {
+    "123": { "name": "Guitar", "color": "blue" },
+    "456": { "name": "Saxophone", "color": "silver" }
+    }
+}
+
+
+:TEMPLATE
+{.repeated section references}
+  {.var @id @.id}{.var @key @.key}
+{@index}. {objects|get @id @key|json}{.end}
+
+:OUTPUT
+1. "Guitar"
+  
+2. "silver"

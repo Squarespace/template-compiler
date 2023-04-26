@@ -1,0 +1,27 @@
+:JSON
+{
+  "references": [
+    { "id": "123", "key": "name" },
+    { "id": "456", "key": "color" }
+  ],
+    "objects": {
+    "123": { "name": "Guitar", "color": "blue" },
+    "456": { "name": "Saxophone", "color": "silver" }
+    }
+}
+
+
+:TEMPLATE
+{.var @ref references.1.id}
+
+{.var @obj objects|get @ref}
+Found {@obj.name}
+
+{.var @obj objects|get @ref @ref @ref @ref}
+ Nope {@obj.name}
+
+:OUTPUT
+Found Saxophone
+
+
+ Nope
