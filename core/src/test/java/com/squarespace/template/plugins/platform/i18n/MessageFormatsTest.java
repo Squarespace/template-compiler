@@ -216,6 +216,6 @@ public class MessageFormatsTest {
   }
 
   private MessageArgs args() {
-    return MessageArgs.build();
+    return new MessageArgs();
   }
 }
