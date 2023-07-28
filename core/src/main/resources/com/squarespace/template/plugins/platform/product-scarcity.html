@@ -1,5 +1,5 @@
 {.repeated section scarcityTemplateViews}
-  <div class="product-scarcity"{.if scarcityShownByDefault}{.or} data-variant-attributes="{attributes|json|htmltag}" hidden{.end}>
+  <div class="product-scarcity"{.if scarcityShownByDefault && .equal? @index 1}{.or} data-variant-attributes="{attributes|json|htmltag}" hidden{.end}>
     {scarcityText|message qtyInStock:qtyInStock|htmltag}
   </div>
 {.end}
