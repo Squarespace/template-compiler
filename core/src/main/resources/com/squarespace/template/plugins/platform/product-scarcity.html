@@ -1,5 +1,11 @@
 {.repeated section scarcityTemplateViews}
-  <div class="product-scarcity"{.if scarcityShownByDefault}{.or} data-variant-attributes="{attributes|json|htmltag}" hidden{.end}>
-    {scarcityText|message qtyInStock:qtyInStock|htmltag}
-  </div>
+  {.equal? @index 1}
+    <div class="product-scarcity"{.if scarcityShownByDefault}{.or} data-variant-attributes="{attributes|json|htmltag}" hidden{.end}>
+      {scarcityText|message qtyInStock:qtyInStock|htmltag}
+    </div>
+  {.or}
+    <div class="product-scarcity"{.if attributes} data-variant-attributes="{attributes|json|htmltag}" hidden{.end}>
+      {scarcityText|message qtyInStock:qtyInStock|htmltag}
+    </div>
+  {.end}
 {.end}
