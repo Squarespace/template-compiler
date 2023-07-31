@@ -7,18 +7,20 @@
     "560c37c1a7c8465c4a71d99a": {
       "scarcityEnabled": true,
       "scarcityTemplateViews": [{
-        "qtyInStock": 3,
-        "attributes": {
-          "Color": "Red"
-        }
+        "qtyInStock": 3
       }, {
-        "qtyInStock": 7,
+        "qtyInStock": 10,
         "attributes": {
           "Color": "Blue"
         }
+      }, {
+        "qtyInStock": 2,
+        "attributes": {
+          "Color": "Green"
+        }
       }],
       "scarcityText": "Only {qtyInStock} left!",
-      "scarcityShownByDefault": false
+      "scarcityShownByDefault": true
     }
   }
 }
@@ -27,13 +29,18 @@
 {item|product-scarcity}
 
 :OUTPUT
-    <div class="product-scarcity" data-variant-attributes="{&quot;Color&quot;:&quot;Red&quot;}" hidden>
+    <div class="product-scarcity">
       Only 3 left!
     </div>
   
 
   
     <div class="product-scarcity" data-variant-attributes="{&quot;Color&quot;:&quot;Blue&quot;}" hidden>
-      Only 7 left!
+      Only 10 left!
     </div>
+  
 
+  
+    <div class="product-scarcity" data-variant-attributes="{&quot;Color&quot;:&quot;Green&quot;}" hidden>
+      Only 2 left!
+    </div>

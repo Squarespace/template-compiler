@@ -230,7 +230,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
         "f-scarcity-not-enabled.html",
         "f-scarcity-default-shown.html",
         "f-scarcity-default-hidden.html",
-        "f-scarcity-default-shown-escape-html.html"
+        "f-scarcity-default-shown-escape-html.html",
+        "f-scarcity-default-shown-and-variants.html"
     );
   }
 
