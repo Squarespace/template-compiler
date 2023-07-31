@@ -20,6 +20,7 @@ import static org.testng.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -248,10 +249,30 @@ public class TestCaseParser extends UnitTestBase {
       buf.append("@@ -" + pos1 + "," + lines1.size());
       buf.append(" +" + pos2 + "," + lines2.size()).append(" @@\n");
       for (String row : lines1) {
-        buf.append("- ").append(row).append('\n');
+        buf.append("- ").append(escaped(row)).append('\n');
       }
       for (String row : lines2) {
-        buf.append("+ ").append(row).append('\n');
+        buf.append("+ ").append(escaped(row)).append('\n');
+      }
+    }
+    return buf.toString();
+  }
+
+  private static final char[] HEX = new char[] {
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+  };
+
+  private static String escaped(String src) {
+    byte[] bytes = src.getBytes(Charset.forName("UTF-8"));
+    StringBuilder buf = new StringBuilder();
+    for (byte b : bytes) {
+      if (b < 0x21 || b >= 0x7f) {
+        buf.append("\\x");
+        buf.append(HEX[b >>> 4]);
+        buf.append(HEX[b & 0xF]);
+      } else {
+        buf.append((char)b);
       }
     }
     return buf.toString();
