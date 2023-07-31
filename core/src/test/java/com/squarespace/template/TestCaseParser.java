@@ -263,13 +263,13 @@ public class TestCaseParser extends UnitTestBase {
       '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
   };
 
-  private static String escaped(String src) {
+  public static String escaped(String src) {
     byte[] bytes = src.getBytes(Charset.forName("UTF-8"));
     StringBuilder buf = new StringBuilder();
     for (byte b : bytes) {
       if (b < 0x21 || b >= 0x7f) {
         buf.append("\\x");
-        buf.append(HEX[b >>> 4]);
+        buf.append(HEX[(b & 0xFF) >>> 4]);
         buf.append(HEX[b & 0xF]);
       } else {
         buf.append((char)b);
