@@ -1,23 +1,23 @@
 description = 'Template compiler core'
 
 dependencies {
-  compile "com.squarespace.compiler:compiler-core:${ccVersion}"
-  compile "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
-  compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
-  compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-  compile 'joda-time:joda-time:2.3'
-  compile 'org.apache.commons:commons-lang3:3.1'
+  api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+  api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+  implementation "com.squarespace.compiler:compiler-core:${ccVersion}"
+  implementation "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
+  implementation 'joda-time:joda-time:2.3'
+  implementation 'org.apache.commons:commons-lang3:3.1'
 
-  testCompile "org.testng:testng:${testngVersion}"
-  testCompile "org.hamcrest:hamcrest-core:${hamcrestVersion}"
-  testCompile "com.googlecode.java-diff-utils:diffutils:${diffutilsVersion}"
-  testCompile "com.flipkart.zjsonpatch:zjsonpatch:${zjsonVersion}"
-  testCompile "net.javacrumbs.json-unit:json-unit:${jsonunitVersion}"
+  testImplementation "org.testng:testng:${testngVersion}"
+  testImplementation "org.hamcrest:hamcrest-core:${hamcrestVersion}"
+  testImplementation "com.googlecode.java-diff-utils:diffutils:${diffutilsVersion}"
+  testImplementation "com.flipkart.zjsonpatch:zjsonpatch:${zjsonVersion}"
+  testImplementation "net.javacrumbs.json-unit:json-unit:${jsonunitVersion}"
 }
 
 configurations {
   tests {
-    extendsFrom testRuntime
+    extendsFrom testImplementation
   }
 }
 

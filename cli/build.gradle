@@ -4,17 +4,19 @@ description = 'Template compiler command line'
 apply plugin: 'application'
 
 dependencies {
-  compile project(':template-core')
-  compile "net.sourceforge.argparse4j:argparse4j:${argparseVersion}"
+  implementation project(':template-core')
+  implementation "net.sourceforge.argparse4j:argparse4j:${argparseVersion}"
 
-  testCompile project(path: ':template-core', configuration: 'tests')
-  testCompile "org.testng:testng:${testngVersion}"
+  testImplementation project(path: ':template-core', configuration: 'tests')
+  testImplementation "org.testng:testng:${testngVersion}"
 }
 
-mainClassName = 'com.squarespace.template.cli.TemplateC'
+application {
+  mainClassName = 'com.squarespace.template.cli.TemplateC'
+}
 
 task execJar(type: Jar, dependsOn: classes) {
-  classifier = 'exec'
+  archiveClassifier = 'exec'
   manifest {
     attributes 'Main-Class': "${mainClassName}"
   }
@@ -29,7 +31,7 @@ task execJar(type: Jar, dependsOn: classes) {
 
 jar {
   manifest {
-    attributes 'Main-Class': "${mainClassName}"
+    attributes('Main-Class': "${mainClassName}")
   }
 }
 
@@ -37,7 +39,7 @@ task makeCli(type: Exec, dependsOn: execJar,
     description: 'Creates executable "templatec" command') {
 
   def inputScript = "src/main/resources/scripts/templatec.in"
-  def inputArchive = execJar.archivePath
+  def inputArchive = execJar.archiveFile
   def destScript = rootProject.file('templatec')
   workingDir '.'
   executable 'bash'
