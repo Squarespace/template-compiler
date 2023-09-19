@@ -17,13 +17,14 @@ application {
 
 task execJar(type: Jar, dependsOn: classes) {
   archiveClassifier = 'exec'
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   manifest {
     attributes 'Main-Class': "${mainClassName}"
   }
   from files(sourceSets.main.output.classesDirs)
   from files(sourceSets.main.output.resourcesDir)
   from {
-    configurations.runtime.collect {
+    configurations.runtimeClasspath.collect {
       it.isDirectory() ? it : zipTree(it)
     }
   }
