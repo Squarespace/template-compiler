@@ -15,7 +15,8 @@ application {
   mainClassName = 'com.squarespace.template.cli.TemplateC'
 }
 
-task execJar(type: Jar, dependsOn: classes) {
+task execJar(type: Jar, dependsOn: classes,
+  description: 'Creates an executable Jar file') {
   archiveClassifier = 'exec'
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   manifest {
@@ -40,7 +41,7 @@ task makeCli(type: Exec, dependsOn: execJar,
     description: 'Creates executable "templatec" command') {
 
   def inputScript = "src/main/resources/scripts/templatec.in"
-  def inputArchive = execJar.archiveFile
+  def inputArchive = execJar.archivePath
   def destScript = rootProject.file('templatec')
   workingDir '.'
   executable 'bash'
