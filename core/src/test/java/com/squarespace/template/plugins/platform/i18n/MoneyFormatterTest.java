@@ -82,6 +82,15 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testBadMoney() {
+    // Mixing up the serialized money
+    ObjectNode m = JsonUtils.createObjectNode();
+    m.put("currencyCode", "USD");
+    m.put("value", "123.456");
+    run(en_US, m.toString(), "", "");
+  }
+
+  @Test
   public void testLong() {
     String args = " style:name mode:significant group minSig:1";
     run(en_US, usd("0.00"), args, "0 US dollars");
@@ -133,7 +142,12 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   @Test
   public void testNoCLDR() {
     String args = " minInt:4";
-    run(en_US, usd("1.57", false), args, "");
+    run(en_US, usd("1.57"), args, "$0,001.57");
+  }
+
+  @Test
+  public void testLegacy() {
+    run(en_US, usd("0.50"), "", "$0.50");
   }
 
   private static BigDecimal big(String n) {
@@ -141,46 +155,33 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   }
 
   private static String usd(String n) {
-    return money(n, CurrencyType.USD, true);
+    return money(n, CurrencyType.USD);
   }
 
   private static String eur(String n) {
-    return money(n, CurrencyType.EUR, true);
+    return money(n, CurrencyType.EUR);
   }
 
   private static String usd(BigDecimal n) {
-    return money(n, CurrencyType.USD, true);
+    return money(n.toPlainString(), CurrencyType.USD);
   }
 
   private static String eur(BigDecimal n) {
-    return money(n, CurrencyType.EUR, true);
+    return money(n.toPlainString(), CurrencyType.EUR);
   }
 
-  private static String usd(String n, boolean useCLDR) {
-    return money(n, CurrencyType.USD, useCLDR);
-  }
-
-  private static String money(BigDecimal n, CurrencyType code, boolean useCLDR) {
-    ObjectNode m = moneyBase(code.name(), useCLDR);
-    m.put("value", n);
+  private static String legacy(String value, String currency) {
+    ObjectNode m = JsonUtils.createObjectNode();
+    m.put("currencyCode", currency);
+    m.put("decimalValue", value);
     return m.toString();
   }
 
-  private static String money(String n, CurrencyType code, boolean useCLDR) {
-    ObjectNode m = moneyBase(code.value(), useCLDR);
-    m.put("value", n);
+  private static String money(String value, CurrencyType code) {
+    ObjectNode m = JsonUtils.createObjectNode();
+    m.put("currency", code.value());
+    m.put("value", value);
     return m.toString();
-  }
-
-  private static ObjectNode moneyBase(String currencyCode, boolean useCLDR) {
-    ObjectNode obj = JsonUtils.createObjectNode();
-    obj.put("currency", currencyCode);
-
-    ObjectNode website = obj.putObject("website");
-    website.put("useCLDRMoneyFormat", useCLDR);
-    ObjectNode flags = obj.putObject("featureFlags");
-    flags.put("useCLDRMoneyFormat", useCLDR);
-    return obj;
   }
 
   private void run(String locale, String json, String args, String expected) {
