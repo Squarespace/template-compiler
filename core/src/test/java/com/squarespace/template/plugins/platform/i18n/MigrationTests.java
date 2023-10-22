@@ -41,7 +41,8 @@ public class MigrationTests  extends PlatformUnitTestBase {
   @Test
   public void testMoney() {
     runner.run(
-        "f-migrate-money-1.html"
+        "f-migrate-money-1.html",
+        "f-migrate-money-multi-locale-1.html"
     );
   }
 }

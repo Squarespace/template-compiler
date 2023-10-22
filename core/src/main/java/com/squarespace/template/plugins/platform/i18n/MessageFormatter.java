@@ -19,11 +19,13 @@ import static com.squarespace.template.GeneralUtils.splitVariable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldrengine.api.MessageArgs;
+import com.squarespace.cldrengine.api.Pair;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.Frame;
+import com.squarespace.template.LocaleManager;
 import com.squarespace.template.MessageFormats;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
@@ -49,12 +51,12 @@ public class MessageFormatter extends BaseFormatter {
     JsonNode node = var.node();
 
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
-    MessageArgs msgargs = messageArgs(args, ctx);
-    MessageFormats formats = ctx.messageFormatter();
+    Pair<MessageArgs, String> msgargs = messageArgs(args, ctx);
+    MessageFormats formats = ctx.localeManager().get(msgargs._2).formatter();
     formats.setTimeZone(zoneId);
 
     String message = node.asText();
-    String result = formats.formatter().format(message, msgargs);
+    String result = formats.formatter().format(message, msgargs._1);
     var.set(result);
   }
 
@@ -69,7 +71,8 @@ public class MessageFormatter extends BaseFormatter {
     return -1;
   }
 
-  private static MessageArgs messageArgs(Arguments args, Context ctx) {
+  private static Pair<MessageArgs, String> messageArgs(Arguments args, Context ctx) {
+    String localeName = LocaleManager.DEFAULT;
     MessageArgs res = new MessageArgs();
     int count = args.count();
     for (int i = 0; i < count; i++) {
@@ -82,6 +85,13 @@ public class MessageFormatter extends BaseFormatter {
         // Map named argument
         name = raw.substring(0, index);
         raw = raw.substring(index + 1);
+      }
+
+      // Special variable 'locale' intercepted and used to select the
+      // localized MessageFormats instance to use.
+      if (name != null && name.equals("locale")) {
+        localeName = raw;
+        continue;
       }
 
       Object[] ref = splitVariable(raw);
@@ -99,6 +109,6 @@ public class MessageFormatter extends BaseFormatter {
       // Keyword arguments are also positional
       res.add(value);
     }
-    return res;
+    return Pair.of(res, localeName);
   }
 }

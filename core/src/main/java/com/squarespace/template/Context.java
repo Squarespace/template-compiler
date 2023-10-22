@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldrengine.CLDR;
-import com.squarespace.cldrengine.api.CLocale;
 import com.squarespace.template.expr.ExprOptions;
 
 
@@ -51,11 +50,7 @@ public class Context {
 
   private static final String META_RIGHT = "}";
 
-  private Locale javaLocale;
-
-  private CLDR cldrengine;
-
-  private MessageFormats messageformats;
+  private LocaleManager localeManager;
 
   private Compiler compiler;
 
@@ -111,7 +106,7 @@ public class Context {
   public Context(JsonNode node, StringBuilder buf, Locale locale) {
     this.currentFrame = new Frame(null, node == null ? MissingNode.getInstance() : node);
     this.buf = buf == null ? new StringBuilder() : buf;
-    this.javaLocale = locale == null ? Locale.US : locale;
+    this.localeManager = new LocaleManager(locale == null ? Locale.US : locale);
   }
 
   public boolean safeExecutionEnabled() {
@@ -136,12 +131,28 @@ public class Context {
     this.exprOptions = options;
   }
 
+  public LocaleManager localeManager() {
+    return this.localeManager;
+  }
+
   public Locale javaLocale() {
-    return javaLocale;
+    return this.localeManager.get().locale();
   }
 
   public void javaLocale(Locale locale) {
-    this.javaLocale = locale;
+    this.localeManager.setLocale(locale);
+  }
+
+  public CLDR cldr() {
+    return this.localeManager.get().cldr();
+  }
+
+  public MessageFormats messageFormatter() {
+    return this.localeManager.get().formatter();
+  }
+
+  public void addLocale(String name, Locale locale) {
+    this.localeManager.addLocale(name, locale);
   }
 
   public void now(Long value) {
@@ -150,41 +161,6 @@ public class Context {
 
   public Long now() {
     return now;
-  }
-
-//  public void cldrLocale(CLDR.Locale locale) {
-//    this.cldrLocale = locale;
-//  }
-//
-//  public CLDR.Locale cldrLocale() {
-//    return cldrLocale;
-//  }
-
-  public MessageFormats messageFormatter() {
-    if (this.messageformats == null) {
-      this.messageformats = new MessageFormats(this.cldr());
-    }
-    return this.messageformats;
-  }
-
-  public CLDR cldr() {
-    if (cldrengine == null) {
-      String tag = javaLocale != null ? this.javaLocale.toLanguageTag() : "en-US";
-      this.cldrengine = com.squarespace.cldrengine.CLDR.get(tag);
-    }
-    return cldrengine;
-  }
-
-  public void cldrengine(CLDR cldr) {
-    this.cldrengine = cldr;
-  }
-
-  public void cldrengine(String id) {
-    this.cldrengine = CLDR.get(id);
-  }
-
-  public void cldrengine(CLocale locale) {
-    this.cldrengine = CLDR.get(locale);
   }
 
   /**

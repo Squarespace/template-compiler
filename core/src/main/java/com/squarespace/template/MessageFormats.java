@@ -104,8 +104,8 @@ public class MessageFormats {
     Decimal value = this.converter.asDecimal(decimalValue);
     String code = this.converter.asString(currencyCode);
     CurrencyType currency = CurrencyType.fromString(code);
-    CurrencyFormatOptions opts = OptionParsers.currency(options);
-    return cldr.Numbers.formatCurrency(value, currency, opts);
+    Options<CurrencyFormatOptions> opts = OptionParsers.currency(options);
+    return cldr.Numbers.formatCurrency(value, currency, opts.inner());
   }
 
   /**
@@ -121,8 +121,8 @@ public class MessageFormats {
     }
     long epoch = node.asLong();
     CalendarDate date = cldr.Calendars.toGregorianDate(epoch, zoneId);
-    DateFormatOptions opts = OptionParsers.datetime(options);
-    return cldr.Calendars.formatDate(date, opts);
+    Options<DateFormatOptions> opts = OptionParsers.datetime(options);
+    return cldr.Calendars.formatDate(date, opts.inner());
   }
 
   /**
@@ -137,8 +137,8 @@ public class MessageFormats {
       return "";
     }
     Decimal value = this.converter.asDecimal(node);
-    DecimalFormatOptions opts = OptionParsers.decimal(options);
-    return cldr.Numbers.formatDecimal(value, opts);
+    Options<DecimalFormatOptions> opts = OptionParsers.decimal(options);
+    return cldr.Numbers.formatDecimal(value, opts.inner());
   }
 
   /**
@@ -155,8 +155,8 @@ public class MessageFormats {
     }
     CalendarDate start = cldr.Calendars.toGregorianDate(v1.asLong(0), zoneId);
     CalendarDate end = cldr.Calendars.toGregorianDate(v2.asLong(0), zoneId);
-    DateIntervalFormatOptions opts = OptionParsers.interval(options);
-    return cldr.Calendars.formatDateInterval(start, end, opts);
+    Options<DateIntervalFormatOptions> opts = OptionParsers.interval(options);
+    return cldr.Calendars.formatDateInterval(start, end, opts.inner());
   }
 
   private static class ArgConverter extends DefaultMessageArgConverter {

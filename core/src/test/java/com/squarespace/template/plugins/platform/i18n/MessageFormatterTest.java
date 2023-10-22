@@ -29,6 +29,7 @@ public class MessageFormatterTest extends PlatformUnitTestBase {
   public void testMessageFormatter() throws Exception {
     runner.run(
         "f-message-named-args.html",
+        "f-message-multi-locale-1.html",
 //        "f-message-units-en-US.html",
 //        "f-message-units-fr-FR.html",
         "f-message-datetime-interval-en-US.html",
