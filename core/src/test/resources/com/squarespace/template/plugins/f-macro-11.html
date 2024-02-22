@@ -1,0 +1,20 @@
+:JSON
+{
+	"key": "hello"
+}
+
+:PARTIALS
+{}
+
+:TEMPLATE
+{.macro m}{.if @}pass{.or}fail{.end} {@|json}{.end}
+
+{@|apply m}
+{key|apply m}
+{missing|apply m}
+
+:OUTPUT
+pass {"key":"hello"}
+pass "hello"
+fail
+
