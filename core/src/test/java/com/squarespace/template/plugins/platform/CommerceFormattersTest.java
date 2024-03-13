@@ -240,4 +240,8 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     runner.exec("f-product-restock-notification-%N.html");
   }
 
+  @Test
+  public void testSubscriptionPrice() {
+    runner.exec("f-subscription-price-1.html");
+  }
 }

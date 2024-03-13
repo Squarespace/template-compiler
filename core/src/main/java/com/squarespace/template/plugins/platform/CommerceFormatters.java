@@ -81,6 +81,7 @@ public class CommerceFormatters implements FormatterRegistry {
     table.add(new VariantsSelectFormatter());
     table.add(new ProductScarcityFormatter());
     table.add(new ProductRestockNotificationFormatter());
+    table.add(new SubscriptionPriceFormatter());
   }
 
   protected static class AddToCartButtonFormatter extends BaseFormatter {
@@ -465,6 +466,63 @@ public class CommerceFormatters implements FormatterRegistry {
       }
 
       return sb.toString();
+    }
+
+    private static String getMoneyString(JsonNode moneyNode, Context ctx) {
+      if (CommerceUtils.useCLDRMode(ctx)) {
+        Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
+        String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
+        return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
+      } else {
+        Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+        StringBuilder buf = new StringBuilder();
+        CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
+        return buf.toString();
+      }
+    }
+  }
+
+  protected static class SubscriptionPriceFormatter extends BaseFormatter {
+
+    private Instruction template;
+
+    public SubscriptionPriceFormatter() {
+      super("subscription-price", false);
+    }
+
+    @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "subscription-price.html");
+      this.template = compiler.compile(source.trim()).code();
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+//      Variable var = variables.first();
+//      String subscriptionId = args.first();
+//      JsonNode node = var.node();
+//      StringBuilder buf = new StringBuilder();
+//      System.out.println("WKAHJDAKSLDJAS D");
+//      ObjectNode obj = JsonUtils.createObjectNode();
+
+//      JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
+//
+//      if (CommerceUtils.hasVariants(node)) {
+//        JsonNode subscriptionPricingNode = CommerceUtils.getSubscriptionPricing(pricingOptions, subscriptionId);
+//
+//        obj.put("fromText", StringUtils.defaultIfEmpty(
+//                ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
+//        obj.put("formattedFromPrice", getMoneyString(subscriptionPricingNode, ctx));
+//      }
+//
+//      JsonNode firstSubscriptionPricingNode = CommerceUtils.getSubscriptionPricing(pricingOptions, null);
+//
+//      obj.put("formattedPriceText", "{price}");
+//      obj.put("formattedPrice", getMoneyString(firstSubscriptionPricingNode, ctx));
+
+      executeTemplate(ctx, template, variables.first().node(), true);
+//      buf.append(subscriptionPriceInfo.asText());
+//      var.set(buf);
     }
 
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {
