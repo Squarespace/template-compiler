@@ -140,76 +140,6 @@ public class CommerceUtils {
     }
   }
 
-  public static JsonNode getPricingOptionsAmongLowestVariant(JsonNode item) {
-    ProductType type = getProductType(item);
-    JsonNode structuredContent = item.path("structuredContent");
-
-    switch (type) {
-      case PHYSICAL:
-      case SERVICE:
-        JsonNode variants = structuredContent.path("variants");
-        if (variants.size() == 0) {
-          return null;
-        }
-
-        JsonNode first = variants.get(0);
-        JsonNode moneyNode = isTruthy(first.path("onSale"))
-                ? first.path("salePriceMoney")
-                : first.path("priceMoney");
-
-        JsonNode pricingOptions = first.path("pricingOptions");
-
-        Decimal price = getAmountFromMoneyNode(moneyNode);
-
-        for (int i = 1; i < variants.size(); i++) {
-          JsonNode var = variants.get(i);
-          JsonNode currentMoneyNode = isTruthy(var.path("onSale"))
-                  ? var.path("salePriceMoney")
-                  : var.path("priceMoney");
-
-          Decimal current = getAmountFromMoneyNode(currentMoneyNode);
-          if (current.compare(price) < 0) {
-            pricingOptions = var.path("pricingOptions");
-          }
-        }
-
-        return pricingOptions;
-
-      default:
-        return null;
-    }
-  }
-
-  public static JsonNode getSubscriptionPricing(JsonNode pricingOptions, String subscriptionId) {
-    JsonNode chosenSubscription = null;
-
-    if (pricingOptions == null || pricingOptions.size() == 0) {
-      return DEFAULT_MONEY_NODE;
-    }
-
-    if (subscriptionId == null) {
-      chosenSubscription = pricingOptions.get(0);
-    } else {
-      for (int i = 0; i < pricingOptions.size(); i++) {
-        if (subscriptionId.equals(pricingOptions.get(i).path("productSubscriptionOptionId").asText())) {
-          chosenSubscription = pricingOptions.get(i);
-        }
-      }
-    }
-
-    return getMoneyAmountFromPricing(chosenSubscription);
-  }
-
-  public static JsonNode getMoneyAmountFromPricing(JsonNode pricing) {
-    if (pricing == null) {
-      return DEFAULT_MONEY_NODE;
-    }
-
-    return isTruthy(pricing.path("onSale"))
-            ? pricing.path("salePriceMoney")
-            : pricing.path("priceMoney");
-  }
-
   public static JsonNode getHighestPriceAmongVariants(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
@@ -511,7 +441,4 @@ public class CommerceUtils {
     return storeSettings.get(fieldName).asBoolean(defaultValue);
   }
 
-  public static JsonNode getDefaultMoneyNode() {
-    return DEFAULT_MONEY_NODE;
-  }
 }

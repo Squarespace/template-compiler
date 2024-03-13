@@ -498,31 +498,10 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
-//      Variable var = variables.first();
-//      String subscriptionId = args.first();
-//      JsonNode node = var.node();
-//      StringBuilder buf = new StringBuilder();
-//      System.out.println("WKAHJDAKSLDJAS D");
-//      ObjectNode obj = JsonUtils.createObjectNode();
-
-//      JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
-//
-//      if (CommerceUtils.hasVariants(node)) {
-//        JsonNode subscriptionPricingNode = CommerceUtils.getSubscriptionPricing(pricingOptions, subscriptionId);
-//
-//        obj.put("fromText", StringUtils.defaultIfEmpty(
-//                ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
-//        obj.put("formattedFromPrice", getMoneyString(subscriptionPricingNode, ctx));
-//      }
-//
-//      JsonNode firstSubscriptionPricingNode = CommerceUtils.getSubscriptionPricing(pricingOptions, null);
-//
-//      obj.put("formattedPriceText", "{price}");
-//      obj.put("formattedPrice", getMoneyString(firstSubscriptionPricingNode, ctx));
-
+      Variable var = variables.first();
+      StringBuilder buf = new StringBuilder();
       executeTemplate(ctx, template, variables.first().node(), true);
-//      buf.append(subscriptionPriceInfo.asText());
-//      var.set(buf);
+      var.set(buf);
     }
 
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {
