@@ -499,9 +499,7 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      StringBuilder buf = new StringBuilder();
-      executeTemplate(ctx, template, variables.first().node(), true);
-      var.set(buf);
+      var.set(executeTemplate(ctx, template, variables.first().node(), true));
     }
 
     private static String getMoneyString(JsonNode moneyNode, Context ctx) {

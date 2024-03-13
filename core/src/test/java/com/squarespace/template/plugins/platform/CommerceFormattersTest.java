@@ -242,6 +242,6 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testSubscriptionPrice() {
-    runner.exec("f-subscription-price-1.html");
+    runner.exec("f-subscription-price-%N.html");
   }
 }
