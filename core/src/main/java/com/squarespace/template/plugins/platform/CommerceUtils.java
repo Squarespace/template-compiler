@@ -208,8 +208,8 @@ public class CommerceUtils {
     }
 
     return isTruthy(node.path("onSale"))
-            ? node.path("salePriceMoney")
-            : node.path("priceMoney");
+      ? node.path("salePriceMoney")
+      : node.path("priceMoney");
   }
 
   public static JsonNode getHighestPriceAmongVariants(JsonNode item) {
