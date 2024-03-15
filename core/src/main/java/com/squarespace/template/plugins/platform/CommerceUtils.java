@@ -189,26 +189,27 @@ public class CommerceUtils {
     }
 
     if (subscriptionId == null) {
-      chosenSubscription = pricingOptions.get(0);
-    } else {
-      for (int i = 0; i < pricingOptions.size(); i++) {
-        if (subscriptionId.equals(pricingOptions.get(i).path("productSubscriptionOptionId").asText())) {
-          chosenSubscription = pricingOptions.get(i);
-        }
+      return getMoneyAmountFromNode(pricingOptions.get(0));
+    }
+
+    for (int i = 0; i < pricingOptions.size(); i++) {
+      if (subscriptionId.equals(pricingOptions.get(i).path("productSubscriptionOptionId").asText())) {
+        chosenSubscription = pricingOptions.get(i);
+        break;
       }
     }
 
-    return getMoneyAmountFromPricing(chosenSubscription);
+    return getMoneyAmountFromNode(chosenSubscription);
   }
 
-  public static JsonNode getMoneyAmountFromPricing(JsonNode pricing) {
-    if (pricing == null) {
+  public static JsonNode getMoneyAmountFromNode(JsonNode node) {
+    if (node == null) {
       return DEFAULT_MONEY_NODE;
     }
 
-    return isTruthy(pricing.path("onSale"))
-            ? pricing.path("salePriceMoney")
-            : pricing.path("priceMoney");
+    return isTruthy(node.path("onSale"))
+            ? node.path("salePriceMoney")
+            : node.path("priceMoney");
   }
 
   public static JsonNode getHighestPriceAmongVariants(JsonNode item) {
