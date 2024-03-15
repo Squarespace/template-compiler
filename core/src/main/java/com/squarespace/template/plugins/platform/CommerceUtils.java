@@ -169,6 +169,7 @@ public class CommerceUtils {
 
           Decimal current = getAmountFromMoneyNode(currentMoneyNode);
           if (current.compare(price) < 0) {
+            price = current;
             pricingOptions = var.path("pricingOptions");
           }
         }
@@ -180,7 +181,7 @@ public class CommerceUtils {
     }
   }
 
-  public static JsonNode getSubscriptionPricing(JsonNode pricingOptions, String subscriptionId) {
+  public static JsonNode getSubscriptionMoneyFromPricingOptions(JsonNode pricingOptions, String subscriptionId) {
     JsonNode chosenSubscription = null;
 
     if (pricingOptions == null || pricingOptions.size() == 0) {
@@ -511,7 +512,16 @@ public class CommerceUtils {
     return storeSettings.get(fieldName).asBoolean(defaultValue);
   }
 
-  public static JsonNode getDefaultMoneyNode() {
-    return DEFAULT_MONEY_NODE;
+  public static String getMoneyString(JsonNode moneyNode, Context ctx) {
+    if (CommerceUtils.useCLDRMode(ctx)) {
+      Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
+      String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
+      return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
+    } else {
+      Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      StringBuilder buf = new StringBuilder();
+      CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
+      return buf.toString();
+    }
   }
 }

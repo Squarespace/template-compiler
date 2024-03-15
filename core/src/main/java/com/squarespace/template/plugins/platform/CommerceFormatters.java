@@ -16,10 +16,6 @@
 
 package com.squarespace.template.plugins.platform;
 
-import static com.squarespace.template.GeneralUtils.executeTemplate;
-import static com.squarespace.template.GeneralUtils.getOrDefault;
-import static com.squarespace.template.GeneralUtils.loadResource;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -51,6 +47,8 @@ import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
+
+import static com.squarespace.template.GeneralUtils.*;
 
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
@@ -359,16 +357,16 @@ public class CommerceFormatters implements FormatterRegistry {
       if (CommerceUtils.hasVariedPrices(productNode)) {
         args.put("fromText", StringUtils.defaultIfEmpty(
             ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
-        args.put("formattedFromPrice", getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
+        args.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
       }
 
       if (CommerceUtils.isOnSale(productNode)) {
         args.put("formattedSalePriceText", "{price}");
-        args.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
+        args.put("formattedSalePrice", CommerceUtils.getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
       }
 
       args.put("formattedNormalPriceText", "{price}");
-      args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
+      args.put("formattedNormalPrice", CommerceUtils.getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
     private static void resolveTemplateVariablesForSubscriptionProduct(
@@ -421,16 +419,16 @@ public class CommerceFormatters implements FormatterRegistry {
 
       if (hasMultiplePrices) {
         args.put("fromText", templateForPrice);
-        args.put("formattedFromPrice", getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
+        args.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
       }
 
       if (CommerceUtils.isOnSale(productNode)) {
         args.put("formattedSalePriceText", templateForPrice);
-        args.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
+        args.put("formattedSalePrice", CommerceUtils.getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
       }
 
       args.put("formattedNormalPriceText", templateForPrice);
-      args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
+      args.put("formattedNormalPrice", CommerceUtils.getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
     // TODO: This is shitty. The formatter should, if necessary, look up the English string and use it.
@@ -467,19 +465,6 @@ public class CommerceFormatters implements FormatterRegistry {
 
       return sb.toString();
     }
-
-    private static String getMoneyString(JsonNode moneyNode, Context ctx) {
-      if (CommerceUtils.useCLDRMode(ctx)) {
-        Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
-        String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
-        return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
-      } else {
-        Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
-        StringBuilder buf = new StringBuilder();
-        CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
-        return buf.toString();
-      }
-    }
   }
 
   protected static class SubscriptionPriceFormatter extends BaseFormatter {
@@ -498,44 +483,49 @@ public class CommerceFormatters implements FormatterRegistry {
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
-//      Variable var = variables.first();
-//      String subscriptionId = args.first();
-//      JsonNode node = var.node();
-//      StringBuilder buf = new StringBuilder();
-//      System.out.println("WKAHJDAKSLDJAS D");
-//      ObjectNode obj = JsonUtils.createObjectNode();
+      Variable var = variables.first();
+      String subscriptionId = args.isEmpty() ? null : args.first();
+      JsonNode node = var.node();
+      StringBuilder buf = new StringBuilder();
+      ObjectNode subscriptionResults = JsonUtils.createObjectNode();
 
-//      JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
-//
-//      if (CommerceUtils.hasVariants(node)) {
-//        JsonNode subscriptionPricingNode = CommerceUtils.getSubscriptionPricing(pricingOptions, subscriptionId);
-//
-//        obj.put("fromText", StringUtils.defaultIfEmpty(
-//                ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
-//        obj.put("formattedFromPrice", getMoneyString(subscriptionPricingNode, ctx));
-//      }
-//
-//      JsonNode firstSubscriptionPricingNode = CommerceUtils.getSubscriptionPricing(pricingOptions, null);
-//
-//      obj.put("formattedPriceText", "{price}");
-//      obj.put("formattedPrice", getMoneyString(firstSubscriptionPricingNode, ctx));
+      JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
 
-      executeTemplate(ctx, template, variables.first().node(), true);
-//      buf.append(subscriptionPriceInfo.asText());
-//      var.set(buf);
+      if (pricingOptions != null && pricingOptions.size() > 0) {
+        if (CommerceUtils.hasVariants(node)) {
+          JsonNode subscriptionFromPricingNode = CommerceUtils.getSubscriptionMoneyFromPricingOptions(pricingOptions, subscriptionId);
+
+          subscriptionResults.put("fromText", StringUtils.defaultIfEmpty(
+                  ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
+          subscriptionResults.put("formattedFromPrice", CommerceUtils.getMoneyString(subscriptionFromPricingNode, ctx));
+        }
+
+        JsonNode firstPricingOption = pricingOptions.get(0);
+
+        if (isOnSale(firstPricingOption)) {
+          subscriptionResults.put("formattedSubscriptionSalePriceText", "{price}");
+          subscriptionResults.put("formattedSubscriptionSalePrice", getSalePriceMoney(firstPricingOption, ctx));
+        }
+
+        subscriptionResults.put("formattedNormalSubscriptionPriceText", "{price}");
+        subscriptionResults.put("formattedNormalSubscriptionPrice", getPriceMoney(firstPricingOption, ctx));
+      }
+
+      JsonNode subscriptionPriceInfo = executeTemplate(ctx, template, subscriptionResults, true);
+      buf.append(subscriptionPriceInfo.asText());
+      var.set(buf);
     }
 
-    private static String getMoneyString(JsonNode moneyNode, Context ctx) {
-      if (CommerceUtils.useCLDRMode(ctx)) {
-        Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
-        String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
-        return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
-      } else {
-        Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
-        StringBuilder buf = new StringBuilder();
-        CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
-        return buf.toString();
-      }
+    private static boolean isOnSale(JsonNode pricingOption) {
+      return isTruthy(pricingOption.path("onSale"));
+    }
+
+    private static String getSalePriceMoney(JsonNode pricingOption, Context ctx) {
+      return CommerceUtils.getMoneyString(pricingOption.path("salePriceMoney"), ctx);
+    }
+
+    private static String getPriceMoney(JsonNode pricingOption, Context ctx) {
+      return CommerceUtils.getMoneyString(pricingOption.path("priceMoney"), ctx);
     }
   }
 

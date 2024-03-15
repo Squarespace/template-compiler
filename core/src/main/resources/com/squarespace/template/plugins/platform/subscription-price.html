@@ -1,4 +1,8 @@
-<div class="subscription-price">
+{.var @originalPriceText localizedStrings.originalPriceText}
+{.var @salePriceText localizedStrings.salePriceText}
 
-  Test
+<div class="subscription-price">
+{.if formattedFromPrice}{fromText|message fromPrice:formattedFromPrice}
+{.or}{.if formattedSubscriptionSalePrice}<span class="visually-hidden v6-visually-hidden">{.if @salePriceText}{@salePriceText|htmltag}{.or}Sale Price:{.end}</span>{formattedSubscriptionSalePriceText|message price:formattedSubscriptionSalePrice}{.space}<span class="visually-hidden v6-visually-hidden">{.if @originalPriceText}{@originalPriceText|htmltag}{.or}Original Price:{.end}</span><span class="original-price">{formattedNormalSubscriptionPriceText|message price:formattedNormalSubscriptionPrice}</span>
+{.or}{.if formattedNormalSubscriptionPrice}{formattedNormalSubscriptionPriceText|message price:formattedNormalSubscriptionPrice}{.end}{.end}{.end}
 </div>

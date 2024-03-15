@@ -1,0 +1,177 @@
+:JSON
+{
+  "structuredContent": {
+    "productType": 1,
+    "variants": [
+      {
+        "priceMoney": {
+          "value": "10"
+        },
+        "onSale": false,
+        "pricingOptions": [
+          {
+            "price": "9",
+            "priceMoney": {
+              "value": "9",
+              "currency": "USD"
+            },
+            "salePrice": 0,
+            "salePriceMoney": {
+              "value": "0",
+              "currency": "USD"
+            },
+            "percentageDiscount": 0.1,
+            "onSale": false,
+            "productSubscriptionOptionId": "c0733e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+            "subscriptionPlan": {
+              "billingPeriod": {
+                "value": 3,
+                "unit": "MONTH"
+              },
+              "planVersionId": "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+              "numBillingCycles": 2
+            }
+          },
+          {
+            "price": "0",
+            "priceMoney": {
+              "value": "0",
+              "currency": "USD"
+            },
+            "salePrice": 0,
+            "salePriceMoney": {
+              "value": "0",
+              "currency": "USD"
+            },
+            "percentageDiscount": 1,
+            "onSale": false,
+            "productSubscriptionOptionId": "c0733e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+            "subscriptionPlan": {
+              "billingPeriod": {
+                "value": 3,
+                "unit": "MONTH"
+              },
+              "planVersionId": "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+              "numBillingCycles": 2
+            }
+          }
+        ]
+      },
+      {
+        "priceMoney": {
+          "value": "20"
+        },
+        "onSale": false,
+        "pricingOptions": [
+          {
+            "price": "18",
+            "priceMoney": {
+              "value": "18",
+              "currency": "USD"
+            },
+            "salePrice": "0",
+            "salePriceMoney": {
+              "value": "0",
+              "currency": "USD"
+            },
+            "percentageDiscount": 0.1,
+            "onSale": false,
+            "productSubscriptionOptionId": "c56446e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+            "subscriptionPlan": {
+              "billingPeriod": {
+                "value": 3,
+                "unit": "MONTH"
+              },
+              "planVersionId": "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+              "numBillingCycles": 2
+            }
+          },
+          {
+            "price": "16",
+            "priceMoney": {
+              "value": "16",
+              "currency": "USD"
+            },
+            "salePrice": "0",
+            "salePriceMoney": {
+              "value": "0",
+              "currency": "USD"
+            },
+            "percentageDiscount": 0.2,
+            "onSale": false,
+            "productSubscriptionOptionId": "c56446e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+            "subscriptionPlan": {
+              "billingPeriod": {
+                "value": 3,
+                "unit": "MONTH"
+              },
+              "planVersionId": "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+              "numBillingCycles": 2
+            }
+          }]
+      },
+      {
+        "priceMoney": {
+          "value": "5"
+        },
+        "onSale": false,
+        "pricingOptions": [{
+          "price" : "4",
+          "priceMoney": {
+            "value": "4",
+            "currency": "USD"
+          },
+          "salePrice" : 0,
+          "salePriceMoney": {
+            "value": 0,
+            "currency": "USD"
+          },
+          "percentageDiscount" : 0.2,
+          "onSale" : false,
+          "productSubscriptionOptionId" : "c9656e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+          "subscriptionPlan" : {
+            "billingPeriod" : {
+              "value" : 3,
+              "unit" : "MONTH"
+            },
+            "planVersionId" : "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+            "numBillingCycles" : 2
+          }
+        },
+        {
+          "price" : "1",
+          "priceMoney": {
+            "value": "1",
+            "currency": "USD"
+          },
+          "salePrice" : 0,
+          "salePriceMoney": {
+            "value": 0,
+            "currency": "USD"
+          },
+          "percentageDiscount" : 0.75,
+          "onSale" : false,
+          "productSubscriptionOptionId" : "c123454d-8b1b-400e-a3fc-f2f8fdc21e7f",
+          "subscriptionPlan" : {
+            "billingPeriod" : {
+              "value" : 3,
+              "unit" : "MONTH"
+            },
+            "planVersionId" : "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+            "numBillingCycles" : 2
+          }
+        }
+      ]
+      }]
+  }
+}
+
+
+:TEMPLATE
+{@|subscription-price c123454d-8b1b-400e-a3fc-f2f8fdc21e7f}
+
+:OUTPUT
+<div class="subscription-price">
+from <span class="sqs-money-native">1.00</span>
+
+</div>
