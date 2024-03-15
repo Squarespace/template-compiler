@@ -16,6 +16,11 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static com.squarespace.template.GeneralUtils.executeTemplate;
+import static com.squarespace.template.GeneralUtils.getOrDefault;
+import static com.squarespace.template.GeneralUtils.isTruthy;
+import static com.squarespace.template.GeneralUtils.loadResource;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -47,8 +52,6 @@ import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
-
-import static com.squarespace.template.GeneralUtils.*;
 
 /**
  * Extracted from Commons library at commit ab4ba7a6f2b872a31cb6449ae9e96f5f5b30f471
@@ -486,7 +489,7 @@ public class CommerceFormatters implements FormatterRegistry {
       Variable var = variables.first();
       String subscriptionId = args.isEmpty() ? null : args.first();
       JsonNode node = var.node();
-      StringBuilder buf = new StringBuilder();
+      StringBuilder buffer = new StringBuilder();
       ObjectNode subscriptionResults = JsonUtils.createObjectNode();
 
       JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
@@ -512,8 +515,8 @@ public class CommerceFormatters implements FormatterRegistry {
       }
 
       JsonNode subscriptionPriceInfo = executeTemplate(ctx, template, subscriptionResults, true);
-      buf.append(subscriptionPriceInfo.asText());
-      var.set(buf);
+      buffer.append(subscriptionPriceInfo.asText());
+      var.set(buffer);
     }
 
     private static boolean isOnSale(JsonNode pricingOption) {
