@@ -487,7 +487,6 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      String subscriptionId = args.isEmpty() ? null : args.first();
       JsonNode node = var.node();
       StringBuilder buffer = new StringBuilder();
       ObjectNode subscriptionResults = JsonUtils.createObjectNode();
@@ -496,10 +495,13 @@ public class CommerceFormatters implements FormatterRegistry {
 
       if (pricingOptions != null && pricingOptions.size() > 0) {
         if (CommerceUtils.hasVariants(node)) {
-          JsonNode subscriptionFromPricingNode = CommerceUtils.getSubscriptionMoneyFromPricingOptions(pricingOptions, subscriptionId);
+          // This will return either salePriceMoney or priceMoney depending on whether the onSale is true or false.
+          // That's because this block here is the from {price} so the from price needs to be the lowest possible price
+          // taking into if a variant is onSale.
+          JsonNode subscriptionFromPricingNode = CommerceUtils.getSubscriptionMoneyFromFirstPricingOptions(pricingOptions);
 
           subscriptionResults.put("fromText", StringUtils.defaultIfEmpty(
-                  ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
+                  ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {price}"));
           subscriptionResults.put("formattedFromPrice", CommerceUtils.getMoneyString(subscriptionFromPricingNode, ctx));
         }
 

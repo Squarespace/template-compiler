@@ -181,25 +181,12 @@ public class CommerceUtils {
     }
   }
 
-  public static JsonNode getSubscriptionMoneyFromPricingOptions(JsonNode pricingOptions, String subscriptionId) {
-    JsonNode chosenSubscription = null;
-
+  public static JsonNode getSubscriptionMoneyFromFirstPricingOptions(JsonNode pricingOptions) {
     if (pricingOptions == null || pricingOptions.size() == 0) {
       return DEFAULT_MONEY_NODE;
     }
 
-    if (subscriptionId == null) {
-      return getMoneyAmountFromNode(pricingOptions.get(0));
-    }
-
-    for (int i = 0; i < pricingOptions.size(); i++) {
-      if (subscriptionId.equals(pricingOptions.get(i).path("productSubscriptionOptionId").asText())) {
-        chosenSubscription = pricingOptions.get(i);
-        break;
-      }
-    }
-
-    return getMoneyAmountFromNode(chosenSubscription);
+    return getMoneyAmountFromNode(pricingOptions.get(0));
   }
 
   public static JsonNode getMoneyAmountFromNode(JsonNode node) {
