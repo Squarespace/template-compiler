@@ -248,7 +248,7 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
          "f-subscription-price-on-sale-variants-pricing-options.html",
          "f-subscription-price-one-on-sale-pricing-option.html",
          "f-subscription-price-one-pricing-option.html",
-//         "f-subscription-price-variants-with-same-pricing.html",
+         "f-subscription-price-variants-with-same-pricing.html",
          "f-subscription-price-no-pricing-options.html"
     );
   }
