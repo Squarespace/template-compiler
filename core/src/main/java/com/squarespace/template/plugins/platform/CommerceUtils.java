@@ -140,6 +140,65 @@ public class CommerceUtils {
     }
   }
 
+  public static JsonNode getPricingOptionsAmongLowestVariant(JsonNode item) {
+    ProductType type = getProductType(item);
+    JsonNode structuredContent = item.path("structuredContent");
+
+    switch (type) {
+      case PHYSICAL:
+      case SERVICE:
+        JsonNode variants = structuredContent.path("variants");
+        if (variants.size() == 0) {
+          return null;
+        }
+
+        JsonNode first = variants.get(0);
+        JsonNode moneyNode = isTruthy(first.path("onSale"))
+                ? first.path("salePriceMoney")
+                : first.path("priceMoney");
+
+        JsonNode pricingOptions = first.path("pricingOptions");
+
+        Decimal price = getAmountFromMoneyNode(moneyNode);
+
+        for (int i = 1; i < variants.size(); i++) {
+          JsonNode var = variants.get(i);
+          JsonNode currentMoneyNode = isTruthy(var.path("onSale"))
+                  ? var.path("salePriceMoney")
+                  : var.path("priceMoney");
+
+          Decimal current = getAmountFromMoneyNode(currentMoneyNode);
+          if (current.compare(price) < 0) {
+            price = current;
+            pricingOptions = var.path("pricingOptions");
+          }
+        }
+
+        return pricingOptions;
+
+      default:
+        return null;
+    }
+  }
+
+  public static JsonNode getSubscriptionMoneyFromFirstPricingOptions(JsonNode pricingOptions) {
+    if (pricingOptions == null || pricingOptions.size() == 0) {
+      return DEFAULT_MONEY_NODE;
+    }
+
+    return getMoneyAmountFromNode(pricingOptions.get(0));
+  }
+
+  public static JsonNode getMoneyAmountFromNode(JsonNode node) {
+    if (node == null) {
+      return DEFAULT_MONEY_NODE;
+    }
+
+    return isTruthy(node.path("onSale"))
+      ? node.path("salePriceMoney")
+      : node.path("priceMoney");
+  }
+
   public static JsonNode getHighestPriceAmongVariants(JsonNode item) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
@@ -441,4 +500,16 @@ public class CommerceUtils {
     return storeSettings.get(fieldName).asBoolean(defaultValue);
   }
 
+  public static String getMoneyString(JsonNode moneyNode, Context ctx) {
+    if (CommerceUtils.useCLDRMode(ctx)) {
+      Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
+      String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
+      return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
+    } else {
+      Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
+      StringBuilder buf = new StringBuilder();
+      CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
+      return buf.toString();
+    }
+  }
 }

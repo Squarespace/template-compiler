@@ -1,0 +1,47 @@
+:JSON
+{
+  "structuredContent": {
+    "productType": 1,
+    "variants": [{
+      "priceMoney": {
+        "value": "50"
+      },
+      "salePriceMoney": {
+        "value": "30"
+      },
+      "onSale": true,
+      "pricingOptions": [{
+        "price" : "2250",
+        "priceMoney": {
+          "value": "22.50",
+          "currency": "USD"
+        },
+        "salePrice" : "1500",
+        "salePriceMoney": {
+          "value": "15",
+          "currency": "USD"
+        },
+        "percentageDiscount" : 0.5,
+        "onSale" : true,
+        "productSubscriptionOptionId" : "c0733e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+        "subscriptionPlan" : {
+          "billingPeriod" : {
+            "value" : 3,
+            "unit" : "MONTH"
+          },
+          "planVersionId" : "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+          "numBillingCycles" : 2
+        }
+      }]
+    }]
+  }
+}
+
+:TEMPLATE
+{@|subscription-price}
+
+:OUTPUT
+<div class="subscription-price">
+<span class="visually-hidden v6-visually-hidden">Sale Price:</span><span class="sqs-money-native">15.00</span> <span class="visually-hidden v6-visually-hidden">Original Price:</span><span class="original-price"><span class="sqs-money-native">22.50</span></span>
+
+</div>

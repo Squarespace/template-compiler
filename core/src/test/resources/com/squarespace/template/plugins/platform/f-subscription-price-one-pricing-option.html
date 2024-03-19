@@ -1,0 +1,43 @@
+:JSON
+{
+  "structuredContent": {
+    "productType": 1,
+    "variants": [{
+      "priceMoney": {
+        "value": "50"
+      },
+      "onSale": false,
+      "pricingOptions": [{
+        "price" : "4500",
+        "priceMoney": {
+          "value": "45",
+          "currency": "USD"
+        },
+        "salePrice" : "0",
+        "salePriceMoney": {
+          "value": "0",
+          "currency": "USD"
+        },
+        "percentageDiscount" : 0.1,
+        "onSale" : false,
+        "productSubscriptionOptionId" : "c0733e4d-8b1b-400e-a3fc-f2f8fdc21e7f",
+        "subscriptionPlan" : {
+          "billingPeriod" : {
+            "value" : 3,
+            "unit" : "MONTH"
+          },
+          "planVersionId" : "3d2d5ea7-a571-4709-b5bc-59223c5a8fbd",
+          "numBillingCycles" : 2
+        }
+      }]
+    }]
+  }
+}
+
+:TEMPLATE
+{@|subscription-price}
+
+:OUTPUT
+<div class="subscription-price">
+<span class="sqs-money-native">45.00</span>
+</div>

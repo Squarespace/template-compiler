@@ -18,6 +18,7 @@ package com.squarespace.template.plugins.platform;
 
 import static com.squarespace.template.GeneralUtils.executeTemplate;
 import static com.squarespace.template.GeneralUtils.getOrDefault;
+import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.loadResource;
 
 import java.util.HashMap;
@@ -81,6 +82,7 @@ public class CommerceFormatters implements FormatterRegistry {
     table.add(new VariantsSelectFormatter());
     table.add(new ProductScarcityFormatter());
     table.add(new ProductRestockNotificationFormatter());
+    table.add(new SubscriptionPriceFormatter());
   }
 
   protected static class AddToCartButtonFormatter extends BaseFormatter {
@@ -358,16 +360,16 @@ public class CommerceFormatters implements FormatterRegistry {
       if (CommerceUtils.hasVariedPrices(productNode)) {
         args.put("fromText", StringUtils.defaultIfEmpty(
             ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
-        args.put("formattedFromPrice", getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
+        args.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
       }
 
       if (CommerceUtils.isOnSale(productNode)) {
         args.put("formattedSalePriceText", "{price}");
-        args.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
+        args.put("formattedSalePrice", CommerceUtils.getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
       }
 
       args.put("formattedNormalPriceText", "{price}");
-      args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
+      args.put("formattedNormalPrice", CommerceUtils.getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
     private static void resolveTemplateVariablesForSubscriptionProduct(
@@ -420,16 +422,16 @@ public class CommerceFormatters implements FormatterRegistry {
 
       if (hasMultiplePrices) {
         args.put("fromText", templateForPrice);
-        args.put("formattedFromPrice", getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
+        args.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
       }
 
       if (CommerceUtils.isOnSale(productNode)) {
         args.put("formattedSalePriceText", templateForPrice);
-        args.put("formattedSalePrice", getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
+        args.put("formattedSalePrice", CommerceUtils.getMoneyString(CommerceUtils.getSalePriceMoneyNode(productNode), ctx));
       }
 
       args.put("formattedNormalPriceText", templateForPrice);
-      args.put("formattedNormalPrice", getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
+      args.put("formattedNormalPrice", CommerceUtils.getMoneyString(CommerceUtils.getHighestPriceAmongVariants(productNode), ctx));
     }
 
     // TODO: This is shitty. The formatter should, if necessary, look up the English string and use it.
@@ -466,18 +468,67 @@ public class CommerceFormatters implements FormatterRegistry {
 
       return sb.toString();
     }
+  }
 
-    private static String getMoneyString(JsonNode moneyNode, Context ctx) {
-      if (CommerceUtils.useCLDRMode(ctx)) {
-        Decimal amount = CommerceUtils.getAmountFromMoneyNode(moneyNode);
-        String currencyCode = CommerceUtils.getCurrencyFromMoneyNode(moneyNode);
-        return PluginUtils.formatMoney(amount, currencyCode, ctx.cldr());
-      } else {
-        Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
-        StringBuilder buf = new StringBuilder();
-        CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
-        return buf.toString();
+  protected static class SubscriptionPriceFormatter extends BaseFormatter {
+
+    private Instruction template;
+
+    public SubscriptionPriceFormatter() {
+      super("subscription-price", false);
+    }
+
+    @Override
+    public void initialize(Compiler compiler) throws CodeException {
+      String source = loadResource(CommerceFormatters.class, "subscription-price.html");
+      this.template = compiler.compile(source.trim()).code();
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+      ObjectNode subscriptionResults = JsonUtils.createObjectNode();
+
+      JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
+
+      if (pricingOptions != null && pricingOptions.size() > 0) {
+        if (CommerceUtils.hasVariants(node)) {
+          // This will return either salePriceMoney or priceMoney depending on whether the onSale is true or false.
+          // That's because this block here is the from {price} so the from price needs to be the lowest possible price
+          // taking into if a variant is onSale.
+          JsonNode subscriptionFromPricingNode = CommerceUtils.getSubscriptionMoneyFromFirstPricingOptions(pricingOptions);
+
+          subscriptionResults.put("fromText", StringUtils.defaultIfEmpty(
+                  ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {price}"));
+          subscriptionResults.put("formattedFromPrice", CommerceUtils.getMoneyString(subscriptionFromPricingNode, ctx));
+        }
+
+        JsonNode firstPricingOption = pricingOptions.get(0);
+
+        if (isOnSale(firstPricingOption)) {
+          subscriptionResults.put("formattedSubscriptionSalePriceText", "{price}");
+          subscriptionResults.put("formattedSubscriptionSalePrice", getSalePriceMoney(firstPricingOption, ctx));
+        }
+
+        subscriptionResults.put("formattedNormalSubscriptionPriceText", "{price}");
+        subscriptionResults.put("formattedNormalSubscriptionPrice", getPriceMoney(firstPricingOption, ctx));
       }
+
+      JsonNode subscriptionPriceInfo = executeTemplate(ctx, template, subscriptionResults, true);
+      var.set(subscriptionPriceInfo.asText());
+    }
+
+    private static boolean isOnSale(JsonNode pricingOption) {
+      return isTruthy(pricingOption.path("onSale"));
+    }
+
+    private static String getSalePriceMoney(JsonNode pricingOption, Context ctx) {
+      return CommerceUtils.getMoneyString(pricingOption.path("salePriceMoney"), ctx);
+    }
+
+    private static String getPriceMoney(JsonNode pricingOption, Context ctx) {
+      return CommerceUtils.getMoneyString(pricingOption.path("priceMoney"), ctx);
     }
   }
 
