@@ -488,7 +488,6 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode node = var.node();
-      StringBuilder buffer = new StringBuilder();
       ObjectNode subscriptionResults = JsonUtils.createObjectNode();
 
       JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
@@ -517,8 +516,7 @@ public class CommerceFormatters implements FormatterRegistry {
       }
 
       JsonNode subscriptionPriceInfo = executeTemplate(ctx, template, subscriptionResults, true);
-      buffer.append(subscriptionPriceInfo.asText());
-      var.set(buffer);
+      var.set(subscriptionPriceInfo.asText());
     }
 
     private static boolean isOnSale(JsonNode pricingOption) {
