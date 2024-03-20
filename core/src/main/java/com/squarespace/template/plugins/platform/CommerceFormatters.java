@@ -493,14 +493,14 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
 
       if (pricingOptions != null && pricingOptions.size() > 0) {
-        if (CommerceUtils.hasVariants(node)) {
+        if (CommerceUtils.hasVariedPrices(node)) {
           // This will return either salePriceMoney or priceMoney depending on whether the onSale is true or false.
           // That's because this block here is the from {price} so the from price needs to be the lowest possible price
           // taking into if a variant is onSale.
           JsonNode subscriptionFromPricingNode = CommerceUtils.getSubscriptionMoneyFromFirstPricingOptions(pricingOptions);
 
           subscriptionResults.put("fromText", StringUtils.defaultIfEmpty(
-                  ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {price}"));
+                  ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
           subscriptionResults.put("formattedFromPrice", CommerceUtils.getMoneyString(subscriptionFromPricingNode, ctx));
         }
 
