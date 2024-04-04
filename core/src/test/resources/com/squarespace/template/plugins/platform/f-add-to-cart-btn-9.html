@@ -1,0 +1,35 @@
+:JSON
+{
+  "item": {
+    "id": "560c37c1a7c8465c4a71d99a",
+    "collectionId": "560c37c1a7c8465c4a71d99b",
+    "structuredContent": {
+      "productType": "2",
+      "useCustomAddButtonText": false,
+      "isSubscribable": false,
+      "productSubscriptionOptions" : [{
+        "id" : "2e0c2fbe-bc48-4a5e-9e0f-bb939576a0aa",
+        "percentageDiscount" : 0,
+        "subscriptionPlan" : {
+          "billingPeriod" : {
+            "value" : 1,
+            "unit" : "WEEK"
+          },
+          "planVersionId" : "d6803d89-82b8-49a3-ab6d-d9a16c93b5a8",
+          "numBillingCycles" : 0
+        }
+      }]
+    }
+  }
+}
+
+:TEMPLATE
+{item|add-to-cart-btn}
+
+:OUTPUT
+<div class="sqs-add-to-cart-button-wrapper" data-animation-role="button">
+  <div class="sqs-add-to-cart-button sqs-suppress-edit-mode sqs-editable-button sqs-button-element--primary " role="button" tabindex="0" data-dynamic-strings data-collection-id="560c37c1a7c8465c4a71d99b" data-item-id="560c37c1a7c8465c4a71d99a" data-product-type="2" data-use-custom-label="false" data-original-label="Add To Cart" >
+    <div class="sqs-add-to-cart-button-inner">Add To Cart</div>
+  </div>
+</div>
+
