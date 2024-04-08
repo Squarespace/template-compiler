@@ -28,7 +28,10 @@ public class DateTimeIntervalFormatterTest extends PlatformUnitTestBase {
 
   @Test
   public void testInterval() {
-    runner.run("f-datetime-interval-1.html");
+    runner.run(
+        "f-datetime-interval-1.html",
+        "f-datetime-interval-multi-locale-1.html"
+    );
   }
 
 }

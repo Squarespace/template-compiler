@@ -1,0 +1,34 @@
+:PROPERTIES
+locale=user:es
+
+:JSON
+{
+	"website": {"timeZone": "America/Los_Angeles"},
+	"dates": [
+		{"start": 1509647217000, "end": 1510641417000},
+		{"start": 1502298000000, "end": 1502305200000}
+	]
+}
+
+
+:TEMPLATE
+{.repeated section dates}
+{start, end|datetime-interval}
+{start, end|datetime-interval EyMMMd}
+
+{start, end|datetime-interval locale:user}
+{start, end|datetime-interval EyMMMd locale:user}
+{.end}
+
+:OUTPUT
+Nov 2 – 13, 2017
+Thu, Nov 2 – Mon, Nov 13, 2017
+
+2–13 nov. 2017
+jue., 2 nov. – lun., 13 nov. 2017
+
+10:00 AM – 12:00 PM
+Wed, Aug 9, 2017
+
+10:00 a. m. – 12:00 p. m.
+mié., 9 ago. 2017

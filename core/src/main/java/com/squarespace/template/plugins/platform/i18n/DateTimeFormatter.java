@@ -22,6 +22,7 @@ import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.OptionParsers;
+import com.squarespace.template.Options;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
 import com.squarespace.template.plugins.PluginDateUtils;
@@ -38,7 +39,7 @@ public class DateTimeFormatter extends BaseFormatter {
 
   @Override
   public void validateArgs(Arguments args) throws ArgumentsException {
-    DateFormatOptions options = OptionParsers.datetime(args);
+    Options<DateFormatOptions> options = OptionParsers.datetime(args);
     args.setOpaque(options);
   }
 
@@ -47,10 +48,11 @@ public class DateTimeFormatter extends BaseFormatter {
     Variable var = variables.first();
     long epoch = var.node().asLong();
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
-    CLDR cldr = ctx.cldr();
-    DateFormatOptions options = (DateFormatOptions) args.getOpaque();
+    @SuppressWarnings("unchecked")
+    Options<DateFormatOptions> options = (Options<DateFormatOptions>) args.getOpaque();
+    CLDR cldr = ctx.localeManager().get(options.localeName()).cldr();
     CalendarDate date = cldr.Calendars.toGregorianDate(epoch, zoneId);
-    String result = cldr.Calendars.formatDate(date, options);
+    String result = cldr.Calendars.formatDate(date, options.inner());
     var.set(result);
   }
 

@@ -46,79 +46,95 @@ public class OptionParsers {
 
   }
 
-  public static DecimalFormatOptions decimal(Arguments args) {
+  public static Options<DecimalFormatOptions> decimal(Arguments args) {
     return decimal(args.getArgs());
   }
 
-  public static DecimalFormatOptions decimal(List<String> args) {
-    DecimalFormatOptions options = new DecimalFormatOptions();
+  public static Options<DecimalFormatOptions> decimal(List<String> args) {
+    Options<DecimalFormatOptions> options = new Options<>(null, new DecimalFormatOptions());
     parse(args, options, OptionParsers::decimalOption);
     return options;
   }
 
-  public static CurrencyFormatOptions currency(Arguments args) {
+  public static Options<CurrencyFormatOptions> currency(Arguments args) {
     return currency(args.getArgs());
   }
 
-  public static CurrencyFormatOptions currency(List<String> args) {
-    CurrencyFormatOptions options = new CurrencyFormatOptions();
+  public static Options<CurrencyFormatOptions> currency(List<String> args) {
+    Options<CurrencyFormatOptions> options = new Options<>(null, new CurrencyFormatOptions());
     parse(args, options, OptionParsers::currencyOption);
     return options;
   }
 
-  public static DateFormatOptions datetime(Arguments args) {
+  public static Options<DateFormatOptions> datetime(Arguments args) {
     return datetime(args.getArgs());
   }
 
-  public static DateFormatOptions datetime(List<String> args) {
-    DateFormatOptions options = DateFormatOptions.build();
+  public static Options<DateFormatOptions> datetime(List<String> args) {
+    Options<DateFormatOptions> options = new Options<>(null, DateFormatOptions.build());
     parse(args, options, OptionParsers::datetimeOption);
     return options;
   }
 
-  public static DateIntervalFormatOptions interval(Arguments args) {
+  public static Options<DateIntervalFormatOptions> interval(Arguments args) {
     return interval(args.getArgs());
   }
 
-  public static DateIntervalFormatOptions interval(List<String> args) {
-    DateIntervalFormatOptions options = DateIntervalFormatOptions.build();
+  public static Options<DateIntervalFormatOptions> interval(List<String> args) {
+    Options<DateIntervalFormatOptions> options = new Options<>(null, DateIntervalFormatOptions.build());
     parse(args, options, OptionParsers::intervalOption);
     return options;
   }
 
-  public static RelativeTimeFormatOptions relativetime(Arguments args) {
+  public static Options<RelativeTimeFormatOptions> relativetime(Arguments args) {
     return relativetime(args.getArgs());
   }
 
-  public static RelativeTimeFormatOptions relativetime(List<String> args) {
-    RelativeTimeFormatOptions options = RelativeTimeFormatOptions.build();
+  public static Options<RelativeTimeFormatOptions> relativetime(List<String> args) {
+    Options<RelativeTimeFormatOptions> options = new Options<>(null, RelativeTimeFormatOptions.build());
     parse(args, options, OptionParsers::relativetimeOption);
     return options;
   }
 
-  private static void decimalOption(String arg, String value, DecimalFormatOptions options) {
-    if (arg.equals("style")) {
-      options.style(DecimalFormatStyleType.fromString(value));
-      if (!options.style.ok() && "standard".equals(value)) {
-        options.style(DecimalFormatStyleType.DECIMAL);
-      }
-    } else {
-      numberOption(arg, value, options);
+  private static void decimalOption(String arg, String value, Options<DecimalFormatOptions> options) {
+    DecimalFormatOptions inner = options.inner();
+    switch (arg) {
+      case "locale":
+        options.localeName(value);
+        break;
+
+      case "style":
+        inner.style(DecimalFormatStyleType.fromString(value));
+        if (!inner.style.ok() && "standard".equals(value)) {
+          inner.style(DecimalFormatStyleType.DECIMAL);
+        }
+        break;
+
+      default:
+        numberOption(arg, value, inner);
     }
   }
 
-  private static void currencyOption(String arg, String value, CurrencyFormatOptions options) {
-    if (arg.equals("style")) {
-      options.style(CurrencyFormatStyleType.fromString(value));
-      if (!options.style.ok() && "standard".equals(value)) {
-        options.style(CurrencyFormatStyleType.SYMBOL);
-      }
+  private static void currencyOption(String arg, String value, Options<CurrencyFormatOptions> options) {
+    CurrencyFormatOptions inner = options.inner();
+    switch (arg) {
+      case "locale":
+        options.localeName(value);
+        break;
 
-    } else if (arg.equals("symbol")) {
-      options.symbolWidth(CurrencySymbolWidthType.fromString(value));
+      case "style":
+        inner.style(CurrencyFormatStyleType.fromString(value));
+        if (!inner.style.ok() && "standard".equals(value)) {
+          inner.style(CurrencyFormatStyleType.SYMBOL);
+        }
+        break;
 
-    } else {
-      numberOption(arg, value, options);
+      case "symbol":
+        inner.symbolWidth(CurrencySymbolWidthType.fromString(value));
+        break;
+
+      default:
+        numberOption(arg, value, inner);
     }
   }
 
@@ -186,25 +202,26 @@ public class OptionParsers {
     }
   }
 
-  private static void datetimeOption(String arg, String value, DateFormatOptions options) {
+  private static void datetimeOption(String arg, String value, Options<DateFormatOptions> options) {
+    DateFormatOptions inner = options.inner();
     if (StringUtils.isEmpty(value)) {
       switch (arg) {
         case "date":
-          options.date(FormatWidthType.SHORT);
+          inner.date(FormatWidthType.SHORT);
           break;
 
         case "time":
-          options.time(FormatWidthType.SHORT);
+          inner.time(FormatWidthType.SHORT);
           break;
 
         default:
           FormatWidthType format = FormatWidthType.fromString(arg);
           if (format != null) {
-            options.datetime(format);
+            inner.datetime(format);
           } else {
             // add skeleton fields
-            String skel = options.skeleton.get();
-            options.skeleton(skel == null ? arg : skel + arg);
+            String skel = inner.skeleton.get();
+            inner.skeleton(skel == null ? arg : skel + arg);
           }
           break;
       }
@@ -212,8 +229,12 @@ public class OptionParsers {
     }
 
     switch (arg) {
+      case "locale":
+        options.localeName(value);
+        break;
+
       case "context":
-        options.context(ContextType.fromString(value));
+        inner.context(ContextType.fromString(value));
         break;
 
       case "date":
@@ -222,28 +243,28 @@ public class OptionParsers {
         FormatWidthType format = FormatWidthType.fromString(value);
         if (format != null) {
           if (arg.equals("date")) {
-            options.date(format);
+            inner.date(format);
           } else if (arg.equals("time")) {
-            options.time(format);
+            inner.time(format);
           } else {
-            options.datetime(format);
+            inner.datetime(format);
           }
         } else {
           // add skeleton fields
-          String skel = options.skeleton.get();
-          options.skeleton(skel == null ? value : skel + value);
+          String skel = inner.skeleton.get();
+          inner.skeleton(skel == null ? value : skel + value);
         }
         break;
       }
 
       case "skeleton":
-        options.skeleton(value);
+        inner.skeleton(value);
         break;
 
       case "wrap":
       case "wrapper":
       case "wrapped": {
-        options.wrap(FormatWidthType.fromString(value));
+        inner.wrap(FormatWidthType.fromString(value));
         break;
       }
 
@@ -252,7 +273,8 @@ public class OptionParsers {
     }
   }
 
-  private static void intervalOption(String arg, String value, DateIntervalFormatOptions options) {
+  private static void intervalOption(String arg, String value, Options<DateIntervalFormatOptions> options) {
+    DateIntervalFormatOptions inner = options.inner();
     if (StringUtils.isEmpty(value)) {
       switch (arg) {
         case "context":
@@ -262,7 +284,7 @@ public class OptionParsers {
           break;
         default:
           if (!StringUtils.isEmpty(arg)) {
-            options.skeleton(arg);
+            inner.skeleton(arg);
           }
           break;
       }
@@ -270,45 +292,52 @@ public class OptionParsers {
     }
 
     switch (arg) {
+      case "locale":
+        options.localeName(value);
+        break;
       case "context":
-        options.context(ContextType.fromString(value));
+        inner.context(ContextType.fromString(value));
         break;
       case "skeleton":
-        options.skeleton(value);
+        inner.skeleton(value);
         break;
       case "date":
-        options.date(value);
+        inner.date(value);
         break;
       case "time":
-        options.time(value);
+        inner.time(value);
         break;
       default:
         break;
     }
   }
 
-  private static void relativetimeOption(String arg, String value, RelativeTimeFormatOptions options) {
+  private static void relativetimeOption(String arg, String value, Options<RelativeTimeFormatOptions> options) {
+    RelativeTimeFormatOptions inner = options.inner();
     switch (arg) {
+      case "locale":
+        options.localeName(value);
+        break;
       case "context":
-        options.context(ContextType.fromString(value));
+        inner.context(ContextType.fromString(value));
         break;
       case "dayOfWeek":
-        options.dayOfWeek("true".equals(value));
+        inner.dayOfWeek("true".equals(value));
         break;
       case "field":
-        options.field(TimePeriodField.fromString(value));
+        inner.field(TimePeriodField.fromString(value));
         break;
       case "numericOnly":
-        options.numericOnly("true".equals(value));
+        inner.numericOnly("true".equals(value));
         break;
       case "alwaysNow":
-        options.alwaysNow("true".equals(value));
+        inner.alwaysNow("true".equals(value));
         break;
       case "width":
-        options.width(DateFieldWidthType.fromString(value));
+        inner.width(DateFieldWidthType.fromString(value));
         break;
       default:
-        numberOption(arg, value, options);
+        numberOption(arg, value, inner);
         break;
     }
   }
