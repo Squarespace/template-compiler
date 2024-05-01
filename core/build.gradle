@@ -3,10 +3,10 @@ description = 'Template compiler core'
 dependencies {
   api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
   api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-  implementation "com.squarespace.compiler:compiler-core:${ccVersion}"
-  implementation "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
-  implementation 'joda-time:joda-time:2.3'
-  implementation 'org.apache.commons:commons-lang3:3.1'
+  api "com.squarespace.compiler:compiler-core:${ccVersion}"
+  api "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
+  api 'joda-time:joda-time:2.3'
+  api 'org.apache.commons:commons-lang3:3.1'
 
   testImplementation "org.testng:testng:${testngVersion}"
   testImplementation "org.hamcrest:hamcrest-core:${hamcrestVersion}"
