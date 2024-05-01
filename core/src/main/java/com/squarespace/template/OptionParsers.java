@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.squarespace.cldrengine.api.CalendarType;
 import com.squarespace.cldrengine.api.ContextType;
 import com.squarespace.cldrengine.api.CurrencyFormatOptions;
 import com.squarespace.cldrengine.api.CurrencyFormatStyleType;
@@ -73,6 +74,9 @@ public class OptionParsers {
   public static DateFormatOptions datetime(List<String> args) {
     DateFormatOptions options = DateFormatOptions.build();
     parse(args, options, OptionParsers::datetimeOption);
+    if (!options.calendar.ok()) {
+      options.calendar(CalendarType.GREGORY);
+    }
     return options;
   }
 
@@ -83,6 +87,9 @@ public class OptionParsers {
   public static DateIntervalFormatOptions interval(List<String> args) {
     DateIntervalFormatOptions options = DateIntervalFormatOptions.build();
     parse(args, options, OptionParsers::intervalOption);
+    if (!options.calendar.ok()) {
+      options.calendar(CalendarType.GREGORY);
+    }
     return options;
   }
 
@@ -93,6 +100,9 @@ public class OptionParsers {
   public static RelativeTimeFormatOptions relativetime(List<String> args) {
     RelativeTimeFormatOptions options = RelativeTimeFormatOptions.build();
     parse(args, options, OptionParsers::relativetimeOption);
+    if (!options.calendar.ok()) {
+      options.calendar(CalendarType.GREGORY);
+    }
     return options;
   }
 
@@ -212,6 +222,10 @@ public class OptionParsers {
     }
 
     switch (arg) {
+      case "calendar":
+        options.calendar(CalendarType.fromString(value.equals("gregorian") ? "gregory" : value));
+        break;
+
       case "context":
         options.context(ContextType.fromString(value));
         break;
