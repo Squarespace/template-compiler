@@ -1,0 +1,36 @@
+:JSON
+{
+	"one": {
+		"two": {
+			"key": "hello"
+		}
+	},
+	"@": {
+		"@": "X"
+	}
+}
+
+:PARTIALS
+{
+	"m2": "{.if @}pass2{.or}fail2{.end} {@|json}"
+}
+
+:TEMPLATE
+{.macro m1}{.if @}pass1{.or}fail1{.end} {@|apply m2}{.end}
+
+{@|apply m1}
+{@.one|apply m1}
+{@.one.two|apply m1}
+
+{@.one.two.three|apply m1}
+{@.two|apply m1}
+{missing|apply m1}
+
+:OUTPUT
+pass1 pass2 {"one":{"two":{"key":"hello"}},"@":{"@":"X"}}
+pass1 pass2 {"two":{"key":"hello"}}
+pass1 pass2 {"key":"hello"}
+
+fail1 fail2 
+fail1 fail2 
+fail1 fail2
