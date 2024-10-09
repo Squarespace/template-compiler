@@ -16,7 +16,7 @@
 
 package com.squarespace.template;
 
-import com.squarespace.compiler.match.Recognizers.Recognizer;
+import com.squarespace.template.match.Recognizers.Recognizer;
 
 
 /**

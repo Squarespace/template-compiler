@@ -16,27 +16,27 @@
 
 package com.squarespace.template;
 
-import static com.squarespace.compiler.match.Recognizers.charClass;
-import static com.squarespace.compiler.match.Recognizers.characters;
-import static com.squarespace.compiler.match.Recognizers.choice;
-import static com.squarespace.compiler.match.Recognizers.digits;
-import static com.squarespace.compiler.match.Recognizers.literal;
-import static com.squarespace.compiler.match.Recognizers.notCharacters;
-import static com.squarespace.compiler.match.Recognizers.oneOrMore;
-import static com.squarespace.compiler.match.Recognizers.sequence;
-import static com.squarespace.compiler.match.Recognizers.zeroOrMore;
-import static com.squarespace.compiler.match.Recognizers.zeroOrOne;
-import static com.squarespace.compiler.text.DefaultCharClassifier.DASH;
-import static com.squarespace.compiler.text.DefaultCharClassifier.DIGIT;
-import static com.squarespace.compiler.text.DefaultCharClassifier.LOWERCASE;
-import static com.squarespace.compiler.text.DefaultCharClassifier.UNDERSCORE;
-import static com.squarespace.compiler.text.DefaultCharClassifier.UPPERCASE;
+import static com.squarespace.template.match.Recognizers.charClass;
+import static com.squarespace.template.match.Recognizers.characters;
+import static com.squarespace.template.match.Recognizers.choice;
+import static com.squarespace.template.match.Recognizers.digits;
+import static com.squarespace.template.match.Recognizers.literal;
+import static com.squarespace.template.match.Recognizers.notCharacters;
+import static com.squarespace.template.match.Recognizers.oneOrMore;
+import static com.squarespace.template.match.Recognizers.sequence;
+import static com.squarespace.template.match.Recognizers.zeroOrMore;
+import static com.squarespace.template.match.Recognizers.zeroOrOne;
+import static com.squarespace.template.match.DefaultCharClassifier.DASH;
+import static com.squarespace.template.match.DefaultCharClassifier.DIGIT;
+import static com.squarespace.template.match.DefaultCharClassifier.LOWERCASE;
+import static com.squarespace.template.match.DefaultCharClassifier.UNDERSCORE;
+import static com.squarespace.template.match.DefaultCharClassifier.UPPERCASE;
 
 import java.util.regex.Pattern;
 
-import com.squarespace.compiler.match.Recognizers.Recognizer;
-import com.squarespace.compiler.text.CharClassifier;
-import com.squarespace.compiler.text.DefaultCharClassifier;
+import com.squarespace.template.match.Recognizers.Recognizer;
+import com.squarespace.template.match.CharClassifier;
+import com.squarespace.template.match.DefaultCharClassifier;
 
 
 /**
