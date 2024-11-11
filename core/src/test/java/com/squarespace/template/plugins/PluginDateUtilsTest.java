@@ -174,7 +174,7 @@ public class PluginDateUtilsTest {
 
     // Month of year, short, locale-adjusted
     assertEquals(formatDate("%h", MAY_13_2013_010000_UTC, TZ_UTC, Locale.GERMANY), "Mai");
-    assertEquals(formatDate("%h", MAY_13_2013_010000_UTC, TZ_UTC, MEXICO), "may.");
+    assertEquals(formatDate("%h", MAY_13_2013_010000_UTC, TZ_UTC, MEXICO), "may");
 
     // Hour of day, 12-hour
     assertEquals(formatDate("%I", JAN_01_1970_071510_UTC, TZ_NY), "02");

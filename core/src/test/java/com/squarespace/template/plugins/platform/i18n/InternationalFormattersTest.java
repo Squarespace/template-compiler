@@ -79,28 +79,28 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     // ENGLISH
 
     assertEquals(format(en_US, DATETIME, mk.args(""), json), "November 2, 2017");
-    assertEquals(format(en_US, DATETIME, mk.args(" short"), json), "11/2/17, 2:26 PM");
-    assertEquals(format(en_US, DATETIME, mk.args(" long"), json), "November 2, 2017 at 2:26:57 PM EDT");
+    assertEquals(format(en_US, DATETIME, mk.args(" short"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" long"), json), "November 2, 2017 at 2:26:57 PM EDT");
 
     assertEquals(format(en_US, DATETIME, mk.args(" date"), json), "11/2/17");
     assertEquals(format(en_US, DATETIME, mk.args(" date:short"), json), "11/2/17");
-    assertEquals(format(en_US, DATETIME, mk.args(" time"), json), "2:26 PM");
-    assertEquals(format(en_US, DATETIME, mk.args(" time:medium"), json), "2:26:57 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" time"), json), "2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" time:medium"), json), "2:26:57 PM");
     assertEquals(format(en_US, DATETIME, mk.args(" date:full time:short"), json),
-        "Thursday, November 2, 2017 at 2:26 PM");
+        "Thursday, November 2, 2017 at 2:26 PM");
 
-    assertEquals(format(en_US, DATETIME, mk.args(" time:hm date:short"), json), "11/2/17, 2:26 PM");
-    assertEquals(format(en_US, DATETIME, mk.args(" date:yMMMd time:hm"), json), "Nov 2, 2017, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" time:hm date:short"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" date:yMMMd time:hm"), json), "Nov 2, 2017, 2:26 PM");
 
     assertEquals(format(en_US, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
-        "Nov 2, 2017, 2:26:57 PM");
+        "Nov 2, 2017, 2:26:57 PM");
     assertEquals(format(en_US, DATETIME, mk.args(" time:medium wrap:full date:yMMMd"), json),
-        "Nov 2, 2017 at 2:26:57 PM");
+        "Nov 2, 2017 at 2:26:57 PM");
 
     // Bare skeletons
 
-    assertEquals(format(en_US, DATETIME, mk.args(" date:short hm"), json), "11/2/17, 2:26 PM");
-    assertEquals(format(en_US, DATETIME, mk.args(" yMMMd hm"), json), "Nov 2, 2017, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" date:short hm"), json), "11/2/17, 2:26 PM");
+    assertEquals(format(en_US, DATETIME, mk.args(" yMMMd hm"), json), "Nov 2, 2017, 2:26 PM");
 
 
     // FRENCH
@@ -110,8 +110,8 @@ public class InternationalFormattersTest extends PlatformUnitTestBase {
     assertEquals(format(fr, DATETIME, mk.args(" date:full time:short"), json),
         "jeudi 2 novembre 2017 à 14:26");
 
-    assertEquals(format(fr, DATETIME, mk.args(" time:hm date:short"), json), "02/11/2017 2:26 PM");
-    assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:hm"), json), "2 nov. 2017 à 2:26 PM");
+    assertEquals(format(fr, DATETIME, mk.args(" time:hm date:short"), json), "02/11/2017 2:26 PM");
+    assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:hm"), json), "2 nov. 2017, 2:26 PM");
 
     assertEquals(format(fr, DATETIME, mk.args(" date:yMMMd time:medium wrap:short"), json),
         "2 nov. 2017 14:26:57");

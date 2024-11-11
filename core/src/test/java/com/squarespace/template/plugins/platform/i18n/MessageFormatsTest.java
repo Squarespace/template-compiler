@@ -183,7 +183,7 @@ public class MessageFormatsTest {
     long epoch = 1582129775000L;
 
     actual = formats.formatter().format(message, args().add(new LongNode(epoch)));
-    assertEquals(actual, "February 19, 2020 at 11:29:35 AM");
+    assertEquals(actual, "February 19, 2020 at 11:29:35 AM");
   }
 
   @Test
@@ -198,7 +198,7 @@ public class MessageFormatsTest {
     long extra = 86400000 + 3600000;
     MessageArgs args = args().add(new LongNode(epoch)).add(new LongNode(epoch + extra));
     actual = formats.formatter().format(message, args);
-    assertEquals(actual, "Feb 19 – 20, 2020");
+    assertEquals(actual, "Feb 19 – 20, 2020");
   }
 
   private ObjectNode money(String value, String currency) {

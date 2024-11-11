@@ -249,10 +249,10 @@ public class TestCaseParser extends UnitTestBase {
       buf.append("@@ -" + pos1 + "," + lines1.size());
       buf.append(" +" + pos2 + "," + lines2.size()).append(" @@\n");
       for (String row : lines1) {
-        buf.append("- ").append(escaped(row)).append('\n');
+        buf.append("- ").append(row).append('\n');
       }
       for (String row : lines2) {
-        buf.append("+ ").append(escaped(row)).append('\n');
+        buf.append("+ ").append(row).append('\n');
       }
     }
     return buf.toString();
