@@ -1,4 +1,4 @@
-
+master
 # Squarespace Template Compiler.
 
 A Java template compiler based on [JSON-Template][jsont].
