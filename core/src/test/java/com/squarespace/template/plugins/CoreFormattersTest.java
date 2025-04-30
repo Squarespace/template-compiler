@@ -709,6 +709,36 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(URL_ENCODE, "\"\\u201ca b\\u201d\"", "%E2%80%9Ca+b%E2%80%9D");
   }
 
+  public void testReactInvalidComponent() throws CodeException {
+    String template = "{@|react InvalidComponent}";
+    String input = "{}";
+    Instruction inst = compiler().compile(template).code();
+    Context ctx = compiler().newExecutor()
+            .json(input)
+            .code(inst)
+            .safeExecution(true)
+            .maxPartialDepth(1)
+            .execute();
+    assertContext(ctx, "Invalid component name: <!-- -->InvalidComponent");
+  }
+
+  public void testReactComponent() throws CodeException {
+    String template = "{@|react Test}";
+    String input = "{\"name\": \"test\"}";
+    Instruction inst = compiler().compile(template).code();
+    Context ctx = compiler().newExecutor()
+            .json(input)
+            .code(inst)
+            .safeExecution(true)
+            .maxPartialDepth(1)
+            .execute();
+    String expectedOutput = "<div data-react-component-name=\"Test\" "+
+            "data-react-component-props=\"{&quot;name&quot;:&quot;test&quot;}\">" +
+            "<h1 class=\"test-container\" data-env=\"server\">test</h1>" +
+            "</div>";
+    assertContext(ctx, expectedOutput);
+  }
+
   protected static String getDateTestJson(long timestamp, String tzId) {
     DateTimeZone timezone = DateTimeZone.forID(tzId);
     ObjectNode node = JsonUtils.createObjectNode();

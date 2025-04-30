@@ -1,3 +1,10 @@
+import java.nio.file.Files
+import java.nio.file.Path
+
+plugins {
+  id 'com.github.node-gradle.node' version '7.0.0'
+}
+
 description = 'Template compiler core'
 
 dependencies {
@@ -19,6 +26,20 @@ configurations {
     extendsFrom testImplementation
   }
 }
+
+task installReactRenderer(type: NpmTask) {
+  workingDir = file("${project.projectDir}/react-renderer")
+  npmCommand = ['install']
+}
+
+task buildReactRenderer(type: NpmTask) {
+  dependsOn installReactRenderer
+  workingDir = file("${project.projectDir}/react-renderer")
+  npmCommand = ['run', 'build']
+}
+
+// Make sure this runs before tests so that the react-render-component.js resource is available
+assemble.dependsOn buildReactRenderer
 
 plugins.withType(EclipsePlugin) {
   project.eclipse.classpath.plusConfigurations += [ configurations.jmh ]

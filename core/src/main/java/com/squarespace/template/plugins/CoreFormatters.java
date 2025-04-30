@@ -19,19 +19,19 @@ package com.squarespace.template.plugins;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_MISSING;
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_SYNTAX;
 import static com.squarespace.template.ExecuteErrorType.GENERAL_ERROR;
-import static com.squarespace.template.GeneralUtils.eatNull;
-import static com.squarespace.template.GeneralUtils.executeTemplate;
-import static com.squarespace.template.GeneralUtils.isTruthy;
-import static com.squarespace.template.GeneralUtils.jsonPretty;
-import static com.squarespace.template.GeneralUtils.splitVariable;
-import static com.squarespace.template.GeneralUtils.getNodeAtPath;
+import static com.squarespace.template.GeneralUtils.*;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -96,6 +96,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new StrFormatter());
     table.add(new TruncateFormatter());
     table.add(new UrlEncodeFormatter());
+    table.add(new ReactFormatter());
   }
 
   /**
@@ -905,6 +906,45 @@ public class CoreFormatters implements FormatterRegistry {
         }
       }
       var.setMissing();
+    }
+
+  }
+
+
+  public static class ReactFormatter extends BaseFormatter {
+
+    public ReactFormatter() {
+      super("react", false);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode props = var.node();
+      String componentName = args.first();
+
+      try {
+        // Read react render script resource and create a temp file to direct node to in order to run it
+        String renderScriptContents = loadResource(CoreFormatters.class, "render-react-component.js");
+        Path tempRenderScriptPath = Files.createTempFile("render-react-component", ".js");
+        Files.write(tempRenderScriptPath, List.of(renderScriptContents), StandardCharsets.UTF_8);
+        ProcessBuilder renderReactProcessBuilder = new ProcessBuilder("node",
+                tempRenderScriptPath.toString(), componentName, props.toString());
+        renderReactProcessBuilder.redirectErrorStream(true);
+        Process renderReactProcess = renderReactProcessBuilder.start();
+        InputStream inputStream = renderReactProcess.getInputStream();
+        Scanner scanner = new Scanner(inputStream);
+        var.set(scanner.nextLine());
+        scanner.close();
+        Files.delete(tempRenderScriptPath);
+      } catch (Exception e) {
+        ErrorInfo error = ctx.error(GENERAL_ERROR).data(e.getMessage());
+        if (ctx.safeExecutionEnabled()) {
+          ctx.addError(error);
+        } else {
+          throw new CodeExecuteException(error);
+        }
+      }
     }
 
   }
