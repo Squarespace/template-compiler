@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "net": "^1.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "webpack": "^5.99.7",
@@ -14,7 +15,8 @@
     "webpack-dev-server": "^5.2.1"
   },
   "scripts": {
-    "build": "npm link @sqs/visitor-react-components; webpack --mode production; node copy-to-java-resources.js"
+    "build": "npm link @sqs/visitor-react-components; webpack --mode production;",
+    "start": "npm run build; node src/index.js"
   },
   "eslintConfig": {
     "extends": [

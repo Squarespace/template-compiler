@@ -1,18 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom/server';
-import { TemplateCompilerComponent } from '@sqs/visitor-react-components';
+const React = require('react');
+const ReactDOM = require('react-dom/server');
+const { TemplateCompilerComponent } = require('@sqs/visitor-react-components');
+const net = require('net');
 
-const componentName = process.argv[2];
-let componentProps;
-try {
-  componentProps = JSON.parse(process.argv[3]);
-} catch {
-  componentProps = {};
-}
+const server = net.createServer((socket) => {
+  console.log('client connected');
+  
+  socket
+    .setEncoding('utf8')
+    .on('data', (data) => {
+      try {
+        const { name, props } = JSON.parse(data.substring(2));
+        const htmlOutput = ReactDOM.renderToString(
+          React.createElement(TemplateCompilerComponent, { name, props }),
+        );
 
-const htmlOutput = ReactDOM.renderToString(
-  <TemplateCompilerComponent name={componentName} props={componentProps} />
-);
+        socket.write(`${htmlOutput}\n`);
+      } catch {
+        socket.write(`Invalid input given: ${data}\n`);
+      }
+    })
+    .on('end', () => {
+      console.log('client disconnected');
+    });
+});
 
-process.stdout.write(htmlOutput);
-process.exit();
+server.on('error', (error) => {
+  console.error(error);
+});
+
+server.listen(8124, () => {
+  console.log('react renderer listening on 8124');
+});

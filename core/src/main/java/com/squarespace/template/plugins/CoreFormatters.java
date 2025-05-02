@@ -23,9 +23,9 @@ import static com.squarespace.template.GeneralUtils.*;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -920,30 +920,21 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      JsonNode props = var.node();
-      String componentName = args.first();
+      ObjectNode props = JsonUtils.createObjectNode();
+      props.put("name", args.first());
+      props.put("props", var.node());
 
       try {
-        // Read react render script resource and create a temp file to direct node to in order to run it
-        String renderScriptContents = loadResource(CoreFormatters.class, "render-react-component.js");
-        Path tempRenderScriptPath = Files.createTempFile("render-react-component", ".js");
-        Files.write(tempRenderScriptPath, List.of(renderScriptContents), StandardCharsets.UTF_8);
-        ProcessBuilder renderReactProcessBuilder = new ProcessBuilder("node",
-                tempRenderScriptPath.toString(), componentName, props.toString());
-        renderReactProcessBuilder.redirectErrorStream(true);
-        Process renderReactProcess = renderReactProcessBuilder.start();
-        InputStream inputStream = renderReactProcess.getInputStream();
-        Scanner scanner = new Scanner(inputStream);
-        var.set(scanner.nextLine());
-        scanner.close();
-        Files.delete(tempRenderScriptPath);
+        Socket client = new Socket("localhost", 8124);
+        DataOutputStream out = new DataOutputStream(client.getOutputStream());
+        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+        out.writeUTF(props.toString());
+        var.set(in.readLine());
+
+        client.close();
       } catch (Exception e) {
-        ErrorInfo error = ctx.error(GENERAL_ERROR).data(e.getMessage());
-        if (ctx.safeExecutionEnabled()) {
-          ctx.addError(error);
-        } else {
-          throw new CodeExecuteException(error);
-        }
+        e.printStackTrace();
       }
     }
 

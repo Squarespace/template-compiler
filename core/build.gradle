@@ -13,6 +13,7 @@ dependencies {
   api "com.squarespace.cldr-engine:cldr-engine:${cldrengineVersion}"
   api 'joda-time:joda-time:2.3'
   api 'org.apache.commons:commons-lang3:3.1'
+  api 'io.socket:socket.io-server:4.0.1'
 
   testImplementation "org.testng:testng:${testngVersion}"
   testImplementation "org.hamcrest:hamcrest-core:${hamcrestVersion}"
@@ -26,20 +27,6 @@ configurations {
     extendsFrom testImplementation
   }
 }
-
-task installReactRenderer(type: NpmTask) {
-  workingDir = file("${project.projectDir}/react-renderer")
-  npmCommand = ['install']
-}
-
-task buildReactRenderer(type: NpmTask) {
-  dependsOn installReactRenderer
-  workingDir = file("${project.projectDir}/react-renderer")
-  npmCommand = ['run', 'build']
-}
-
-// Make sure this runs before tests so that the react-render-component.js resource is available
-assemble.dependsOn buildReactRenderer
 
 plugins.withType(EclipsePlugin) {
   project.eclipse.classpath.plusConfigurations += [ configurations.jmh ]
