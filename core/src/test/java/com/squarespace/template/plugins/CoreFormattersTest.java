@@ -299,11 +299,14 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testCount() throws CodeException {
-    for (String val : new String[] { "null", "0", "\"foo\"" }) {
+    runner.exec("f-count-%N.html");
+
+    for (String val : new String[] { "null", "0", "true", "false"}) {
       assertFormatter(COUNT, val, "0");
     }
     assertFormatter(COUNT, "[1,2,3]", "3");
     assertFormatter(COUNT, "{\"a\": 1, \"b\": 2}", "2");
+    assertFormatter(COUNT, "\"hello\"", "5");
   }
 
   @Test

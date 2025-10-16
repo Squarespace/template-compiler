@@ -193,6 +193,8 @@ public class CoreFormatters implements FormatterRegistry {
       JsonNode node = var.node();
       if (node.isArray() || node.isObject()) {
         var.set(node.size());
+      } else if (node.isTextual()) {
+        var.set(node.asText().length());
       } else {
         var.set(0);
       }
