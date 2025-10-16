@@ -181,19 +181,15 @@ subprojects {
   }
   repositories {
       maven {
-        def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-        def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        name = 'maven-central-api'
+        def snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
+        def releaseUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+        url = version.endsWith('SNAPSHOT') ? snapshotUrl : releaseUrl
+        authentication {
+          basic(BasicAuthentication)
+        }
         def _username = project.ext.properties.OSS_USERNAME
         def _password = project.ext.properties.OSS_PASSWORD
-
-        if (project.hasProperty('publish-internal')) {
-          releasesRepoUrl = NEXUS_INTERNAL_RELEASE_URL
-          snapshotsRepoUrl = NEXUS_INTERNAL_SNAPSHOT_URL
-          _username = NEXUS_USERNAME
-          _password = System.getenv('NEXUS_PASSWORD')
-        }
-
-        url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
         credentials {
           username = _username
           password = _password
