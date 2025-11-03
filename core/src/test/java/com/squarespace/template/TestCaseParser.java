@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.template.compat.CompatLevel;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -143,11 +144,17 @@ public class TestCaseParser extends UnitTestBase {
 
         boolean preprocess = Boolean.valueOf(properties.getProperty("preprocess"));
 
-        Instruction code = compiler.compile(template, false, preprocess).code();
+        String levelProp = properties.getProperty("level");
+        CompatLevel compat = levelProp == null
+            ? CompatLevel.defaultLevel()
+            : CompatLevel.at(Integer.valueOf(levelProp.trim()));
+
+        Instruction code = compiler.compile(template, false, preprocess, compat).code();
         CompilerExecutor executor = compiler.newExecutor()
             .code(code)
             .json(json)
-            .safeExecution(true);
+            .safeExecution(true)
+            .compat(compat);
         if (now != null) {
           executor.now(Long.valueOf(now));
         }
