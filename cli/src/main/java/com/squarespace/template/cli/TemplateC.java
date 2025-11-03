@@ -42,6 +42,8 @@ import com.squarespace.template.ReferenceScanner;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.TreeEmitter;
+import com.squarespace.template.compat.CompatLevel;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 import com.squarespace.template.plugins.platform.CommerceFormatters;
@@ -113,6 +115,15 @@ public class TemplateC {
       .action(Arguments.storeTrue())
       .help("Preprocess the template");
 
+    parser.addArgument("--compat-level")
+      .type(Integer.class)
+      .help("Compatibility level for the run. 0 keeps released behavior");
+
+    parser.addArgument("--compat-patch")
+      .action(Arguments.append())
+      .type(String.class)
+      .help("Force a legacy patch by name. Repeatable");
+
     parser.addArgument("template")
       .type(String.class)
       .nargs("?")
@@ -131,11 +142,18 @@ public class TemplateC {
         System.exit(exitCode);
       }
       boolean preprocess = res.getBoolean("preprocess");
+      CompatLevel compat = CompatLevel.defaultLevel();
+      try {
+        compat = compatLevel(res);
+      } catch (IllegalArgumentException e) {
+        System.err.println("error: " + e.getMessage());
+        System.exit(1);
+      }
       if (res.getBoolean("stats")) {
-        exitCode = stats(res.getString("template"), preprocess);
+        exitCode = stats(res.getString("template"), preprocess, compat);
 
       } else if (res.getBoolean("tree")) {
-        exitCode = tree(res.getString("template"), preprocess);
+        exitCode = tree(res.getString("template"), preprocess, compat);
 
       } else {
         exitCode = compile(
@@ -143,7 +161,8 @@ public class TemplateC {
             res.getString("json"),
             res.getString("partials"),
             res.getString("locale"),
-            preprocess);
+            preprocess,
+            compat);
       }
 
     } catch (CodeException | IOException e) {
@@ -159,9 +178,27 @@ public class TemplateC {
   }
 
   /**
+   * Build the compatibility level from the command line options.
+   */
+  private static CompatLevel compatLevel(Namespace res) {
+    CompatLevel compat = CompatLevel.defaultLevel();
+    Integer level = (Integer) res.get("compat_level");
+    if (level != null) {
+      compat = compat.withLevel(level);
+    }
+    List<String> patches = res.getList("compat_patch");
+    if (patches != null) {
+      for (String name : patches) {
+        compat = compat.withPatch(Patch.valueOf(name.trim().toUpperCase()));
+      }
+    }
+    return compat;
+  }
+
+  /**
    * Compile a template against a given json tree and emit the result.
    */
-  protected int compile(String templatePath, String jsonPath, String partialsPath, String locale, boolean preprocess)
+  protected int compile(String templatePath, String jsonPath, String partialsPath, String locale, boolean preprocess, CompatLevel compat)
       throws CodeException, IOException {
 
     String template = readFile(templatePath);
@@ -179,7 +216,7 @@ public class TemplateC {
       locale = "en-US";
     }
 
-    CompiledTemplate compiled = compiler().compile(template, true, preprocess);
+    CompiledTemplate compiled = compiler().compile(template, true, preprocess, compat);
 
     StringBuilder errorBuf = new StringBuilder();
     List<ErrorInfo> errors = compiled.errors();
@@ -225,6 +262,7 @@ public class TemplateC {
         .partialsMap((ObjectNode)partialsTree)
         .enableExpr(true)
         .enableInclude(true)
+        .compat(compat)
         .execute();
 
     // If compile was successful, print the output.
@@ -239,10 +277,10 @@ public class TemplateC {
   /**
    * Scan the compiled template and print statistics.
    */
-  protected int stats(String templatePath, boolean preprocess) throws CodeException, IOException {
+  protected int stats(String templatePath, boolean preprocess, CompatLevel compat) throws CodeException, IOException {
     String template = readFile(templatePath);
 
-    CompiledTemplate compiled = compiler().compile(template, false, preprocess);
+    CompiledTemplate compiled = compiler().compile(template, false, preprocess, compat);
     ReferenceScanner scanner = new ReferenceScanner();
     scanner.extract(compiled.code());
     ObjectNode report = scanner.references().report();
@@ -254,10 +292,10 @@ public class TemplateC {
   /**
    * Print the syntax tree for the given template.
    */
-  protected int tree(String templatePath, boolean preprocess) throws CodeException, IOException {
+  protected int tree(String templatePath, boolean preprocess, CompatLevel compat) throws CodeException, IOException {
     String template = readFile(templatePath);
 
-    CompiledTemplate compiled = compiler().compile(template, false, preprocess);
+    CompiledTemplate compiled = compiler().compile(template, false, preprocess, compat);
     StringBuilder buf = new StringBuilder();
     TreeEmitter.emit(compiled.code(), 0, buf);
     System.out.println(buf.toString());

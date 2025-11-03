@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.squarespace.template.compat.CompatLevel;
+
 
 /**
  * Main compiler API.
@@ -67,11 +69,22 @@ public class Compiler {
    * indicates whether errors cause an exception to be thrown.
    */
   public CompiledTemplate compile(String template, boolean safeMode, boolean preprocess) throws CodeSyntaxException {
+    return compile(template, safeMode, preprocess, CompatLevel.defaultLevel());
+  }
+
+  /**
+   * Compile the template at the given compatibility level. The level
+   * selects which legacy behaviors stay active. Existing calls keep the
+   * released behavior at level 0.
+   */
+  public CompiledTemplate compile(String template, boolean safeMode, boolean preprocess, CompatLevel compat)
+      throws CodeSyntaxException {
     CodeMachine machine = new CodeMachine();
     if (safeMode) {
       machine.setValidate();
     }
     Tokenizer tokenizer = new Tokenizer(template, machine, preprocess, formatterTable, predicateTable);
+    tokenizer.setCompat(compat);
     if (safeMode) {
       tokenizer.setValidate();
     }

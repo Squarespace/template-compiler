@@ -31,6 +31,8 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CLocale;
+import com.squarespace.template.compat.CompatLevel;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.expr.ExprOptions;
 
 
@@ -96,6 +98,8 @@ public class Context {
   private boolean enableExpr = false;
   private ExprOptions exprOptions = null;
   private boolean enableInclude = false;
+
+  private CompatLevel compat = CompatLevel.defaultLevel();
 
   /* Holds the final output of the template execution */
   private StringBuilder buf;
@@ -211,6 +215,27 @@ public class Context {
 
   public boolean getEnableInclude() {
     return this.enableInclude;
+  }
+
+  /**
+   * Set the compatibility level for this execution.
+   */
+  public void setCompat(CompatLevel compat) {
+    this.compat = compat == null ? CompatLevel.defaultLevel() : compat;
+  }
+
+  /**
+   * The compatibility level for this execution.
+   */
+  public CompatLevel getCompat() {
+    return compat;
+  }
+
+  /**
+   * True when the legacy behavior for the patch is active at this level.
+   */
+  public boolean compatEnabled(Patch patch) {
+    return compat.enabled(patch);
   }
 
   /**

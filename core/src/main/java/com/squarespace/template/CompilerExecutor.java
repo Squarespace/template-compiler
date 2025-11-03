@@ -20,6 +20,8 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.template.compat.CompatLevel;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.expr.ExprOptions;
 
 
@@ -45,6 +47,7 @@ public class CompilerExecutor {
   private boolean enableInclude;
   private ExprOptions exprOptions;
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
+  private CompatLevel compat = CompatLevel.defaultLevel();
 
   CompilerExecutor(Compiler compiler) {
     this.compiler = compiler;
@@ -59,7 +62,7 @@ public class CompilerExecutor {
     Instruction instruction = rootInstruction;
     if (instruction == null) {
       template = template == null ? "" : template;
-      CompiledTemplate compiled = compiler.compile(template, safeExecution, preprocess);
+      CompiledTemplate compiled = compiler.compile(template, safeExecution, preprocess, compat);
       for (ErrorInfo error : compiled.errors()) {
         ctx.addError(error);
       }
@@ -94,6 +97,7 @@ public class CompilerExecutor {
     ctx.setEnableExpr(enableExpr);
     ctx.setEnableInclude(enableInclude);
     ctx.setMaxPartialDepth(maxPartialDepth);
+    ctx.setCompat(compat);
     ctx.execute(instruction);
     return ctx;
   }
@@ -247,6 +251,30 @@ public class CompilerExecutor {
    */
   public CompilerExecutor maxPartialDepth(int depth) {
     this.maxPartialDepth = depth;
+    return this;
+  }
+
+  /**
+   * Sets the full compatibility level for this execution.
+   */
+  public CompilerExecutor compat(CompatLevel compat) {
+    this.compat = compat == null ? CompatLevel.defaultLevel() : compat;
+    return this;
+  }
+
+  /**
+   * Sets the compatibility level by number.
+   */
+  public CompilerExecutor compatLevel(int level) {
+    this.compat = compat.withLevel(level);
+    return this;
+  }
+
+  /**
+   * Forces a legacy behavior on for this execution, regardless of level.
+   */
+  public CompilerExecutor compatPatch(Patch patch) {
+    this.compat = compat.withPatch(patch);
     return this;
   }
 

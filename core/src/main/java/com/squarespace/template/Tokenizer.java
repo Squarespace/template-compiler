@@ -59,6 +59,7 @@ import com.squarespace.template.Instructions.InjectInst;
 import com.squarespace.template.Instructions.MacroInst;
 import com.squarespace.template.Instructions.PredicateInst;
 import com.squarespace.template.Instructions.VariableInst;
+import com.squarespace.template.compat.CompatLevel;
 
 
 /**
@@ -91,6 +92,8 @@ public class Tokenizer {
 
   boolean validate = false;
   boolean preprocess = false;
+
+  private CompatLevel compat = CompatLevel.defaultLevel();
 
   private int textLine;
   private int textOffset;
@@ -150,6 +153,20 @@ public class Tokenizer {
 
   public void setPreprocess() {
     this.preprocess = true;
+  }
+
+  /**
+   * Set the compatibility level for compile-time decisions.
+   */
+  public void setCompat(CompatLevel compat) {
+    this.compat = compat == null ? CompatLevel.defaultLevel() : compat;
+  }
+
+  /**
+   * The compatibility level for this compile.
+   */
+  public CompatLevel getCompat() {
+    return compat;
   }
 
   public List<ErrorInfo> getErrors() {
