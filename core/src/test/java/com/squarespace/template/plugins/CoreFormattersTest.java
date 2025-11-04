@@ -44,6 +44,8 @@ import com.squarespace.template.JsonUtils;
 import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.UnitTestBase;
+import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.CountFormatter;
 import com.squarespace.template.plugins.CoreFormatters.CycleFormatter;
@@ -607,6 +609,23 @@ public class CoreFormattersTest extends UnitTestBase {
 
     // Bad value defaults to 0
     assertFormatter(MOD, args, "\"abc\"", "0");
+
+    // Legacy, divisor 0 throws by zero at the default level.
+    try {
+      format(MOD, mk.args(" 0"), "7");
+      fail("expected ArithmeticException");
+    } catch (ArithmeticException e) {
+      // Expected
+    }
+
+    // Fixed, divisor 0 defaults to 2.
+    Context ctx = new Context(JsonUtils.decode("7"));
+    ctx.setCompat(CompatLevel.fixed());
+    Variables vars = new Variables("var", ctx.node());
+    MOD.apply(ctx, mk.args(" 0"), vars);
+    assertEquals(vars.first().node().asText(), "1");
+
+    runner.exec("f-mod-zero-%N.html");
   }
 
   @Test

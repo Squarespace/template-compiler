@@ -59,6 +59,7 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.plugins.FormatUtils.FormatArg;
 
 
@@ -731,6 +732,11 @@ public class CoreFormatters implements FormatterRegistry {
           divisor = Long.parseLong(arg, 10);
         } catch (NumberFormatException e) {
           // NOOP, default to divisor = 2
+        }
+        // Legacy, divisor 0 reaches the modulus and throws by zero.
+        // Fixed, a zero divisor defaults to 2 like bad input.
+        if (divisor == 0 && !ctx.compatEnabled(Patch.MOD_ZERO)) {
+          divisor = 2;
         }
       }
       Variable first = variables.first();
