@@ -16,6 +16,7 @@
 
 package com.squarespace.template.plugins;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 import java.util.Locale;
 
@@ -62,6 +63,24 @@ public class PluginUtilsTest {
   @Test
   public void testRemoveTags() {
     assertEquals(PluginUtils.removeTags("hi,<\nhello < >world"), "hi, world");
+  }
+
+  @Test
+  public void testTruncate() {
+    assertEquals(PluginUtils.truncate("abcdefghij", 3, "..."), "abc...");
+    assertEquals(PluginUtils.truncate("ab", 5, "..."), "ab");
+
+    // Legacy, a negative length throws on the released signature.
+    try {
+      PluginUtils.truncate("abcdefghij", -1, "...");
+      fail("expected StringIndexOutOfBoundsException");
+    } catch (StringIndexOutOfBoundsException e) {
+      // Expected
+    }
+
+    // Fixed, a negative length clamps to 0.
+    assertEquals(PluginUtils.truncate("abcdefghij", -1, "...", false), "...");
+    assertEquals(PluginUtils.truncate("abcdefghij", 3, "...", false), "abc...");
   }
 
 }

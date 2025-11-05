@@ -968,7 +968,9 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       TruncateArgs obj = (TruncateArgs)args.getOpaque();
-      String value = PluginUtils.truncate(var.node().asText(), obj.maxLen, obj.ellipses);
+      // Legacy, a negative length throws. Fixed, it clamps to 0.
+      String value = PluginUtils.truncate(var.node().asText(), obj.maxLen, obj.ellipses,
+          ctx.compatEnabled(Patch.TRUNCATE_NEGATIVE));
       var.set(value);
     }
   }

@@ -155,6 +155,17 @@ public class PluginUtils {
   }
 
   public static String truncate(String value, int maxLen, String ellipses) {
+    return truncate(value, maxLen, ellipses, true);
+  }
+
+  /**
+   * Truncate with the released behavior flag. When the flag is set a
+   * negative maxLen throws like the release. When clear it clamps to 0.
+   */
+  public static String truncate(String value, int maxLen, String ellipses, boolean legacyNegative) {
+    if (!legacyNegative) {
+      maxLen = Math.max(0, maxLen);
+    }
     if (value.length() <= maxLen) {
       return value;
     }
