@@ -487,6 +487,11 @@ public class Instructions {
 
     @Override
     public void invoke(Context ctx) throws CodeExecuteException {
+      // Refuse to run the instruction if expressions are disabled
+      if (!ctx.getEnableExpr()) {
+        return;
+      }
+
       List<String> errors;
 
       if (this.expr == null) {

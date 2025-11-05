@@ -37,4 +37,23 @@ public class CodeExecutorTest extends UnitTestBase {
     assertEquals(ctx.buffer().toString(), "albert-123");
   }
 
+  @Test
+  public void testEvalInstGatedByEnableExpr() throws CodeException {
+    // Expr is on by default. Eval must run and emit the result.
+    Context ctx = compiler().newExecutor()
+        .template("{.eval 2*3}")
+        .json("{}")
+        .execute();
+    assertEquals(ctx.buffer().toString(), "6");
+
+    // Turn expr off. Eval must do nothing: no output, no errors.
+    ctx = compiler().newExecutor()
+        .template("{.eval 2*3}")
+        .json("{}")
+        .enableExpr(false)
+        .execute();
+    assertEquals(ctx.buffer().toString(), "");
+    assertEquals(ctx.getErrors().size(), 0);
+  }
+
 }
