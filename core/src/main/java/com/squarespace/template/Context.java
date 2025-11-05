@@ -95,7 +95,7 @@ public class Context {
 
   private CodeLimiter codeLimiter = new NoopCodeLimiter();
 
-  private boolean enableExpr = false;
+  private boolean enableExpr = true;
   private ExprOptions exprOptions = null;
   private boolean enableInclude = false;
 

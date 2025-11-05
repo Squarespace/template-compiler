@@ -43,7 +43,7 @@ public class CompilerExecutor {
   private CodeLimiter codeLimiter;
   private boolean safeExecution;
   private boolean preprocess;
-  private boolean enableExpr;
+  private boolean enableExpr = true;
   private boolean enableInclude;
   private ExprOptions exprOptions;
   private int maxPartialDepth = Constants.DEFAULT_MAX_PARTIAL_DEPTH;
