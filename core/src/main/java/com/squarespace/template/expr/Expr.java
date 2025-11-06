@@ -182,11 +182,20 @@ public class Expr {
    * of the last expression as output.
    */
   public JsonNode reduce(Context ctx) {
+    return reduce(ctx, null);
+  }
+
+  /**
+   * Reduce the expressions, applying limits from the given options. When
+   * options is null the limits configured at construction time apply.
+   */
+  public JsonNode reduce(Context ctx, ExprOptions options) {
+    int maxStringLen = (options == null) ? this.maxStringLen : options.maxStringLen();
     int len = this.expr.size();
     JsonNode r = null;
     for (int i = 0; i < len; i++) {
       List<Token> expr = this.expr.get(i);
-      r = this.reduceExpr(ctx, expr);
+      r = this.reduceExpr(ctx, expr, maxStringLen);
     }
     return r;
   }
@@ -195,6 +204,10 @@ public class Expr {
    * Reduce an expression to its simplest form.
    */
   public JsonNode reduceExpr(Context ctx, List<Token> expr) {
+    return reduceExpr(ctx, expr, this.maxStringLen);
+  }
+
+  private JsonNode reduceExpr(Context ctx, List<Token> expr, int maxStringLen) {
     Stack<Token> stack = new Stack<>();
 
     loop: for (Token t : expr) {
@@ -326,9 +339,9 @@ public class Expr {
                 String _a = asstr(a);
                 String _b = asstr(b);
                 // Ensure a concatenated string won't exceed the configured limit.
-                if (this.maxStringLen > 0 && (_a.length() + _b.length() > this.maxStringLen)) {
+                if (maxStringLen > 0 && (_a.length() + _b.length() > maxStringLen)) {
                   ErrorInfo error = ctx.error(ExecuteErrorType.EXPRESSION_REDUCE)
-                      .data("Concatenation would exceed maximum string length " + this.maxStringLen);
+                      .data("Concatenation would exceed maximum string length " + maxStringLen);
                   ctx.addError(error);
                   break loop;
                 }

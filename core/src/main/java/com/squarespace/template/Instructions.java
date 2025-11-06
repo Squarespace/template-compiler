@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.expr.Expr;
+import com.squarespace.template.expr.ExprOptions;
 import com.squarespace.template.expr.Formats;
 import com.squarespace.template.expr.Tokens;
 
@@ -442,9 +443,10 @@ public class Instructions {
 
     /**
      * Parsed and assembled expression, ready for evaluation.
-     * The expression is parsed the first time it executes.
+     * Built eagerly at construction time so the instruction is
+     * immutable and safe to share across threads.
      */
-    private Expr expr;
+    private final Expr expr;
 
     public EvalInst(String raw) {
       this.debug = raw.startsWith("#");
@@ -452,6 +454,11 @@ public class Instructions {
         raw = raw.substring(1);
       }
       this.raw = raw;
+      // Build the expression now, before the instruction can be shared
+      // between contexts. No context exists here, so default options
+      // apply. Limits configured on a context are enforced in invoke().
+      this.expr = new Expr(raw, null);
+      this.expr.build();
     }
 
     /**
@@ -492,30 +499,13 @@ public class Instructions {
         return;
       }
 
-      List<String> errors;
-
-      if (this.expr == null) {
-
-        // Construct the expression. This tokenizes the input.
-        this.expr = new Expr(this.raw, ctx.getExprOptions());
-
-        // Build the expression. This assembles the expression in
-        // reverse polish notation so it can be evaluated later.
-        this.expr.build();
-
-        // Check if the expression has a parse error and emit it.
-        errors = this.expr.errors();
-        if (!errors.isEmpty()) {
-          for (String error : errors) {
-            ErrorInfo info = ctx.error(ExecuteErrorType.EXPRESSION_PARSE)
-                .data(error);
-            ctx.addError(info);
-          }
-        }
-      } else {
-        // Repeated evaluations, get a reference to the expression's
-        // errors list.
-        errors = this.expr.errors();
+      // The expression was built eagerly at construction time, so the
+      // parse errors are fixed. Each execution reports them.
+      List<String> errors = this.expr.errors();
+      for (String error : errors) {
+        ErrorInfo info = ctx.error(ExecuteErrorType.EXPRESSION_PARSE)
+            .data(error);
+        ctx.addError(info);
       }
 
       if (debug) {
@@ -523,10 +513,25 @@ public class Instructions {
         Tokens.debug(this.expr.expressions(), ctx.buffer());
       }
 
+      // The eager build used default options, since no context exists at
+      // construction time. Check the limits configured on the context here,
+      // per execution.
+      boolean tokenLimitHit = false;
+      ExprOptions options = ctx.getExprOptions();
+      if (options != null && errors.isEmpty()) {
+        int maxTokens = options.maxTokens();
+        if (maxTokens > 0 && this.expr.tokens().length() > maxTokens) {
+          ErrorInfo info = ctx.error(ExecuteErrorType.EXPRESSION_PARSE)
+              .data("Expression exceeds the maximum number of allowed tokens: " + maxTokens);
+          ctx.addError(info);
+          tokenLimitHit = true;
+        }
+      }
+
       // Evaluate the expression against the current context and append
       // any output. We only attempt to reduce the expression if there
-      // were no parse errors.
-      if (errors.isEmpty()) {
+      // were no parse errors and the token limit was not hit.
+      if (errors.isEmpty() && !tokenLimitHit) {
         // Track the error count to detect if reduce produces an error.
         int errs = errors.size();
 
@@ -536,7 +541,7 @@ public class Instructions {
         ctx.push(ctx.node());
 
         // Reduce the expression
-        JsonNode result = this.expr.reduce(ctx);
+        JsonNode result = this.expr.reduce(ctx, options);
 
         // Collect all local variables created by the expression.
         Map<String, JsonNode> vars = ctx.frame().getVars();

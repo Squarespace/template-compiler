@@ -17,11 +17,18 @@
 package com.squarespace.template;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.squarespace.template.Instructions.RootInst;
 import com.squarespace.template.plugins.CorePredicates;
@@ -207,6 +214,52 @@ public class CodeExecuteTest extends UnitTestBase {
     value = "123.0";
     node = new DecimalNode(new BigDecimal(value));
     assertContext(execute(node, root), value);
+  }
+
+  @Test
+  public void testEvalSharedCompiledTemplate() throws Exception {
+    // Compile once and share the code across many concurrent executions.
+    // The expression is built in the constructor, so all threads that
+    // share the compiled template evaluate the same complete expression.
+    Compiler compiler = compiler();
+    CompiledTemplate compiled = compiler.compile("{.eval a + 40}", false, false);
+    JsonNode json = this.json("{\"a\": 4}");
+
+    final int threads = 16;
+    final int perThread = 20000;
+    ExecutorService pool = Executors.newFixedThreadPool(threads);
+    CountDownLatch start = new CountDownLatch(1);
+    CountDownLatch done = new CountDownLatch(threads);
+    final AtomicLong dropped = new AtomicLong();
+    for (int t = 0; t < threads; t++) {
+      pool.submit(() -> {
+        try {
+          start.await();
+          for (int i = 0; i < perThread; i++) {
+            try {
+              Context ctx = compiler.newExecutor()
+                  .code(compiled.code())
+                  .json(json)
+                  .enableExpr(true)
+                  .execute();
+              if (!"44".equals(ctx.buffer().toString()) || !ctx.getErrors().isEmpty()) {
+                dropped.incrementAndGet();
+              }
+            } catch (CodeException e) {
+              dropped.incrementAndGet();
+            }
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        } finally {
+          done.countDown();
+        }
+      });
+    }
+    start.countDown();
+    assertTrue(done.await(300, TimeUnit.SECONDS));
+    pool.shutdown();
+    assertEquals(dropped.get(), 0L);
   }
 
 }
