@@ -40,10 +40,14 @@ import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.Predicate;
 import com.squarespace.template.SyntaxErrorType;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.UnitTestBase;
+import com.squarespace.template.compat.CompatLevel;
 
 
 public class CorePredicatesTest extends UnitTestBase {
+
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), CorePredicatesTest.class);
 
   @Test
   public void testDebug() throws CodeException {
@@ -199,6 +203,37 @@ public class CorePredicatesTest extends UnitTestBase {
     assertFalse(LESS_THAN_OR_EQUAL, context("3.1415"), mk.args(" 3.1"));
     assertFalse(LESS_THAN_OR_EQUAL, context("\"z\""), mk.args(" \"j\""));
     assertFalse(LESS_THAN_OR_EQUAL, context("{}"), mk.args(" 3 2"));
+  }
+
+  @Test
+  public void testCompareTotalOrder() throws CodeException {
+    CodeMaker mk = maker();
+
+    // Legacy, the released order at the default level.
+    // A fractional right operand is truncated to long.
+    assertTrue(GREATER_THAN_OR_EQUAL, context("2"), mk.args(" 2 2.5"));
+    assertFalse(LESS_THAN, context("2"), mk.args(" 2 2.001"));
+    // Text vs number compares lexicographic.
+    assertTrue(GREATER_THAN, context("\"5\""), mk.args(" \"5\" 40"));
+    assertFalse(LESS_THAN, context("\"5\""), mk.args(" \"5\" 40"));
+    // equal? keeps strict node equality, no cross-type coercion.
+    assertFalse(EQUAL, context("2"), mk.args(" 2 2.0"));
+    assertTrue(EQUAL, context("2"), mk.args(" 2 2"));
+
+    // Fixed, a total order at the patch threshold.
+    Context fixed = context("2");
+    fixed.setCompat(CompatLevel.fixed());
+    assertFalse(GREATER_THAN_OR_EQUAL, fixed, mk.args(" 2 2.5"));
+    assertTrue(LESS_THAN, fixed, mk.args(" 2 2.001"));
+    // Text ranks below numbers, so this is never lexicographic.
+    assertFalse(GREATER_THAN, fixed, mk.args(" \"5\" 40"));
+    assertTrue(GREATER_THAN, fixed, mk.args(" 40 \"5\""));
+    assertTrue(LESS_THAN, fixed, mk.args(" \"5\" 40"));
+    // 1-arg form compares the current node against the argument.
+    assertFalse(GREATER_THAN_OR_EQUAL, fixed, mk.args(" 2.5"));
+    assertTrue(LESS_THAN, fixed, mk.args(" 2.001"));
+
+    runner.exec("f-compare-total-order-%N.html");
   }
 
   @Test

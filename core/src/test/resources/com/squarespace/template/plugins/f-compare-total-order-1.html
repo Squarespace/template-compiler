@@ -1,0 +1,14 @@
+:TEMPLATE
+{.greaterThanOrEqual? 2 2.5}A{.end}
+{.greaterThan? "5" 40}B{.end}
+{.lessThan? 2 2.001}C{.end}
+{.section n}{.greaterThanOrEqual? 2.5}D{.end}{.end}
+
+:JSON
+{"n": 2}
+
+:OUTPUT
+A
+B
+
+D

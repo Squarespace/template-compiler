@@ -74,21 +74,97 @@ public class JsonUtils {
    *          is less than, equal to, or greater than the specified object.
    */
   public static int compare(JsonNode left, JsonNode right) {
-    if (left.isLong() || left.isInt()) {
-      return Long.compare(left.asLong(), right.asLong());
+    return compare(left, right, true);
+  }
 
-    } else if (left.isDouble() || left.isFloat()) {
-      return Double.compare(left.asDouble(), right.asDouble());
+  /**
+   * Compare two JsonNode values with the released behavior flag. Returns a
+   * negative, zero, or positive int when left is less than, equal to, or
+   * greater than right.
+   *
+   * When the flag is set the released order applies, which is not a total
+   * order over mixed types. When clear a total order applies:
+   * 1. number vs number: exact numeric order via BigDecimal, never
+   *    truncated or rounded. NaN sorts before every finite number, and
+   *    NaN equals NaN.
+   * 2. text vs text: lexicographic code-unit order (no locale).
+   * 3. boolean vs boolean: false < true.
+   * 4. mixed types: fixed type rank, missing/null (0) < text (1) < number
+   *    (2) < boolean (3) < composite (4). So "5" < 40, never lexicographic.
+   * 5. same rank otherwise: null and missing both mean "nothing" and are
+   *    equal; composites (objects, arrays) have no natural order and fall
+   *    back to node equality.
+   */
+  public static int compare(JsonNode left, JsonNode right, boolean legacyOrder) {
+    if (legacyOrder) {
+      // Legacy, the exact code the release shipped.
+      if (left.isLong() || left.isInt()) {
+        return Long.compare(left.asLong(), right.asLong());
 
-    } else if (left.isTextual()) {
-      return left.asText().compareTo(right.asText());
+      } else if (left.isDouble() || left.isFloat()) {
+        return Double.compare(left.asDouble(), right.asDouble());
 
-    } else if (left.isBoolean()) {
-      return Boolean.compare(left.asBoolean(), right.asBoolean());
+      } else if (left.isTextual()) {
+        return left.asText().compareTo(right.asText());
+
+      } else if (left.isBoolean()) {
+        return Boolean.compare(left.asBoolean(), right.asBoolean());
+      }
+
+      // Not comparable in a relative sense, default to equals.
+      return left.equals(right) ? 0 : -1;
     }
 
-    // Not comparable in a relative sense, default to equals.
+    if (left.isNumber() && right.isNumber()) {
+      return compareNumbers(left, right);
+    }
+    if (left.isTextual() && right.isTextual()) {
+      return left.asText().compareTo(right.asText());
+    }
+    if (left.isBoolean() && right.isBoolean()) {
+      return Boolean.compare(left.asBoolean(), right.asBoolean());
+    }
+    int leftRank = typeRank(left);
+    int rightRank = typeRank(right);
+    if (leftRank != rightRank) {
+      return leftRank < rightRank ? -1 : 1;
+    }
+    if (leftRank == 0) {
+      return 0;
+    }
     return left.equals(right) ? 0 : -1;
+  }
+
+  /**
+   * Compare two numbers. NaN is not a valid JSON value and BigDecimal
+   * cannot hold it, so NaN orders before every finite number.
+   */
+  private static int compareNumbers(JsonNode left, JsonNode right) {
+    boolean leftNaN = left.isFloatingPointNumber() && Double.isNaN(left.asDouble());
+    boolean rightNaN = right.isFloatingPointNumber() && Double.isNaN(right.asDouble());
+    if (leftNaN || rightNaN) {
+      return leftNaN == rightNaN ? 0 : (leftNaN ? -1 : 1);
+    }
+    return left.decimalValue().compareTo(right.decimalValue());
+  }
+
+  /**
+   * Fixed rank for a node's type, used to order mixed-type pairs.
+   */
+  private static int typeRank(JsonNode node) {
+    if (node.isNull() || node.isMissingNode()) {
+      return 0;
+    }
+    if (node.isTextual()) {
+      return 1;
+    }
+    if (node.isNumber()) {
+      return 2;
+    }
+    if (node.isBoolean()) {
+      return 3;
+    }
+    return 4;
   }
 
 }

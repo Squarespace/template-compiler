@@ -37,6 +37,7 @@ import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.VariableRef;
+import com.squarespace.template.compat.Patch;
 
 
 public class CorePredicates implements PredicateRegistry {
@@ -197,9 +198,9 @@ public class CorePredicates implements PredicateRegistry {
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode arg0 = resolve(ctx, args, 0);
       if (args.count() == 1) {
-        return JsonUtils.compare(ctx.node(), arg0) > 0;
+        return JsonUtils.compare(ctx.node(), arg0, ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) > 0;
       }
-      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) > 0;
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1), ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) > 0;
     }
 
   };
@@ -216,9 +217,9 @@ public class CorePredicates implements PredicateRegistry {
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode arg0 = resolve(ctx, args, 0);
       if (args.count() == 1) {
-        return JsonUtils.compare(ctx.node(), arg0) >= 0;
+        return JsonUtils.compare(ctx.node(), arg0, ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) >= 0;
       }
-      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) >= 0;
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1), ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) >= 0;
     }
 
   };
@@ -235,9 +236,9 @@ public class CorePredicates implements PredicateRegistry {
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode arg0 = resolve(ctx, args, 0);
       if (args.count() == 1) {
-        return JsonUtils.compare(ctx.node(), arg0) < 0;
+        return JsonUtils.compare(ctx.node(), arg0, ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) < 0;
       }
-      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) < 0;
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1), ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) < 0;
     }
 
   };
@@ -254,9 +255,9 @@ public class CorePredicates implements PredicateRegistry {
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
       JsonNode arg0 = resolve(ctx, args, 0);
       if (args.count() == 1) {
-        return JsonUtils.compare(ctx.node(), arg0) <= 0;
+        return JsonUtils.compare(ctx.node(), arg0, ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) <= 0;
       }
-      return JsonUtils.compare(arg0, resolve(ctx, args, 1)) <= 0;
+      return JsonUtils.compare(arg0, resolve(ctx, args, 1), ctx.compatEnabled(Patch.COMPARE_TOTAL_ORDER)) <= 0;
     }
 
   };
