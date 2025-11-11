@@ -173,12 +173,28 @@ public class CoreFormatters implements FormatterRegistry {
       // barrier checks if we're currently executing a given partial.  If so, we refuse to
       // execute it a second time and return a missing node.  Otherwise we execute the partial
       // template and return the result.
-      if (ctx.enterPartial(name)) {
-        var.set(executeTemplate(ctx, inst, var.node(), privateContext, argvar));
+      if (ctx.compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
+        // Legacy, the depth is released even on a breach and is not released
+        // when the partial throws.
+        if (ctx.enterPartial(name)) {
+          var.set(executeTemplate(ctx, inst, var.node(), privateContext, argvar));
+        } else {
+          var.setMissing();
+        }
+        ctx.exitPartial(name);
       } else {
-        var.setMissing();
+        // Fixed, the depth is released only when it was taken and the release
+        // happens even when the partial throws.
+        if (ctx.enterPartial(name)) {
+          try {
+            var.set(executeTemplate(ctx, inst, var.node(), privateContext, argvar));
+          } finally {
+            ctx.exitPartial(name);
+          }
+        } else {
+          var.setMissing();
+        }
       }
-      ctx.exitPartial(name);
     }
 
   }

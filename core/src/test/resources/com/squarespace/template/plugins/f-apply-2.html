@@ -1,0 +1,18 @@
+:PROPERTIES
+maxPartialDepth=1
+enableInclude=true
+
+:JSON
+{"out": {}, "out2": {}}
+
+:PARTIALS
+{
+  "pA": "{.include pB}",
+  "pB": "B",
+  "pC": "C"
+}
+
+:TEMPLATE
+{out|apply pA}{out2|apply pC}
+
+:OUTPUT

@@ -165,6 +165,17 @@ public class TestCaseParser extends UnitTestBase {
           executor.injectablesMap(injectMap);
         }
 
+        // An optional maxPartialDepth property lowers the recursion limit.
+        String maxDepth = properties.getProperty("maxPartialDepth");
+        if (maxDepth != null) {
+          executor.maxPartialDepth(Integer.valueOf(maxDepth.trim()));
+        }
+
+        // An optional enableInclude property turns on the include instruction.
+        String include = properties.getProperty("enableInclude");
+        if (include != null && Boolean.valueOf(include.trim())) {
+          executor.enableInclude(true);
+        }
 
         String locale = properties.getProperty("locale");
         if (locale != null) {

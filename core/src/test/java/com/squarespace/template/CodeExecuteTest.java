@@ -16,8 +16,11 @@
 
 package com.squarespace.template;
 
+import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
+import static com.squarespace.template.ExecuteErrorType.INCLUDE_PARTIAL_MISSING;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
@@ -31,6 +34,7 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.squarespace.template.Instructions.RootInst;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.CorePredicates;
 
 
@@ -260,6 +264,131 @@ public class CodeExecuteTest extends UnitTestBase {
     assertTrue(done.await(300, TimeUnit.SECONDS));
     pool.shutdown();
     assertEquals(dropped.get(), 0L);
+  }
+
+  @Test
+  public void testIncludePartialDepthBreach() throws CodeException {
+    String partials = "{\"pA\": \"{.include pB}\", \"pB\": \"B\", \"pC\": \"C\"}";
+    String template = "{.include pA}{.include pC output}";
+
+    // Released behavior. The breach inside pA leaks the depth counter, so
+    // the include of pC fails with a spurious depth error.
+    Context ctx = partialContext("{}", partials, true, CompatLevel.defaultLevel());
+    ctx.execute(compiler().compile(template, true, false, CompatLevel.defaultLevel()).code());
+    assertContext(ctx, "");
+    assertEquals(ctx.getErrors().size(), 2);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+    assertEquals(ctx.getErrors().get(1).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+
+    // Fixed behavior. Only the real breach is reported and pC includes fine.
+    ctx = partialContext("{}", partials, true, CompatLevel.at(1));
+    ctx.execute(compiler().compile(template, true, false, CompatLevel.at(1)).code());
+    assertContext(ctx, "C");
+    assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+  }
+
+  @Test
+  public void testApplyPartialDepthBreach() throws CodeException {
+    String partials = "{\"pA\": \"{.include pB}\", \"pB\": \"B\", \"pC\": \"C\"}";
+    String json = "{\"out\": {}, \"out2\": {}}";
+    String template = "{out|apply pA}{out2|apply pC}";
+
+    // Released behavior. The breach inside pA leaks the depth counter, so
+    // the apply of pC fails with a spurious depth error.
+    Context ctx = partialContext(json, partials, true, CompatLevel.defaultLevel());
+    ctx.execute(compiler().compile(template, true, false, CompatLevel.defaultLevel()).code());
+    assertContext(ctx, "");
+    assertEquals(ctx.getErrors().size(), 2);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+    assertEquals(ctx.getErrors().get(1).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+
+    // Fixed behavior. Only the real breach is reported and pC applies fine.
+    ctx = partialContext(json, partials, true, CompatLevel.at(1));
+    ctx.execute(compiler().compile(template, true, false, CompatLevel.at(1)).code());
+    assertContext(ctx, "C");
+    assertEquals(ctx.getErrors().size(), 1);
+    assertEquals(ctx.getErrors().get(0).getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+  }
+
+  @Test
+  public void testIncludePartialDepthAfterThrow() throws CodeException {
+    String partials = "{\"pA\": \"{.include missing}\", \"pC\": \"C\"}";
+
+    // The missing include inside pA throws in non-safe mode.
+    for (CompatLevel compat : new CompatLevel[] { CompatLevel.defaultLevel(), CompatLevel.at(1) }) {
+      Context ctx = partialContext("{}", partials, false, compat);
+      try {
+        ctx.execute(compiler().compile("{.include pA}", false, false, compat).code());
+        fail("Expected the missing include to throw");
+      } catch (CodeExecuteException e) {
+        assertEquals(e.getErrorInfo().getType(), INCLUDE_PARTIAL_MISSING);
+      }
+
+      // The next include should see a clean depth counter.
+      if (compat.level() == 0) {
+        // Released behavior. The leaked counter raises a spurious depth error.
+        try {
+          ctx.execute(compiler().compile("{.include pC}", false, false, compat).code());
+          fail("Expected the leaked depth counter to throw");
+        } catch (CodeExecuteException e) {
+          assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+        }
+      } else {
+        ctx.execute(compiler().compile("{.include pC output}", false, false, compat).code());
+        assertContext(ctx, "C");
+        assertEquals(ctx.getErrors().size(), 0);
+      }
+    }
+  }
+
+  @Test
+  public void testApplyPartialDepthAfterThrow() throws CodeException {
+    String partials = "{\"pA\": \"{.include missing}\", \"pC\": \"C\"}";
+    String json = "{\"out\": {}}";
+
+    // The missing include inside pA throws in non-safe mode.
+    for (CompatLevel compat : new CompatLevel[] { CompatLevel.defaultLevel(), CompatLevel.at(1) }) {
+      Context ctx = partialContext(json, partials, false, compat);
+      try {
+        ctx.execute(compiler().compile("{out|apply pA}", false, false, compat).code());
+        fail("Expected the missing include to throw");
+      } catch (CodeExecuteException e) {
+        assertEquals(e.getErrorInfo().getType(), INCLUDE_PARTIAL_MISSING);
+      }
+
+      // The next include should see a clean depth counter.
+      if (compat.level() == 0) {
+        // Released behavior. The leaked counter raises a spurious depth error.
+        try {
+          ctx.execute(compiler().compile("{.include pC}", false, false, compat).code());
+          fail("Expected the leaked depth counter to throw");
+        } catch (CodeExecuteException e) {
+          assertEquals(e.getErrorInfo().getType(), APPLY_PARTIAL_RECURSION_DEPTH);
+        }
+      } else {
+        ctx.execute(compiler().compile("{.include pC output}", false, false, compat).code());
+        assertContext(ctx, "C");
+        assertEquals(ctx.getErrors().size(), 0);
+      }
+    }
+  }
+
+  /**
+   * Build a context with a compiler, the given partials, a depth limit of
+   * one, and includes enabled.
+   */
+  private Context partialContext(String jsonText, String partialsText, boolean safe, CompatLevel compat) {
+    Context ctx = new Context(JsonUtils.decode(jsonText));
+    ctx.setCompiler(compiler());
+    ctx.setPartials(JsonUtils.decode(partialsText));
+    ctx.setMaxPartialDepth(1);
+    ctx.setEnableInclude(true);
+    if (safe) {
+      ctx.setSafeExecution();
+    }
+    ctx.setCompat(compat);
+    return ctx;
   }
 
 }

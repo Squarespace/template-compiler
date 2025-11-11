@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.expr.Expr;
 import com.squarespace.template.expr.ExprOptions;
 import com.squarespace.template.expr.Formats;
@@ -805,22 +806,37 @@ public class Instructions {
 
       // Execute the partial or macro inline.
       if (ctx.enterPartial(name)) {
-        InstructionType type = code.getType();
-        switch (type) {
-          case ROOT:
-            ((RootInst)code).invoke(ctx);
-            break;
-          case MACRO:
-            ((MacroInst)code).root().invoke(ctx);
-            break;
-          default:
-            break;
+        if (ctx.compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
+          // Legacy, the depth is released only when the partial finishes
+          // without throwing.
+          invokePartial(ctx, code);
+          ctx.exitPartial(name);
+        } else {
+          // Fixed, the depth is released even when the partial throws.
+          try {
+            invokePartial(ctx, code);
+          } finally {
+            ctx.exitPartial(name);
+          }
         }
-        ctx.exitPartial(name);
       }
 
       if (!output && buf != null) {
         ctx.swapBuffer(buf);
+      }
+    }
+
+    private void invokePartial(Context ctx, Instruction code) throws CodeExecuteException {
+      InstructionType type = code.getType();
+      switch (type) {
+        case ROOT:
+          ((RootInst)code).invoke(ctx);
+          break;
+        case MACRO:
+          ((MacroInst)code).root().invoke(ctx);
+          break;
+        default:
+          break;
       }
     }
 

@@ -433,9 +433,25 @@ public class Context {
    * all recursion as an error.
    */
   public boolean enterPartial(String name) throws CodeExecuteException {
-    // Limit maximum partial recursion depth
-    partialDepth++;
-    if (partialDepth > maxPartialDepth) {
+    if (compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
+      // Legacy, the counter is incremented before the depth check. A breach
+      // leaves it elevated and a later include fails with a spurious error.
+      partialDepth++;
+      if (partialDepth > maxPartialDepth) {
+        ErrorInfo error = error(APPLY_PARTIAL_RECURSION_DEPTH)
+            .name(name)
+            .data(maxPartialDepth);
+        if (safeExecution) {
+          addError(error);
+          return false;
+        } else {
+          throw new CodeExecuteException(error);
+        }
+      }
+      return true;
+    }
+    // Fixed, the depth is checked first so a breach does not move the counter.
+    if (partialDepth >= maxPartialDepth) {
       ErrorInfo error = error(APPLY_PARTIAL_RECURSION_DEPTH)
           .name(name)
           .data(maxPartialDepth);
@@ -446,6 +462,7 @@ public class Context {
         throw new CodeExecuteException(error);
       }
     }
+    partialDepth++;
     return true;
   }
 
