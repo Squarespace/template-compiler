@@ -50,6 +50,7 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
 
@@ -357,7 +358,7 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     private static void resolveTemplateVariablesForOTPProduct(Context ctx, JsonNode productNode, ObjectNode args) {
-      if (CommerceUtils.hasVariedPrices(productNode)) {
+      if (CommerceUtils.hasVariedPrices(productNode, ctx.compatEnabled(Patch.VARIED_PRICES_NON_ARRAY))) {
         args.put("fromText", StringUtils.defaultIfEmpty(
             ctx.resolve(Constants.PRODUCT_PRICE_FROM_TEXT_KEY).asText(), "from {fromPrice}"));
         args.put("formattedFromPrice", CommerceUtils.getMoneyString(CommerceUtils.getLowestPriceAmongVariants(productNode), ctx));
@@ -383,7 +384,7 @@ public class CommerceFormatters implements FormatterRegistry {
         return;
       }
 
-      boolean hasMultiplePrices = CommerceUtils.hasVariedPrices(productNode);
+      boolean hasMultiplePrices = CommerceUtils.hasVariedPrices(productNode, ctx.compatEnabled(Patch.VARIED_PRICES_NON_ARRAY));
       int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
       String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
 
@@ -418,7 +419,7 @@ public class CommerceFormatters implements FormatterRegistry {
 
       String templateForPrice = StringUtils.defaultIfEmpty(
           ctx.resolve(new String[] {"localizedStrings",
-              i18nKeyBuilder.toString()}).asText(), defaultSubscriptionPriceString(productNode));
+              i18nKeyBuilder.toString()}).asText(), defaultSubscriptionPriceString(ctx, productNode));
 
       if (hasMultiplePrices) {
         args.put("fromText", templateForPrice);
@@ -435,10 +436,10 @@ public class CommerceFormatters implements FormatterRegistry {
     }
 
     // TODO: This is shitty. The formatter should, if necessary, look up the English string and use it.
-    private static String defaultSubscriptionPriceString(JsonNode productNode) {
+    private static String defaultSubscriptionPriceString(Context ctx, JsonNode productNode) {
       JsonNode billingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(productNode);
 
-      boolean hasMultiplePrices = CommerceUtils.hasVariedPrices(productNode);
+      boolean hasMultiplePrices = CommerceUtils.hasVariedPrices(productNode, ctx.compatEnabled(Patch.VARIED_PRICES_NON_ARRAY));
       int billingPeriodValue = CommerceUtils.getValueFromSubscriptionPlanBillingPeriod(billingPeriodNode);
       boolean billingPeriodPlural = billingPeriodValue > 1;
       String billingPeriodUnit = CommerceUtils.getUnitFromSubscriptionPlanBillingPeriod(billingPeriodNode);
@@ -493,7 +494,7 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode pricingOptions = CommerceUtils.getPricingOptionsAmongLowestVariant(node);
 
       if (pricingOptions != null && pricingOptions.size() > 0) {
-        if (CommerceUtils.hasVariedPrices(node)) {
+        if (CommerceUtils.hasVariedPrices(node, ctx.compatEnabled(Patch.VARIED_PRICES_NON_ARRAY))) {
           // This will return either salePriceMoney or priceMoney depending on whether the onSale is true or false.
           // That's because this block here is the from {price} so the from price needs to be the lowest possible price
           // taking into if a variant is onSale.

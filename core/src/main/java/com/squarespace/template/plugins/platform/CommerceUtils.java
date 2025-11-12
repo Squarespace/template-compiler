@@ -305,6 +305,17 @@ public class CommerceUtils {
   }
 
   public static boolean hasVariedPrices(JsonNode item) {
+    return hasVariedPrices(item, true);
+  }
+
+  /**
+   * Check for varied prices with the released behavior flag.
+   *
+   * When the flag is set, an object variants node with two or more
+   * fields throws. When clear, a non-array variants node is treated
+   * like missing or empty and returns false.
+   */
+  public static boolean hasVariedPrices(JsonNode item, boolean legacyNonArray) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
 
@@ -313,6 +324,12 @@ public class CommerceUtils {
       case SERVICE:
       case GIFT_CARD:
         JsonNode variants = structuredContent.path("variants");
+        if (!legacyNonArray && !variants.isArray()) {
+          // Fixed, non-array variants means no varied prices.
+          return false;
+        }
+        // The released code below throws when an object variants node has
+        // two or more fields, kept as shipped for the legacy flag.
         JsonNode first = variants.get(0);
         for (int i = 1; i < variants.size(); i++) {
           JsonNode var = variants.get(i);

@@ -196,6 +196,12 @@ public enum Patch {
   CART_QUANTITY_MISSING(2),
 
   /**
+   * varied-prices? throws when variants is an object with two or more
+   * fields instead of an array.
+   */
+  VARIED_PRICES_NON_ARRAY(2),
+
+  /**
    * A null timeZone renders as the text null and fails the zone lookup.
    */
   TIMEZONE_NULL_LITERAL(3),

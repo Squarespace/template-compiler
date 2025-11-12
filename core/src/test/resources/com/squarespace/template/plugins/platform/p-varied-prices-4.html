@@ -1,0 +1,20 @@
+:PROPERTIES
+level=2
+
+:JSON
+{
+  "productType": 1,
+  "structuredContent": {
+    "productType": 1,
+    "variants": [
+      { "price": 100 },
+      { "price": 200 }
+    ]
+  }
+}
+
+:TEMPLATE
+[{.varied-prices?}y{.or}n{.end}]
+
+:OUTPUT
+[y]

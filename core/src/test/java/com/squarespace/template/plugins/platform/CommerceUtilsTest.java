@@ -25,6 +25,7 @@ import static com.squarespace.template.plugins.platform.CommerceUtils.isMultiple
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,29 @@ public class CommerceUtilsTest extends UnitTestBase {
         assertFalse(hasVariedPrices(entry.getValue()), key);
       }
     }
+  }
+
+  @Test
+  public void testHasVariedPricesNonArrayVariants() {
+    JsonNode item = json("{\"productType\":1,\"structuredContent\":{\"productType\":1,\"variants\":{\"a\":1,\"b\":2}}}");
+
+    // Legacy, the released signature throws on an object variants node
+    // with two or more fields.
+    try {
+      hasVariedPrices(item);
+      fail("expected NullPointerException");
+    } catch (NullPointerException e) {
+      // Expected
+    }
+
+    // Fixed, a non-array variants node is treated like missing or empty.
+    assertFalse(hasVariedPrices(item, false));
+
+    // Fixed, well-formed arrays keep the released verdicts.
+    JsonNode varied = json("{\"structuredContent\":{\"productType\":1,\"variants\":[{\"price\":100},{\"price\":200}]}}");
+    assertTrue(hasVariedPrices(varied, false));
+    JsonNode same = json("{\"structuredContent\":{\"productType\":1,\"variants\":[{\"price\":100},{\"price\":100}]}}");
+    assertFalse(hasVariedPrices(same, false));
   }
 
   @Test

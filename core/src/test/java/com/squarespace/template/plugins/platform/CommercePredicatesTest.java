@@ -16,9 +16,16 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeException;
+import com.squarespace.template.Context;
 import com.squarespace.template.TestSuiteRunner;
+import com.squarespace.template.compat.CompatLevel;
 
 
 public class CommercePredicatesTest extends PlatformUnitTestBase {
@@ -41,8 +48,37 @@ public class CommercePredicatesTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testVariedPrices() {
-    runner.run("p-varied-prices.html");
+  public void testVariedPrices() throws CodeException {
+    runner.run(
+        "p-varied-prices.html",
+        "p-varied-prices-2.html",
+        "p-varied-prices-3.html",
+        "p-varied-prices-4.html"
+        );
+
+    String malformed = "{\"productType\":1,\"structuredContent\":{\"productType\":1,\"variants\":{\"a\":1,\"b\":2}}}";
+
+    // Legacy, an object variants node with two or more fields throws at
+    // the default level and safe mode collects the throw.
+    Context legacy = compiler().newExecutor()
+        .template("{.varied-prices?}y{.or}n{.end}")
+        .json(malformed)
+        .safeExecution(true)
+        .execute();
+    assertContext(legacy, "");
+    assertEquals(legacy.getErrors().size(), 1);
+    assertEquals(legacy.getErrors().get(0).getType(), UNEXPECTED_ERROR);
+    assertTrue(legacy.getErrors().get(0).getMessage().contains("NullPointerException"));
+
+    // Fixed, the same input renders the false branch without error.
+    Context fixed = compiler().newExecutor()
+        .template("{.varied-prices?}y{.or}n{.end}")
+        .json(malformed)
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertContext(fixed, "n");
+    assertEquals(fixed.getErrors().size(), 0);
   }
 
 }

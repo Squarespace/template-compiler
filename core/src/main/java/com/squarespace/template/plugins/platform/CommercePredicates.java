@@ -24,6 +24,7 @@ import com.squarespace.template.Predicate;
 import com.squarespace.template.PredicateRegistry;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
+import com.squarespace.template.compat.Patch;
 
 
 /**
@@ -63,7 +64,7 @@ public class CommercePredicates implements PredicateRegistry {
   public static final Predicate VARIED_PRICES = new BasePredicate("varied-prices?", false) {
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
-      return CommerceUtils.hasVariedPrices(ctx.node());
+      return CommerceUtils.hasVariedPrices(ctx.node(), ctx.compatEnabled(Patch.VARIED_PRICES_NON_ARRAY));
     }
   };
 
