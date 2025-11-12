@@ -39,7 +39,9 @@ import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.plugins.PluginDateUtils;
+import com.squarespace.template.plugins.PluginUtils;
 
 
 /**
@@ -300,12 +302,27 @@ public class SocialFormatters implements FormatterRegistry {
       if (userName.equals("")) {
         String profileUrl = account.path("profileUrl").asText();
         String[] parts = StringUtils.split(profileUrl, '/');
-        userName = parts[parts.length - 1];
+        if (ctx.compatEnabled(Patch.TWITTER_BUTTON_USERNAME)) {
+          // Legacy, an empty profileUrl throws here.
+          userName = parts[parts.length - 1];
+        } else if (parts.length == 0) {
+          // Fixed, no username and no profileUrl, nothing to render.
+          var.setMissing();
+          return;
+        } else {
+          userName = parts[parts.length - 1];
+        }
       }
       buf.append("<script>Y.use('squarespace-follow-buttons', function(Y) { ");
       buf.append("Y.on('domready', function() { Y.Squarespace.FollowButtonUtils.renderAll(); }); });");
       buf.append("</script><div class=\"squarespace-follow-button\" data-username=\"");
-      buf.append(userName);
+      if (ctx.compatEnabled(Patch.TWITTER_BUTTON_USERNAME)) {
+        // Legacy, the username goes into the attribute unescaped.
+        buf.append(userName);
+      } else {
+        // Fixed, escape before writing into the attribute.
+        PluginUtils.escapeHtmlAttribute(userName, buf);
+      }
       buf.append("\"></div>");
       var.set(buf);
     }

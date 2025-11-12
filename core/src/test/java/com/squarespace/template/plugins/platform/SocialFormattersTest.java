@@ -17,16 +17,25 @@
 package com.squarespace.template.plugins.platform;
 
 
+import static com.squarespace.template.ExecuteErrorType.UNEXPECTED_ERROR;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
 import com.squarespace.template.CodeException;
+import com.squarespace.template.Constants;
+import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.KnownDates;
 import com.squarespace.template.TestSuiteRunner;
+import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.SocialFormatters.ActivateTwitterLinksFormatter;
 import com.squarespace.template.plugins.platform.SocialFormatters.GoogleCalendarUrlFormatter;
+import com.squarespace.template.plugins.platform.SocialFormatters.TwitterFollowButtonFormatter;
 
 
 /**
@@ -37,6 +46,8 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   private static final Formatter ACTIVATE_TWITTER_LINKS = new ActivateTwitterLinksFormatter();
 
   private static final Formatter GOOGLE_CALENDAR_URL = new GoogleCalendarUrlFormatter();
+
+  private static final Formatter TWITTER_FOLLOW_BUTTON = new TwitterFollowButtonFormatter();
 
   private static final long ONE_DAY = 86400 * 1000;
 
@@ -117,10 +128,52 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testTwitterFollowButton() {
+  public void testTwitterFollowButton() throws CodeException {
     runner.run(
         "f-twitter-follow-button-1.html",
-        "f-twitter-follow-button-2.html"
+        "f-twitter-follow-button-2.html",
+        "f-twitter-follow-button-3.html",
+        "f-twitter-follow-button-4.html",
+        "f-twitter-follow-button-5.html",
+        "f-twitter-follow-button-6.html"
         );
+
+    String empty = "{\"userName\": \"\", \"profileUrl\": \"\"}";
+
+    // Legacy, an empty username and profileUrl throws at the default level.
+    try {
+      format(TWITTER_FOLLOW_BUTTON, empty);
+      fail("expected ArrayIndexOutOfBoundsException");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      // Expected
+    }
+
+    // Legacy, safe mode at the default level collects the throw.
+    Context legacy = compiler().newExecutor()
+        .template("x {@|twitter-follow-button} x")
+        .json(empty)
+        .safeExecution(true)
+        .execute();
+    assertContext(legacy, "x  x");
+    assertEquals(legacy.getErrors().size(), 1);
+    assertEquals(legacy.getErrors().get(0).getType(), UNEXPECTED_ERROR);
+    assertTrue(legacy.getErrors().get(0).getMessage().contains("ArrayIndexOutOfBoundsException"));
+
+    // Fixed, an empty username and profileUrl renders nothing without error.
+    Context fixed = compiler().newExecutor()
+        .template("x {@|twitter-follow-button} x")
+        .json(empty)
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertContext(fixed, "x  x");
+    assertEquals(fixed.getErrors().size(), 0);
+
+    // Fixed, the username is escaped before it goes into the attribute.
+    Context ctx = new Context(JsonUtils.decode("{\"userName\": \"a\\\"b\"}"));
+    ctx.setCompat(CompatLevel.fixed());
+    Variables vars = new Variables("var", ctx.node());
+    TWITTER_FOLLOW_BUTTON.apply(ctx, Constants.EMPTY_ARGUMENTS, vars);
+    assertTrue(vars.first().node().asText().contains("data-username=\"a&quot;b\""));
   }
 }
