@@ -16,6 +16,7 @@
 package com.squarespace.template.plugins.platform.i18n;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -30,8 +31,10 @@ import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
+import com.squarespace.template.ExecuteErrorType;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -82,12 +85,61 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
   }
 
   @Test
-  public void testBadMoney() {
+  public void testBadMoney() throws CodeException {
     // Mixing up the serialized money
     ObjectNode m = JsonUtils.createObjectNode();
     m.put("currencyCode", "USD");
     m.put("value", "123.456");
     run(en_US, m.toString(), "", "");
+
+    String[] bad = {
+        "{\"decimalValue\":null,\"currencyCode\":\"USD\"}",
+        "{\"decimalValue\":\"not-a-number\",\"currencyCode\":\"USD\"}"
+    };
+
+    // Legacy, a null or non-numeric decimalValue throws at the default level.
+    for (String json : bad) {
+      try {
+        format(en_US, mk.args(""), json);
+        Assert.fail("expected IllegalArgumentException");
+      } catch (IllegalArgumentException e) {
+        // Expected
+      }
+    }
+
+    // Legacy, safe mode at the default level collects the throw.
+    Context legacy = compiler().newExecutor()
+        .template("[ {@|money} ]")
+        .json(bad[0])
+        .safeExecution(true)
+        .execute();
+    assertEquals(legacy.getErrors().size(), 1);
+    assertEquals(legacy.getErrors().get(0).getType(), ExecuteErrorType.UNEXPECTED_ERROR);
+    assertTrue(legacy.getErrors().get(0).getMessage().contains("IllegalArgumentException"));
+
+    // Fixed, a null or non-numeric decimalValue renders missing without error.
+    for (String json : bad) {
+      Context ctx = new Context(JsonUtils.decode(json));
+      ctx.javaLocale(Locale.US);
+      ctx.setCompat(CompatLevel.fixed());
+      MONEY.validateArgs(mk.args(""));
+      Variables variables = new Variables("@", ctx.node());
+      MONEY.apply(ctx, mk.args(""), variables);
+      assertTrue(variables.first().node().isMissingNode(), json);
+    }
+
+    // Fixed, the malformed input renders empty without error.
+    Context fixed = compiler().newExecutor()
+        .template("[ {@|money} ]")
+        .json(bad[0])
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0);
+    assertEquals(fixed.buffer().toString(), "[  ]");
+
+    // A valid decimalValue is unchanged.
+    run(en_US, "{\"decimalValue\":\"1.25\",\"currencyCode\":\"USD\"}", "", "$1.25");
   }
 
   @Test

@@ -52,7 +52,7 @@ public enum Patch {
   TWITTER_BUTTON_USERNAME(1),
 
   /**
-   * money throws when decimalValue is null or not a number.
+   * money and decimal throw when the value is null or not a number.
    */
   MONEY_BAD_DECIMAL(1),
 

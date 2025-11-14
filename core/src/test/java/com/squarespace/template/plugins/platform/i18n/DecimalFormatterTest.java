@@ -32,6 +32,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -58,6 +59,28 @@ public class DecimalFormatterTest extends PlatformUnitTestBase {
         // f-decimal-2 defunct
         "f-decimal-3.html"
     );
+  }
+
+  @Test
+  public void testBadDecimal() throws CodeException {
+    String json = "\"not-a-number\"";
+
+    // Legacy, a non-numeric string throws at the default level.
+    try {
+      format(EN_US, mk.args(""), json);
+      Assert.fail("expected IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    // Fixed, a non-numeric string renders missing without error.
+    Context ctx = new Context(JsonUtils.decode(json));
+    ctx.javaLocale(Locale.US);
+    ctx.setCompat(CompatLevel.fixed());
+    DECIMAL.validateArgs(mk.args(""));
+    Variables variables = new Variables("@", ctx.node());
+    DECIMAL.apply(ctx, mk.args(""), variables);
+    Assert.assertTrue(variables.first().node().isMissingNode());
   }
 
   @Test

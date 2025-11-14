@@ -29,6 +29,7 @@ import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.Patch;
 
 
 /**
@@ -69,7 +70,13 @@ public class MoneyFormatter extends BaseFormatter {
 
     CLDR cldr = ctx.cldr();
     String code = currencyNode.asText();
-    Decimal decimal = GeneralUtils.nodeToDecimal(decimalValue);
+    boolean legacyBadDecimal = ctx.compatEnabled(Patch.MONEY_BAD_DECIMAL);
+    Decimal decimal = GeneralUtils.nodeToDecimal(decimalValue, legacyBadDecimal);
+    if (decimal == null && !legacyBadDecimal) {
+      // Fixed, an unconvertible decimalValue renders missing.
+      var.setMissing();
+      return;
+    }
     CurrencyType currency = CurrencyType.fromString(code);
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
     String result = cldr.Numbers.formatCurrency(decimal, currency, opts);

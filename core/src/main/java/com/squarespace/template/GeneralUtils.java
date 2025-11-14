@@ -91,6 +91,18 @@ public class GeneralUtils {
    * conversion method.
    */
   public static Decimal nodeToDecimal(JsonNode node) {
+    return nodeToDecimal(node, true);
+  }
+
+  /**
+   * Convert an opaque JSON node to Decimal using the most correct
+   * conversion method, with the released behavior flag.
+   *
+   * When the flag is set, cldr's IllegalArgumentException on bad text
+   * propagates. When clear, it falls through to null like the other
+   * unconvertible types.
+   */
+  public static Decimal nodeToDecimal(JsonNode node, boolean legacyIae) {
     JsonNodeType type = node.getNodeType();
     if (type == JsonNodeType.NUMBER) {
       return numericToDecimal((NumericNode)node);
@@ -100,6 +112,12 @@ public class GeneralUtils {
         return new Decimal(node.asText());
       } catch (ArithmeticException | NumberFormatException e) {
         // Fall through..
+      } catch (IllegalArgumentException e) {
+        if (legacyIae) {
+          // Legacy, the release lets cldr's IAE propagate.
+          throw e;
+        }
+        // Fixed, fall through to null like the other unconvertible types.
       }
     }
     return null;

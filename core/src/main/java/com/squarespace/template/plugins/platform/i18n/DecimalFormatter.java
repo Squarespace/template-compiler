@@ -27,6 +27,7 @@ import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.Patch;
 
 
 /**
@@ -47,7 +48,7 @@ public class DecimalFormatter extends BaseFormatter {
   @Override
   public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
     Variable var = variables.first();
-    Decimal number = GeneralUtils.nodeToDecimal(var.node());
+    Decimal number = GeneralUtils.nodeToDecimal(var.node(), ctx.compatEnabled(Patch.MONEY_BAD_DECIMAL));
     if (number == null) {
       var.setMissing();
       return;
