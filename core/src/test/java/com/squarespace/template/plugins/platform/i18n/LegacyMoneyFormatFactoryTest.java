@@ -16,6 +16,8 @@ import static com.squarespace.template.plugins.platform.i18n.LegacyMoneyFormatFa
 import static com.squarespace.template.plugins.platform.i18n.LegacyMoneyFormatFactory.STARTS_WITH_LETTER;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormatSymbols;
+import java.util.Currency;
 import java.util.Locale;
 
 import org.testng.Assert;
@@ -26,9 +28,11 @@ import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
+import com.squarespace.template.ExecuteErrorType;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -109,6 +113,84 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
     Assert.assertFalse(ENDS_WITH_LETTER.matcher("Ch$").matches());
 
     Assert.assertTrue(ENDS_WITH_LETTER.matcher("kr").matches());
+  }
+
+  @Test
+  public void testJvmDefaultLocaleSymbols() throws Exception {
+    Locale original = Locale.getDefault();
+    Locale.setDefault(new Locale("fr", "FR"));
+    try {
+      // Legacy, a fr-FR JVM default locale throws for every target.
+      for (String target : new String[] { "en-US", "fr-FR" }) {
+        try {
+          legacy(target, "USD", "1234.56");
+          Assert.fail("expected IllegalArgumentException for " + target);
+        } catch (IllegalArgumentException e) {
+          Assert.assertTrue(e.getMessage().contains("Malformed pattern"), e.getMessage());
+        }
+      }
+
+      // Legacy, safe mode at the default level collects the throw.
+      Context legacyCtx = compiler().newExecutor()
+          .template("[ {@|i18n-money-format en-US} ]")
+          .json(moneyJson("1234.56", "USD").toString())
+          .safeExecution(true)
+          .execute();
+      Assert.assertEquals(legacyCtx.getErrors().size(), 1);
+      Assert.assertEquals(legacyCtx.getErrors().get(0).getType(), ExecuteErrorType.UNEXPECTED_ERROR);
+      Assert.assertTrue(legacyCtx.getErrors().get(0).getMessage().contains("IllegalArgumentException"));
+
+      // Fixed, the pattern parse does not read the JVM default locale.
+      Context ctx = new Context(moneyJson("1234.56", "USD"));
+      ctx.setCompat(CompatLevel.fixed());
+      Arguments args = mk.args(" en-US");
+      LEGACY_MONEY.validateArgs(args);
+      Variables variables = new Variables("@", ctx.node());
+      LEGACY_MONEY.apply(ctx, args, variables);
+      Assert.assertEquals(variables.first().node().asText(), "$1,234.56");
+
+      // Fixed, a comma decimal target formats correctly too.
+      ctx = new Context(moneyJson("1234.56", "EUR"));
+      ctx.setCompat(CompatLevel.fixed());
+      args = mk.args(" fr-FR");
+      LEGACY_MONEY.validateArgs(args);
+      variables = new Variables("@", ctx.node());
+      LEGACY_MONEY.apply(ctx, args, variables);
+      char grouping = new DecimalFormatSymbols(new Locale("fr", "FR")).getGroupingSeparator();
+      Assert.assertEquals(variables.first().node().asText(), "1" + grouping + "234,56\u20ac");
+
+      // Fixed, safe mode at the fixed level renders without error.
+      Context fixedCtx = compiler().newExecutor()
+          .template("[ {@|i18n-money-format en-US} ]")
+          .json(moneyJson("1234.56", "USD").toString())
+          .safeExecution(true)
+          .compat(CompatLevel.fixed())
+          .execute();
+      Assert.assertEquals(fixedCtx.getErrors().size(), 0);
+      Assert.assertEquals(fixedCtx.buffer().toString(), "[ $1,234.56 ]");
+    } finally {
+      Locale.setDefault(original);
+    }
+  }
+
+  @Test
+  public void testFixedMatchesReleasedOnDotDecimalJvm() throws Exception {
+    if (new DecimalFormatSymbols(Locale.getDefault()).getDecimalSeparator() != '.') {
+      // The legacy path throws off a dot decimal JVM, see the test above.
+      return;
+    }
+    for (String locale : LOCALES) {
+      for (String currency : CURRENCIES) {
+        for (String n : NUMBERS) {
+          Locale tag = Locale.forLanguageTag(locale);
+          Currency cur = Currency.getInstance(currency);
+          double value = Double.parseDouble(n);
+          String released = LegacyMoneyFormatFactory.create(tag, cur).format(value);
+          String fixed = LegacyMoneyFormatFactory.create(tag, cur, false).format(value);
+          Assert.assertEquals(fixed, released, locale + " " + currency + " " + n);
+        }
+      }
+    }
   }
 
   private String legacy(String locale, String currency, String number) throws CodeException {

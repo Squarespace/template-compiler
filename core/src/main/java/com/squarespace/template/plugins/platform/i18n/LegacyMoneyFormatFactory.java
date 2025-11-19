@@ -82,12 +82,37 @@ class LegacyMoneyFormatFactory {
   }
 
   static NumberFormat create(Locale locale, Currency currency) {
-    // The order of these lines matter! For instance, swapping lines 3 and 4 causes 2 decimal places to always be shown.
+    return create(locale, currency, true);
+  }
+
+  /**
+   * Create a currency format, with the released behavior flag.
+   *
+   * When the flag is set the pattern is parsed as a localized pattern,
+   * which reads the separator characters from the formatter's current
+   * symbols. Those are the JVM default locale's symbols at construction,
+   * so a JVM default locale without a dot decimal separator throws
+   * Malformed pattern for every target locale. When the flag is clear the
+   * pattern is parsed as a non-localized pattern with the standard dot
+   * and comma separators, so the parse does not depend on the JVM default
+   * locale.
+   */
+  static NumberFormat create(Locale locale, Currency currency, boolean legacyLocalizedPattern) {
     DecimalFormat formatter = new DecimalFormat();
     formatter.setCurrency(currency);
-    formatter.applyLocalizedPattern(getLocalizedPattern(locale, currency));
-    formatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
-    formatter.setDecimalFormatSymbols(getDecimalFormatSymbols(locale, currency));
+    if (legacyLocalizedPattern) {
+      // Legacy, the exact code the release shipped.
+      // The order of these lines matter! For instance, swapping lines 3 and 4
+      // causes 2 decimal places to always be shown.
+      formatter.applyLocalizedPattern(getLocalizedPattern(locale, currency));
+      formatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+      formatter.setDecimalFormatSymbols(getDecimalFormatSymbols(locale, currency));
+    } else {
+      // Fixed, the non-localized parse ignores the JVM default locale.
+      formatter.applyPattern(getLocalizedPattern(locale, currency));
+      formatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+      formatter.setDecimalFormatSymbols(getDecimalFormatSymbols(locale, currency));
+    }
     return formatter;
   }
 

@@ -29,6 +29,7 @@ import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.Patch;
 
 class LegacyMoneyFormatter extends BaseFormatter {
 
@@ -76,7 +77,8 @@ class LegacyMoneyFormatter extends BaseFormatter {
     Currency currency = getCurrency(node);
     double value = node.path(VALUE_FIELD_NAME).asDouble(0);
 
-    String result = LegacyMoneyFormatFactory.create(locale, currency).format(value);
+    String result = LegacyMoneyFormatFactory
+        .create(locale, currency, ctx.compatEnabled(Patch.MONEY_LOCALE_SYMBOLS)).format(value);
     var.set(result);
   }
 
