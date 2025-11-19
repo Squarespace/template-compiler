@@ -36,6 +36,7 @@ import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.plugins.PluginUtils;
 import com.squarespace.template.plugins.platform.enums.ProductType;
 
@@ -411,7 +412,16 @@ public class CommerceUtils {
    * Format money using legacy currency formatter
    */
   public static void writeLegacyMoneyString(Decimal value, StringBuilder buf) {
-    String formatted = PluginUtils.formatMoney(value, Locale.US);
+    writeLegacyMoneyString(value, buf, true);
+  }
+
+  /**
+   * Format money using the legacy currency formatter with the released
+   * behavior flag. When the flag is set the value goes through a double
+   * and loses precision on large values.
+   */
+  public static void writeLegacyMoneyString(Decimal value, StringBuilder buf, boolean legacyDouble) {
+    String formatted = PluginUtils.formatMoney(value, Locale.US, legacyDouble);
     buf.append("<span class=\"sqs-money-native\">").append(formatted).append("</span>");
   }
 
@@ -525,7 +535,7 @@ public class CommerceUtils {
     } else {
       Decimal legacyAmount = CommerceUtils.getLegacyPriceFromMoneyNode(moneyNode);
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeLegacyMoneyString(legacyAmount, buf);
+      CommerceUtils.writeLegacyMoneyString(legacyAmount, buf, ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING));
       return buf.toString();
     }
   }

@@ -15,6 +15,7 @@
  */
 package com.squarespace.template.plugins.platform.i18n;
 
+import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -75,7 +76,22 @@ class LegacyMoneyFormatter extends BaseFormatter {
 
     Locale locale = (Locale) args.getOpaque();
     Currency currency = getCurrency(node);
-    double value = node.path(VALUE_FIELD_NAME).asDouble(0);
+
+    if (ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING)) {
+      // Legacy, formats through a double and loses precision on large values.
+      double value = node.path(VALUE_FIELD_NAME).asDouble(0);
+      var.set(LegacyMoneyFormatFactory
+          .create(locale, currency, ctx.compatEnabled(Patch.MONEY_LOCALE_SYMBOLS)).format(value));
+      return;
+    }
+    // Fixed, formats the exact decimal value.
+    BigDecimal value;
+    try {
+      value = new BigDecimal(node.path(VALUE_FIELD_NAME).asText());
+    } catch (NumberFormatException e) {
+      // Missing, null or non-numeric input renders as zero, like asDouble(0).
+      value = BigDecimal.ZERO;
+    }
 
     String result = LegacyMoneyFormatFactory
         .create(locale, currency, ctx.compatEnabled(Patch.MONEY_LOCALE_SYMBOLS)).format(value);

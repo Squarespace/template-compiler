@@ -145,7 +145,8 @@ public class CommerceFormatters implements FormatterRegistry {
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-subtotal\">");
-      CommerceUtils.writeLegacyMoneyString(subtotalCents, buf);
+      CommerceUtils.writeLegacyMoneyString(subtotalCents, buf,
+          ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING));
       buf.append("</span>");
       var.set(buf);
     }
@@ -196,7 +197,8 @@ public class CommerceFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       Decimal value = new Decimal(var.node().asText());
-      var.set(PluginUtils.formatMoney(value, Locale.US));
+      var.set(PluginUtils.formatMoney(value, Locale.US,
+          ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING)));
     }
   }
 
@@ -252,7 +254,8 @@ public class CommerceFormatters implements FormatterRegistry {
       Variable var = variables.first();
       Decimal value = new Decimal(var.node().asText());
       StringBuilder buf = new StringBuilder();
-      CommerceUtils.writeLegacyMoneyString(value, buf);
+      CommerceUtils.writeLegacyMoneyString(value, buf,
+          ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING));
       var.set(buf);
     }
   }

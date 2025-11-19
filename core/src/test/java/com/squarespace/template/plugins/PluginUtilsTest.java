@@ -50,6 +50,15 @@ public class PluginUtilsTest {
   }
 
   @Test
+  public void testFormatMoneyLargeValue() {
+    // Legacy, the released double round-trip loses precision on large values.
+    assertEquals(PluginUtils.formatMoney(new Decimal("123456789012345678"), Locale.US, true), "1,234,567,890,123,456.80");
+
+    // Fixed, the exact decimal value is preserved.
+    assertEquals(PluginUtils.formatMoney(new Decimal("123456789012345678"), Locale.US, false), "1,234,567,890,123,456.78");
+  }
+
+  @Test
   public void testFormatMoneyCLDR() {
     CLDR en = CLDR.get("en-US");
     assertEquals(PluginUtils.formatMoney(new Decimal(1), "USD", en), "$1.00");

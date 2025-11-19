@@ -31,6 +31,7 @@ import com.squarespace.template.Context;
 import com.squarespace.template.ExecuteErrorType;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.JsonUtils;
+import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.Variables;
 import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
@@ -69,15 +70,47 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
       "1234.56", "-1234.56"
   };
 
+  private final TestSuiteRunner runner = new TestSuiteRunner(compiler(), LegacyMoneyFormatFactoryTest.class);
+
+  @Test
+  public void testLargeValuePrecision() throws Exception {
+    String large = "123456789012345678.90";
+    Arguments args = mk.args(" en-US");
+    LEGACY_MONEY.validateArgs(args);
+
+    // Level 0, the released double round-trip loses precision.
+    Context ctx = new Context(moneyJson(large, "USD"));
+    Variables variables = new Variables("@", ctx.node());
+    LEGACY_MONEY.apply(ctx, args, variables);
+    Assert.assertEquals(variables.first().node().asText(), "$123,456,789,012,345,680.00");
+
+    // Fixed, the exact decimal value is preserved.
+    ctx = new Context(moneyJson(large, "USD"));
+    ctx.setCompat(CompatLevel.fixed());
+    variables = new Variables("@", ctx.node());
+    LEGACY_MONEY.apply(ctx, args, variables);
+    Assert.assertEquals(variables.first().node().asText(), "$123,456,789,012,345,678.90");
+
+    // Fixed, a missing decimalValue renders zero, like the released asDouble(0).
+    ObjectNode noValue = JsonUtils.createObjectNode();
+    noValue.put("currencyCode", "USD");
+    ctx = new Context(noValue);
+    ctx.setCompat(CompatLevel.fixed());
+    variables = new Variables("@", ctx.node());
+    LEGACY_MONEY.apply(ctx, args, variables);
+    Assert.assertEquals(variables.first().node().asText(), "$0.00");
+  }
+
+  @Test
+  public void testLargeValueFixtures() {
+    runner.run("i18n-money-format-9.html", "i18n-money-format-10.html");
+  }
+
   /**
    * Check compatibility between the legacy money formatter and the CLDR-based one.
    */
   @Test
   public void testCompatibility() throws Exception {
-    if (!isJava8()) {
-      // Skip test on JDK 9+
-      return;
-    }
     System.out.printf("%-8s %-10s %15s %20s %20s\n", "LOCALE", "CURRENCY", "LEGACY", "CLDR (narrow)", "CLDR (std)");
     System.out.println("------------------------------------------------------------------------------");
     for (String locale : LOCALES) {
@@ -91,6 +124,21 @@ public class LegacyMoneyFormatFactoryTest extends PlatformUnitTestBase {
         System.out.println();
       }
     }
+
+    // The legacy formatter uses Squarespace symbols and its own placement
+    // rules, so it differs from CLDR in expected ways.
+    // en-US USD agrees with CLDR.
+    Assert.assertEquals(legacy("en-US", "USD", "1234.56"), "$1,234.56");
+    Assert.assertEquals(legacy("en-US", "USD", "1234.56"), cldr("en-US", "USD", "1234.56", true));
+
+    // de-DE USD differs only in the no-break space before the right-hand symbol.
+    Assert.assertEquals(legacy("de-DE", "USD", "1234.56"), "1.234,56$");
+    Assert.assertEquals(cldr("de-DE", "USD", "1234.56", true), "1.234,56\u00a0$");
+
+    // en-UK AUD differs only in the symbol, narrow CLDR drops the letter.
+    Assert.assertEquals(legacy("en-UK", "AUD", "1234.56"), "A$1,234.56");
+    Assert.assertEquals(cldr("en-UK", "AUD", "1234.56", true), "$1,234.56");
+    Assert.assertEquals(cldr("en-UK", "AUD", "1234.56", false), "A$1,234.56");
   }
 
   @Test

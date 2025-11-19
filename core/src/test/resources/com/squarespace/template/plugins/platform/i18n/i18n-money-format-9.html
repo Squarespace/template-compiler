@@ -1,0 +1,30 @@
+:JSON
+[
+  {
+    "currencyCode": "USD",
+    "decimalValue": "123456789012345678.90"
+  },
+  {
+    "currencyCode": "USD",
+    "decimalValue": "-123456789012345678.90"
+  }
+]
+
+:TEMPLATE
+{.repeated section @}
+de_DE {@|i18n-money-format de_DE}
+en_UK {@|i18n-money-format en_UK}
+en_US {@|i18n-money-format en_US}
+es_US {@|i18n-money-format es_US}
+{.end}
+
+:OUTPUT
+de_DE 123.456.789.012.345.680,00$
+en_UK $123,456,789,012,345,680.00
+en_US $123,456,789,012,345,680.00
+es_US $123,456,789,012,345,680.00
+
+de_DE -123.456.789.012.345.680,00$
+en_UK -$123,456,789,012,345,680.00
+en_US -$123,456,789,012,345,680.00
+es_US -$123,456,789,012,345,680.00

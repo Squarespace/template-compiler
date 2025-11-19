@@ -20,6 +20,7 @@ import static com.squarespace.template.Patterns.WHITESPACE_RE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.MULTILINE;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -111,11 +112,25 @@ public class PluginUtils {
   }
 
   public static String formatMoney(Decimal input, Locale locale) {
-    double cents = Double.parseDouble(input.toString());
-    cents /= 100;
+    return formatMoney(input, locale, true);
+  }
+
+  /**
+   * Format money with the released behavior flag. When the flag is set the
+   * value goes through a double, which loses precision on large values.
+   * When clear the exact decimal value is formatted.
+   */
+  public static String formatMoney(Decimal input, Locale locale, boolean legacyDouble) {
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
     DecimalFormat format = new DecimalFormat("#,##0.00", symbols);
-    return format.format(cents);
+    if (legacyDouble) {
+      // Legacy, the exact code the release shipped.
+      double cents = Double.parseDouble(input.toString());
+      cents /= 100;
+      return format.format(cents);
+    }
+    // Fixed, it converts cents to dollars exactly.
+    return format.format(new BigDecimal(input.toString()).movePointLeft(2));
   }
 
   public static String formatMoney(Decimal amount, String currencyCode, CLDR cldr) {

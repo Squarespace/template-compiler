@@ -63,8 +63,9 @@ public enum Patch {
   MONEY_LOCALE_SYMBOLS(1),
 
   /**
-   * i18n-money-format formats through a double and loses precision on large
-   * values.
+   * The legacy money formatters (i18n-money-format, moneyFormat,
+   * money-format, money-string, cart-subtotal) format through a double and
+   * lose precision on large values.
    */
   MONEY_DOUBLE_ROUNDING(1),
 
