@@ -185,8 +185,19 @@ public class PluginDateUtils {
 
   /**
    * Takes a strftime()-compatible format string and outputs the properly formatted date.
+   * %W is Sunday anchored like the release.
    */
   public static void formatDate(CLDR cldr, String fmt, long instant, String tzName, StringBuilder buf) {
+    formatDate(cldr, fmt, instant, tzName, true, buf);
+  }
+
+  /**
+   * Takes a strftime()-compatible format string and outputs the properly formatted date.
+   * When legacyWeekAnchor is set %W is Sunday anchored like the release.
+   * When clear %W is Monday anchored per POSIX.
+   */
+  public static void formatDate(CLDR cldr, String fmt, long instant, String tzName,
+      boolean legacyWeekAnchor, StringBuilder buf) {
     GregorianDate d = GregorianDate.fromUnixEpoch(instant, tzName, 0, 0);
     CalendarFields fields = null;
     Bundle bundle = null;
@@ -194,10 +205,11 @@ public class PluginDateUtils {
       fields = cldr.Schema.Gregorian.standAlone;
       bundle = cldr.General.bundle();
     }
-    _formatDate(bundle, fields, fmt, d, buf);
+    _formatDate(bundle, fields, fmt, d, legacyWeekAnchor, buf);
   }
 
-  private static void _formatDate(Bundle bundle, CalendarFields fields, String fmt, GregorianDate d, StringBuilder buf) {
+  private static void _formatDate(Bundle bundle, CalendarFields fields, String fmt, GregorianDate d,
+      boolean legacyWeekAnchor, StringBuilder buf) {
     int index = 0;
     int len = fmt.length();
     while (index < len) {
@@ -255,7 +267,7 @@ public class PluginDateUtils {
 
         // %c     locale's date and time (e.g., Thu Mar  3 23:05:25 2005)
         case 'c':
-          _formatDate(bundle, fields, "%a, %b " + d.dayOfMonth() + ", %Y %i:%M:%S %p %Z", d, buf);
+          _formatDate(bundle, fields, "%a, %b " + d.dayOfMonth() + ", %Y %i:%M:%S %p %Z", d, legacyWeekAnchor, buf);
           break;
 
         // %C     century; like %Y, except omit last two digits (e.g., 20)
@@ -265,13 +277,13 @@ public class PluginDateUtils {
         case 'd': leftPad(d.dayOfMonth(), '0', 2, buf); break;
 
         // %D     date; same as %m/%d/%y
-        case 'D': _formatDate(bundle, fields, "%m/%d/%y", d, buf); break;
+        case 'D': _formatDate(bundle, fields, "%m/%d/%y", d, legacyWeekAnchor, buf); break;
 
         // %e     day of month, space padded; same as %_d
         case 'e': leftPad(d.dayOfMonth(), ' ', 2, buf); break;
 
         // %F     full date; same as %Y-%m-%d
-        case 'F': _formatDate(bundle, fields, "%Y-%m-%d", d, buf); break;
+        case 'F': _formatDate(bundle, fields, "%Y-%m-%d", d, legacyWeekAnchor, buf); break;
 
         // %g     last two digits of year of ISO week number (see %G)
         case 'g': leftPad(d.yearOfWeekOfYearISO() % 100, '0', 2, buf); break;
@@ -349,12 +361,12 @@ public class PluginDateUtils {
         case 'r': {
           int h = (int)d.hour();
           buf.append(h == 0 ? 12 : h);
-          _formatDate(bundle, fields, ":%M:%S %p", d, buf);
+          _formatDate(bundle, fields, ":%M:%S %p", d, legacyWeekAnchor, buf);
           break;
         }
 
         // %R     24-hour hour and minute; same as %H:%M
-        case 'R': _formatDate(bundle, fields, "%H:%M", d, buf); break;
+        case 'R': _formatDate(bundle, fields, "%H:%M", d, legacyWeekAnchor, buf); break;
 
         // %s     seconds since 1970-01-01 00:00:00 UTC
         case 's': buf.append(d.unixEpoch() / 1000); break;
@@ -366,7 +378,7 @@ public class PluginDateUtils {
         case 't': buf.append('\t'); break;
 
         // %T     time; same as %H:%M:%S
-        case 'T': _formatDate(bundle, fields, "%H:%M:%S", d, buf); break;
+        case 'T': _formatDate(bundle, fields, "%H:%M:%S", d, legacyWeekAnchor, buf); break;
 
         // %u     day of week (1..7); 1 is Monday
         case 'u': {
@@ -379,7 +391,7 @@ public class PluginDateUtils {
         case 'U': leftPad(d.weekOfYear(), '0', 2, buf); break;
 
         // Undocumented
-        case 'v': _formatDate(bundle, fields, "%e-%b-%Y", d, buf); break;
+        case 'v': _formatDate(bundle, fields, "%e-%b-%Y", d, legacyWeekAnchor, buf); break;
 
         // %V     ISO week number, with Monday as first day of week (01..53)
         case 'V': leftPad(d.weekOfYearISO(), '0', 2, buf); break;
@@ -388,13 +400,26 @@ public class PluginDateUtils {
         case 'w': buf.append(d.dayOfWeek() - 1); break;
 
         // %W     week number of year, with Monday as first day of week (00..53)
-        case 'W': leftPad(d.weekOfYear(), '0', 2, buf); break;
+        case 'W': {
+          if (legacyWeekAnchor) {
+            // Legacy, Sunday anchored, the exact code the release shipped.
+            leftPad(d.weekOfYear(), '0', 2, buf);
+          } else {
+            // Fixed, Monday anchored. dayOfWeek(): 1=Sun..7=Sat (see %u).
+            // Back out Jan 1's weekday and count Monday-first weeks.
+            int doy = (int)d.dayOfYear();
+            int dow = (int)d.dayOfWeek();
+            int jan1Dow = ((dow - (doy - 1) - 1) % 7 + 7) % 7 + 1;
+            leftPad(mondayWeekOfYear(doy, jan1Dow), '0', 2, buf);
+          }
+          break;
+        }
 
         // %x     locale's date representation (e.g., 12/31/1999)
-        case 'x': _formatDate(bundle, fields, "%m/%d/%Y", d, buf); break;
+        case 'x': _formatDate(bundle, fields, "%m/%d/%Y", d, legacyWeekAnchor, buf); break;
 
         // %X     locale's time representation (e.g., 23:13:48)
-        case 'X': _formatDate(bundle, fields, "%I:%M:%S %p", d, buf); break;
+        case 'X': _formatDate(bundle, fields, "%I:%M:%S %p", d, legacyWeekAnchor, buf); break;
 
         // %y     last two digits of year (00..99)
         case 'y':
@@ -425,6 +450,13 @@ public class PluginDateUtils {
       }
       index++;
     }
+  }
+
+  // POSIX %W week number: Monday starts week 1, days before that are week 00.
+  // dayOfYear is 1-based. jan1Dow is Jan 1's day of week, 1=Sun..7=Sat.
+  static int mondayWeekOfYear(int dayOfYear, int jan1Dow) {
+    int firstMonday = (9 - jan1Dow) % 7 + 1; // day-of-year of first Monday
+    return (dayOfYear + 7 - firstMonday) / 7;
   }
 
   private static class TZC {

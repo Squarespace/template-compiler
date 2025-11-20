@@ -453,6 +453,13 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testDateWeek() throws CodeException {
+    // Level 0: %W is Sunday anchored and duplicates %U.
+    // Level 1 and up: %W is Monday anchored per POSIX.
+    runner.exec("f-date-week-%N.html");
+  }
+
+  @Test
   public void testEncodeSpace() throws CodeException {
     assertFormatter(ENCODE_SPACE, "\"  \\n \"", "&nbsp;&nbsp;&nbsp;&nbsp;");
   }

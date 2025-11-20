@@ -20,6 +20,7 @@ import static com.squarespace.template.KnownDates.AUG_24_2015_172345_UTC;
 import static com.squarespace.template.KnownDates.JAN_01_1970_071510_UTC;
 import static com.squarespace.template.KnownDates.MAY_13_2013_010000_UTC;
 import static com.squarespace.template.KnownDates.NOV_15_2013_123030_UTC;
+import static com.squarespace.template.plugins.PluginDateUtils.mondayWeekOfYear;
 import static com.squarespace.template.plugins.PluginDateUtils.sameDay;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -55,6 +56,20 @@ public class PluginDateUtilsTest {
   private static final long ONE_MONTH_MS = (long)(30.41 * ONE_DAY_MS);
 
   private static final long ONE_YEAR_MS = 365 * ONE_DAY_MS;
+
+  private static final long JAN_01_2020_UTC = 1577836800000L; // Wednesday
+
+  private static final long JAN_01_2023_UTC = 1672531200000L; // Sunday
+
+  private static final long JAN_02_2023_UTC = 1672617600000L; // Monday
+
+  private static final long JUL_03_2023_UTC = 1688342400000L; // Monday
+
+  private static final long JUL_09_2023_UTC = 1688860800000L; // Sunday
+
+  private static final long DEC_31_2023_UTC = 1703980800000L; // Sunday
+
+  private static final long DEC_31_2024_UTC = 1735603200000L; // Tuesday, leap year
 
   @Test
   public void testHumanizeDate() {
@@ -351,9 +366,62 @@ public class PluginDateUtilsTest {
 
   @Test
   public void testWeekOfYear() {
-    // TODO: Week of Year (Joda doesn't support the full range of week-of-year calculations)
-//    format = "%U %V %W";
-//    assertEquals(formatDate(format, MAY_13_2013_010000_UTC, TZ_NY), "20");
+    // Released behavior: %W is Sunday anchored and duplicates %U.
+    // Sunday 2023-01-01 is week 01 Sunday-based, ISO week 52 of 2022.
+    assertEquals(formatDate("%U %W %V", JAN_01_2023_UTC, TZ_UTC), "01 01 52");
+    // Wednesday 2020-01-01 is before the first Monday but in the first
+    // Sunday-based and ISO weeks of 2020.
+    assertEquals(formatDate("%U %W %V", JAN_01_2020_UTC, TZ_UTC), "01 01 01");
+    // Sunday 2023-07-09 starts a new Sunday-based week but not a Monday one.
+    assertEquals(formatDate("%U %W %V", JUL_09_2023_UTC, TZ_UTC), "28 28 27");
+  }
+
+  @Test
+  public void testWeekOfYearMondayAnchored() {
+    // Fixed behavior: %W is Monday anchored per POSIX.
+    assertEquals(formatDate("%U %W %V", JAN_01_2023_UTC, TZ_UTC, false), "01 00 52");
+    // Before the first Monday of the year is week 00 even when the date
+    // sits in week 1 Sunday-based and ISO.
+    assertEquals(formatDate("%U %W %V", JAN_01_2020_UTC, TZ_UTC, false), "01 00 01");
+    // The Monday after starts the first Monday-anchored week.
+    assertEquals(formatDate("%W", JAN_02_2023_UTC, TZ_UTC, false), "01");
+    // A mid-year Monday and the following Sunday are in the same %W week.
+    assertEquals(formatDate("%W", JUL_03_2023_UTC, TZ_UTC, false), "27");
+    assertEquals(formatDate("%W", JUL_09_2023_UTC, TZ_UTC, false), "27");
+    // Year end, and a 53-week Monday-anchored year (2024 leap, Jan 1 Monday).
+    assertEquals(formatDate("%W", DEC_31_2023_UTC, TZ_UTC, false), "52");
+    assertEquals(formatDate("%W", DEC_31_2024_UTC, TZ_UTC, false), "53");
+  }
+
+  @Test
+  public void testMondayWeekOfYear() {
+    // POSIX %W: first Monday of the year starts week 1; before it is week 00.
+    // jan1Dow is Jan 1's day of week, 1=Sun..7=Sat.
+    // Jan 1 on Sunday (2023, 2029): first Monday is Jan 2.
+    assertEquals(mondayWeekOfYear(1, 1), 0);
+    assertEquals(mondayWeekOfYear(2, 1), 1);
+    assertEquals(mondayWeekOfYear(8, 1), 1);
+    assertEquals(mondayWeekOfYear(9, 1), 2);
+    // Jan 1 on Monday (2024): week 1 starts Jan 1.
+    assertEquals(mondayWeekOfYear(1, 2), 1);
+    assertEquals(mondayWeekOfYear(7, 2), 1);
+    assertEquals(mondayWeekOfYear(8, 2), 2);
+    // Jan 1 on Tuesday (2019): first Monday is Jan 7.
+    assertEquals(mondayWeekOfYear(1, 3), 0);
+    assertEquals(mondayWeekOfYear(6, 3), 0);
+    assertEquals(mondayWeekOfYear(7, 3), 1);
+    // Jan 1 on Wednesday (2020): first Monday is Jan 6.
+    assertEquals(mondayWeekOfYear(5, 4), 0);
+    assertEquals(mondayWeekOfYear(6, 4), 1);
+    // Jan 1 on Thursday (2015): first Monday is Jan 5.
+    assertEquals(mondayWeekOfYear(4, 5), 0);
+    assertEquals(mondayWeekOfYear(5, 5), 1);
+    // Jan 1 on Friday (2021): first Monday is Jan 4.
+    assertEquals(mondayWeekOfYear(3, 6), 0);
+    assertEquals(mondayWeekOfYear(4, 6), 1);
+    // Jan 1 on Saturday (2022): first Monday is Jan 3.
+    assertEquals(mondayWeekOfYear(2, 7), 0);
+    assertEquals(mondayWeekOfYear(3, 7), 1);
   }
 
   private String humanizeDate(long instantMs, long baseMs, boolean showSeconds) {
@@ -368,6 +436,13 @@ public class PluginDateUtilsTest {
 
   private String formatDate(String format, long timestamp, String tzId) {
     return formatDate(format, timestamp, tzId, Locale.US);
+  }
+
+  private String formatDate(String format, long timestamp, String tzId, boolean legacyWeekAnchor) {
+    CLDR cldr = CLDR.get(Locale.US);
+    StringBuilder buf = new StringBuilder();
+    PluginDateUtils.formatDate(cldr, format, timestamp, tzId, legacyWeekAnchor, buf);
+    return buf.toString();
   }
 
   private String formatDate(String format, long timestamp, String tzId, Locale locale) {
