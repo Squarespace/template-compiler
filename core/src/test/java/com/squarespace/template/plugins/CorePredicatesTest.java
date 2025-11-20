@@ -27,6 +27,7 @@ import static com.squarespace.template.plugins.CorePredicates.LESS_THAN_OR_EQUAL
 import static com.squarespace.template.plugins.CorePredicates.NTH;
 import static com.squarespace.template.plugins.CorePredicates.ODD;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -255,6 +256,35 @@ public class CorePredicatesTest extends UnitTestBase {
     template = "{.repeated section @}{.nth? @index 3}A{.end}{.end}";
     assertEquals(execute(template, "[0,0,0]").buffer().toString(), "A");
     assertEquals(execute(template, "[0,0,0,0,0,0]").buffer().toString(), "AA");
+
+    // Legacy, modulus 0 throws by zero at the default level.
+    Arguments args = mk.args(" 0");
+    NTH.validateArgs(args);
+    try {
+      NTH.apply(context("6"), args);
+      fail("expected ArithmeticException");
+    } catch (ArithmeticException e) {
+      // Expected
+    }
+
+    // The two-argument form resolves the final modulus from the second argument.
+    args = mk.args(" 6 0");
+    NTH.validateArgs(args);
+    try {
+      NTH.apply(context("0"), args);
+      fail("expected ArithmeticException");
+    } catch (ArithmeticException e) {
+      // Expected
+    }
+
+    // Fixed, modulus 0 is not a match.
+    Context fixed = context("6");
+    fixed.setCompat(CompatLevel.fixed());
+    assertFalse(NTH, fixed, mk.args(" 0"));
+    assertFalse(NTH, fixed, mk.args(" 6 0"));
+    assertTrue(NTH, fixed, mk.args(" 6 3"));
+
+    runner.exec("f-nth-modulo-zero-%N.html");
   }
 
   @Test

@@ -298,7 +298,16 @@ public class CorePredicates implements PredicateRegistry {
         modulus = resolve(ctx, args, 1);
       }
       if (node.isIntegralNumber() && modulus.isIntegralNumber()) {
-        return node.asLong() % modulus.asLong() == 0;
+        long m = modulus.asLong();
+        if (m == 0) {
+          // Legacy, a zero modulus reaches the division and throws by zero.
+          // Fixed, a zero modulus is not a match.
+          if (ctx.compatEnabled(Patch.NTH_MODULO_ZERO)) {
+            return node.asLong() % m == 0;
+          }
+          return false;
+        }
+        return node.asLong() % m == 0;
       }
       return false;
     }
