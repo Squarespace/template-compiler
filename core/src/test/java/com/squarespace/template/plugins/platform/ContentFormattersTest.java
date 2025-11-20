@@ -213,7 +213,10 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     String result = format(TIMESINCE, now);
     assertTrue(result.contains("less than a minute ago"));
 
-    runner.run("f-timesince-1.html");
+    runner.run(
+        "f-timesince-1.html",
+        "f-timesince-2.html"
+        );
   }
 
   @Test

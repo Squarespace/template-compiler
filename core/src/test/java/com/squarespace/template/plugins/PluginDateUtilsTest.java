@@ -42,6 +42,8 @@ public class PluginDateUtilsTest {
 
   private static final String TZ_LA = "America/Los_Angeles";
 
+  private static final String TZ_TOKYO = "Asia/Tokyo";
+
   private static final Locale MEXICO = new Locale("es", "MX");
 
   private static final long ONE_MINUTE_MS = 60 * 1000;
@@ -86,6 +88,25 @@ public class PluginDateUtilsTest {
 
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, NOV_15_2013_123030_UTC, true), "about 6 months ago");
     assertEquals(humanizeDate(MAY_13_2013_010000_UTC, AUG_24_2015_172345_UTC, true), "about 2 years ago");
+  }
+
+  @Test
+  public void testHumanizeDateTzOffset() {
+    long baseMs = MAY_13_2013_010000_UTC;
+    long hourBefore = baseMs - ONE_HOUR_MS;
+
+    // Legacy, the zone offset is added to the epoch millis delta.
+    assertEquals(humanizeDate(hourBefore, baseMs, TZ_NY, false, true), "less than a minute ago");
+    assertEquals(humanizeDate(hourBefore, baseMs, TZ_TOKYO, false, true), "about 10 hours ago");
+
+    // Fixed, the delta is the epoch millis difference in every zone.
+    assertEquals(humanizeDate(hourBefore, baseMs, TZ_NY, false, false), "about an hour ago");
+    assertEquals(humanizeDate(hourBefore, baseMs, TZ_TOKYO, false, false), "about an hour ago");
+
+    // Fixed, a future instant and old instants bucket as before.
+    assertEquals(humanizeDate(baseMs + ONE_HOUR_MS, baseMs, TZ_NY, false, false), "less than a minute ago");
+    assertEquals(humanizeDate(MAY_13_2013_010000_UTC, NOV_15_2013_123030_UTC, TZ_NY, true, false), "about 6 months ago");
+    assertEquals(humanizeDate(MAY_13_2013_010000_UTC, AUG_24_2015_172345_UTC, TZ_NY, true, false), "about 2 years ago");
   }
 
   @Test
@@ -336,8 +357,12 @@ public class PluginDateUtilsTest {
   }
 
   private String humanizeDate(long instantMs, long baseMs, boolean showSeconds) {
+    return humanizeDate(instantMs, baseMs, TZ_UTC, showSeconds, true);
+  }
+
+  private String humanizeDate(long instantMs, long baseMs, String tzId, boolean showSeconds, boolean legacyTzOffset) {
     StringBuilder buf = new StringBuilder();
-    PluginDateUtils.humanizeDate(instantMs, baseMs, TZ_UTC, showSeconds, buf);
+    PluginDateUtils.humanizeDate(instantMs, baseMs, tzId, showSeconds, legacyTzOffset, buf);
     return buf.toString();
   }
 

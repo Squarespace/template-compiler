@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,7 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeExecuteException;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.Compiler;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
@@ -828,7 +830,10 @@ public class ContentFormatters implements FormatterRegistry {
         long now = _now == null ? System.currentTimeMillis() : _now.longValue();
         long value = node.asLong();
         buf.append("<span class=\"timesince\" data-date=\"" + value + "\">");
-        PluginDateUtils.humanizeDate(value, now, false, buf);
+        // Legacy, the zone offset is added to the epoch millis delta.
+        // Fixed, the delta is the epoch millis difference.
+        PluginDateUtils.humanizeDate(value, now, TimeZone.getDefault().getID(), false,
+            ctx.compatEnabled(Patch.HUMANIZE_DATE_TZ), buf);
         buf.append("</span>");
       }
       var.set(buf);

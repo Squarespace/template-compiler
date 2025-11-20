@@ -100,9 +100,26 @@ public class PluginDateUtils {
   }
 
   public static void humanizeDate(long instantMs, long baseMs, String tzId, boolean showSeconds, StringBuilder buf) {
-    DateTimeZone timeZone = DateTimeZone.forID(tzId);
-    int offset = timeZone.getOffset(instantMs);
-    Duration delta = new Duration(baseMs - instantMs + offset);
+    humanizeDate(instantMs, baseMs, tzId, showSeconds, true, buf);
+  }
+
+  /**
+   * Humanize with the released behavior flag. When the flag is set the zone
+   * offset is added to the epoch millis delta like the release. When clear
+   * the delta is the epoch millis difference.
+   */
+  public static void humanizeDate(long instantMs, long baseMs, String tzId,
+      boolean showSeconds, boolean legacyTzOffset, StringBuilder buf) {
+    Duration delta;
+    if (legacyTzOffset) {
+      // Legacy, the zone offset is added to the epoch millis delta.
+      DateTimeZone timeZone = DateTimeZone.forID(tzId);
+      int offset = timeZone.getOffset(instantMs);
+      delta = new Duration(baseMs - instantMs + offset);
+    } else {
+      // Fixed, the delta is the epoch millis difference.
+      delta = new Duration(baseMs - instantMs);
+    }
 
     int days = (int)delta.getStandardDays();
     int years = (int)Math.floor(days / 365.0);
