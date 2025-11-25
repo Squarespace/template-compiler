@@ -798,31 +798,35 @@ public class Instructions {
         }
       }
 
-      // By default we suppress output from the partial or macro
+      // By default we suppress output from the partial or macro. Swap in a
+      // fresh buffer and always swap it back, even when the partial throws
+      // at runtime.
       StringBuilder buf = null;
       if (!output) {
         buf = ctx.swapBuffer(new StringBuilder());
       }
 
-      // Execute the partial or macro inline.
-      if (ctx.enterPartial(name)) {
-        if (ctx.compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
-          // Legacy, the depth is released only when the partial finishes
-          // without throwing.
-          invokePartial(ctx, code);
-          ctx.exitPartial(name);
-        } else {
-          // Fixed, the depth is released even when the partial throws.
-          try {
+      try {
+        // Execute the partial or macro inline.
+        if (ctx.enterPartial(name)) {
+          if (ctx.compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
+            // Legacy, the depth is released only when the partial finishes
+            // without throwing.
             invokePartial(ctx, code);
-          } finally {
             ctx.exitPartial(name);
+          } else {
+            // Fixed, the depth is released even when the partial throws.
+            try {
+              invokePartial(ctx, code);
+            } finally {
+              ctx.exitPartial(name);
+            }
           }
         }
-      }
-
-      if (!output && buf != null) {
-        ctx.swapBuffer(buf);
+      } finally {
+        if (buf != null) {
+          ctx.swapBuffer(buf);
+        }
       }
     }
 

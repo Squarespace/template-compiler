@@ -18,7 +18,9 @@ package com.squarespace.template;
 
 import static com.squarespace.template.ExecuteErrorType.APPLY_PARTIAL_RECURSION_DEPTH;
 import static com.squarespace.template.ExecuteErrorType.INCLUDE_PARTIAL_MISSING;
+import static com.squarespace.template.ExecuteErrorType.INCLUDE_PARTIAL_SYNTAX;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -374,12 +376,73 @@ public class CodeExecuteTest extends UnitTestBase {
     }
   }
 
+  @Test
+  public void testIncludePartialBufferAfterThrow() throws CodeException {
+    // pA compiles but fails at runtime on the missing include inside it.
+    // pB emits output and then fails at runtime. pC fails to compile.
+    String partials = "{\"pA\": \"{.include missing}\", "
+        + "\"pB\": \"X {.include missing}\", "
+        + "\"pC\": \"{.bogus}\"}";
+    String template = "A {.include pA} B";
+
+    // The missing include inside the partial throws in non-safe mode. The
+    // caller buffer, seeded before the run, must survive the throw with its
+    // identity and its content.
+    for (CompatLevel compat : new CompatLevel[] { CompatLevel.defaultLevel(), CompatLevel.at(1) }) {
+      StringBuilder callerBuffer = new StringBuilder("caller");
+      Context ctx = partialContext("{}", partials, false, compat, callerBuffer);
+      try {
+        ctx.execute(compiler().compile(template, false, false, compat).code());
+        fail("Expected the missing include to throw");
+      } catch (CodeExecuteException e) {
+        assertEquals(e.getErrorInfo().getType(), INCLUDE_PARTIAL_MISSING);
+      }
+      assertSame(callerBuffer, ctx.buffer());
+      assertEquals(ctx.buffer().toString(), "callerA ");
+
+      // The partial's own output, written before it throws, must not leak
+      // into the caller buffer.
+      callerBuffer = new StringBuilder("caller");
+      ctx = partialContext("{}", partials, false, compat, callerBuffer);
+      try {
+        ctx.execute(compiler().compile("A {.include pB} B", false, false, compat).code());
+        fail("Expected the missing include to throw");
+      } catch (CodeExecuteException e) {
+        assertEquals(e.getErrorInfo().getType(), INCLUDE_PARTIAL_MISSING);
+      }
+      assertSame(callerBuffer, ctx.buffer());
+      assertEquals(ctx.buffer().toString(), "callerA ");
+
+      // The bad partial fails to compile. The buffer swap never happens and
+      // the caller buffer stays intact.
+      callerBuffer = new StringBuilder("caller");
+      ctx = partialContext("{}", partials, false, compat, callerBuffer);
+      try {
+        ctx.execute(compiler().compile("A {.include pC} B", false, false, compat).code());
+        fail("Expected the bad partial to throw");
+      } catch (CodeExecuteException e) {
+        assertEquals(e.getErrorInfo().getType(), INCLUDE_PARTIAL_SYNTAX);
+      }
+      assertSame(callerBuffer, ctx.buffer());
+      assertEquals(ctx.buffer().toString(), "callerA ");
+    }
+  }
+
   /**
    * Build a context with a compiler, the given partials, a depth limit of
    * one, and includes enabled.
    */
   private Context partialContext(String jsonText, String partialsText, boolean safe, CompatLevel compat) {
-    Context ctx = new Context(JsonUtils.decode(jsonText));
+    return partialContext(jsonText, partialsText, safe, compat, null);
+  }
+
+  /**
+   * Build a context with a compiler, the given partials, a depth limit of
+   * one, and includes enabled, starting with the given output buffer.
+   */
+  private Context partialContext(String jsonText, String partialsText, boolean safe, CompatLevel compat,
+      StringBuilder buf) {
+    Context ctx = new Context(JsonUtils.decode(jsonText), buf, null);
     ctx.setCompiler(compiler());
     ctx.setPartials(JsonUtils.decode(partialsText));
     ctx.setMaxPartialDepth(1);
