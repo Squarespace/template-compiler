@@ -75,6 +75,18 @@ public class PluginUtilsTest {
   }
 
   @Test
+  public void testEscapeScriptTags() {
+    assertEquals(PluginUtils.escapeScriptTags("foo </bar>"), "foo <\\/bar>");
+
+    // Legacy, raw U+2028 and U+2029 pass through on the released signature.
+    assertEquals(PluginUtils.escapeScriptTags("a\u2028b\u2029c"), "a\u2028b\u2029c");
+
+    // Fixed, the separators are escaped and the script tag escape holds.
+    assertEquals(PluginUtils.escapeScriptTags("a</b\u2028c\u2029d", false), "a<\\/b\\u2028c\\u2029d");
+    assertEquals(PluginUtils.escapeScriptTags("foo </bar>", false), "foo <\\/bar>");
+  }
+
+  @Test
   public void testTruncate() {
     assertEquals(PluginUtils.truncate("abcdefghij", 3, "..."), "abc...");
     assertEquals(PluginUtils.truncate("ab", 5, "..."), "ab");

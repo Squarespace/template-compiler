@@ -592,7 +592,10 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      String escaped = escapeScriptTags((var.node().toString()));
+      // Legacy, raw U+2028 and U+2029 pass through.
+      // Fixed, the separators are escaped for script embedding.
+      String escaped = escapeScriptTags(var.node().toString(),
+          ctx.compatEnabled(Patch.JSON_LINE_SEPARATORS));
       var.set(escaped);
     }
 
@@ -614,7 +617,7 @@ public class CoreFormatters implements FormatterRegistry {
       Variable var = variables.first();
       try {
         String result = jsonPretty(var.node());
-        var.set(escapeScriptTags(result));
+        var.set(escapeScriptTags(result, ctx.compatEnabled(Patch.JSON_LINE_SEPARATORS)));
         return;
 
       } catch (IOException e) {

@@ -519,13 +519,31 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testJson() throws CodeException {
+    CodeMaker mk = maker();
+
     assertFormatter(JSON, "{ \"a\":  3.14159 }", "{\"a\":3.14159}");
     assertFormatter(JSON, "\"foo </script>\"", "\"foo <\\/script>\"");
 
     assertFormatter(JSON_PRETTY, "{ \"a\":  3.14159 }", "{\n  \"a\": 3.14159\n}");
 
+    // Legacy, raw U+2028 and U+2029 pass through at the default level.
+    assertFormatter(JSON, "\"a\u2028b\u2029c\"", "\"a\u2028b\u2029c\"");
+    assertFormatter(JSON_PRETTY, "\"a\u2028b\u2029c\"", "\"a\u2028b\u2029c\"");
+
+    // Fixed, the separators are escaped for script embedding.
+    Context ctx = new Context(JsonUtils.decode("\"a\u2028b\u2029c\""));
+    ctx.setCompat(CompatLevel.fixed());
+    Variables vars = new Variables("var", ctx.node());
+    JSON.apply(ctx, mk.args(""), vars);
+    assertEquals(vars.first().node().asText(), "\"a\\u2028b\\u2029c\"");
+    vars = new Variables("var", ctx.node());
+    JSON_PRETTY.apply(ctx, mk.args(""), vars);
+    assertEquals(vars.first().node().asText(), "\"a\\u2028b\\u2029c\"");
+
     runner.exec("f-json-%N.html");
     runner.exec("f-json-pretty-%N.html");
+    runner.exec("f-json-line-separators-%N.html");
+    runner.exec("f-json-pretty-line-separators-%N.html");
   }
 
   @Test

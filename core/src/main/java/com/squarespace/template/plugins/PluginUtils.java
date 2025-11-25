@@ -65,7 +65,21 @@ public class PluginUtils {
    * Escape instances of HTML script tags.
    */
   public static String escapeScriptTags(String str) {
-    return SCRIPT_TAG.matcher(str).replaceAll("<\\\\/");
+    return escapeScriptTags(str, true);
+  }
+
+  /**
+   * Escape instances of HTML script tags with the released behavior flag.
+   * When the flag is set U+2028 and U+2029 pass through raw. When clear
+   * they are written as json escapes, safe for embedding in a script.
+   */
+  public static String escapeScriptTags(String str, boolean legacyLineSeparators) {
+    str = SCRIPT_TAG.matcher(str).replaceAll("<\\\\/");
+    if (!legacyLineSeparators) {
+      // Fixed, escape the line separator characters.
+      str = str.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029");
+    }
+    return str;
   }
 
   public static void escapeHtml(String str, StringBuilder buf) {

@@ -1,0 +1,11 @@
+:PROPERTIES
+level=2
+
+:TEMPLATE
+{var|json}
+
+:JSON
+{"var": {"line1": "a</b\u2028c"}}
+
+:OUTPUT
+{"line1":"a<\/b\u2028c"}
