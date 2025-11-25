@@ -460,6 +460,14 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testDateNullTimeZone() throws CodeException {
+    // Level 0: a null timeZone resolves to the text null and the zone
+    // lookup falls back to UTC.
+    // Level 3 and up: a null timeZone resolves to the default zone.
+    runner.exec("f-date-timezone-null-%N.html");
+  }
+
+  @Test
   public void testEncodeSpace() throws CodeException {
     assertFormatter(ENCODE_SPACE, "\"  \\n \"", "&nbsp;&nbsp;&nbsp;&nbsp;");
   }

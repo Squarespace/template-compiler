@@ -21,6 +21,7 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
@@ -46,7 +47,8 @@ public class DateTimeFormatter extends BaseFormatter {
   public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
     Variable var = variables.first();
     long epoch = var.node().asLong();
-    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx,
+        ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
     CLDR cldr = ctx.cldr();
     DateFormatOptions options = (DateFormatOptions) args.getOpaque();
     CalendarDate date = cldr.Calendars.toGregorianDate(epoch, zoneId);

@@ -23,6 +23,7 @@ import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.Frame;
 import com.squarespace.template.MessageFormats;
 import com.squarespace.template.Variable;
@@ -48,7 +49,8 @@ public class MessageFormatter extends BaseFormatter {
     Variable var = variables.first();
     JsonNode node = var.node();
 
-    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx,
+        ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
     MessageArgs msgargs = messageArgs(args, ctx);
     MessageFormats formats = ctx.messageFormatter();
     formats.setTimeZone(zoneId);

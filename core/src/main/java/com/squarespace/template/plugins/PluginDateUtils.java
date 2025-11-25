@@ -475,16 +475,35 @@ public class PluginDateUtils {
     }
   }
 
+  /**
+   * The timeZone from the context. Released behavior, a null timeZone
+   * resolves to the text null and the zone lookup falls back to UTC.
+   */
   public static String getTimeZoneNameFromContext(Context ctx) {
-    JsonNode tzNode = ctx.resolve(Constants.TIMEZONE_KEY);
+    return getTimeZoneNameFromContext(ctx, true);
+  }
 
-    String tzName = "UTC";
-    if (tzNode.isMissingNode()) {
-      tzName = DEFAULT_TIMEZONEID;
-    } else {
-      tzName = tzNode.asText();
+  /**
+   * The timeZone from the context. When legacyNull is false a null
+   * timeZone resolves to the default zone, like a missing one.
+   */
+  public static String getTimeZoneNameFromContext(Context ctx, boolean legacyNull) {
+    JsonNode tzNode = ctx.resolve(Constants.TIMEZONE_KEY);
+    if (legacyNull) {
+      // Legacy, the exact code the release shipped.
+      String tzName = "UTC";
+      if (tzNode.isMissingNode()) {
+        tzName = DEFAULT_TIMEZONEID;
+      } else {
+        tzName = tzNode.asText();
+      }
+      return tzName;
     }
-    return tzName;
+    // Fixed, a null timeZone resolves to the default zone.
+    if (tzNode.isMissingNode() || tzNode.isNull()) {
+      return DEFAULT_TIMEZONEID;
+    }
+    return tzNode.asText();
   }
 
 }

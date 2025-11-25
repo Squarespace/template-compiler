@@ -24,6 +24,7 @@ import com.squarespace.template.ArgumentsException;
 import com.squarespace.template.BaseFormatter;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.OptionParsers;
 import com.squarespace.template.Variable;
 import com.squarespace.template.Variables;
@@ -56,7 +57,8 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
     Variable v2 = variables.get(1);
 
     CLDR cldr = ctx.cldr();
-    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+    String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx,
+        ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
     CalendarDate start = cldr.Calendars.toGregorianDate(v1.node().asLong(0), zoneId);
     CalendarDate end = cldr.Calendars.toGregorianDate(v2.node().asLong(0), zoneId);
     DateIntervalFormatOptions options = (DateIntervalFormatOptions) args.getOpaque();

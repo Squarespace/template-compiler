@@ -269,7 +269,8 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx);
+      String tzName = PluginDateUtils.getTimeZoneNameFromContext(ctx,
+          ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
       long instant = var.node().asLong();
       StringBuilder buf = new StringBuilder();
       formatDate(ctx.cldr(), (String)args.getOpaque(), instant, tzName,

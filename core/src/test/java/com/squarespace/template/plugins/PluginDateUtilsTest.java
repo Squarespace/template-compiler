@@ -32,6 +32,8 @@ import org.testng.annotations.Test;
 
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.template.CodeException;
+import com.squarespace.template.Context;
+import com.squarespace.template.JsonUtils;
 
 
 @Test(groups = { "unit" })
@@ -424,6 +426,25 @@ public class PluginDateUtilsTest {
     assertEquals(mondayWeekOfYear(3, 7), 1);
   }
 
+  @Test
+  public void testTimeZoneNameFromContext() throws Exception {
+    // Legacy, the exact code the release shipped. A null timeZone
+    // resolves to the text null and the zone lookup falls back to UTC.
+    assertEquals(timeZone("{\"website\":{\"timeZone\":\"America/New_York\"}}", true), TZ_NY);
+    assertEquals(timeZone("{\"website\":{\"timeZone\":\"UTC\"}}", true), TZ_UTC);
+    assertEquals(timeZone("{\"website\":{\"timeZone\":null}}", true), "null");
+    assertEquals(timeZone("{\"other\":1}", true), TZ_NY);
+
+    // Fixed, a null timeZone resolves to the default zone, like a missing one.
+    assertEquals(timeZone("{\"website\":{\"timeZone\":\"America/New_York\"}}", false), TZ_NY);
+    assertEquals(timeZone("{\"website\":{\"timeZone\":\"UTC\"}}", false), TZ_UTC);
+    assertEquals(timeZone("{\"website\":{\"timeZone\":null}}", false), TZ_NY);
+    assertEquals(timeZone("{\"other\":1}", false), TZ_NY);
+
+    // An empty string is not null and passes through unchanged.
+    assertEquals(timeZone("{\"website\":{\"timeZone\":\"\"}}", false), "");
+  }
+
   private String humanizeDate(long instantMs, long baseMs, boolean showSeconds) {
     return humanizeDate(instantMs, baseMs, TZ_UTC, showSeconds, true);
   }
@@ -450,6 +471,11 @@ public class PluginDateUtilsTest {
     StringBuilder buf = new StringBuilder();
     PluginDateUtils.formatDate(cldr, format, timestamp, tzId, buf);
     return buf.toString();
+  }
+
+  private static String timeZone(String json, boolean legacyNull) throws Exception {
+    Context ctx = new Context(JsonUtils.decode(json));
+    return PluginDateUtils.getTimeZoneNameFromContext(ctx, legacyNull);
   }
 
 }
