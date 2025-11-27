@@ -599,7 +599,7 @@ public class Context {
   }
 
   public JsonNode resolve(Object name) {
-    return lookupStack(name);
+    return lookupStackFrom(name, currentFrame);
   }
 
   public Instruction resolveMacro(String name) {
@@ -631,8 +631,12 @@ public class Context {
       return startingFrame.node();
     }
 
-    // Find the starting point.
-    JsonNode node = lookupStack(names[0]);
+    // Find the starting point. Legacy, the first segment resolves from
+    // the current frame. Fixed, it walks from the given frame so a
+    // formatter can skip its own frame.
+    JsonNode node = compatEnabled(Patch.SUBPATH_PARENT_SCOPE)
+        ? lookupStackFrom(names[0], currentFrame)
+        : lookupStackFrom(names[0], startingFrame);
     for (int i = 1, len = names.length; i < len; i++) {
       if (node.isMissingNode()) {
         return undefined;
@@ -665,19 +669,14 @@ public class Context {
   }
 
   /**
-   * Starting at the current frame, walk up the stack looking for the first
+   * Starting at the given frame, walk up the stack looking for the first
    * object node which contains 'name' and return that. If none match, return
    * undefined.
    */
-  private JsonNode lookupStack(Object name) {
-    JsonNode node = resolve(name, currentFrame);
-    if (!node.isMissingNode()) {
-      return node;
-    }
-
-    Frame frame = currentFrame;
+  private JsonNode lookupStackFrom(Object name, Frame from) {
+    Frame frame = from;
     while (frame != null) {
-      node = resolve(name, frame);
+      JsonNode node = resolve(name, frame);
       if (!node.isMissingNode()) {
         return node;
       }

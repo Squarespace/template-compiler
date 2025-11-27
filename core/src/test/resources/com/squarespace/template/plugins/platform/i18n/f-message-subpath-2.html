@@ -1,0 +1,14 @@
+:PROPERTIES
+level=2
+
+:JSON
+{
+	"x": {"y": 1},
+	"m": "val={a}"
+}
+
+:TEMPLATE
+{.section x}{m|message a=@.y}{.end}
+
+:OUTPUT
+val=1
