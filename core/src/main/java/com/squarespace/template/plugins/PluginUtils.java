@@ -103,6 +103,16 @@ public class PluginUtils {
   }
 
   public static void escapeHtmlAttribute(String str, StringBuilder buf) {
+    escapeHtmlAttribute(str, buf, true);
+  }
+
+  /**
+   * Escape HTML attribute characters with the released behavior flag.
+   * When the flag is set the single quote passes through raw, matching the
+   * release. When clear it is written as &#39;, safe for single-quoted
+   * attribute values.
+   */
+  public static void escapeHtmlAttribute(String str, StringBuilder buf, boolean legacySingleQuote) {
     int length = str.length();
     for (int i = 0; i < length; i++) {
       char ch = str.charAt(i);
@@ -118,6 +128,15 @@ public class PluginUtils {
           break;
         case '"':
           buf.append("&quot;");
+          break;
+        case '\'':
+          if (legacySingleQuote) {
+            // Legacy, the single quote passes through raw.
+            buf.append(ch);
+          } else {
+            // Fixed, escape it for single-quoted attribute values.
+            buf.append("&#39;");
+          }
           break;
         default:
           buf.append(ch);

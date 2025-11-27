@@ -70,6 +70,23 @@ public class PluginUtilsTest {
   }
 
   @Test
+  public void testEscapeHtmlAttribute() {
+    // Legacy, the single quote passes through raw on the released signature.
+    StringBuilder buf = new StringBuilder();
+    PluginUtils.escapeHtmlAttribute("it's", buf);
+    assertEquals(buf.toString(), "it's");
+
+    // Fixed, the quote is escaped for single-quoted attribute values.
+    buf.setLength(0);
+    PluginUtils.escapeHtmlAttribute("it's", buf, false);
+    assertEquals(buf.toString(), "it&#39;s");
+
+    buf.setLength(0);
+    PluginUtils.escapeHtmlAttribute("a'b&c<d>e\"f", buf, false);
+    assertEquals(buf.toString(), "a&#39;b&amp;c&lt;d&gt;e&quot;f");
+  }
+
+  @Test
   public void testRemoveTags() {
     assertEquals(PluginUtils.removeTags("hi,<\nhello < >world"), "hi, world");
   }

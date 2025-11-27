@@ -536,7 +536,8 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtmlAttribute(eatNull(var.node()), buf);
+      // Legacy, the single quote passes through. Fixed, it is escaped.
+      PluginUtils.escapeHtmlAttribute(eatNull(var.node()), buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
       var.set(buf);
     }
 
@@ -556,7 +557,8 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       StringBuilder buf = new StringBuilder();
-      PluginUtils.escapeHtmlAttribute(eatNull(var.node()), buf);
+      // Legacy, the single quote passes through. Fixed, it is escaped.
+      PluginUtils.escapeHtmlAttribute(eatNull(var.node()), buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
       var.set(buf);
     }
 

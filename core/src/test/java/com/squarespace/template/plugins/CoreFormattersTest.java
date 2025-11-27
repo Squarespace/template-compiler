@@ -519,10 +519,22 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testHtmlEscape() throws CodeException {
+    CodeMaker mk = maker();
     assertFormatter(HTML, "\"< foo & bar >\"", "&lt; foo &amp; bar &gt;");
     for (Formatter formatter : Arrays.asList(HTMLTAG, HTMLATTR)) {
       assertFormatter(formatter, "\"< \\\"foo & bar\\\" >\"", "&lt; &quot;foo &amp; bar&quot; &gt;");
+
+      // Legacy, the single quote passes through at the default level.
+      assertFormatter(formatter, "\"it's\"", "it's");
+
+      // Fixed, the quote is escaped for single-quoted attribute values.
+      Context ctx = new Context(JsonUtils.decode("\"a'b&c<d>e\\\"f\""));
+      ctx.setCompat(CompatLevel.fixed());
+      Variables vars = new Variables("var", ctx.node());
+      formatter.apply(ctx, mk.args(""), vars);
+      assertEquals(vars.first().node().asText(), "a&#39;b&amp;c&lt;d&gt;e&quot;f");
     }
+    runner.exec("f-htmlattr-quote-%N.html");
   }
 
   @Test
