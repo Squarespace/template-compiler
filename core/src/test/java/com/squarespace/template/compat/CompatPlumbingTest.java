@@ -51,7 +51,7 @@ public class CompatPlumbingTest extends UnitTestBase {
       "{.include part} {missing}",
       "{.eval 2 * 3 + 40}",
       "{o|json}",
-      "{.if nth? n 2}{y}{.end} {s|encode-space}");
+      "{.if nth? n 2}{y}{.end}");
 
   private static final String JSON =
       "{\"a\":true,\"s\":\"abcdef\",\"n\":7,\"d\":{\"c\":5,\"items\":[1,2]},\"o\":{\"k\":\"v\"}}";

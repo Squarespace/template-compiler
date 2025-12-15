@@ -469,7 +469,26 @@ public class CoreFormattersTest extends UnitTestBase {
 
   @Test
   public void testEncodeSpace() throws CodeException {
+    CodeMaker mk = maker();
+
+    // Legacy, all whitespace is replaced at the default level.
+    assertFormatter(ENCODE_SPACE, "\"a b\"", "a&nbsp;b");
     assertFormatter(ENCODE_SPACE, "\"  \\n \"", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+    // Fixed, only the space character is replaced per the doc.
+    Context ctx = new Context(JsonUtils.decode("\"a\\tb\\nc\""));
+    ctx.setCompat(CompatLevel.fixed());
+    Variables vars = new Variables("var", ctx.node());
+    ENCODE_SPACE.apply(ctx, mk.args(""), vars);
+    assertEquals(vars.first().node().asText(), "a\tb\nc");
+
+    ctx = new Context(JsonUtils.decode("\"a b\""));
+    ctx.setCompat(CompatLevel.fixed());
+    vars = new Variables("var", ctx.node());
+    ENCODE_SPACE.apply(ctx, mk.args(""), vars);
+    assertEquals(vars.first().node().asText(), "a&nbsp;b");
+
+    runner.exec("f-encode-space-%N.html");
   }
 
   @Test

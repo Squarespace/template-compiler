@@ -293,8 +293,15 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       JsonNode node = var.node();
-      String value = Patterns.ONESPACE.matcher(node.asText()).replaceAll("&nbsp;");
-      var.set(value);
+      if (ctx.compatEnabled(Patch.ENCODE_SPACE_WHITESPACE)) {
+        // Legacy, tabs and newlines are replaced along with spaces.
+        String value = Patterns.ONESPACE.matcher(node.asText()).replaceAll("&nbsp;");
+        var.set(value);
+      } else {
+        // Fixed, only the space character is replaced per the doc.
+        String value = node.asText().replace(" ", "&nbsp;");
+        var.set(value);
+      }
     }
 
   }
