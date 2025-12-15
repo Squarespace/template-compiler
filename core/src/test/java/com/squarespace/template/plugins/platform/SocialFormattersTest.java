@@ -61,8 +61,10 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
     assertTrue(result.contains("twitter.com/hashtag/bar"));
 
     runner.run(
-       "f-activate-twitter-links-1.html"
-    );
+        "f-activate-twitter-links-1.html",
+        "f-activate-twitter-links-2.html",
+        "f-activate-twitter-links-3.html"
+        );
    }
 
   @Test

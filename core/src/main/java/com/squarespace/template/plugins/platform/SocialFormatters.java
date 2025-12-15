@@ -93,6 +93,15 @@ public class SocialFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       String text = var.node().asText();
+      if (ctx.compatEnabled(Patch.TWITTER_LINKS_RAW_HTML)) {
+        // Legacy, linkify the raw text and let hostile markup pass through.
+      } else {
+        // Fixed, escape the raw text first so hostile markup cannot pass
+        // through. The anchors built below are trusted.
+        StringBuilder escaped = new StringBuilder();
+        PluginUtils.escapeHtml(text, escaped);
+        text = escaped.toString();
+      }
       text = TWITTER_LINKS_REGEX.matcher(text).replaceAll(TWITTER_LINKS_REPLACE);
       text = TWITTER_TWEETS_REGEX.matcher(text).replaceAll(TWITTER_TWEETS_REPLACE);
       Matcher matcher = TWITTER_HASHTAG_REGEX.matcher(text);

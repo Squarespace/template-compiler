@@ -1,0 +1,13 @@
+:PROPERTIES
+level=0
+
+:JSON
+{
+	"text": "hello <img src=x onerror=alert(1)> @user #tag http://example.com/?a=1&b=2"
+}
+
+:TEMPLATE
+{text|activate-twitter-links}
+
+:OUTPUT
+hello <img src=x onerror=alert(1)> <a target="new" href="https://twitter.com/user/">@user</a> <a target="new" href="https://twitter.com/hashtag/tag?src=hash">#tag</a> <a target="new" href="http://example.com/?a=1&b=2">http://example.com/?a=1&b=2</a>
