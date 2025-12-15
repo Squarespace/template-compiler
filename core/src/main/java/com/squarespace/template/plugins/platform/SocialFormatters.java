@@ -265,7 +265,7 @@ public class SocialFormatters implements FormatterRegistry {
       Variable var = variables.first();
       JsonNode website = ctx.resolve("website");
       StringBuilder buf = new StringBuilder();
-      PlatformUtils.makeSocialButton(website, var.node(), false, buf);
+      PlatformUtils.makeSocialButton(website, var.node(), false, ctx.compatEnabled(Patch.SOCIAL_BUTTON_ATTRIBUTES), buf);
       var.set(buf);
     }
   }
@@ -281,7 +281,7 @@ public class SocialFormatters implements FormatterRegistry {
       Variable var = variables.first();
       JsonNode website = ctx.resolve("website");
       StringBuilder buf = new StringBuilder();
-      PlatformUtils.makeSocialButton(website, var.node(), true, buf);
+      PlatformUtils.makeSocialButton(website, var.node(), true, ctx.compatEnabled(Patch.SOCIAL_BUTTON_ATTRIBUTES), buf);
       var.set(buf);
     }
   }

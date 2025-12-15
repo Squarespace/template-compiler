@@ -116,14 +116,19 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   @Test
   public void testSocialButton() {
     runner.run(
-        "f-social-button-1.html"
+        "f-social-button-1.html",
+        "f-social-button-2.html",
+        "f-social-button-3.html",
+        "f-social-button-4.html",
+        "f-social-button-5.html"
         );
   }
 
   @Test
   public void testSocialButtonInline() {
     runner.run(
-        "f-social-button-inline-1.html"
+        "f-social-button-inline-1.html",
+        "f-social-button-inline-2.html"
         );
   }
 

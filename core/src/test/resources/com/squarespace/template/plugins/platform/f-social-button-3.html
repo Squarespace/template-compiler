@@ -1,0 +1,18 @@
+:PROPERTIES
+level=2
+
+:JSON
+{
+  "website": {"shareButtonOptions": ["foo"]},
+  "systemDataId": "id\"x",
+  "assetUrl": "http://evil.com/a\"><script>",
+  "recordType": "1\">",
+  "fullUrl": "http://full.com/x</script>",
+  "title": "t\"><script>alert(2)</script>"
+}
+
+:TEMPLATE
+{@|social-button}
+
+:OUTPUT
+<div class="squarespace-social-buttons button-style" data-system-data-id="id&quot;x" data-asset-url="http://evil.com/a&quot;&gt;&lt;script&gt;" data-record-type="1&quot;&gt;" data-full-url="http://full.com/x&lt;/script&gt;" data-title="t&quot;&gt;&lt;script&gt;alert(2)&lt;/script&gt;"></div>
