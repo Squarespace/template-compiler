@@ -75,7 +75,7 @@ class LegacyMoneyFormatter extends BaseFormatter {
     JsonNode node = var.node();
 
     Locale locale = (Locale) args.getOpaque();
-    Currency currency = getCurrency(node);
+    Currency currency = getCurrency(node, ctx.compatEnabled(Patch.LEGACY_MONEY_BAD_CURRENCY));
 
     if (ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING)) {
       // Legacy, formats through a double and loses precision on large values.
@@ -106,12 +106,22 @@ class LegacyMoneyFormatter extends BaseFormatter {
     return StringUtils.trimToNull(args.first());
   }
 
-  private static Currency getCurrency(JsonNode node) {
+  private static Currency getCurrency(JsonNode node, boolean legacyBadCurrency) {
     String currencyStr = StringUtils.trimToNull(node.path(CURRENCY_FIELD_NAME).asText());
     if (currencyStr == null) {
       return DEFAULT_CURRENCY;
     }
 
-    return Currency.getInstance(currencyStr);
+    // Legacy, an unknown or malformed code (e.g. "FOO", "usd") throws.
+    try {
+      return Currency.getInstance(currencyStr);
+    } catch (IllegalArgumentException e) {
+      if (legacyBadCurrency) {
+        throw e;
+      }
+      // Fixed, it falls back to the default currency, matching the
+      // missing-code path.
+      return DEFAULT_CURRENCY;
+    }
   }
 }

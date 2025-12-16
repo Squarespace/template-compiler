@@ -32,6 +32,7 @@ import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
 import com.squarespace.template.JsonUtils;
 import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.PlatformUnitTestBase;
 
 
@@ -55,6 +56,38 @@ public class MoneyFormatterLegacyTest extends PlatformUnitTestBase {
     // "Tsd." does not end up producing a shorter string than the full formatted
     // amount, e.g. "15.789 $" vs "15 Tsd. $" - This is a decision made at the CLDR level.
     assertEquals(executeLocale(template, json, "de-DE"), "-15.789 $");
+  }
+
+  @Test
+  public void testInvalidCurrencyCode() throws CodeException {
+    // Legacy, an unknown code collects the throw at the default level.
+    Context legacy = compiler().newExecutor()
+        .template("{@|i18n-money-format}")
+        .json("{\"decimalValue\":\"1.25\",\"currencyCode\":\"FOO\"}")
+        .locale(Locale.forLanguageTag("en-US"))
+        .safeExecution(true)
+        .execute();
+    assertEquals(legacy.getErrors().size(), 1);
+    Assert.assertTrue(legacy.getErrors().get(0).getMessage().contains("IllegalArgumentException"));
+
+    // Fixed, unknown, lowercase and missing codes render with the default currency.
+    String json = "{\"decimalValue\":\"1.25\"";
+    assertEquals(execFixed("{@|i18n-money-format}", json + ",\"currencyCode\":\"FOO\"}"), "$1.25");
+    assertEquals(execFixed("{@|i18n-money-format}", json + ",\"currencyCode\":\"usd\"}"), "$1.25");
+    assertEquals(execFixed("{@|i18n-money-format}", json + "}"), "$1.25");
+    // A valid code still formats in that currency.
+    assertEquals(execFixed("{@|i18n-money-format}", json + ",\"currencyCode\":\"EUR\"}"), "€1.25");
+  }
+
+  private String execFixed(String template, String json) throws CodeException {
+    Compiler compiler = compiler();
+    Context ctx = compiler.newExecutor()
+        .template(template)
+        .json(json)
+        .locale(Locale.forLanguageTag("en-US"))
+        .compat(CompatLevel.fixed())
+        .execute();
+    return ctx.buffer().toString();
   }
 
   private String executeLocale(String template, String json, String locale) throws CodeException {
