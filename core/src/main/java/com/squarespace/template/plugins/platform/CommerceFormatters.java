@@ -141,7 +141,11 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      Decimal subtotalCents = new Decimal(var.node().path("subtotalCents").asText());
+      // Legacy, a blank or missing subtotalCents crashes the block.
+      // Fixed, those values render as zero.
+      Decimal subtotalCents = ctx.compatEnabled(Patch.MONEY_BLANK_PARSE)
+          ? new Decimal(var.node().path("subtotalCents").asText())
+          : CommerceUtils.decimalOrZero(var.node().path("subtotalCents"));
 
       StringBuilder buf = new StringBuilder();
       buf.append("<span class=\"sqs-cart-subtotal\">");
@@ -196,7 +200,11 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      Decimal value = new Decimal(var.node().asText());
+      // Legacy, blank or missing money input crashes the block.
+      // Fixed, those values render as zero.
+      Decimal value = ctx.compatEnabled(Patch.MONEY_BLANK_PARSE)
+          ? new Decimal(var.node().asText())
+          : CommerceUtils.decimalOrZero(var.node());
       var.set(PluginUtils.formatMoney(value, Locale.US,
           ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING)));
     }
@@ -252,7 +260,11 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      Decimal value = new Decimal(var.node().asText());
+      // Legacy, blank or missing money input crashes the block.
+      // Fixed, those values render as zero.
+      Decimal value = ctx.compatEnabled(Patch.MONEY_BLANK_PARSE)
+          ? new Decimal(var.node().asText())
+          : CommerceUtils.decimalOrZero(var.node());
       StringBuilder buf = new StringBuilder();
       CommerceUtils.writeLegacyMoneyString(value, buf,
           ctx.compatEnabled(Patch.MONEY_DOUBLE_ROUNDING));

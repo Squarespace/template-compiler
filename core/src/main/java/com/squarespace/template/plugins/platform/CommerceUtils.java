@@ -273,6 +273,22 @@ public class CommerceUtils {
     return value == null ? DEFAULT_MONEY_AMOUNT : new Decimal(value);
   }
 
+  /**
+   * Parse a node as a decimal. Missing, null, blank or malformed values
+   * fall back to zero.
+   */
+  public static Decimal decimalOrZero(JsonNode node) {
+    String value = StringUtils.trimToNull(node.asText());
+    if (value == null || "null".equals(value)) {
+      return DEFAULT_MONEY_AMOUNT;
+    }
+    try {
+      return new Decimal(value);
+    } catch (IllegalArgumentException e) {
+      return DEFAULT_MONEY_AMOUNT;
+    }
+  }
+
   public static String getCurrencyFromMoneyNode(JsonNode moneyNode) {
     String currency = StringUtils.trimToNull(moneyNode.path("currency").asText());
     return currency == null ? DEFAULT_CURRENCY : currency;
