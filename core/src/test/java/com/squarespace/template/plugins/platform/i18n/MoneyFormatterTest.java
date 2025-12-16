@@ -140,6 +140,18 @@ public class MoneyFormatterTest extends PlatformUnitTestBase {
 
     // A valid decimalValue is unchanged.
     run(en_US, "{\"decimalValue\":\"1.25\",\"currencyCode\":\"USD\"}", "", "$1.25");
+
+    // Legacy, an unknown currency code renders a bare number with a leading NBSP.
+    run(en_US, "{\"decimalValue\":\"1.25\",\"currencyCode\":\"FOO\"}", "", "\u00a01.25");
+
+    // Fixed, an unknown currency code renders missing.
+    Context unknownCtx = new Context(JsonUtils.decode("{\"decimalValue\":\"1.25\",\"currencyCode\":\"FOO\"}"));
+    unknownCtx.javaLocale(Locale.US);
+    unknownCtx.setCompat(CompatLevel.fixed());
+    MONEY.validateArgs(mk.args(""));
+    Variables unknownVars = new Variables("@", unknownCtx.node());
+    MONEY.apply(unknownCtx, mk.args(""), unknownVars);
+    assertTrue(unknownVars.first().node().isMissingNode());
   }
 
   @Test

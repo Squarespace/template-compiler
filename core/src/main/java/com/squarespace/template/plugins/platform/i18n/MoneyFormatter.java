@@ -78,6 +78,13 @@ public class MoneyFormatter extends BaseFormatter {
       return;
     }
     CurrencyType currency = CurrencyType.fromString(code);
+    // Legacy, an unknown currency code renders a bare number with a
+    // leading NBSP. Fixed, it renders missing, like the other bad-money
+    // paths.
+    if (currency == null && !ctx.compatEnabled(Patch.MONEY_UNKNOWN_CURRENCY)) {
+      var.setMissing();
+      return;
+    }
     CurrencyFormatOptions opts = (CurrencyFormatOptions) args.getOpaque();
     String result = cldr.Numbers.formatCurrency(decimal, currency, opts);
     var.set(result);
