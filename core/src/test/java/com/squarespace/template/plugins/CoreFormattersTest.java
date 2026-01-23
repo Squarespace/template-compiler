@@ -56,6 +56,7 @@ import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonFormatter;
 import com.squarespace.template.plugins.CoreFormatters.JsonPrettyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.KeyByFormatter;
+import com.squarespace.template.plugins.CoreFormatters.LineBreaksFormatter;
 import com.squarespace.template.plugins.CoreFormatters.LookupFormatter;
 import com.squarespace.template.plugins.CoreFormatters.ModFormatter;
 import com.squarespace.template.plugins.CoreFormatters.OutputFormatter;
@@ -86,6 +87,7 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter JSON = new JsonFormatter();
   private static final Formatter JSON_PRETTY = new JsonPrettyFormatter();
   private static final Formatter KEY_BY = new KeyByFormatter();
+  private static final Formatter LINE_BREAKS = new LineBreaksFormatter();
   private static final Formatter OUTPUT = new OutputFormatter();
   private static final Formatter LOOKUP = new LookupFormatter();
   private static final Formatter MOD = new ModFormatter();
@@ -540,6 +542,15 @@ public class CoreFormattersTest extends UnitTestBase {
     );
 
     runner.exec("f-key-by-%N.html");
+  }
+
+  @Test
+  public void testLineBreaks() throws CodeException {
+    runner.exec("f-line-breaks-%N.html");
+
+    assertFormatter(LINE_BREAKS, "\"\"", "");
+    assertFormatter(LINE_BREAKS, "\"  \\n  \"", "  <br/>  ");
+    assertFormatter(LINE_BREAKS, "\"A\\nB\\n\\n\\nC\\nD\"", "A<br/>B<br/><br/><br/>C<br/>D");
   }
 
   @Test

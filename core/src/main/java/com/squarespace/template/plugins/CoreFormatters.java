@@ -83,9 +83,10 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new JsonFormatter());
     table.add(new JsonPrettyFormatter());
     table.add(new KeyByFormatter());
-    table.add(new OutputFormatter());
+    table.add(new LineBreaksFormatter());
     table.add(new LookupFormatter());
     table.add(new ModFormatter());
+    table.add(new OutputFormatter());
     table.add(new PluralizeFormatter());
     table.add(new PropFormatter());
     table.add(new RawFormatter());
@@ -580,6 +581,25 @@ public class CoreFormatters implements FormatterRegistry {
     }
   }
 
+
+  /**
+   * LINE-BREAKS
+   */
+  public static class LineBreaksFormatter extends BaseFormatter {
+
+    public LineBreaksFormatter() {
+      super("line-breaks", false);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      String value = var.node().asText();
+      String replaced = Patterns.ONENEWLINE.matcher(value).replaceAll("<br/>");
+      var.set(replaced);
+    }
+
+  }
 
   /**
    * OUTPUT

@@ -53,6 +53,7 @@ public class Patterns {
   public static final char POUND_CHAR = '#';
 
   public static final Pattern ONESPACE = Pattern.compile("\\s");
+  public static final Pattern ONENEWLINE = Pattern.compile("\n");
   public static final Pattern WHITESPACE_RE = Pattern.compile("\\s+");
   public static final Pattern WHITESPACE_NBSP = Pattern.compile("[\\s\u200b\u00a0]+");
 
