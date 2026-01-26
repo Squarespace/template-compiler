@@ -1,0 +1,26 @@
+:JSON
+{
+  "quotes": [
+    "|     \n     |",
+    "",
+    "\"abc\"",
+    "\"A\nB\nC\"",
+    "\"\nLong\n\nquote\n\nwith\n\nseveral\n\n\nline\n\nbreaks\n\""
+  ]
+}
+
+:TEMPLATE
+{.repeated section quotes}
+{@|line-breaks}
+{.end}
+
+:OUTPUT
+|     <br/>     |
+
+
+
+"abc"
+
+"A<br/>B<br/>C"
+
+"<br/>Long<br/><br/>quote<br/><br/>with<br/><br/>several<br/><br/><br/>line<br/><br/>breaks<br/>"
