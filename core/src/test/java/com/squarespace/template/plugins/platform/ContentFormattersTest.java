@@ -17,7 +17,9 @@
 package com.squarespace.template.plugins.platform;
 
 
+import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
@@ -28,7 +30,10 @@ import com.squarespace.template.CodeMaker;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.TestSuiteRunner;
+import com.squarespace.template.Variables;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.ContentFormatters.ColorWeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.HeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.ResizedHeightForWidthFormatter;
@@ -189,6 +194,24 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     assertFormatter(RESIZED_HEIGHT_FOR_WIDTH, args, json, "1200");
     assertFormatter(RESIZED_WIDTH_FOR_HEIGHT, args, json, "300");
 
+    // Legacy, non-numeric dimensions throw at the default level.
+    args = mk.args(" 50");
+    json = "\"axb\"";
+    try {
+      format(RESIZED_HEIGHT_FOR_WIDTH, args, json);
+      fail("expected NumberFormatException");
+    } catch (NumberFormatException e) {
+      // Expected
+    }
+
+    // Fixed, non-numeric dimensions take the invalid-source path.
+    assertEquals(formatFixed(RESIZED_HEIGHT_FOR_WIDTH, args, json), "Invalid source parameter. Pass in 'originalSize'.");
+    assertEquals(formatFixed(RESIZED_WIDTH_FOR_HEIGHT, args, json), "Invalid source parameter. Pass in 'originalSize'.");
+
+    // An empty value takes the invalid-source path at every level.
+    json = "\"\"";
+    assertFormatter(RESIZED_HEIGHT_FOR_WIDTH, args, json, "Invalid source parameter. Pass in 'originalSize'.");
+
     assertInvalidArgs(RESIZED_HEIGHT_FOR_WIDTH, mk.args(""));
     assertInvalidArgs(RESIZED_WIDTH_FOR_HEIGHT, mk.args(""));
   }
@@ -233,6 +256,30 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     String json = "\"100x200\"";
     assertFormatter(WIDTH, json, "100");
     assertFormatter(HEIGHT, json, "200");
+
+    // Legacy, non-numeric dimensions throw at the default level.
+    json = "\"axb\"";
+    try {
+      format(WIDTH, json);
+      fail("expected NumberFormatException");
+    } catch (NumberFormatException e) {
+      // Expected
+    }
+
+    // Fixed, non-numeric dimensions take the invalid-source path.
+    assertEquals(formatFixed(WIDTH, EMPTY_ARGUMENTS, json), "Invalid source parameter. Pass in 'originalSize'.");
+    assertEquals(formatFixed(HEIGHT, EMPTY_ARGUMENTS, json), "Invalid source parameter. Pass in 'originalSize'.");
+
+    json = "\"6x4\"";
+    assertFormatter(HEIGHT, json, "4");
+
+    json = "\"640x480\"";
+    assertFormatter(WIDTH, json, "640");
+
+    // An empty value takes the invalid-source path at every level.
+    json = "\"\"";
+    assertFormatter(WIDTH, json, "Invalid source parameter. Pass in 'originalSize'.");
+    assertFormatter(HEIGHT, json, "Invalid source parameter. Pass in 'originalSize'.");
   }
 
   @Test
@@ -252,5 +299,14 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
 
     String validHslaJsonDecimals = "{\"hue\": 0.956, \"saturation\": 0.9554, \"lightness\": 0.9567, \"alpha\": 0.555}";
     assertFormatter(WEBSITE_COLOR, validHslaJsonDecimals, "hsla(0.96, 95.54%, 95.67%, 0.56)");
+  }
+
+  private String formatFixed(Formatter impl, Arguments args, String json) throws CodeException {
+    Context ctx = new Context(JsonUtils.decode(json));
+    ctx.setCompat(CompatLevel.fixed());
+    impl.validateArgs(args);
+    Variables variables = new Variables("var", ctx.node());
+    impl.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 }

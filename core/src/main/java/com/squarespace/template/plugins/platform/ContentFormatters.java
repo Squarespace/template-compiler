@@ -288,11 +288,22 @@ public class ContentFormatters implements FormatterRegistry {
     }
   };
 
-  private static String[] splitDimensions(JsonNode node) {
+  private static String[] splitDimensions(JsonNode node, boolean legacyNonNumeric) {
     String val = node.asText();
     String[] parts = StringUtils.split(val, 'x');
     if (parts.length != 2) {
       return null;
+    }
+    // Legacy, non-numeric dimensions reach the consumer's Integer.parseInt
+    // and throw. Fixed, they are rejected here so the consumer takes its
+    // invalid-source path.
+    if (!legacyNonNumeric) {
+      try {
+        Integer.parseInt(parts[0]);
+        Integer.parseInt(parts[1]);
+      } catch (NumberFormatException e) {
+        return null;
+      }
     }
     return parts;
   }
@@ -315,7 +326,8 @@ public class ContentFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      String[] parts = splitDimensions(var.node());
+      String[] parts = splitDimensions(var.node(),
+          ctx.compatEnabled(Patch.SPLIT_DIMENSIONS_NONNUMERIC));
       if (parts == null || parts.length != 2) {
         var.set("Invalid source parameter. Pass in 'originalSize'.");
       } else {
@@ -718,7 +730,8 @@ public class ContentFormatters implements FormatterRegistry {
     }
 
     protected JsonNode resize(Context ctx, JsonNode node, boolean resizeWidth, int requested) {
-      String[] parts = splitDimensions(node);
+      String[] parts = splitDimensions(node,
+          ctx.compatEnabled(Patch.SPLIT_DIMENSIONS_NONNUMERIC));
       if (parts == null || parts.length != 2) {
         return new TextNode("Invalid source parameter. Pass in 'originalSize'.");
       }
@@ -850,7 +863,8 @@ public class ContentFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      String[] parts = splitDimensions(var.node());
+      String[] parts = splitDimensions(var.node(),
+          ctx.compatEnabled(Patch.SPLIT_DIMENSIONS_NONNUMERIC));
       if (parts == null || parts.length != 2) {
         var.set("Invalid source parameter. Pass in 'originalSize'.");
       } else {
