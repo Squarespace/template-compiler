@@ -13,6 +13,7 @@
 
 package com.squarespace.template.plugins.platform.i18n;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CalendarDate;
 import com.squarespace.cldrengine.api.DateFormatOptions;
@@ -46,7 +47,15 @@ public class DateTimeFormatter extends BaseFormatter {
   @Override
   public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
     Variable var = variables.first();
-    long epoch = var.node().asLong();
+    JsonNode node = var.node();
+    // Legacy, a missing or null value reads as epoch 0 and renders the
+    // 1969 date. Fixed, it renders missing.
+    if ((node.isMissingNode() || node.isNull())
+        && !ctx.compatEnabled(Patch.DATETIME_MISSING_EPOCH)) {
+      var.setMissing();
+      return;
+    }
+    long epoch = node.asLong();
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx,
         ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
     CLDR cldr = ctx.cldr();

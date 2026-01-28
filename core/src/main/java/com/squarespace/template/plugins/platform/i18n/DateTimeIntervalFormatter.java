@@ -16,6 +16,7 @@
 
 package com.squarespace.template.plugins.platform.i18n;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.squarespace.cldrengine.CLDR;
 import com.squarespace.cldrengine.api.CalendarDate;
 import com.squarespace.cldrengine.api.DateIntervalFormatOptions;
@@ -55,12 +56,21 @@ public class DateTimeIntervalFormatter extends BaseFormatter {
 
     Variable v1 = variables.get(0);
     Variable v2 = variables.get(1);
+    JsonNode n1 = v1.node();
+    JsonNode n2 = v2.node();
+    // Legacy, a missing or null operand reads as epoch 0. Fixed, the
+    // interval renders missing.
+    if ((n1.isMissingNode() || n1.isNull() || n2.isMissingNode() || n2.isNull())
+        && !ctx.compatEnabled(Patch.DATETIME_INTERVAL_RAW)) {
+      v1.setMissing();
+      return;
+    }
 
     CLDR cldr = ctx.cldr();
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx,
         ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
-    CalendarDate start = cldr.Calendars.toGregorianDate(v1.node().asLong(0), zoneId);
-    CalendarDate end = cldr.Calendars.toGregorianDate(v2.node().asLong(0), zoneId);
+    CalendarDate start = cldr.Calendars.toGregorianDate(n1.asLong(), zoneId);
+    CalendarDate end = cldr.Calendars.toGregorianDate(n2.asLong(), zoneId);
     DateIntervalFormatOptions options = (DateIntervalFormatOptions) args.getOpaque();
     String result = cldr.Calendars.formatDateInterval(start, end, options);
     v1.set(result);
