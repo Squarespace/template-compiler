@@ -18,6 +18,8 @@ package com.squarespace.template.plugins.platform.i18n;
 import static com.squarespace.template.GeneralUtils.splitVariable;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.cldrengine.api.MessageArgs;
 import com.squarespace.template.Arguments;
 import com.squarespace.template.BaseFormatter;
@@ -60,15 +62,49 @@ public class MessageFormatter extends BaseFormatter {
     var.set(result);
   }
 
-  private static int delimiter(String arg) {
+  /**
+   * Find the name/value delimiter in an argument. At the fixed level an
+   * argument is a named argument only when the name part is a plain
+   * identifier and the delimiter is not part of a URL scheme (e.g.
+   * http://example.com). Otherwise the argument is positional.
+   */
+  private static int delimiter(String arg, boolean legacyUrlSplit) {
     int len = arg.length();
     for (int i = 0; i < len; i++) {
       char c = arg.charAt(i);
-      if (c == ':' || c == '=') {
+      if (c != ':' && c != '=') {
+        continue;
+      }
+      // Legacy, the first colon or equals is the delimiter.
+      if (legacyUrlSplit) {
         return i;
       }
+      // A colon followed by "//" is a URL scheme, not a delimiter.
+      if (c == ':' && i + 2 < len && arg.charAt(i + 1) == '/' && arg.charAt(i + 2) == '/') {
+        continue;
+      }
+      // Any later delimiter would extend the same name, which already
+      // failed, so no later position can be a delimiter either.
+      return isName(arg.substring(0, i)) ? i : -1;
     }
     return -1;
+  }
+
+  private static boolean isName(String s) {
+    if (s.isEmpty()) {
+      return false;
+    }
+    char c0 = s.charAt(0);
+    if (!(Character.isLetter(c0) || c0 == '_' || c0 == '$')) {
+      return false;
+    }
+    for (int i = 1; i < s.length(); i++) {
+      char c = s.charAt(i);
+      if (!(Character.isLetterOrDigit(c) || c == '_' || c == '$')) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private static MessageArgs messageArgs(Arguments args, Context ctx) {
@@ -79,7 +115,7 @@ public class MessageFormatter extends BaseFormatter {
       String name = null;
 
       // Either ':' or '=' can delimit key/value arguments
-      int index = delimiter(raw);
+      int index = delimiter(raw, ctx.compatEnabled(Patch.MESSAGE_ARG_URL_SPLIT));
       if (index != -1) {
         // Map named argument
         name = raw.substring(0, index);
@@ -94,6 +130,11 @@ public class MessageFormatter extends BaseFormatter {
       // the message string.
       Frame parent = ctx.frame().parent();
       JsonNode value = ctx.resolve(ref, parent == null ? ctx.frame() : parent);
+      // Fixed, an argument that did not resolve to a variable passes
+      // through as literal text. Legacy, it is dropped.
+      if (value.isMissingNode() && !ctx.compatEnabled(Patch.MESSAGE_ARG_URL_SPLIT)) {
+        value = TextNode.valueOf(raw);
+      }
 
       if (name != null) {
         res.add(name, value);

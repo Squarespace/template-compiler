@@ -29,6 +29,8 @@ public class MessageFormatterTest extends PlatformUnitTestBase {
   public void testMessageFormatter() throws Exception {
     runner.run(
         "f-message-named-args.html",
+        "f-message-literal-args.html",
+        "f-message-literal-args-legacy.html",
         "f-message-subpath-1.html",
         "f-message-subpath-2.html",
         "f-message-subpath-3.html",
