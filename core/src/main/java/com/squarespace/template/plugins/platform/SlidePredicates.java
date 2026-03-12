@@ -20,6 +20,7 @@ import com.squarespace.template.Arguments;
 import com.squarespace.template.BasePredicate;
 import com.squarespace.template.CodeExecuteException;
 import com.squarespace.template.Context;
+import com.squarespace.template.compat.Patch;
 import com.squarespace.template.Predicate;
 import com.squarespace.template.PredicateRegistry;
 import com.squarespace.template.StringView;
@@ -41,6 +42,11 @@ public class SlidePredicates implements PredicateRegistry {
 
     @Override
     public boolean apply(Context ctx, Arguments args) throws CodeExecuteException {
+      // Legacy, a call with no arguments throws at render time. Fixed,
+      // it evaluates false, so the .or branch renders.
+      if (args.count() == 0 && !ctx.compatEnabled(Patch.CURRENT_TYPE_ARITY)) {
+        return false;
+      }
       int expected = ctx.node().path("currentType").asInt();
       SliceType type = SliceType.fromName(args.get(0));
       return type.code() == expected;

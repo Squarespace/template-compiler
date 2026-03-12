@@ -16,9 +16,17 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+
 import org.testng.annotations.Test;
 
+import com.squarespace.template.CodeException;
+import com.squarespace.template.Context;
+import com.squarespace.template.JsonUtils;
 import com.squarespace.template.TestSuiteRunner;
+import com.squarespace.template.compat.CompatLevel;
 
 public class SlidePredicatesTest extends PlatformUnitTestBase {
 
@@ -27,6 +35,37 @@ public class SlidePredicatesTest extends PlatformUnitTestBase {
   @Test
   public void testCurrentType() {
     runner.run("p-current-type.html");
+  }
+
+  @Test
+  public void testCurrentTypeAritySoft() throws CodeException {
+    Context ctx = new Context(JsonUtils.decode("{\"currentType\": 5}"));
+
+    // Legacy, a call with no arguments throws at render time.
+    try {
+      SlidePredicates.CURRENT_TYPE.apply(ctx, EMPTY_ARGUMENTS);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      // Expected
+    }
+
+    // Fixed, it evaluates false, so the .or branch renders.
+    ctx.setCompat(CompatLevel.fixed());
+    assertEquals(SlidePredicates.CURRENT_TYPE.apply(ctx, EMPTY_ARGUMENTS), false);
+
+    // Extra args are ignored, matching the JS engine: first arg wins.
+    Context gallery = compiler().newExecutor()
+        .template("{.current-type? gallery extra}a{.or}b{.end}")
+        .json("{\"currentType\": 5}")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(gallery.buffer().toString(), "a");
+    Context blog = compiler().newExecutor()
+        .template("{.current-type? blog extra}a{.or}b{.end}")
+        .json("{\"currentType\": 5}")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(blog.buffer().toString(), "b");
   }
 
 }
