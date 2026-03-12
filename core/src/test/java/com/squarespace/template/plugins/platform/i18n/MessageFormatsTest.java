@@ -39,8 +39,7 @@ public class MessageFormatsTest {
   public void testBasicArgs() {
     String actual;
     CLDR cldr = CLDR.get("en");
-    MessageFormats formats = new MessageFormats(cldr);
-    formats.setTimeZone("America/New_York");
+    MessageFormats formats = new MessageFormats(cldr, "America/New_York");
     String message = "{0 select abc {ABC} def {DEF} true {T} false {F}}";
 
     actual = formats.formatter().format(message, args().add(new TextNode("abc")));
@@ -122,8 +121,7 @@ public class MessageFormatsTest {
   public void testPlural() {
     String actual;
     CLDR cldr = CLDR.get("en");
-    MessageFormats formats = new MessageFormats(cldr);
-    formats.setTimeZone("America/New_York");
+    MessageFormats formats = new MessageFormats(cldr, "America/New_York");
     String message = "you have {0} item{0 plural one{} other{s}} in your cart";
 
     actual = formats.formatter().format(message, args().add(JsonUtils.decode("1")));
@@ -148,8 +146,7 @@ public class MessageFormatsTest {
   public void testCurrency() {
     String actual;
     CLDR cldr = CLDR.get("en");
-    MessageFormats formats = new MessageFormats(cldr);
-    formats.setTimeZone("America/New_York");
+    MessageFormats formats = new MessageFormats(cldr, "America/New_York");
     String message = "{0 currency style:standard}";
 
     ObjectNode money = money("12345.789", "USD");
@@ -165,8 +162,7 @@ public class MessageFormatsTest {
   public void testDecimal() {
     String actual;
     CLDR cldr = CLDR.get("en");
-    MessageFormats formats = new MessageFormats(cldr);
-    formats.setTimeZone("America/New_York");
+    MessageFormats formats = new MessageFormats(cldr, "America/New_York");
     String message = "{0 decimal style:short}";
 
     actual = formats.formatter().format(message, args().add(new TextNode("12345.789")));
@@ -177,21 +173,38 @@ public class MessageFormatsTest {
   public void testDateTime() {
     String actual;
     CLDR cldr = CLDR.get("en");
-    MessageFormats formats = new MessageFormats(cldr);
-    formats.setTimeZone("America/New_York");
+    MessageFormats formats = new MessageFormats(cldr, "America/New_York");
     String message = "{0 datetime date:long time:medium}";
     long epoch = 1582129775000L;
 
     actual = formats.formatter().format(message, args().add(new LongNode(epoch)));
-    assertEquals(actual, "February 19, 2020 at 11:29:35 AM");
+    assertEquals(actual, "February 19, 2020 at 11:29:35\u202FAM");
+  }
+
+  /**
+   * The zone is fixed per instance. Two instances with different zones
+   * must not interfere, since there is no shared mutable zone field.
+   */
+  @Test
+  public void testZonePerInstance() {
+    String message = "{0 datetime date:long time:medium}";
+    long epoch = 1582129775000L;
+    MessageArgs args = args().add(new LongNode(epoch));
+
+    CLDR cldr = CLDR.get("en");
+    MessageFormats newYork = new MessageFormats(cldr, "America/New_York");
+    MessageFormats tokyo = new MessageFormats(cldr, "Asia/Tokyo");
+
+    // Same message and args, each instance formats in its own zone.
+    assertEquals(newYork.formatter().format(message, args), "February 19, 2020 at 11:29:35\u202FAM");
+    assertEquals(tokyo.formatter().format(message, args), "February 20, 2020 at 1:29:35\u202FAM");
   }
 
   @Test
   public void testInterval() {
     String actual;
     CLDR cldr = CLDR.get("en");
-    MessageFormats formats = new MessageFormats(cldr);
-    formats.setTimeZone("America/New_York");
+    MessageFormats formats = new MessageFormats(cldr, "America/New_York");
     String message = "{0;1 datetime-interval}";
     long epoch = 1582129775000L;
 

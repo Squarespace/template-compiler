@@ -37,18 +37,21 @@ import com.squarespace.cldrengine.message.DefaultMessageArgConverter;
 
 /**
  * Hooks custom formatting functions into the @phensley/cldr message formatter.
+ *
+ * The time zone is fixed at construction and never mutated. The cldr
+ * MessageFormatter API takes no zone on a format() call, so callers build
+ * one MessageFormats per zone (Context caches them by zone id).
  */
 public class MessageFormats {
-
-  private static final String DEFAULT_ZONE = "America/New_York";
 
   private final CLDR cldr;
   private final MessageArgConverter converter;
   private final MessageFormatter formatter;
-  private String zoneId = DEFAULT_ZONE;
+  private final String zoneId;
 
-  public MessageFormats(CLDR cldr) {
+  public MessageFormats(CLDR cldr, String zoneId) {
     this.cldr = cldr;
+    this.zoneId = zoneId;
     Bundle bundle = cldr.General.bundle();
     this.converter = new ArgConverter();
     MessageFormatterOptions options = MessageFormatterOptions.build()
@@ -58,10 +61,6 @@ public class MessageFormats {
         .language(bundle.language())
         .region(bundle.region());
     this.formatter = new MessageFormatter(options);
-  }
-
-  public void setTimeZone(String zoneId) {
-    this.zoneId = zoneId;
   }
 
   public MessageFormatter formatter() {

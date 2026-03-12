@@ -54,8 +54,7 @@ public class MessageFormatter extends BaseFormatter {
     String zoneId = PluginDateUtils.getTimeZoneNameFromContext(ctx,
         ctx.compatEnabled(Patch.TIMEZONE_NULL_LITERAL));
     MessageArgs msgargs = messageArgs(args, ctx);
-    MessageFormats formats = ctx.messageFormatter();
-    formats.setTimeZone(zoneId);
+    MessageFormats formats = ctx.messageFormatter(zoneId);
 
     String message = node.asText();
     String result = formats.formatter().format(message, msgargs);

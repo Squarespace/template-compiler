@@ -57,7 +57,7 @@ public class Context {
 
   private CLDR cldrengine;
 
-  private MessageFormats messageformats;
+  private final Map<String, MessageFormats> messageformats = new HashMap<>();
 
   private Compiler compiler;
 
@@ -164,11 +164,18 @@ public class Context {
 //    return cldrLocale;
 //  }
 
-  public MessageFormats messageFormatter() {
-    if (this.messageformats == null) {
-      this.messageformats = new MessageFormats(this.cldr());
+  /**
+   * Return the message formatter for the given time zone. Instances are
+   * immutable per zone, so cache one per zone id instead of rebinding a
+   * shared zone field on every call.
+   */
+  public MessageFormats messageFormatter(String zoneId) {
+    MessageFormats formats = this.messageformats.get(zoneId);
+    if (formats == null) {
+      formats = new MessageFormats(this.cldr(), zoneId);
+      this.messageformats.put(zoneId, formats);
     }
-    return this.messageformats;
+    return formats;
   }
 
   public CLDR cldr() {
