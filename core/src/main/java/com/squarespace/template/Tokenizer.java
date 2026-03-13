@@ -594,7 +594,7 @@ public class Tokenizer {
     }
 
     try {
-      predicate.validateArgs(args);
+      predicate.validateArgs(args, getCompat());
     } catch (ArgumentsException e) {
       String identifier = predicate.identifier();
       fail(error(PREDICATE_ARGS_INVALID).name(identifier).data(e.getMessage()));

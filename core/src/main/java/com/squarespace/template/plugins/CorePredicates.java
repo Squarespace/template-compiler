@@ -37,6 +37,7 @@ import com.squarespace.template.ReprEmitter;
 import com.squarespace.template.StringView;
 import com.squarespace.template.SymbolTable;
 import com.squarespace.template.VariableRef;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.compat.Patch;
 
 
@@ -93,19 +94,28 @@ public class CorePredicates implements PredicateRegistry {
 
     @Override
     public void validateArgs(Arguments args) throws ArgumentsException {
+      validateArgs(args, CompatLevel.defaultLevel());
+    }
+
+    @Override
+    public void validateArgs(Arguments args, CompatLevel compat) throws ArgumentsException {
       limitArgs(args);
+      // Legacy, a keyword argument with leading whitespace is not
+      // parsed as json. Fixed, JSON whitespace is skipped and keywords
+      // must match exactly.
+      boolean legacyStart = compat.enabled(Patch.JSON_START_KEYWORD);
       List<Object> parsed = new ArrayList<>();
       for (int i = 0; i < args.count(); i++) {
-        parsed.add(parse(args, i));
+        parsed.add(parse(args, i, legacyStart));
       }
       args.setOpaque(parsed);
     };
 
-    private Object parse(Arguments args, int index) throws ArgumentsException {
+    private Object parse(Arguments args, int index, boolean legacyStart) throws ArgumentsException {
       String raw = args.get(index);
       // Peek at content to see if its JSON-like. This will cut down on the
       // number of failed JSON parse attempts.
-      if (GeneralUtils.isJsonStart(raw)) {
+      if (GeneralUtils.isJsonStart(raw, legacyStart)) {
         JsonNode result = JsonUtils.decode(raw, true);
         if (!result.isMissingNode()) {
           return result;

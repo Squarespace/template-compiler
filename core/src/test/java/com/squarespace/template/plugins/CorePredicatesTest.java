@@ -93,6 +93,29 @@ public class CorePredicatesTest extends UnitTestBase {
 
     ctx = execute(template, "{\"b\": 2}");
     assertEquals(ctx.buffer().toString(), "no");
+
+    // Legacy, a keyword argument with leading whitespace is not a JSON
+    // value at the default level, so the template fails to compile.
+    try {
+      compiler().compile("{.equal?\" true\"}");
+      fail("expected CodeSyntaxException");
+    } catch (CodeSyntaxException e) {
+      // Expected
+    }
+
+    // Fixed, it parses as the JSON boolean.
+    Context fixed = compiler().newExecutor()
+        .template("{.equal?\" true\"}yes{.or}no{.end}")
+        .json("true")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.buffer().toString(), "yes");
+    fixed = compiler().newExecutor()
+        .template("{.equal?\" false\"}yes{.or}no{.end}")
+        .json("false")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.buffer().toString(), "yes");
   }
 
   @Test

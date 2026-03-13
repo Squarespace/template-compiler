@@ -334,11 +334,69 @@ public class GeneralUtils {
     return node == null ? defaultValue : node.asText();
   }
 
-  /**
-   * Returns true if the first non-whitespace character is one of the
-   * valid starting characters for a JSON value; else false.
-   */
   public static boolean isJsonStart(String raw) {
+    return isJsonStart(raw, true);
+  }
+
+  /**
+   * With legacyStart, the released rules apply: only spaces are skipped
+   * and a keyword must start at index 0, so " true" is not a JSON start
+   * while "truex" is. Otherwise JSON whitespace is skipped and keywords
+   * (true, false, null) must match exactly, so "truex" is not JSON.
+   * Cheap pre-filter only; decoding still happens in the caller.
+   */
+  public static boolean isJsonStart(String raw, boolean legacyStart) {
+    if (legacyStart) {
+      return isJsonStartLegacy(raw);
+    }
+    int size = raw.length();
+    int index = 0;
+    while (index < size) {
+      char ch = raw.charAt(index);
+      if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r') {
+        switch (ch) {
+          case '"':
+          case '-':
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+          case '[':
+          case '{':
+            return true;
+
+          // Exact keyword match starting at the first non-whitespace char.
+          // regionMatches alone is not enough: "truex" would match "true".
+          // The keyword must end at the string end or at JSON whitespace.
+          case 'f':
+            return raw.regionMatches(index, "false", 0, 5)
+                && jsonKeywordEnd(raw, index + 5);
+
+          case 'n':
+            return raw.regionMatches(index, "null", 0, 4)
+                && jsonKeywordEnd(raw, index + 4);
+
+          case 't':
+            return raw.regionMatches(index, "true", 0, 4)
+                && jsonKeywordEnd(raw, index + 4);
+
+          default:
+            return false;
+        }
+      }
+      index++;
+    }
+    return false;
+  }
+
+  // The released isJsonStart rules, kept for the default compat level.
+  private static boolean isJsonStartLegacy(String raw) {
     int size = raw.length();
     int index = 0;
     while (index < size) {
@@ -384,6 +442,15 @@ public class GeneralUtils {
       index++;
     }
     return false;
+  }
+
+  // True if the keyword ends at the end of the string or at JSON whitespace.
+  private static boolean jsonKeywordEnd(String raw, int end) {
+    if (end >= raw.length()) {
+      return true;
+    }
+    char ch = raw.charAt(end);
+    return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
   }
 
 

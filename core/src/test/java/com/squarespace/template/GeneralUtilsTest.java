@@ -72,6 +72,7 @@ public class GeneralUtilsTest {
 
   @Test
   public void testIsJsonStart() {
+    // Both levels agree on structural starts.
     assertTrue(isJsonStart("123"));
     assertTrue(isJsonStart("  123"));
     assertTrue(isJsonStart("  {\"key\": \"val\"}"));
@@ -79,6 +80,25 @@ public class GeneralUtilsTest {
     assertFalse(isJsonStart(":123"));
     assertFalse(isJsonStart("'foo'"));
     assertFalse(isJsonStart("   "));
+
+    // Legacy, only spaces are skipped and a keyword must start at
+    // index 0, so " true" is not a start while "truex" is.
+    assertFalse(isJsonStart(" true"));
+    assertFalse(isJsonStart("\ttrue"));
+    assertTrue(isJsonStart(" 12"));
+    assertTrue(isJsonStart("truex"));
+    assertFalse(isJsonStart("nul"));
+
+    // Fixed, JSON whitespace is skipped and keywords must match
+    // exactly, so "truex" is not JSON.
+    assertTrue(isJsonStart(" true", false));
+    assertTrue(isJsonStart("  false", false));
+    assertTrue(isJsonStart("\ttrue", false));
+    assertTrue(isJsonStart(" 12", false));
+    assertFalse(isJsonStart("truex", false));
+    assertTrue(isJsonStart("true", false));
+    assertTrue(isJsonStart("null", false));
+    assertFalse(isJsonStart("nul", false));
   }
 
   @Test

@@ -17,6 +17,7 @@
 package com.squarespace.template;
 
 import com.squarespace.template.ReferenceScanner.References;
+import com.squarespace.template.compat.CompatLevel;
 
 
 /**
@@ -47,6 +48,15 @@ public interface Predicate {
   void addReferences(Arguments args, References refs);
 
   void validateArgs(Arguments args) throws ArgumentsException;
+
+  /**
+   * Validate the arguments for a compile at the given compatibility
+   * level. Predicates that make level-dependent compile-time decisions
+   * override this; the default keeps the released validation.
+   */
+  default void validateArgs(Arguments args, CompatLevel compat) throws ArgumentsException {
+    validateArgs(args);
+  }
 
   boolean apply(Context ctx, Arguments args) throws CodeExecuteException;
 
