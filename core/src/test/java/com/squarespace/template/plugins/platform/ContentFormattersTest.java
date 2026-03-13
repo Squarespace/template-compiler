@@ -163,6 +163,18 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     assertFormatter(COLOR_WEIGHT, "\"#444\"", "dark");
     assertFormatter(COLOR_WEIGHT, "\"800000\"", "light");
     assertFormatter(COLOR_WEIGHT, "\"7fffff\"", "dark");
+    // Legacy, a 4 or 5 char hex passes the old pattern and reports
+    // "dark" through the zero value.
+    assertFormatter(COLOR_WEIGHT, "\"#1234\"", "dark");
+    assertFormatter(COLOR_WEIGHT, "\"#12345\"", "dark");
+
+    // Fixed, it renders missing.
+    assertEquals(formatFixed(COLOR_WEIGHT, EMPTY_ARGUMENTS, "\"#1234\""), "");
+    assertEquals(formatFixed(COLOR_WEIGHT, EMPTY_ARGUMENTS, "\"#12345\""), "");
+
+    // A 7 char hex and non-hex chars render missing at every level.
+    assertFormatter(COLOR_WEIGHT, "\"1234567\"", "");
+    assertFormatter(COLOR_WEIGHT, "\"#GGG\"", "");
   }
 
   @Test

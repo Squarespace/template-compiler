@@ -245,7 +245,13 @@ public class ContentFormatters implements FormatterRegistry {
     }
   }
 
-  private static final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
+  // Legacy, the {3,6} match also accepts 4 and 5 char hex, which decode
+  // through the zero value and report "dark".
+  private static final Pattern VALID_COLOR_LEGACY = Pattern.compile("[abcdef0-9]{3,6}", Pattern.CASE_INSENSITIVE);
+
+  // Only 3-char and 6-char hex are decodable; matches() anchors the full
+  // string, so lengths 4/5/other never pass.
+  private static final Pattern VALID_COLOR = Pattern.compile("[abcdef0-9]{3}([abcdef0-9]{3})?", Pattern.CASE_INSENSITIVE);
 
   private static final int HALFBRIGHT = 0xFFFFFF / 2;
 
@@ -273,7 +279,10 @@ public class ContentFormatters implements FormatterRegistry {
       Variable var = variables.first();
       String hex = var.node().asText();
       hex = hex.replace("#", "");
-      if (!VALID_COLOR.matcher(hex).matches()) {
+      // Fixed, only 3 and 6 char hex are valid colors.
+      Pattern validColor = ctx.compatEnabled(Patch.COLOR_WEIGHT_LENGTH)
+          ? VALID_COLOR_LEGACY : VALID_COLOR;
+      if (!validColor.matcher(hex).matches()) {
         var.setMissing();
         return;
       }
