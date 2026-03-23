@@ -441,7 +441,8 @@ public class CoreFormatters implements FormatterRegistry {
       resolve(ctx, arguments);
       StringBuilder buf = new StringBuilder();
       String pattern = var.node().asText();
-      FormatUtils.format(pattern, arguments, buf);
+      FormatUtils.format(pattern, arguments, buf,
+          ctx.compatEnabled(Patch.FORMAT_STATE_DIGITS));
       var.set(buf);
     }
 

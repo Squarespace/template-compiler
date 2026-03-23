@@ -30,9 +30,15 @@ public class FormatUtils {
 
 
   /**
-   * Performs positional substitution of arguments in a pattern string in a single pass.
+   * Performs positional substitution of arguments in a pattern string in
+   * a single pass.
+   *
+   * With legacyState the released rules apply: digits inside a bad tag
+   * keep counting, which can re-arm a slot and leak its value, and
+   * braces have no escape. Otherwise "{{" is a literal "{" and "}}" a
+   * literal "}", and a bad tag is ignored until its closing brace.
    */
-  public static void format(String pattern, FormatArg[] args, StringBuilder buf) {
+  public static void format(String pattern, FormatArg[] args, StringBuilder buf, boolean legacyState) {
     // position in pattern
     int i = 0;
 
@@ -49,6 +55,7 @@ public class FormatUtils {
     while (i < length) {
       char ch = pattern.charAt(i);
       if (index == -2 && ch == '}') {
+        // done ignoring, back outside a tag
         index = -1;
 
       } else if (index != -1) {
@@ -63,11 +70,23 @@ public class FormatUtils {
           case '7':
           case '8':
           case '9':
-            // support > 9 arguments
-            if (index > 0) {
-              index *= 10;
+            if (legacyState) {
+              // Legacy, digits count even while ignoring, which can
+              // re-arm a slot: {x 2} leaks slot 0.
+              // support > 9 arguments
+              if (index > 0) {
+                index *= 10;
+              }
+              index += (int)(ch - '0');
+            } else if (index >= 0) {
+              // Fixed, only count digits inside a real tag, never
+              // while ignoring.
+              // support > 9 arguments
+              if (index > 0) {
+                index *= 10;
+              }
+              index += (int)(ch - '0');
             }
-            index += (int)(ch - '0');
             break;
 
           case '}':
@@ -78,14 +97,28 @@ public class FormatUtils {
             break;
 
           default:
+            // not a digit, so the tag is bad: ignore it until the closing brace
             index = -2;
             break;
         }
 
       } else if (ch == '{') {
-        index = 0;
+        if (!legacyState && i + 1 < length && pattern.charAt(i + 1) == '{') {
+          // Fixed, "{{" is a literal "{"
+          buf.append('{');
+          i++;
 
-      } else if (index != -2) {
+        } else {
+          // start of a substitution tag
+          index = 0;
+        }
+
+      } else if (!legacyState && ch == '}' && i + 1 < length && pattern.charAt(i + 1) == '}') {
+        // Fixed, "}}" is a literal "}"
+        buf.append('}');
+        i++;
+
+      } else {
         buf.append(ch);
       }
 
