@@ -60,8 +60,10 @@ public class StringView implements CharSequence {
 
   public StringView(String str, int start, int end) {
     this.str = str;
-    this.start = Math.max(start, 0);
-    this.end = Math.min(end, str.length());
+    // Clamp start into [0, length], then end into [start, length].
+    // Keeps length() >= 0 and start <= end for any input.
+    this.start = Math.max(0, Math.min(start, str.length()));
+    this.end = Math.max(this.start, Math.min(end, str.length()));
   }
 
   public String data() {
@@ -77,6 +79,9 @@ public class StringView implements CharSequence {
   }
 
   public char lastChar() {
+    if (end <= start) {
+      throw new IllegalStateException("StringView is empty");
+    }
     return str.charAt(end - 1);
   }
 

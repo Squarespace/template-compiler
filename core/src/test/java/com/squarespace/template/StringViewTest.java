@@ -73,6 +73,39 @@ public class StringViewTest {
   }
 
   @Test
+  public void testClampedWindow() {
+    // start beyond the string: window collapses to the end
+    StringView view = new StringView("abc", 5, 10);
+    assertEquals(0, view.length());
+    assertEquals(3, view.start());
+    assertEquals(3, view.end());
+
+    // empty string, any out-of-range window
+    view = new StringView("", 5, 10);
+    assertEquals(0, view.length());
+    assertEquals(0, view.start());
+    assertEquals(0, view.end());
+  }
+
+  @Test(expectedExceptions = IllegalStateException.class)
+  public void testLastCharEmpty() {
+    new StringView("", 5, 10).lastChar();
+  }
+
+  @Test
+  public void testLastChar() {
+    assertEquals('b', new StringView("abc", 1, 2).lastChar());
+  }
+
+  @Test
+  public void testInRangeUnchanged() {
+    StringView view = new StringView("abc", 1, 2);
+    assertEquals("b", view.toString());
+    assertEquals('b', view.charAt(0));
+    assertEquals('c', new StringView("abc", 1, 3).lastChar());
+  }
+
+  @Test
   public void testBuilder() {
     String orig = "foobar";
     StringView view = new StringView(orig, 1, 5);
