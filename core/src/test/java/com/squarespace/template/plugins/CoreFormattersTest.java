@@ -45,6 +45,8 @@ import com.squarespace.template.SyntaxErrorType;
 import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.UnitTestBase;
 import com.squarespace.template.Variables;
+import static com.squarespace.template.Constants.EMPTY_ARGUMENTS;
+
 import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.CoreFormatters.ApplyFormatter;
 import com.squarespace.template.plugins.CoreFormatters.CountFormatter;
@@ -498,6 +500,11 @@ public class CoreFormattersTest extends UnitTestBase {
     assertFormatter(ENCODE_URI,
         "\"http://www.google.ru/support/jobs/bin/static.py?page=why-ru.html&sid=liveandwork\"",
         "http://www.google.ru/support/jobs/bin/static.py?page=why-ru.html&sid=liveandwork");
+    // Legacy, the quote is not in the unescaped set and encodes to %27.
+    assertFormatter(ENCODE_URI, "\"'\"", "%27");
+    // Fixed, the quote is uriMark and stays unescaped.
+    assertEquals(formatFixed(ENCODE_URI, EMPTY_ARGUMENTS, "\"'\""), "'");
+    assertEquals(formatFixed(ENCODE_URI, EMPTY_ARGUMENTS, "\"-_.!~*'() ;/?:@&=+$,#\""), "-_.!~*'()%20;/?:@&=+$,#");
   }
 
   @Test
@@ -510,8 +517,12 @@ public class CoreFormattersTest extends UnitTestBase {
         "http%3A%2F%2Fwww.google.ru%2Fsupport%2Fjobs%2Fbin%2Fstatic.py%3Fpage%3Dwhy-ru.html%26sid%3Dliveandwork");
     assertFormatter(ENCODE_URI_COMPONENT, "\"http://en.wikipedia.org/wiki/UTF-8#Description\"",
         "http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FUTF-8%23Description");
-
+    // Legacy, the quote encodes to %27.
+    assertFormatter(ENCODE_URI_COMPONENT, "\"'\"", "%27");
     assertFormatter(ENCODE_URI_COMPONENT, "\"-_.!~*() ;/?@&=+$,#\"", "-_.!~*()%20%3B%2F%3F%40%26%3D%2B%24%2C%23");
+    // Fixed, the quote is uriMark and stays unescaped.
+    assertEquals(formatFixed(ENCODE_URI_COMPONENT, EMPTY_ARGUMENTS, "\"'\""), "'");
+    assertEquals(formatFixed(ENCODE_URI_COMPONENT, EMPTY_ARGUMENTS, "\"-_.!~*'() ;/?@&=+$,#\""), "-_.!~*'()%20%3B%2F%3F%40%26%3D%2B%24%2C%23");
   }
 
   @Test
@@ -856,5 +867,14 @@ public class CoreFormattersTest extends UnitTestBase {
     website.put("timeZoneOffset", timezone.getOffset(timestamp));
     website.put("timeZone", timezone.getID());
     return node.toString();
+  }
+
+  private String formatFixed(Formatter impl, Arguments args, String json) throws CodeException {
+    Context ctx = new Context(JsonUtils.decode(json));
+    ctx.setCompat(CompatLevel.fixed());
+    impl.validateArgs(args);
+    Variables variables = new Variables("var", ctx.node());
+    impl.apply(ctx, args, variables);
+    return variables.first().node().asText();
   }
 }

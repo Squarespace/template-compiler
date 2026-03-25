@@ -323,7 +323,7 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       String value = var.node().asText();
-      String encoded = EncodeUtils.encodeURI(value);
+      String encoded = EncodeUtils.encodeURI(value, ctx.compatEnabled(Patch.ENCODE_URI_QUOTE));
       // EncodeUtils returns null on lone surrogates. Fixed, that emits
       // empty output instead of the text "null".
       if (encoded == null && !ctx.compatEnabled(Patch.ENCODE_URI_SURROGATE)) {
@@ -351,7 +351,7 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       String value = var.node().asText();
-      String encoded = EncodeUtils.encodeURIComponent(value);
+      String encoded = EncodeUtils.encodeURIComponent(value, ctx.compatEnabled(Patch.ENCODE_URI_QUOTE));
       // EncodeUtils returns null on lone surrogates. Fixed, that emits
       // empty output instead of the text "null".
       if (encoded == null && !ctx.compatEnabled(Patch.ENCODE_URI_SURROGATE)) {

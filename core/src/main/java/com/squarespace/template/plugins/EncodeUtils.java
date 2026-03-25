@@ -17,24 +17,32 @@ package com.squarespace.template.plugins;
 public class EncodeUtils {
 
   public static String encodeURI(String value) {
-    return encode(value, true);
+    return encode(value, true, true);
   }
 
   public static String encodeURIComponent(String value) {
-    return encode(value, false);
+    return encode(value, false, true);
+  }
+
+  public static String encodeURI(String value, boolean legacyQuote) {
+    return encode(value, true, legacyQuote);
+  }
+
+  public static String encodeURIComponent(String value, boolean legacyQuote) {
+    return encode(value, false, legacyQuote);
   }
 
   /*
    * ECMA 3, 15.1.3 URI Handling Function Properties The following are implementations of the algorithms given in the
    * ECMA specification for the hidden functions 'Encode' and 'Decode'.
    */
-  private static String encode(String str, boolean fullUri) {
+  private static String encode(String str, boolean fullUri, boolean legacyQuote) {
     byte[] utf8buf = null;
     StringBuilder sb = null;
 
     for (int k = 0, length = str.length(); k != length; ++k) {
       char c = str.charAt(k);
-      if (encodeUnescaped(c, fullUri)) {
+      if (encodeUnescaped(c, fullUri, legacyQuote)) {
         if (sb != null) {
           sb.append(c);
         }
@@ -102,7 +110,7 @@ public class EncodeUtils {
     return utf8Length;
   }
 
-  private static boolean encodeUnescaped(char c, boolean fullUri) {
+  private static boolean encodeUnescaped(char c, boolean fullUri, boolean legacyQuote) {
     if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9')) {
       return true;
     }
@@ -116,6 +124,13 @@ public class EncodeUtils {
       case '(':
       case ')':
         return true;
+      case '\'':
+        // uriMark per ECMA-262. Legacy, the quote was missing from
+        // this set and encoded as %27.
+        if (!legacyQuote) {
+          return true;
+        }
+        break;
       case ';':
       case '/':
       case '?':
