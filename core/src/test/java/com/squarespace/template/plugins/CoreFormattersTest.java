@@ -515,6 +515,34 @@ public class CoreFormattersTest extends UnitTestBase {
   }
 
   @Test
+  public void testEscapeUriLoneSurrogate() throws CodeException {
+    // Legacy, the null from EncodeUtils renders as the text "null".
+    Context ctx = compiler().newExecutor()
+        .template("{s|encode-uri}")
+        .json("{\"s\":\"a\\uD800b\"}")
+        .execute();
+    assertEquals(ctx.buffer().toString(), "null");
+    assertEquals(ctx.getErrors().size(), 0);
+
+    // Fixed, a lone surrogate emits empty output.
+    ctx = compiler().newExecutor()
+        .template("{s|encode-uri}")
+        .json("{\"s\":\"a\\uD800b\"}")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(ctx.buffer().toString(), "");
+    assertEquals(ctx.getErrors().size(), 0);
+
+    ctx = compiler().newExecutor()
+        .template("{s|encode-uri-component}")
+        .json("{\"s\":\"a\\uDC00b\"}")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(ctx.buffer().toString(), "");
+    assertEquals(ctx.getErrors().size(), 0);
+  }
+
+  @Test
   public void testFormat() throws CodeException {
     runner.exec("f-format-%N.html");
   }
