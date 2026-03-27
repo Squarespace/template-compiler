@@ -873,18 +873,32 @@ public class CommerceFormatters implements FormatterRegistry {
       }
 
       // Find the merchandising context for this product
-      String productId = product.get("id").asText();
+      // Legacy, a product without an id or a context entry without
+      // scarcityEnabled throws. Fixed, the block renders empty.
+      boolean legacyScarcity = ctx.compatEnabled(Patch.SCARCITY_MISSING_FIELD);
+      String productId = legacyScarcity
+          ? product.get("id").asText()
+          : product.path("id").asText();
       JsonNode contextForProduct = productMerchandisingContext.path(productId);
 
       if (contextForProduct.isMissingNode()) {
         return;
       }
 
-      if (contextForProduct.get("scarcityEnabled").asBoolean()) {
+      JsonNode scarcityEnabled = legacyScarcity
+          ? contextForProduct.get("scarcityEnabled")
+          : contextForProduct.path("scarcityEnabled");
+      if (scarcityEnabled.asBoolean(false)) {
         ObjectNode templateVariables = JsonUtils.createObjectNode();
-        templateVariables.put("scarcityTemplateViews", contextForProduct.get("scarcityTemplateViews"));
-        templateVariables.put("scarcityText", contextForProduct.get("scarcityText"));
-        templateVariables.put("scarcityShownByDefault", contextForProduct.get("scarcityShownByDefault"));
+        templateVariables.set("scarcityTemplateViews", legacyScarcity
+            ? contextForProduct.get("scarcityTemplateViews")
+            : contextForProduct.path("scarcityTemplateViews"));
+        templateVariables.set("scarcityText", legacyScarcity
+            ? contextForProduct.get("scarcityText")
+            : contextForProduct.path("scarcityText"));
+        templateVariables.set("scarcityShownByDefault", legacyScarcity
+            ? contextForProduct.get("scarcityShownByDefault")
+            : contextForProduct.path("scarcityShownByDefault"));
         var.set(executeTemplate(ctx, template, templateVariables, false));
       }
     }
@@ -911,7 +925,11 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode websiteCtx = ctx.resolve("website");
       JsonNode productCtx = ctx.resolve("productMerchandisingContext");
 
-      String productId = product.get("id").asText();
+      // Legacy, a product without an id throws. Fixed, the block
+      // renders empty.
+      String productId = ctx.compatEnabled(Patch.SCARCITY_MISSING_FIELD)
+          ? product.get("id").asText()
+          : product.path("id").asText();
       JsonNode productNode = productCtx.path(productId);
       ObjectNode templateVariables = JsonUtils.createObjectNode();
       templateVariables.set("product", product);

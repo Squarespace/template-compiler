@@ -16,9 +16,14 @@
 
 package com.squarespace.template.plugins.platform;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.Test;
 
 import com.squarespace.template.CodeException;
+import com.squarespace.template.Context;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.TestSuiteRunner;
 import com.squarespace.template.plugins.platform.CommerceFormatters.MoneyDashFormatter;
@@ -227,12 +232,65 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   public void testProductScarcity() {
     runner.run(
         "f-scarcity-context-missing.html",
+        "f-scarcity-no-enabled-field.html",
         "f-scarcity-not-enabled.html",
         "f-scarcity-default-shown.html",
         "f-scarcity-default-hidden.html",
         "f-scarcity-default-shown-escape-html.html",
         "f-scarcity-default-shown-and-variants.html"
     );
+  }
+
+  @Test
+  public void testProductScarcityMissingEnabledField() throws CodeException {
+    String json = "{\"item\":{\"id\":\"560c37c1a7c8465c4a71d99a\"},"
+        + "\"productMerchandisingContext\":{\"560c37c1a7c8465c4a71d99a\":{}}}";
+
+    // Legacy, a context entry without scarcityEnabled collects the NPE
+    // at the default level.
+    Context legacy = compiler().newExecutor()
+        .template("{item|product-scarcity}")
+        .json(json)
+        .safeExecution(true)
+        .execute();
+    assertEquals(legacy.getErrors().size(), 1);
+    assertTrue(legacy.getErrors().get(0).getMessage().contains("NullPointerException"));
+
+    // Fixed, the block renders empty without error.
+    Context fixed = compiler().newExecutor()
+        .template("[{item|product-scarcity}]")
+        .json(json)
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0);
+    assertEquals(fixed.buffer().toString(), "[]");
+  }
+
+  @Test
+  public void testRestockMissingProductId() throws CodeException {
+    String json = "{\"item\":{},\"productMerchandisingContext\":{}}";
+
+    // Legacy, a product without an id collects the NPE at the default
+    // level.
+    Context legacy = compiler().newExecutor()
+        .template("{item|product-restock-notification}")
+        .json(json)
+        .safeExecution(true)
+        .execute();
+    assertEquals(legacy.getErrors().size(), 1);
+    assertTrue(legacy.getErrors().get(0).getMessage().contains("NullPointerException"));
+
+    // Fixed, the block renders empty without error.
+    Context fixed = compiler().newExecutor()
+        .template("[{item|product-restock-notification}]")
+        .json(json)
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0);
+    // The template keeps its static whitespace; the conditional parts render empty.
+    assertEquals(fixed.buffer().toString(), "[\n\n\n\n\n\n]");
   }
 
   @Test

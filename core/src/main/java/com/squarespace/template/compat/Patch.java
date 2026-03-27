@@ -220,7 +220,13 @@ public enum Patch {
   /**
    * datetime-interval returns the raw input for a missing operand.
    */
-  DATETIME_INTERVAL_RAW(3);
+  DATETIME_INTERVAL_RAW(3),
+
+  /**
+   * product-scarcity and restock throw when the product has no id or
+   * the merchandising context entry has no scarcityEnabled field.
+   */
+  SCARCITY_MISSING_FIELD(3);
 
   /**
    * Lowest level where this patch is fixed. Frozen once a release ships.
