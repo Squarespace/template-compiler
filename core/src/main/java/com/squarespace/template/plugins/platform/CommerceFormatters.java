@@ -116,10 +116,25 @@ public class CommerceFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      int count = 0;
       JsonNode entriesNode = var.node().path("entries");
-      for (int i = 0; i < entriesNode.size(); i++) {
-        count += entriesNode.get(i).get("quantity").intValue();
+      long count;
+      if (ctx.compatEnabled(Patch.CART_QUANTITY_MISSING)) {
+        // Legacy, a missing quantity NPEs and the int sum overflows
+        // on big carts.
+        int legacyCount = 0;
+        for (int i = 0; i < entriesNode.size(); i++) {
+          legacyCount += entriesNode.get(i).get("quantity").intValue();
+        }
+        count = legacyCount;
+      } else {
+        // Fixed, a missing or non-numeric quantity counts as 0 and
+        // the long sum does not overflow.
+        count = 0;
+        if (entriesNode.isArray()) {
+          for (int i = 0; i < entriesNode.size(); i++) {
+            count += entriesNode.get(i).path("quantity").asLong();
+          }
+        }
       }
 
       StringBuilder buf = new StringBuilder();
