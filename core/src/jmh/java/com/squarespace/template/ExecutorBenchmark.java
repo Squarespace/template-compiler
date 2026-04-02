@@ -17,6 +17,7 @@
 package com.squarespace.template;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -76,6 +77,11 @@ public class ExecutorBenchmark {
     blackhole.consume(state.execute(state.simpleTemplate));
   }
 
+  @Benchmark
+  public void partialApplyInst(BenchmarkState state, Blackhole blackhole) throws CodeException {
+    blackhole.consume(state.execute(state.partialApplyInst, state.partials));
+  }
+
   @State(Scope.Benchmark)
   public static class BenchmarkState {
 
@@ -97,6 +103,10 @@ public class ExecutorBenchmark {
 
     public Instruction simpleTemplate;
 
+    public Instruction partialApplyInst;
+
+    public ObjectNode partials;
+
     @Setup
     public void setupCompiler() throws RunnerException {
       try {
@@ -110,6 +120,10 @@ public class ExecutorBenchmark {
         this.repeatedSectionInst = compiler.compile("{.repeated section foos}{bar}{.end}").code();
         this.ifInst = compiler.compile("{.if foo}{bar}{.end}").code();
         this.simpleTemplate = compiler.compile("{.section foo}{.if bar}baz{.or}qux{.end}{.end}").code();
+        // Template whose partials are compiled fresh for every new context.
+        this.partialApplyInst = compiler.compile("{.repeated section foos}{@|apply row}{.end}").code();
+        this.partials = (ObjectNode)JsonUtils.decode("{\"row\":\"<li>{bar}</li><li>{bar|json}</li>"
+            + "<li>{bar}</li><li>{bar|json}</li><li>{bar}</li>\"}");
       } catch (Exception e) {
         throw new RunnerException("Failed to init benchmark state", e);
       }
@@ -117,6 +131,11 @@ public class ExecutorBenchmark {
 
     public Context execute(Instruction instruction) throws CodeException {
       return compiler.newExecutor().code(instruction).json(simpleJsonNode).safeExecution(true).execute();
+    }
+
+    public Context execute(Instruction instruction, ObjectNode partialsMap) throws CodeException {
+      return compiler.newExecutor().code(instruction).json(simpleJsonNode).partialsMap(partialsMap)
+          .safeExecution(true).execute();
     }
 
     private static FormatterTable formatterTable() {

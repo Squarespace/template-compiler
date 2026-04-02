@@ -414,19 +414,30 @@ public class Context {
       // Compile the partial.  This can throw a syntax exception, which the formatter
       // will catch and nest inside a runtime exception.
       String source = partialNode.asText();
-      CompiledTemplate template = compiler.compile(source, safeExecution, preprocess);
-      if (safeExecution) {
-        List<ErrorInfo> errors = template.errors();
-        if (!errors.isEmpty()) {
-          ErrorInfo parent = error(ExecuteErrorType.COMPILE_PARTIAL_SYNTAX).name(name);
-          parent.child(errors);
-          addError(parent);
-        }
-      }
 
-      // Cache the compiled template in case it is used more than once.
-      inst = template.code();
-      compiledPartials.put(name, inst);
+      // Reuse a compile from another context with the same source and flags,
+      // so repeated executions of the same partial set don't recompile.
+      inst = compiler.getCachedPartial(name, source, safeExecution, preprocess);
+      if (inst == null) {
+        CompiledTemplate template = compiler.compile(source, safeExecution, preprocess);
+        if (safeExecution) {
+          List<ErrorInfo> errors = template.errors();
+          if (!errors.isEmpty()) {
+            ErrorInfo parent = error(ExecuteErrorType.COMPILE_PARTIAL_SYNTAX).name(name);
+            parent.child(errors);
+            addError(parent);
+          }
+        }
+
+        // Cache the compiled template in case it is used more than once.
+        inst = template.code();
+        // Share error-free compiles across contexts only. A compile with
+        // syntax errors must be re-reported on every execution.
+        if (template.errors().isEmpty()) {
+          compiler.cachePartial(name, source, safeExecution, preprocess, inst);
+        }
+        compiledPartials.put(name, inst);
+      }
     }
     return inst;
   }

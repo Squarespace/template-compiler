@@ -17,6 +17,8 @@
 package com.squarespace.template;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Locale;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.Instructions.VariableInst;
@@ -141,6 +144,28 @@ public class CompilerTest {
         .partialsMap(partialsMap)
         .execute();
     assertEquals(ctx.buffer().toString(), "123");
+  }
+
+  @Test
+  public void testPartialCacheAcrossContexts() throws CodeException {
+    Compiler compiler = new Compiler(FORMATTERS, PREDICATES);
+    ObjectNode partials = (ObjectNode) JsonUtils.decode("{\"greet\":\"{msg}!\"}");
+    JsonNode json = JsonUtils.decode("{\"msg\":\"hi\"}");
+
+    // Both executions render from the same partial source.
+    Context ctx1 = compiler.newExecutor().template("{@|apply greet}").json(json).partialsMap(partials).execute();
+    Context ctx2 = compiler.newExecutor().template("{@|apply greet}").json(json).partialsMap(partials).execute();
+    assertEquals(ctx1.buffer().toString(), "hi!");
+    assertEquals(ctx2.buffer().toString(), "hi!");
+
+    // The second context reuses the instruction compiled by the first.
+    assertSame(ctx2.getPartial("greet"), ctx1.getPartial("greet"));
+
+    // Same partial name, different source: must recompile, never go stale.
+    ObjectNode partials2 = (ObjectNode) JsonUtils.decode("{\"greet\":\"{msg}!!!\"}");
+    Context ctx3 = compiler.newExecutor().template("{@|apply greet}").json(json).partialsMap(partials2).execute();
+    assertEquals(ctx3.buffer().toString(), "hi!!!");
+    assertNotSame(ctx3.getPartial("greet"), ctx1.getPartial("greet"));
   }
 
   @Test
