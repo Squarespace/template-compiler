@@ -36,7 +36,6 @@ public enum InstructionType {
   NOOP,
   OR_PREDICATE,
   PREDICATE,
-  PREPROCESSOR,
   REPEATED,
   ROOT,
   SECTION,
