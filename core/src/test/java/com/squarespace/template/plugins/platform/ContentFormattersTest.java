@@ -22,11 +22,21 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import static org.testng.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+
 import org.testng.annotations.Test;
 
 import com.squarespace.template.Arguments;
 import com.squarespace.template.CodeException;
 import com.squarespace.template.CodeMaker;
+import com.squarespace.template.CompiledTemplate;
+import com.squarespace.template.Compiler;
 import com.squarespace.template.Context;
 import com.squarespace.template.Formatter;
 import com.squarespace.template.Instruction;
@@ -320,5 +330,44 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
     Variables variables = new Variables("var", ctx.node());
     impl.apply(ctx, args, variables);
     return variables.first().node().asText();
+  }
+
+  @Test
+  public void testWebsiteColorConcurrent() throws Exception {
+    // Formatters are registered once per FormatterTable, so all compiled
+    // templates share one WebsiteColorFormatter instance. The formatter
+    // must not keep mutable state (DecimalFormat is not thread-safe).
+    // Compile per thread but share the Compiler: the formatter instance
+    // is the only shared state. Fire 8 threads x 2000 executions. Input is
+    // fixed, so every output must equal the expected string exactly.
+    Compiler compiler = compiler();
+    String json = "{\"c\": {\"hue\": 200.956, \"saturation\": 0.3, \"lightness\": 0.5, \"alpha\": 0.9}}";
+    String expected = "hsla(200.96, 30%, 50%, 0.9)";
+    Pattern colorPattern = Pattern.compile(
+        "^hsl(?:a)?\\(\\d+(?:\\.\\d+)?(?:, \\d+(?:\\.\\d+)?%){2}(?:, \\d+(?:\\.\\d+)?)?\\)$");
+
+    ExecutorService pool = Executors.newFixedThreadPool(8);
+    CountDownLatch start = new CountDownLatch(1);
+    List<Future<String>> futures = new ArrayList<>();
+    for (int i = 0; i < 8; i++) {
+      futures.add(pool.submit(() -> {
+        start.await();
+        CompiledTemplate compiled = compiler.compile("{c|website-color}");
+        StringBuilder out = new StringBuilder();
+        for (int j = 0; j < 2000; j++) {
+          Context ctx = compiler.newExecutor().code(compiled.code()).json(json).execute();
+          out.append(ctx.buffer()).append('\n');
+        }
+        return out.toString();
+      }));
+    }
+    start.countDown();
+    pool.shutdown();
+    for (Future<String> future : futures) {
+      for (String line : future.get().split("\n")) {
+        assertTrue(colorPattern.matcher(line).matches(), "bad website-color output: '" + line + "'");
+        assertEquals(line, expected);
+      }
+    }
   }
 }

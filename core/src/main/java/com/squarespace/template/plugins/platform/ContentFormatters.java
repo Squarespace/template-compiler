@@ -22,10 +22,11 @@ import static com.squarespace.template.GeneralUtils.loadResource;
 import static com.squarespace.template.plugins.PluginUtils.slugify;
 
 import java.text.DecimalFormat;
-
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -352,10 +353,16 @@ public class ContentFormatters implements FormatterRegistry {
       super("website-color", false);
     }
 
-    private final DecimalFormat format = new DecimalFormat("0.##");
+    // DecimalFormat is not thread-safe, and this formatter is shared by
+    // concurrent executions (registered once per FormatterTable). Build a
+    // fresh one per call, like PlatformUtils.formatPercentage(). Locale is
+    // taken from the context (defaults to Locale.US) so output is stable.
+    private static final String PATTERN = "0.##";
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      DecimalFormat format = new DecimalFormat(PATTERN,
+          DecimalFormatSymbols.getInstance(ctx.javaLocale() != null ? ctx.javaLocale() : Locale.US));
       Variable var = variables.first();
       JsonNode node = var.node();
       boolean hasAlphaValue = false;
