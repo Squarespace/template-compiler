@@ -20,9 +20,13 @@ import static com.squarespace.template.GeneralUtils.isTruthy;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -479,6 +483,10 @@ public class CommerceUtils {
     }
 
     ArrayNode userDefinedOptions = JsonUtils.createArrayNode();
+    // Look up the option by name instead of scanning the array each time.
+    Map<String, ObjectNode> optionByName = new HashMap<>();
+    // Track seen values per option so the membership check does not rescan.
+    Map<String, Set<String>> optionValuesByName = new HashMap<>();
     JsonNode ordering = structuredContent.path("variantOptionOrdering");
     for (int i = 0; i < ordering.size(); i++) {
       String optionName = ordering.path(i).asText();
@@ -486,6 +494,7 @@ public class CommerceUtils {
       option.put("name", optionName);
       option.putArray("values");
       userDefinedOptions.add(option);
+      optionByName.put(optionName, option);
     }
 
     for (int i = 0; i < variants.size(); i++) {
@@ -500,27 +509,20 @@ public class CommerceUtils {
         String field = fields.next();
 
         String variantOptionValue = attributes.get(field).asText();
-        ObjectNode userDefinedOption = null;
-
-        for (int j = 0; j < userDefinedOptions.size(); j++) {
-          ObjectNode current = (ObjectNode)userDefinedOptions.get(j);
-          if (current.get("name").asText().equals(field)) {
-            userDefinedOption = current;
-          }
-        }
-
+        ObjectNode userDefinedOption = optionByName.get(field);
         if (userDefinedOption != null) {
-          boolean hasOptionValue = false;
           ArrayNode optionValues = (ArrayNode)userDefinedOption.get("values");
-          for (int k = 0; k < optionValues.size(); k++) {
-            String optionValue = optionValues.get(k).asText();
-            if (optionValue.equals(variantOptionValue)) {
-              hasOptionValue = true;
-              break;
+          Set<String> seenValues = optionValuesByName.get(field);
+          if (seenValues == null) {
+            seenValues = new HashSet<>();
+            for (int k = 0; k < optionValues.size(); k++) {
+              seenValues.add(optionValues.get(k).asText());
             }
+            optionValuesByName.put(field, seenValues);
           }
 
-          if (!hasOptionValue) {
+          if (!seenValues.contains(variantOptionValue)) {
+            seenValues.add(variantOptionValue);
             optionValues.add(variantOptionValue);
           }
         }
