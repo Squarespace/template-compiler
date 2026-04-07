@@ -311,7 +311,9 @@ public class CommerceUtils {
     if (EnumSet.of(ProductType.DIGITAL, ProductType.GIFT_CARD).contains(type)) {
       return Double.POSITIVE_INFINITY;
     } else {
-      int total = 0;
+      // Accumulate in long: qtyInStock is read as long, and an int
+      // accumulator would wrap past 2^31 units. Return widens to double.
+      long total = 0;
       JsonNode variants = structuredContent.path("variants");
       for (int i = 0; i < variants.size(); i++) {
         JsonNode variant = variants.get(i);
