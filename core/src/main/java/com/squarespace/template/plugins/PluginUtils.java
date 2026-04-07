@@ -229,10 +229,17 @@ public class PluginUtils {
   }
 
   /**
-   * Left-pads values where 0 <= n.
+   * Left-pads values, counting a leading '-' as a digit for negative
+   * values. Digits are derived with log10, so values above ~2^53 are
+   * approximate; date fields never reach that size.
    */
   public static void leftPad(long value, char padChar, int maxDigits, StringBuilder buf) {
-    int digits = (value == 0) ? 1 : (int) Math.log10(value) + 1;
+    int digits;
+    if (value < 0) {
+      digits = (int) Math.log10(Math.abs((double) value)) + 2;   // +1 for the sign
+    } else {
+      digits = (value == 0) ? 1 : (int) Math.log10(value) + 1;
+    }
     for (int i = 0; i < maxDigits - digits; i++) {
       buf.append(padChar);
     }

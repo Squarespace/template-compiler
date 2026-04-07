@@ -428,7 +428,8 @@ public class PluginDateUtils {
         // %Y     year
         case 'Y': buf.append(d.year()); break;
 
-        // %z     +hhmm numeric time zone (e.g., -0400)
+        // %z     numeric time zone as +hh:mm (e.g., -04:00, +02:00);
+        //        the colon form is what HTML5 <time datetime> requires
         case 'z': {
           TZC t = new TZC(d.timeZoneOffset());
           buf.append(t.negative ? '-' : '+');

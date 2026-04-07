@@ -358,12 +358,16 @@ public class PluginDateUtilsTest {
 
   @Test
   public void testTimezoneOffsets() {
-    // Timezone short names and offsets
+    // Timezone short names and offsets. %z always uses the +hh:mm
+    // (colon) form, positive and negative.
     String format = "%Z %z";
     assertEquals(formatDate(format, MAY_13_2013_010000_UTC, TZ_NY), "EDT -04:00");
     assertEquals(formatDate(format, MAY_13_2013_010000_UTC, TZ_LA), "PDT -07:00");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, TZ_NY), "EST -05:00");
     assertEquals(formatDate(format, NOV_15_2013_123030_UTC, TZ_LA), "PST -08:00");
+    // Positive offset (CEST, +02:00 in May).
+    assertEquals(formatDate("%z", MAY_13_2013_010000_UTC, "Europe/Paris"), "+02:00");
+    assertEquals(formatDate("%z", NOV_15_2013_123030_UTC, "Europe/Paris"), "+01:00");
   }
 
   @Test

@@ -70,6 +70,31 @@ public class PluginUtilsTest {
   }
 
   @Test
+  public void testLeftPad() {
+    // Non-negative values pad as before.
+    assertEquals(leftPad(55, '0', 3), "055");
+    assertEquals(leftPad(0, '0', 3), "000");
+    assertEquals(leftPad(7, '0', 2), "07");
+    assertEquals(leftPad(123, '0', 2), "123");
+    // Negative values count the sign as a digit, no over-padding.
+    assertEquals(leftPad(-55, '0', 3), "-55");
+    assertEquals(leftPad(-5, '0', 2), "-5");
+    assertEquals(leftPad(-5, '0', 3), "0-5");
+    assertEquals(leftPad(-500, '0', 3), "-500");
+    // Extremes must not overflow when negating (MIN_VALUE cannot be
+    // negated in long; the double path keeps the digit count exact).
+    assertEquals(leftPad(Long.MIN_VALUE, '0', 20), Long.toString(Long.MIN_VALUE));
+    assertEquals(leftPad(Long.MAX_VALUE, '0', 19), Long.toString(Long.MAX_VALUE));
+    assertEquals(leftPad(Long.MIN_VALUE, '0', 22), "00" + Long.MIN_VALUE);
+  }
+
+  private String leftPad(long value, char padChar, int maxDigits) {
+    StringBuilder buf = new StringBuilder();
+    PluginUtils.leftPad(value, padChar, maxDigits, buf);
+    return buf.toString();
+  }
+
+  @Test
   public void testEscapeHtmlAttribute() {
     // Legacy, the single quote passes through raw on the released signature.
     StringBuilder buf = new StringBuilder();
