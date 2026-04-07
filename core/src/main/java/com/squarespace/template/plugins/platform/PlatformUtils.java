@@ -35,8 +35,10 @@ public class PlatformUtils {
   }
 
   /**
-   * Like money-format (e.g. 0.00) but with a currency (dollar) sign and parentheses on negative values.
-   * Fully internationalized. Uses NumberFormat under the hood.
+   * Like money-format (e.g. 0.00) but with a currency symbol. Negative values
+   * use the locale's minus sign (no parentheses - NumberFormat currency
+   * instances do not emit accounting parentheses). Fully internationalized.
+   * Uses NumberFormat under the hood.
    */
   public static String formatBookkeeperMoney(double cents, Locale locale) {
     NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
