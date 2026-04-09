@@ -803,13 +803,27 @@ public class CommerceFormatters implements FormatterRegistry {
       StringBuilder buf = new StringBuilder();
       buf.append("<div style=\"font-size:11px; margin-top:3px\">\n");
       buf.append("  <span style=\"font-weight:bold;\">");
-      buf.append(field.path("rawTitle").asText());
+      // Legacy, rawTitle and the fallback text land in the HTML
+      // unescaped. Fixed, they are escaped before appending.
+      boolean legacyTitles = ctx.compatEnabled(Patch.SUMMARY_FIELD_TITLE_ESCAPES);
+      if (legacyTitles) {
+        buf.append(field.path("rawTitle").asText());
+      } else {
+        // rawTitle is user data; escape it before it lands in the span.
+        PluginUtils.escapeHtml(field.path("rawTitle").asText(), buf);
+      }
       buf.append(":</span> ");
       if (GeneralUtils.isTruthy(value)) {
         buf.append(value.asText());
       } else {
         String text = ctx.resolve(Constants.PRODUCT_SUMMARY_FORM_NO_ANSWER_TEXT_KEY).asText();
-        buf.append(StringUtils.defaultIfEmpty(text, "N/A"));
+        String safe = StringUtils.defaultIfEmpty(text, "N/A");
+        if (legacyTitles) {
+          buf.append(safe);
+        } else {
+          // localized fallback is data too, so escape it the same way.
+          PluginUtils.escapeHtml(safe, buf);
+        }
       }
       buf.append("\n</div>");
 

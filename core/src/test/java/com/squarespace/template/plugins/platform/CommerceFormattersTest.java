@@ -215,6 +215,12 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
     runner.run(
         "f-summary-form-field-default-1.html"
         );
+    runner.run(
+        "f-summary-form-field-escape-1.html",
+        "f-summary-form-field-escape-2.html",
+        "f-summary-form-field-escape-3.html",
+        "f-summary-form-field-escape-4.html"
+        );
   }
 
   @Test

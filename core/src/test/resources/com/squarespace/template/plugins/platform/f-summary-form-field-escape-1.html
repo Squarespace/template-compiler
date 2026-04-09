@@ -1,0 +1,19 @@
+:PROPERTIES
+level=3
+
+:JSON
+{
+  "field": {
+    "type": "unknown",
+    "rawTitle": "A <B> & \"C\"",
+    "value": "<b>bold</b>"
+  }
+}
+
+:TEMPLATE
+{field|summary-form-field}
+
+:OUTPUT
+<div style="font-size:11px; margin-top:3px">
+  <span style="font-weight:bold;">A &lt;B&gt; &amp; "C":</span> <b>bold</b>
+</div>
