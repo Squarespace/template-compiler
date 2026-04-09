@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.template.Context;
@@ -33,6 +34,7 @@ import com.squarespace.template.ErrorInfo;
 import com.squarespace.template.ExecuteErrorType;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.TokenMatcher;
+import com.squarespace.template.compat.Patch;
 
 /**
  *  Expression evaluation using an extended version of Dijkstra's "shunting
@@ -433,8 +435,20 @@ public class Expr {
         switch (v.type) {
           case BOOLEAN:
             return ((BooleanToken)v).value ? BooleanNode.TRUE : BooleanNode.FALSE;
-          case NUMBER:
-            return new DoubleNode(((NumberToken)v).value);
+          case NUMBER: {
+            double dv = ((NumberToken)v).value;
+            // Fixed, integral results that fit in a long emit LongNode,
+            // so exact-value consumers see an integer. (double)
+            // Long.MAX_VALUE is 2^63, so this excludes values too large
+            // for a long.
+            if (!ctx.compatEnabled(Patch.EVAL_INTEGRAL_LONG)
+                && dv == Math.rint(dv)
+                && dv >= (double) Long.MIN_VALUE
+                && dv < (double) Long.MAX_VALUE) {
+              return new LongNode((long) dv);
+            }
+            return new DoubleNode(dv);
+          }
           case STRING:
             return new TextNode(((StringToken)v).value);
           case NULL:

@@ -223,6 +223,12 @@ public enum Patch {
   DATETIME_INTERVAL_RAW(3),
 
   /**
+   * An integral eval result emits DoubleNode, so exact-value consumers
+   * such as the level 1 compare ordering treat it as a double.
+   */
+  EVAL_INTEGRAL_LONG(3),
+
+  /**
    * product-scarcity and restock throw when the product has no id or
    * the merchandising context entry has no scarcityEnabled field.
    */

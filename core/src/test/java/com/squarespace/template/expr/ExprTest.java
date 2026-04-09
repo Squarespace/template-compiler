@@ -31,9 +31,11 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.squarespace.template.Context;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.GeneralUtils;
 import com.squarespace.template.JsonUtils;
 
@@ -60,7 +62,13 @@ public class ExprTest {
     e = "1+2";
     assertEquals(parse(e), asList(num(1), ADD, num(2)));
     assertEquals(build(e), asList(asList(num(1), num(2), ADD)));
+    // Legacy, the default level emits DoubleNode for integral results.
     assertEquals(reduce(e, c), new DoubleNode(3));
+
+    // Fixed, integral results within long range emit LongNode.
+    Context fixedCtx = new Context(JsonUtils.decode("{}"));
+    fixedCtx.setCompat(CompatLevel.fixed());
+    assertEquals(reduce(e, fixedCtx), new LongNode(3));
 
     e = "1-2";
     assertEquals(parse(e), asList(num(1), SUB, num(2)));

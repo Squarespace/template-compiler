@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.EofInst;
+import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.Instructions.VariableInst;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
@@ -211,6 +212,40 @@ public class CompilerTest {
         .execute();
     assertEquals(ctx.getErrors().size(), 0);
     assertEquals(ctx.buffer().toString(), "5");
+  }
+
+  @Test
+  public void testEvalIntegralResults() throws CodeException {
+    // Legacy, the default level renders integral results through the
+    // double path: exact below 2^53, rounded above it.
+    assertEval("{.eval 3.0}", "3");
+    assertEval("{.eval 2 ** 62}", "4611686018427388000");
+    // fractional and out-of-range results render as double at every level
+    assertEval("{.eval 1.5}", "1.5");
+    assertEval("{.eval 1/3}", "0.3333333333333333");
+    assertEval("{.eval 2 ** 64}", "18446744073709552000");
+    // NOTE: literals past 2^53 are already rounded to a double at tokenize
+    // time, so 2^53+1 renders as 2^53 (same as JS).
+    assertEval("{.eval 9007199254740993}", "9007199254740992");
+    assertEval("{.eval 0x20000000000001}", "9007199254740992");
+
+    // Fixed, integral results within long range render as exact long values.
+    Context fixed = COMPILER.newExecutor()
+        .template("{.eval 2 ** 62}")
+        .json("{}")
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0);
+    assertEquals(fixed.buffer().toString(), "4611686018427387904");
+  }
+
+  private void assertEval(String template, String expected) throws CodeException {
+    Context ctx = COMPILER.newExecutor()
+        .template(template)
+        .json("{}")
+        .execute();
+    assertEquals(ctx.getErrors().size(), 0);
+    assertEquals(ctx.buffer().toString(), expected);
   }
 
   @Test
