@@ -305,8 +305,18 @@ public class TemplateC {
     return 0;
   }
 
+  private Compiler compiler;
+
+  /**
+   * One Compiler per command run, shared by the compile and execute
+   * phases, so the cross-context partial cache (Compiler.cachePartial)
+   * is reused within the run.
+   */
   protected Compiler compiler() {
-    return new Compiler(formatterTable(), predicateTable());
+    if (this.compiler == null) {
+      this.compiler = new Compiler(formatterTable(), predicateTable());
+    }
+    return this.compiler;
   }
 
   protected static FormatterTable formatterTable() {

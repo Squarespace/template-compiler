@@ -66,4 +66,12 @@ public class TemplateCTest {
     Assert.assertEquals(compile("{.include noSuchPartial}"), 1);
   }
 
+  @Test
+  public void testSingleCompilerPerRun() {
+    // One Compiler per run so the partial compile cache is shared
+    // between the compile and execute phases.
+    TemplateC command = new TemplateC();
+    Assert.assertSame(command.compiler(), command.compiler());
+  }
+
 }
