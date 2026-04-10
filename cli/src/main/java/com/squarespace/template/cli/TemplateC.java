@@ -217,15 +217,7 @@ public class TemplateC {
     }
 
     CompiledTemplate compiled = compiler().compile(template, true, preprocess, compat);
-
-    StringBuilder errorBuf = new StringBuilder();
-    List<ErrorInfo> errors = compiled.errors();
-    if (!errors.isEmpty()) {
-      errorBuf.append("Caught errors executing template:\n");
-      for (ErrorInfo error : errors) {
-        errorBuf.append("    ").append(error.getMessage()).append('\n');
-      }
-    }
+    List<ErrorInfo> errors = new ArrayList<>(compiled.errors());
 
     Instruction code = compiled.code();
 
@@ -265,11 +257,22 @@ public class TemplateC {
         .compat(compat)
         .execute();
 
-    // If compile was successful, print the output.
+    // Render-time errors are collected on the context in safe mode.
+    errors.addAll(context.getErrors());
+
+    // Always print the output, even when errors occurred; the caller can
+    // use the exit code to decide whether it is trustworthy.
     System.out.print(context.buffer().toString());
 
-    if (errorBuf.length() > 0) {
-      System.err.println(errorBuf.toString());
+    // Any compile-time or render-time error means the output is not
+    // trustworthy. Report the details and exit nonzero so build tooling
+    // can react.
+    if (!errors.isEmpty()) {
+      System.err.println("Caught errors executing template:");
+      for (ErrorInfo error : errors) {
+        System.err.println("    " + error.getMessage());
+      }
+      return 1;
     }
     return 0;
   }
