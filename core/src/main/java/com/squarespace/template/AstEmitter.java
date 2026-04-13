@@ -333,8 +333,9 @@ public class AstEmitter {
    *
    * Otherwise it returns an array where each element has one of two forms:
    *
-   *  ["<name>", 0]        - a formatter with no arguments.
-   *  ["<name>", [..]]  - a formatter with one or more arguments
+   *  ["<name>"]        - a formatter with no arguments.
+   *  ["<name>", [..]]  - a formatter with one or more arguments; [..] is the
+   *                      arguments() shape, e.g. [["<arg1>", ...], "<delimiter>"].
    */
   private static JsonNode formatters(List<FormatterCall> formatters) {
     if (formatters.isEmpty()) {

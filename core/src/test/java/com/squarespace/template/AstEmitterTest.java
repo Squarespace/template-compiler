@@ -59,6 +59,39 @@ public class AstEmitterTest extends UnitTestBase {
     assertTrue(out.endsWith(",18]"));
   }
 
+  @Test
+  public void testFormatterShapeNoArgs() throws Exception {
+    // No-arg formatter: {x|mod} emits ["<name>"] (see AstEmitter.formatters()).
+    JsonNode formatters = formatters("{x|mod}");
+    assertEquals(formatters.size(), 1);
+    assertEquals(formatters.get(0).toString(), "[\"mod\"]");
+  }
+
+  @Test
+  public void testFormatterShapeWithArgs() throws Exception {
+    // One-arg formatter: {x|mod 3} emits ["<name>", [["<arg>"], "<delimiter>"]]
+    // per the arguments() contract.
+    JsonNode formatters = formatters("{x|mod 3}");
+    assertEquals(formatters.size(), 1);
+    assertEquals(formatters.get(0).toString(), "[\"mod\",[[\"3\"],\" \"]]");
+  }
+
+  @Test
+  public void testFormatterShapeChain() throws Exception {
+    // Chained no-arg formatters each emit a single-element array.
+    JsonNode formatters = formatters("{x|mod|raw}");
+    assertEquals(formatters.size(), 2);
+    assertEquals(formatters.get(0).toString(), "[\"mod\"]");
+    assertEquals(formatters.get(1).toString(), "[\"raw\"]");
+  }
+
+  private JsonNode formatters(String source) throws CodeSyntaxException {
+    CompiledTemplate template = compiler().compile(source);
+    // ROOT is [17, 1, [instructions], 18]; the first instruction is the
+    // VARIABLE node [1, [variables], formatters].
+    return AstEmitter.get(template.code()).get(2).get(0).get(2);
+  }
+
   private String render(String source) throws CodeSyntaxException {
     CompiledTemplate template = compiler().compile(source);
     return AstEmitter.get(template.code()).toString();
