@@ -795,6 +795,38 @@ public class ExprTest {
     assertEquals(reduce("true && \"\"", c), BooleanNode.FALSE);
   }
 
+  /**
+   * Pins the deliberate divergences from JavaScript documented in the Expr
+   * class javadoc. These are NOT bugs to fix silently; true JS semantics is
+   * a separate, explicitly-approved task.
+   */
+  @Test
+  public void testJsDivergences() {
+    Context c = ctx();
+
+    // && and || yield a BOOLEAN and always evaluate BOTH operands. JS
+    // returns the deciding operand: 1 && 2 -> 2, 0 || 3 -> 3.
+    assertEquals(reduce("1 && 2", c), BooleanNode.TRUE);
+    assertEquals(reduce("0 || 3", c), BooleanNode.TRUE);
+    assertEquals(reduce("true && false", c), BooleanNode.FALSE);
+
+    // null coerces to 0 in numeric comparisons. JS: both false.
+    assertEquals(reduce("null == 0", c), BooleanNode.TRUE);
+    assertEquals(reduce("null == \"\"", c), BooleanNode.TRUE);
+    assertEquals(reduce("null == 1", c), BooleanNode.FALSE);
+
+    // No short-circuit: the right operand of && runs even when the left
+    // operand is falsy. In JS, 0 && (x = 2) leaves x unchanged. Here the
+    // assignment fires (x becomes 2) and the leftover 0 spills out as the
+    // expression result.
+    // The default level emits DoubleNode for integral results (gated on
+    // Patch.EVAL_INTEGRAL_LONG); the fixed level would emit LongNode(0).
+    Expr e = new Expr("@x = 1; 0 && (@x = 2)");
+    e.build();
+    assertEquals(e.reduce(c), new DoubleNode(0));
+    assertEquals(c.resolve(new Object[] {"@x"}), new DoubleNode(2));
+  }
+
   @Test
   public void testComparisons() {
     Context c = ctx();

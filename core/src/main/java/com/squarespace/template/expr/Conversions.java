@@ -236,6 +236,11 @@ public class Conversions {
 
   /**
    * Convert a token into a number token.
+   *
+   * Note: null converts to 0 here (deliberate divergence from JS, where
+   * null only loose-equals null/undefined). Combined with numeric loose
+   * equality, null == 0 and null == "" both evaluate to true (JS: false).
+   * See Expr class javadoc.
    */
   public static double asnum(Token t) {
     switch (t.type) {
@@ -306,6 +311,7 @@ public class Conversions {
       case BOOLEAN:
         return ((BooleanToken)t).value ? 1 : 0;
       case NULL:
+        // null coerces to 0 (deliberate divergence from JS loose equality)
         return 0;
 
       // objects and arrays will fall through

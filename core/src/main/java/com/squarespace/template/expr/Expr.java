@@ -38,9 +38,17 @@ import com.squarespace.template.compat.Patch;
 
 /**
  *  Expression evaluation using an extended version of Dijkstra's "shunting
- *  yard" algorithm with JavaScript semantics. This algorithm was chosen as
- *  it is simple, sufficient, and can be implemented compactly, minimizing
- *  the size of the code and making it easier to verify correct.
+ *  yard" algorithm with JavaScript-INSPIRED semantics. This algorithm was
+ *  chosen as it is simple, sufficient, and can be implemented compactly,
+ *  minimizing the size of the code and making it easier to verify correct.
+ *
+ *  Deliberate, tested divergences from JavaScript:
+ *
+ *   - {@code &&} and {@code ||} always evaluate BOTH operands (no
+ *     short-circuit) and yield a BOOLEAN result ({@code 1 && 2 -> true}),
+ *     unlike JS, which returns the deciding operand ({@code 1 && 2 -> 2}).
+ *   - null coerces to 0 in numeric comparisons ({@code null == 0 -> true};
+ *     {@code null == "" -> true}), unlike JS (both false).
  *
  *  Features:
  *
