@@ -454,4 +454,30 @@ public class CodeExecuteTest extends UnitTestBase {
     return ctx;
   }
 
+  @Test
+  public void testIncludeTrailingSpaceLiteral() throws CodeException {
+    // Probe X2 (qwen-findings 2.11): in "{.include }" the space is consumed by
+    // matcher.space() so matcher.arguments() fails and the instruction degrades
+    // to literal text. Safe compile: 0 errors, literal text in output.
+    CompiledTemplate compiled = compiler().compile("{.include }", true, false);
+    assertEquals(compiled.errors().size(), 0);
+    Context ctx = compiler().newExecutor()
+        .code(compiled.code())
+        .json("{}")
+        .execute();
+    assertContext(ctx, "{.include }");
+    assertEquals(ctx.getErrors().size(), 0);
+
+    // A real partial behind the space still parses as an include; with the
+    // output flag it renders, since includes suppress output by default.
+    Context ctx2 = compiler().newExecutor()
+        .code(compiler().compile("{.include pC output}").code())
+        .json("{}")
+        .partialsMap("{\"pC\": \"C\"}")
+        .enableInclude(true)
+        .execute();
+    assertContext(ctx2, "C");
+    assertEquals(ctx2.getErrors().size(), 0);
+  }
+
 }

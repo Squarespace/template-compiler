@@ -260,6 +260,7 @@ public class TokenizerCoreTest extends UnitTestBase {
     assertResult("{.include}", mk.text("{.include}"), mk.eof());
     assertResult("{.include }", mk.text("{.include }"), mk.eof());
     assertResult("{.include a}", mk.include(mk.args(" a")), mk.eof());
+    assertResult("{.include pC output}", mk.include(mk.args(" pC output")), mk.eof());
   }
 
   @Test

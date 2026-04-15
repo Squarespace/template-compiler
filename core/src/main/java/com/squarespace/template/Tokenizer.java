@@ -440,9 +440,9 @@ public class Tokenizer {
           return emitInvalid();
         }
 
-        // TODO: the line below will never fail since it looks for at least 1 character,
-        // and the matcher is currently pointing at the space above, since it's the
-        // argument delimiter.
+        // matcher.arguments() needs at least one character AFTER the space already
+        // consumed by matcher.space() above. For "{.include }" (nothing after the
+        // space) it fails and the instruction degrades to literal text.
         if (!matcher.arguments()) {
           return emitInvalid();
         }
