@@ -24,6 +24,13 @@ import com.squarespace.template.Context;
 import com.squarespace.template.Variables;
 
 
+/**
+ * Deprecated stub kept ONLY for backward compatibility. This formatter
+ * accepts any input and always renders as missing, so it contributes
+ * nothing to the page. It must stay registered: customer templates may
+ * still call {"unit"} and removing it would fail their compile. See the
+ * ds4-risks decision (never break customer templates).
+ */
 public class UnitFormatter extends BaseFormatter {
 
   // DEPRECATED

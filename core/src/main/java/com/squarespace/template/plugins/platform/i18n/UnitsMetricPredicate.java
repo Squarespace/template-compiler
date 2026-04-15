@@ -24,8 +24,10 @@ import com.squarespace.template.Context;
 
 
 /**
- * Predicate that returns true if the given category uses the metric system
- * for the current locale. Defaults to true when locale is not determined.
+ * Deprecated stub kept ONLY for backward compatibility. Always returns
+ * true for any input and locale. Must stay registered: customer
+ * templates may still call {"units-metric?"} and removing it would fail
+ * their compile.
  */
 public class UnitsMetricPredicate extends BasePredicate {
 

@@ -55,7 +55,10 @@ public class InternationalFormatters implements FormatterRegistry {
   }
 
   /**
-   * DEPRECATE
+   * Deprecated stub kept ONLY for backward compatibility. Accepts any
+   * input and always renders as missing. Must stay registered: customer
+   * templates may still call {"datetimefield"} and removing it would
+   * fail their compile.
    */
   public static class DateTimeFieldFormatter extends BaseFormatter {
 
