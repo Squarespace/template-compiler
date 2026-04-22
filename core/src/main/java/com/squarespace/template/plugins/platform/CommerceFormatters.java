@@ -408,7 +408,16 @@ public class CommerceFormatters implements FormatterRegistry {
       JsonNode billingPeriodNode = CommerceUtils.getSubscriptionPlanBillingPeriodNode(productNode);
 
       if (billingPeriodNode.isMissingNode()) {
-        args.put("formattedFromPrice", true);
+        if (!ctx.compatEnabled(Patch.PRODUCT_PRICE_TRUE_SLOT)) {
+          // Fixed, the slot holds a string. A single space keeps the
+          // template's .if gate passing (an empty string is falsy) and
+          // renders nothing where a localized unavailable text embeds
+          // a price placeholder. Legacy, the slot held the boolean
+          // true, which such a text rendered literally as "true".
+          args.put("formattedFromPrice", " ");
+        } else {
+          args.put("formattedFromPrice", true);
+        }
         args.put("fromText", StringUtils.defaultIfEmpty(
             ctx.resolve(new String[] {"localizedStrings", "productPriceUnavailable"}).asText(), "Unavailable"));
         return;

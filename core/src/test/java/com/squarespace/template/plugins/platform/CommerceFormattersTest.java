@@ -17,6 +17,7 @@
 package com.squarespace.template.plugins.platform;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
@@ -160,7 +161,66 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
 
   @Test
   public void testProductSubscriptionPriceMissingPlan() {
-    runner.run("f-product-price-subscription-weekly-plan-unavailable.html");
+    runner.run("f-product-price-subscription-weekly-plan-unavailable.html",
+        "f-product-price-subscription-plan-unavailable-true-slot.html",
+        "f-product-price-subscription-plan-unavailable-true-slot-level-3.html");
+  }
+
+  @Test
+  public void testProductPriceUnavailableFromPriceSlot() throws CodeException {
+    // A subscribable product whose plan has no billing period. The
+    // localized unavailable text embeds a price placeholder.
+    String json = "{\"item\":{\"structuredContent\":{"
+        + "\"isSubscribable\":true,\"subscriptionPlan\":{}}},"
+        + "\"localizedStrings\":{\"productPriceUnavailable\":\"Price ({price})\"}}";
+
+    // Legacy, the slot holds the boolean true and the placeholder
+    // renders it literally.
+    Context legacy = compiler().newExecutor()
+        .template("{item|product-price}")
+        .json(json)
+        .safeExecution(true)
+        .execute();
+    assertEquals(legacy.getErrors().size(), 0);
+    assertTrue(legacy.buffer().toString().contains("Price (true)"));
+
+    // Fixed, the slot holds a string and the placeholder renders
+    // nothing.
+    Context fixed = compiler().newExecutor()
+        .template("{item|product-price}")
+        .json(json)
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0);
+    String out = fixed.buffer().toString();
+    assertTrue(out.contains("Price ( )"));
+    assertFalse(out.contains("true"));
+  }
+
+  @Test
+  public void testProductPriceUnavailableDefaultText() throws CodeException {
+    // Without localizedStrings the branch falls back to "Unavailable"
+    // at both levels, and the slot value never reaches the output.
+    String json = "{\"item\":{\"structuredContent\":{"
+        + "\"isSubscribable\":true,\"subscriptionPlan\":{}}}}";
+
+    Context legacy = compiler().newExecutor()
+        .template("{item|product-price}")
+        .json(json)
+        .safeExecution(true)
+        .execute();
+    assertEquals(legacy.getErrors().size(), 0);
+    assertTrue(legacy.buffer().toString().contains("Unavailable"));
+
+    Context fixed = compiler().newExecutor()
+        .template("{item|product-price}")
+        .json(json)
+        .safeExecution(true)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0);
+    assertTrue(fixed.buffer().toString().contains("Unavailable"));
   }
 
   @Test
