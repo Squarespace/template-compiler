@@ -69,6 +69,8 @@ public class GeneralUtils {
 
   /**
    * Quick string to integer conversion, clamping negative values to zero.
+   * Saturates at Long.MAX_VALUE instead of silently wrapping, so a
+   * long digit string can never make the result negative.
    */
   public static long toPositiveLong(CharSequence seq, int pos, int length) {
     long n = 0;
@@ -76,6 +78,10 @@ public class GeneralUtils {
     while (i < length) {
       char c = seq.charAt(i);
       if (c >= '0' && c <= '9') {
+        // Stop before the next digit would overflow; keep the maximum.
+        if (n > (Long.MAX_VALUE - (c - '0')) / 10) {
+          return Long.MAX_VALUE;
+        }
         n *= 10;
         n += c - '0';
       } else {

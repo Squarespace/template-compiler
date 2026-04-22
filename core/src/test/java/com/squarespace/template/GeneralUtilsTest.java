@@ -68,6 +68,11 @@ public class GeneralUtilsTest {
     assertEquals(toPositiveLong("12345xyz", 0, 8), 12345);
     assertEquals(toPositiveLong("xyz", 0, 3), 0);
     assertEquals(toPositiveLong("   ", 0, 3), 0);
+    // Exact long boundary parses in full.
+    assertEquals(toPositiveLong("9223372036854775807", 0, 19), Long.MAX_VALUE);
+    // One past the boundary saturates instead of wrapping negative.
+    assertEquals(toPositiveLong("9223372036854775808", 0, 19), Long.MAX_VALUE);
+    assertEquals(toPositiveLong("999999999999999999999999999", 0, 27), Long.MAX_VALUE);
   }
 
   @Test
