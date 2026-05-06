@@ -304,27 +304,38 @@ public class CommerceUtils {
   }
 
   public static double getTotalStockRemaining(JsonNode item) {
+    return getTotalStockRemaining(item, false);
+  }
+
+  public static double getTotalStockRemaining(JsonNode item, boolean legacyStockOverflow) {
     ProductType type = getProductType(item);
     JsonNode structuredContent = item.path("structuredContent");
-
-
     if (EnumSet.of(ProductType.DIGITAL, ProductType.GIFT_CARD).contains(type)) {
       return Double.POSITIVE_INFINITY;
-    } else {
-      // Accumulate in long: qtyInStock is read as long, and an int
-      // accumulator would wrap past 2^31 units. Return widens to double.
-      long total = 0;
-      JsonNode variants = structuredContent.path("variants");
+    }
+    JsonNode variants = structuredContent.path("variants");
+    if (legacyStockOverflow) {
+      // Legacy, the int accumulator wraps past 2^31 units.
+      int total = 0;
       for (int i = 0; i < variants.size(); i++) {
         JsonNode variant = variants.get(i);
         if (isTruthy(variant.path("unlimited"))) {
           return Double.POSITIVE_INFINITY;
-        } else {
-          total += variant.path("qtyInStock").asLong();
         }
+        total += variant.path("qtyInStock").asLong();
       }
       return total;
     }
+    // Fixed, the long sum does not overflow.
+    long total = 0;
+    for (int i = 0; i < variants.size(); i++) {
+      JsonNode variant = variants.get(i);
+      if (isTruthy(variant.path("unlimited"))) {
+        return Double.POSITIVE_INFINITY;
+      }
+      total += variant.path("qtyInStock").asLong();
+    }
+    return total;
   }
 
   public static boolean hasVariedPrices(JsonNode item) {

@@ -232,7 +232,13 @@ public enum Patch {
    * product-scarcity and restock throw when the product has no id or
    * the merchandising context entry has no scarcityEnabled field.
    */
-  SCARCITY_MISSING_FIELD(3);
+  SCARCITY_MISSING_FIELD(3),
+
+  /**
+   * quantity-input wraps the variant stock total negative past 2^31
+   * units, hiding the quantity input for in-stock products.
+   */
+  STOCK_OVERFLOW(3);
 
   /**
    * Lowest level where this patch is fixed. Frozen once a release ships.

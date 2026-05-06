@@ -76,6 +76,9 @@ public class CommerceUtilsTest extends UnitTestBase {
     // Sum > Integer.MAX_VALUE must not wrap negative (accumulate in long).
     item = jsonMap.get("getTotalStock-overflow");
     assertEquals(getTotalStockRemaining(item), 4294967296.0);
+
+    // Legacy, the int accumulator wraps 2^32 back to 0.
+    assertEquals(getTotalStockRemaining(item, true), 0.0);
   }
 
   @Test

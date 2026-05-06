@@ -669,7 +669,8 @@ public class CommerceFormatters implements FormatterRegistry {
           || (ProductType.SERVICE.equals(type)
              && CommerceUtils.isMultipleQuantityAllowedForServices(ctx.resolve("websiteSettings"))))
           && !CommerceUtils.isSubscribable(node);
-      boolean hideQuantityInput = !multipleQuantityAllowed || CommerceUtils.getTotalStockRemaining(node) <= 1;
+      boolean hideQuantityInput = !multipleQuantityAllowed
+          || CommerceUtils.getTotalStockRemaining(node, ctx.compatEnabled(Patch.STOCK_OVERFLOW)) <= 1;
 
       if (hideQuantityInput) {
         var.setMissing();
