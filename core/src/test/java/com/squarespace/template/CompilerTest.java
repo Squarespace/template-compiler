@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.squarespace.template.Instructions.EofInst;
 import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.Instructions.VariableInst;
+import com.squarespace.template.expr.ExprOptions;
 import com.squarespace.template.plugins.CoreFormatters;
 import com.squarespace.template.plugins.CorePredicates;
 
@@ -237,6 +238,33 @@ public class CompilerTest {
         .execute();
     assertEquals(fixed.getErrors().size(), 0);
     assertEquals(fixed.buffer().toString(), "4611686018427387904");
+  }
+
+  @Test
+  public void testEvalMaxTokens() throws CodeException {
+    // Two executions share one compiled template; only one sets a token
+    // limit. The limited execution must refuse to build the expression
+    // and emit nothing, the other must evaluate it normally.
+    CompiledTemplate compiled = COMPILER.compile("{.eval 1 + 2 + 3 + 4 + 5 + 6}");
+
+    ExprOptions opts = new ExprOptions();
+    opts.maxTokens(10);
+    Context limited = COMPILER.newExecutor()
+        .code(compiled.code())
+        .json("{}")
+        .exprOptions(opts)
+        .execute();
+    assertEquals(limited.getErrors().size(), 1);
+    assertEquals(limited.getErrors().get(0).getType(), ExecuteErrorType.EXPRESSION_PARSE);
+    assertTrue(limited.getErrors().get(0).getMessage().contains("maximum number of allowed tokens"));
+    assertEquals(limited.buffer().toString(), "");
+
+    Context unlimited = COMPILER.newExecutor()
+        .code(compiled.code())
+        .json("{}")
+        .execute();
+    assertEquals(unlimited.getErrors().size(), 0);
+    assertEquals(unlimited.buffer().toString(), "21");
   }
 
   private void assertEval(String template, String expected) throws CodeException {

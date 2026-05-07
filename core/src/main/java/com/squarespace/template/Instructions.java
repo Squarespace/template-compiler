@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
@@ -443,11 +444,13 @@ public class Instructions {
     private final boolean debug;
 
     /**
-     * Parsed and assembled expression, ready for evaluation.
-     * Built eagerly at construction time so the instruction is
-     * immutable and safe to share across threads.
+     * Parsed and assembled expressions, one per combination of option
+     * limits. Built lazily at execution time so the context's limits
+     * bound the build. A built expression is shared across executions
+     * with the same limits; the cache ensures one thread builds it
+     * before any other execution can observe it.
      */
-    private final Expr expr;
+    private final ConcurrentHashMap<Long, Expr> exprCache = new ConcurrentHashMap<>();
 
     public EvalInst(String raw) {
       this.debug = raw.startsWith("#");
@@ -455,11 +458,14 @@ public class Instructions {
         raw = raw.substring(1);
       }
       this.raw = raw;
-      // Build the expression now, before the instruction can be shared
-      // between contexts. No context exists here, so default options
-      // apply. Limits configured on a context are enforced in invoke().
-      this.expr = new Expr(raw, null);
-      this.expr.build();
+    }
+
+    /**
+     * Pack the option limits into a cache key. Null options default to
+     * no limits, which is the same as the zero key.
+     */
+    private static long optionsKey(ExprOptions options) {
+      return ((long) options.maxTokens() << 32) | (options.maxStringLen() & 0xffffffffL);
     }
 
     /**
@@ -500,9 +506,20 @@ public class Instructions {
         return;
       }
 
-      // The expression was built eagerly at construction time, so the
-      // parse errors are fixed. Each execution reports them.
-      List<String> errors = this.expr.errors();
+      // Build the expression with the context's option limits, reusing a
+      // previously built one when the same limits occurred before. The build
+      // happens inside the cache lookup, so a concurrent execution sharing
+      // the instruction waits for the build to complete before reducing it.
+      ExprOptions options = ctx.getExprOptions();
+      long key = (options == null) ? 0 : optionsKey(options);
+      Expr expr = this.exprCache.computeIfAbsent(key, k -> {
+        Expr built = new Expr(raw, options);
+        built.build();
+        return built;
+      });
+
+      // Parse errors are fixed at build time; each execution reports them.
+      List<String> errors = expr.errors();
       for (String error : errors) {
         ErrorInfo info = ctx.error(ExecuteErrorType.EXPRESSION_PARSE)
             .data(error);
@@ -511,28 +528,13 @@ public class Instructions {
 
       if (debug) {
         ctx.buffer().append("EVAL=");
-        Tokens.debug(this.expr.expressions(), ctx.buffer());
-      }
-
-      // The eager build used default options, since no context exists at
-      // construction time. Check the limits configured on the context here,
-      // per execution.
-      boolean tokenLimitHit = false;
-      ExprOptions options = ctx.getExprOptions();
-      if (options != null && errors.isEmpty()) {
-        int maxTokens = options.maxTokens();
-        if (maxTokens > 0 && this.expr.tokens().length() > maxTokens) {
-          ErrorInfo info = ctx.error(ExecuteErrorType.EXPRESSION_PARSE)
-              .data("Expression exceeds the maximum number of allowed tokens: " + maxTokens);
-          ctx.addError(info);
-          tokenLimitHit = true;
-        }
+        Tokens.debug(expr.expressions(), ctx.buffer());
       }
 
       // Evaluate the expression against the current context and append
       // any output. We only attempt to reduce the expression if there
-      // were no parse errors and the token limit was not hit.
-      if (errors.isEmpty() && !tokenLimitHit) {
+      // were no parse errors.
+      if (errors.isEmpty()) {
         // Track the error count to detect if reduce produces an error.
         int errs = errors.size();
 
@@ -542,7 +544,7 @@ public class Instructions {
         ctx.push(ctx.node());
 
         // Reduce the expression
-        JsonNode result = this.expr.reduce(ctx, options);
+        JsonNode result = expr.reduce(ctx, options);
 
         // Collect all local variables created by the expression.
         Map<String, JsonNode> vars = ctx.frame().getVars();
