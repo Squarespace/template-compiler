@@ -210,7 +210,8 @@ public class ContentFormatters implements FormatterRegistry {
     buf.append("data-image-dimensions=\"").append(origSize).append("\" ");
     buf.append("data-image-focal-point=\"").append(focalPoint).append("\" ");
     buf.append("alt=\"");
-    PluginUtils.escapeHtmlAttribute(altText, buf);
+    // Legacy, the single quote passes through. Fixed, it is escaped.
+    PluginUtils.escapeHtmlAttribute(altText, buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
     buf.append("\" ");
   }
 
@@ -492,7 +493,8 @@ public class ContentFormatters implements FormatterRegistry {
       buf.append("<img ");
       buf.append("src=\"").append(assetUrl).append("\" ");
       buf.append("alt=\"");
-      PluginUtils.escapeHtmlAttribute(altText, buf);
+      // Legacy, the single quote passes through. Fixed, it is escaped.
+      PluginUtils.escapeHtmlAttribute(altText, buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
       buf.append("\" ");
       buf.append("/>");
       buf.append("</noscript>");
@@ -935,7 +937,8 @@ public class ContentFormatters implements FormatterRegistry {
         buf.append(" data-load=\"false\" ");
       }
       buf.append("data-html=\"");
-      PluginUtils.escapeHtmlAttribute(oEmbed.path("html").asText(), buf);
+      // Legacy, the single quote passes through. Fixed, it is escaped.
+      PluginUtils.escapeHtmlAttribute(oEmbed.path("html").asText(), buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
       buf.append("\" data-provider-name=\"").append(oEmbed.path("providerName").asText()).append("\">");
 
       if (isTruthy(node.path("overlay"))) {

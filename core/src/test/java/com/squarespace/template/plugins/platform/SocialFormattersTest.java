@@ -35,6 +35,7 @@ import com.squarespace.template.Variables;
 import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.SocialFormatters.ActivateTwitterLinksFormatter;
 import com.squarespace.template.plugins.platform.SocialFormatters.GoogleCalendarUrlFormatter;
+import com.squarespace.template.plugins.platform.SocialFormatters.SocialButtonFormatter;
 import com.squarespace.template.plugins.platform.SocialFormatters.TwitterFollowButtonFormatter;
 
 
@@ -46,6 +47,8 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
   private static final Formatter ACTIVATE_TWITTER_LINKS = new ActivateTwitterLinksFormatter();
 
   private static final Formatter GOOGLE_CALENDAR_URL = new GoogleCalendarUrlFormatter();
+
+  private static final Formatter SOCIAL_BUTTON = new SocialButtonFormatter();
 
   private static final Formatter TWITTER_FOLLOW_BUTTON = new TwitterFollowButtonFormatter();
 
@@ -132,6 +135,31 @@ public class SocialFormattersTest extends PlatformUnitTestBase {
         "f-social-button-inline-1.html",
         "f-social-button-inline-2.html"
         );
+  }
+
+  @Test
+  public void testSocialButtonQuote() throws CodeException {
+    String json = "{"
+        + "\"website\": {\"shareButtonOptions\": [\"foo\"]},"
+        + "\"mainImageId\": \"560c37c1a7c8465c4a71d99a\","
+        + "\"assetUrl\": \"http://foo.com/bar.jpg\","
+        + "\"recordType\": 1,"
+        + "\"title\": \"it's\","
+        + "\"fullUrl\": \"http://full.com/url\""
+        + "}";
+
+    // Legacy, the single quote passes through raw at the default level.
+    Context legacy = new Context(JsonUtils.decode(json));
+    Variables legacyVars = new Variables("var", legacy.node());
+    SOCIAL_BUTTON.apply(legacy, Constants.EMPTY_ARGUMENTS, legacyVars);
+    assertTrue(legacyVars.first().node().asText().contains("data-title=\"it's\""));
+
+    // Fixed, the quote is escaped for single-quoted attribute values.
+    Context fixed = new Context(JsonUtils.decode(json));
+    fixed.setCompat(CompatLevel.fixed());
+    Variables fixedVars = new Variables("var", fixed.node());
+    SOCIAL_BUTTON.apply(fixed, Constants.EMPTY_ARGUMENTS, fixedVars);
+    assertTrue(fixedVars.first().node().asText().contains("data-title=\"it&#39;s\""));
   }
 
   @Test

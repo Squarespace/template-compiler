@@ -234,6 +234,30 @@ public class CommerceFormattersTest extends PlatformUnitTestBase {
   }
 
   @Test
+  public void testProductStatusQuote() throws CodeException {
+    String json = "{"
+        + "\"id\": \"560c37c1a7c8465c4a71d99a\","
+        + "\"structuredContent\": {\"productType\": 1, \"variants\": []},"
+        + "\"productMerchandisingContext\": {\"560c37c1a7c8465c4a71d99a\": {\"customSoldOutText\": \"it's gone\"}}"
+        + "}";
+
+    // Legacy, the single quote passes through raw at the default level.
+    Context legacy = compiler().newExecutor()
+        .template("{@|product-status}")
+        .json(json)
+        .execute();
+    assertTrue(legacy.buffer().toString().contains("it's gone"));
+
+    // Fixed, the quote is escaped.
+    Context fixed = compiler().newExecutor()
+        .template("{@|product-status}")
+        .json(json)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertTrue(fixed.buffer().toString().contains("it&#39;s gone"));
+  }
+
+  @Test
   public void testQuantityInput() {
     runner.exec("f-quantity-input-%N.html");
   }

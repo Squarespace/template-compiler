@@ -56,15 +56,21 @@ public class PlatformUtils {
     makeSocialButton(website, item, inline, true, buf);
   }
 
-  /**
-   * The legacyAttributes flag has the same polarity as
-   * Context.compatEnabled: true keeps the released behavior (raw
-   * attribute values, assetUrl read before the missing check), false
-   * applies the SOCIAL_BUTTON_ATTRIBUTES fix (every attribute value
-   * escaped, missing/null/empty assetUrl falls back).
-   */
   public static void makeSocialButton(JsonNode website, JsonNode item, boolean inline, boolean legacyAttributes,
       StringBuilder buf) {
+    makeSocialButton(website, item, inline, legacyAttributes, true, buf);
+  }
+
+  /**
+   * Both flags have the same polarity as Context.compatEnabled: true
+   * keeps the released behavior, false applies the fix.
+   *
+   * legacyAttributes keeps the raw attribute values and the assetUrl
+   * read before the missing check. legacySingleQuote keeps the single
+   * quote raw inside escaped attribute values.
+   */
+  public static void makeSocialButton(JsonNode website, JsonNode item, boolean inline, boolean legacyAttributes,
+      boolean legacySingleQuote, StringBuilder buf) {
     JsonNode options = website.path("shareButtonOptions");
     if (website.isMissingNode() || options.isMissingNode() || options.size() == 0) {
       return;
@@ -101,34 +107,35 @@ public class PlatformUtils {
     buf.append(style);
     buf.append("\" data-system-data-id=\"");
     if (!legacyAttributes) {
-      PluginUtils.escapeHtmlAttribute(imageId, buf);
+      PluginUtils.escapeHtmlAttribute(imageId, buf, legacySingleQuote);
     } else {
       // Legacy, the released behavior: the value goes in raw.
       buf.append(imageId);
     }
     buf.append("\" data-asset-url=\"");
     if (!legacyAttributes) {
-      PluginUtils.escapeHtmlAttribute(assetUrl, buf);
+      PluginUtils.escapeHtmlAttribute(assetUrl, buf, legacySingleQuote);
     } else {
       // Legacy, the released behavior: the value goes in raw.
       buf.append(assetUrl);
     }
     buf.append("\" data-record-type=\"");
     if (!legacyAttributes) {
-      PluginUtils.escapeHtmlAttribute(item.path("recordType").asText(), buf);
+      PluginUtils.escapeHtmlAttribute(item.path("recordType").asText(), buf, legacySingleQuote);
     } else {
       // Legacy, the released behavior: the value goes in raw.
       buf.append(item.path("recordType").asText());
     }
     buf.append("\" data-full-url=\"");
     if (!legacyAttributes) {
-      PluginUtils.escapeHtmlAttribute(item.path("fullUrl").asText(), buf);
+      PluginUtils.escapeHtmlAttribute(item.path("fullUrl").asText(), buf, legacySingleQuote);
     } else {
       // Legacy, the released behavior: the value goes in raw.
       buf.append(item.path("fullUrl").asText());
     }
     buf.append("\" data-title=\"");
-    PluginUtils.escapeHtmlAttribute(item.path("title").asText(), buf);
+    // Legacy, the single quote passes through. Fixed, it is escaped.
+    PluginUtils.escapeHtmlAttribute(item.path("title").asText(), buf, legacySingleQuote);
     buf.append("\">");
     if (inline) {
       buf.append("</span>");

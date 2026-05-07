@@ -274,7 +274,8 @@ public class SocialFormatters implements FormatterRegistry {
       Variable var = variables.first();
       JsonNode website = ctx.resolve("website");
       StringBuilder buf = new StringBuilder();
-      PlatformUtils.makeSocialButton(website, var.node(), false, ctx.compatEnabled(Patch.SOCIAL_BUTTON_ATTRIBUTES), buf);
+      PlatformUtils.makeSocialButton(website, var.node(), false, ctx.compatEnabled(Patch.SOCIAL_BUTTON_ATTRIBUTES),
+          ctx.compatEnabled(Patch.HTMLATTR_QUOTE), buf);
       var.set(buf);
     }
   }
@@ -290,7 +291,8 @@ public class SocialFormatters implements FormatterRegistry {
       Variable var = variables.first();
       JsonNode website = ctx.resolve("website");
       StringBuilder buf = new StringBuilder();
-      PlatformUtils.makeSocialButton(website, var.node(), true, ctx.compatEnabled(Patch.SOCIAL_BUTTON_ATTRIBUTES), buf);
+      PlatformUtils.makeSocialButton(website, var.node(), true, ctx.compatEnabled(Patch.SOCIAL_BUTTON_ATTRIBUTES),
+          ctx.compatEnabled(Patch.HTMLATTR_QUOTE), buf);
       var.set(buf);
     }
   }
@@ -330,7 +332,7 @@ public class SocialFormatters implements FormatterRegistry {
         buf.append(userName);
       } else {
         // Fixed, escape before writing into the attribute.
-        PluginUtils.escapeHtmlAttribute(userName, buf);
+        PluginUtils.escapeHtmlAttribute(userName, buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
       }
       buf.append("\"></div>");
       var.set(buf);

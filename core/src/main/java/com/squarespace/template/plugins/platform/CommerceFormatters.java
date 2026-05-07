@@ -630,7 +630,8 @@ public class CommerceFormatters implements FormatterRegistry {
         String defaultSoldOutMessage = StringUtils.defaultIfEmpty(defaultSoldOutText, "sold out");
         String soldOutMessage = StringUtils.defaultIfEmpty(customSoldOutMessage, defaultSoldOutMessage);
         buf.append("<div class=\"product-mark sold-out\">");
-        PluginUtils.escapeHtmlAttribute(soldOutMessage, buf);
+        // Legacy, the single quote passes through. Fixed, it is escaped.
+        PluginUtils.escapeHtmlAttribute(soldOutMessage, buf, ctx.compatEnabled(Patch.HTMLATTR_QUOTE));
         buf.append("</div>");
         var.set(buf);
       } else if (CommerceUtils.isOnSale(node)) {

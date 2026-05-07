@@ -46,6 +46,7 @@ import com.squarespace.template.Variables;
 import com.squarespace.template.compat.CompatLevel;
 import com.squarespace.template.plugins.platform.ContentFormatters.ColorWeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.HeightFormatter;
+import com.squarespace.template.plugins.platform.ContentFormatters.ImageFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.ResizedHeightForWidthFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.ResizedWidthForHeightFormatter;
 import com.squarespace.template.plugins.platform.ContentFormatters.SqspThumbForHeightFormatter;
@@ -63,6 +64,8 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
   private static final Formatter COLOR_WEIGHT = new ColorWeightFormatter();
 
   private static final Formatter HEIGHT = new HeightFormatter();
+
+  private static final Formatter IMAGE = new ImageFormatter();
 
   private static final Formatter RESIZED_WIDTH_FOR_HEIGHT = new ResizedWidthForHeightFormatter();
 
@@ -118,6 +121,22 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
         "f-image-6.html",
         "f-image-7.html"
         );
+  }
+
+  @Test
+  public void testImageQuote() throws CodeException {
+    String json = "{"
+        + "\"id\": \"560c37c1a7c8465c4a71d99a\","
+        + "\"title\": \"it's\","
+        + "\"originalSize\": 1000,"
+        + "\"assetUrl\": \"/foo/bar.jpg\""
+        + "}";
+
+    // Legacy, the single quote passes through raw at the default level.
+    assertTrue(format(IMAGE, json).contains("alt=\"it's\""));
+
+    // Fixed, the quote is escaped for single-quoted attribute values.
+    assertTrue(formatFixed(IMAGE, EMPTY_ARGUMENTS, json).contains("alt=\"it&#39;s\""));
   }
 
   @Test
