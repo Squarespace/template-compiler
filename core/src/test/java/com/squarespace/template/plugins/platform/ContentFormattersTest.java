@@ -24,6 +24,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -340,6 +341,21 @@ public class ContentFormattersTest extends PlatformUnitTestBase {
 
     String validHslaJsonDecimals = "{\"hue\": 0.956, \"saturation\": 0.9554, \"lightness\": 0.9567, \"alpha\": 0.555}";
     assertFormatter(WEBSITE_COLOR, validHslaJsonDecimals, "hsla(0.96, 95.54%, 95.67%, 0.56)");
+  }
+
+  @Test
+  public void testWebsiteColorLocale() throws CodeException {
+    // CSS requires '.' as the decimal separator. Formatting must not
+    // depend on the executor locale, or a comma-decimal locale would
+    // produce invalid CSS like "hsla(0,96, 95,54%, 95,67%, 0,56)".
+    String json = "{\"c\": {\"hue\": 0.956, \"saturation\": 0.9554, \"lightness\": 0.9567, \"alpha\": 0.555}}";
+    String expected = "hsla(0.96, 95.54%, 95.67%, 0.56)";
+    CompiledTemplate compiled = compiler().compile("{c|website-color}");
+    Context usCtx = compiler().newExecutor().locale(Locale.US).code(compiled.code()).json(json).execute();
+    Context frCtx = compiler().newExecutor().locale(Locale.FRANCE).code(compiled.code()).json(json).execute();
+    assertEquals(eval(usCtx), expected);
+    assertEquals(eval(frCtx), expected);
+    assertEquals(eval(usCtx), eval(frCtx));
   }
 
   private String formatFixed(Formatter impl, Arguments args, String json) throws CodeException {

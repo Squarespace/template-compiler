@@ -356,14 +356,14 @@ public class ContentFormatters implements FormatterRegistry {
 
     // DecimalFormat is not thread-safe, and this formatter is shared by
     // concurrent executions (registered once per FormatterTable). Build a
-    // fresh one per call, like PlatformUtils.formatPercentage(). Locale is
-    // taken from the context (defaults to Locale.US) so output is stable.
+    // fresh one per call, like PlatformUtils.formatPercentage(). Numbers
+    // are formatted with Locale.ROOT: the decimal separator is always
+    // '.', so the CSS output is valid under any executor locale.
     private static final String PATTERN = "0.##";
 
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
-      DecimalFormat format = new DecimalFormat(PATTERN,
-          DecimalFormatSymbols.getInstance(ctx.javaLocale() != null ? ctx.javaLocale() : Locale.US));
+      DecimalFormat format = new DecimalFormat(PATTERN, new DecimalFormatSymbols(Locale.ROOT));
       Variable var = variables.first();
       JsonNode node = var.node();
       boolean hasAlphaValue = false;
