@@ -109,6 +109,20 @@ public final class CompatLevel {
     return new CompatLevel(level, overrides);
   }
 
+  /**
+   * A copy at the base's level. The override set is the union of this
+   * level's and the base's, so setting a full level never drops a
+   * per-site override applied before it.
+   */
+  public CompatLevel withBase(CompatLevel base) {
+    Set<Patch> merged = overrides;
+    if (!base.overrides().isEmpty()) {
+      merged = merged.isEmpty() ? EnumSet.copyOf(base.overrides()) : EnumSet.copyOf(merged);
+      merged.addAll(base.overrides());
+    }
+    return new CompatLevel(base.level(), merged);
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {

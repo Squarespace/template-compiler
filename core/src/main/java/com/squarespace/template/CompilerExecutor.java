@@ -255,10 +255,14 @@ public class CompilerExecutor {
   }
 
   /**
-   * Sets the full compatibility level for this execution.
+   * Sets the compatibility level for this execution. Merges onto the
+   * current level like compatLevel/compatPatch: the level value is
+   * taken from the argument and per-site overrides are kept (unioned
+   * with any the argument carries). A null argument resets to the
+   * default level.
    */
   public CompilerExecutor compat(CompatLevel compat) {
-    this.compat = compat == null ? CompatLevel.defaultLevel() : compat;
+    this.compat = compat == null ? CompatLevel.defaultLevel() : this.compat.withBase(compat);
     return this;
   }
 

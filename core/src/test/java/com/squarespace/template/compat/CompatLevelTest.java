@@ -120,11 +120,33 @@ public class CompatLevelTest {
     ctx = compiler.newExecutor()
         .template("x")
         .json("{}")
+        .compatPatch(Patch.MOD_ZERO)
+        .compat(CompatLevel.at(2))
+        .execute();
+    assertTrue(ctx.compatEnabled(Patch.MOD_ZERO), "override must survive a later compat(...)");
+    assertEquals(ctx.getCompat(), CompatLevel.at(2).withPatch(Patch.MOD_ZERO));
+    ctx = compiler.newExecutor()
+        .template("x")
+        .json("{}")
         .compatLevel(2)
         .compatPatch(Patch.MOD_ZERO)
         .execute();
     assertTrue(ctx.compatEnabled(Patch.MOD_ZERO), "override must apply after compatLevel");
     assertEquals(ctx.getCompat().level(), 2);
+  }
+
+  @Test
+  public void testWithBase() {
+    // The level moves to the base's; overrides are the union.
+    CompatLevel receiver = CompatLevel.at(0).withPatch(Patch.MOD_ZERO);
+    CompatLevel merged = receiver.withBase(CompatLevel.at(2));
+    assertEquals(merged.level(), 2);
+    for (Patch patch : Patch.values()) {
+      assertEquals(merged.enabled(patch), patch == Patch.MOD_ZERO || patch.threshold() > 2, patch.name());
+    }
+    assertEquals(merged, CompatLevel.at(2).withPatch(Patch.MOD_ZERO));
+    // The receiver is untouched.
+    assertEquals(receiver, CompatLevel.at(0).withPatch(Patch.MOD_ZERO));
   }
 
   @Test
