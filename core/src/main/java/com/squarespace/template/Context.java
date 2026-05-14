@@ -415,11 +415,12 @@ public class Context {
       // will catch and nest inside a runtime exception.
       String source = partialNode.asText();
 
-      // Reuse a compile from another context with the same source and flags,
-      // so repeated executions of the same partial set don't recompile.
-      inst = compiler.getCachedPartial(name, source, safeExecution, preprocess);
+      // Reuse a compile from another context with the same source, flags and
+      // compat level, so repeated executions of the same partial set don't
+      // recompile.
+      inst = compiler.getCachedPartial(name, source, safeExecution, preprocess, getCompat());
       if (inst == null) {
-        CompiledTemplate template = compiler.compile(source, safeExecution, preprocess);
+        CompiledTemplate template = compiler.compile(source, safeExecution, preprocess, getCompat());
         if (safeExecution) {
           List<ErrorInfo> errors = template.errors();
           if (!errors.isEmpty()) {
@@ -434,7 +435,7 @@ public class Context {
         // Share error-free compiles across contexts only. A compile with
         // syntax errors must be re-reported on every execution.
         if (template.errors().isEmpty()) {
-          compiler.cachePartial(name, source, safeExecution, preprocess, inst);
+          compiler.cachePartial(name, source, safeExecution, preprocess, inst, getCompat());
         }
         compiledPartials.put(name, inst);
       }

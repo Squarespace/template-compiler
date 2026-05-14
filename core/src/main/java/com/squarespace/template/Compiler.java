@@ -58,12 +58,9 @@ public class Compiler {
   /**
    * Cross-context cache of compiled partials. Never the source of truth: a
    * context always compiles on a miss and stores in its own map; this cache
-   * only skips a redundant recompile. Keyed by partial name, source hash, and
-   * the safe/preprocess flags so differing compile modes never collide.
-   *
-   * The key omits the compat level because partials are always compiled at
-   * the default level. If that changes, add the level to the key or a level
-   * mismatch will serve a stale compile.
+   * only skips a redundant recompile. Keyed by partial name, source hash, the
+   * safe/preprocess flags, and the compat level, so a compile is only reused
+   * by contexts at the same level.
    */
   private final Map<String, PartialEntry> partialCache = new ConcurrentHashMap<>();
 
@@ -92,30 +89,34 @@ public class Compiler {
 
   /**
    * Returns a previously cached compile of this partial, or null if none is
-   * usable. The key covers the partial name, the source hash and the compile
-   * flags, and the stored source is compared on a hit, so a changed partial
-   * of the same name always recompiles.
+   * usable. The key covers the partial name, the source hash, the compile
+   * flags and the compat level, and the stored source is compared on a hit,
+   * so a changed partial of the same name always recompiles.
    */
-  public Instruction getCachedPartial(String name, String source, boolean safeExecution, boolean preprocess) {
-    PartialEntry entry = partialCache.get(key(name, source, safeExecution, preprocess));
+  public Instruction getCachedPartial(String name, String source, boolean safeExecution, boolean preprocess,
+      CompatLevel compat) {
+    PartialEntry entry = partialCache.get(key(name, source, safeExecution, preprocess, compat));
     return entry != null && source.equals(entry.source) ? entry.inst : null;
   }
 
   /**
    * Caches a compiled partial for reuse by later contexts. Compile the partial
-   * with the same flags the caller used; entries with different flags never
-   * collide because the flags are part of the key. Only cache error-free
-   * compiles so a cached instruction never hides syntax errors.
+   * with the same flags and compat level the caller used; entries with
+   * different modes never collide because they are part of the key. Only cache
+   * error-free compiles so a cached instruction never hides syntax errors.
    */
-  public void cachePartial(String name, String source, boolean safeExecution, boolean preprocess, Instruction inst) {
+  public void cachePartial(String name, String source, boolean safeExecution, boolean preprocess, Instruction inst,
+      CompatLevel compat) {
     if (partialCache.size() >= MAX_PARTIAL_CACHE) {
       partialCache.clear();
     }
-    partialCache.put(key(name, source, safeExecution, preprocess), new PartialEntry(source, inst));
+    partialCache.put(key(name, source, safeExecution, preprocess, compat), new PartialEntry(source, inst));
   }
 
-  private static String key(String name, String source, boolean safeExecution, boolean preprocess) {
-    return name + '\0' + source.hashCode() + '\0' + safeExecution + '\0' + preprocess;
+  private static String key(String name, String source, boolean safeExecution, boolean preprocess, CompatLevel compat) {
+    // CompatLevel has value equals/hashCode, and overrides (not just the
+    // level number) affect parse-time validation, so key on the whole value.
+    return name + '\0' + source.hashCode() + '\0' + safeExecution + '\0' + preprocess + '\0' + compat.hashCode();
   }
 
   /**

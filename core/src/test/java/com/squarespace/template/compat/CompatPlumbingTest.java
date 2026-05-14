@@ -19,6 +19,7 @@ package com.squarespace.template.compat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import com.squarespace.template.CodeException;
+import com.squarespace.template.CodeSyntaxException;
 import com.squarespace.template.Compiler;
 import com.squarespace.template.CompilerExecutor;
 import com.squarespace.template.Context;
@@ -108,6 +110,33 @@ public class CompatPlumbingTest extends UnitTestBase {
         TreeEmitter.emit(compiler.compile(template, false, false, CompatLevel.at(level)).code(), 0, buf);
         assertEquals(buf.toString(), base.toString(), template + " tree at level " + level);
       }
+    }
+  }
+
+  @Test
+  public void testPartialInheritsParentCompatLevel() throws Exception {
+    // The partial only compiles when JSON_START_KEYWORD is fixed. The output
+    // keyword is required, otherwise the include suppresses the partial's
+    // output.
+    String partials = "{\"p\":\"{.equal?\\\" true\\\"}yes{.or}no{.end}\"}";
+
+    Context fixed = compiler().newExecutor()
+        .template("{.include p output}")
+        .json("true")
+        .safeExecution(true)
+        .enableInclude(true)
+        .partialsMap(partials)
+        .compat(CompatLevel.fixed())
+        .execute();
+    assertEquals(fixed.getErrors().size(), 0, "fixed-level partial must compile");
+    assertEquals(fixed.buffer().toString(), "yes");
+
+    // The default level still rejects the same syntax, in the main template.
+    try {
+      compiler().compile("{.equal?\" true\"}");
+      fail("expected CodeSyntaxException");
+    } catch (CodeSyntaxException e) {
+      // Expected
     }
   }
 
