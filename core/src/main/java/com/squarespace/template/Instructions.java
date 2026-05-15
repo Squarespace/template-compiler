@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.squarespace.template.compat.Patch;
 import com.squarespace.template.expr.Expr;
 import com.squarespace.template.expr.ExprOptions;
 import com.squarespace.template.expr.Formats;
@@ -810,21 +809,8 @@ public class Instructions {
 
       try {
         // Execute the partial or macro inline.
-        if (ctx.enterPartial(name)) {
-          if (ctx.compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
-            // Legacy, the depth is released only when the partial finishes
-            // without throwing.
-            invokePartial(ctx, code);
-            ctx.exitPartial(name);
-          } else {
-            // Fixed, the depth is released even when the partial throws.
-            try {
-              invokePartial(ctx, code);
-            } finally {
-              ctx.exitPartial(name);
-            }
-          }
-        }
+        final Instruction partial = code;
+        ctx.partialScoped(name, () -> invokePartial(ctx, partial));
       } finally {
         if (buf != null) {
           ctx.swapBuffer(buf);

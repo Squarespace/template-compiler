@@ -444,6 +444,21 @@ public class Context {
   }
 
   /**
+   * Report a partial depth breach. In safe execution the error is
+   * recorded and false is returned; otherwise the exception is thrown.
+   */
+  private boolean depthBreach(String name) throws CodeExecuteException {
+    ErrorInfo error = error(APPLY_PARTIAL_RECURSION_DEPTH)
+        .name(name)
+        .data(maxPartialDepth);
+    if (safeExecution) {
+      addError(error);
+      return false;
+    }
+    throw new CodeExecuteException(error);
+  }
+
+  /**
    * Check if we're about to recurse through a partial we're already evaluating.
    * This code currently prevents all reentrant evaluation of partials.
    *
@@ -453,33 +468,18 @@ public class Context {
    */
   public boolean enterPartial(String name) throws CodeExecuteException {
     if (compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
-      // Legacy, the counter is incremented before the depth check. A breach
-      // leaves it elevated and a later include fails with a spurious error.
+      // Legacy, the counter is incremented before the depth check. A
+      // breach leaves it elevated and a later include fails with a
+      // spurious error.
       partialDepth++;
       if (partialDepth > maxPartialDepth) {
-        ErrorInfo error = error(APPLY_PARTIAL_RECURSION_DEPTH)
-            .name(name)
-            .data(maxPartialDepth);
-        if (safeExecution) {
-          addError(error);
-          return false;
-        } else {
-          throw new CodeExecuteException(error);
-        }
+        return depthBreach(name);
       }
       return true;
     }
     // Fixed, the depth is checked first so a breach does not move the counter.
     if (partialDepth >= maxPartialDepth) {
-      ErrorInfo error = error(APPLY_PARTIAL_RECURSION_DEPTH)
-          .name(name)
-          .data(maxPartialDepth);
-      if (safeExecution) {
-        addError(error);
-        return false;
-      } else {
-        throw new CodeExecuteException(error);
-      }
+      return depthBreach(name);
     }
     partialDepth++;
     return true;
@@ -490,6 +490,38 @@ public class Context {
    */
   public void exitPartial(String name) {
     partialDepth--;
+  }
+
+  /**
+   * A body run while holding the partial depth slot for one partial.
+   */
+  @FunctionalInterface
+  public interface PartialBody {
+    void run() throws CodeExecuteException;
+  }
+
+  /**
+   * Run body while holding the partial depth slot for name. Returns
+   * false when the depth limit is breached (body not run). With
+   * PARTIAL_DEPTH_LEAK the slot is released after the body returns
+   * normally (not when it throws); otherwise it is released in a
+   * finally.
+   */
+  public boolean partialScoped(String name, PartialBody body) throws CodeExecuteException {
+    if (!enterPartial(name)) {
+      return false;
+    }
+    if (compatEnabled(Patch.PARTIAL_DEPTH_LEAK)) {
+      body.run();
+      exitPartial(name);
+    } else {
+      try {
+        body.run();
+      } finally {
+        exitPartial(name);
+      }
+    }
+    return true;
   }
 
   /**
