@@ -171,6 +171,29 @@ public class CompilerTest {
   }
 
   @Test
+  public void testPartialCacheEvictsSingleEntry() throws CodeException {
+    Compiler compiler = new Compiler(FORMATTERS, PREDICATES);
+    int saved = Compiler.MAX_PARTIAL_CACHE;
+    try {
+      Compiler.MAX_PARTIAL_CACHE = 2;
+      CompatLevel compat = CompatLevel.defaultLevel();
+      compiler.cachePartial("a", "a", false, false, new VariableInst("@"), compat);
+      compiler.cachePartial("b", "b", false, false, new EofInst(), compat);
+      assertTrue(compiler.partialCacheSize() == 2);
+
+      // Overflow evicts one entry, so the cache still holds its bound and at
+      // least one previously cached partial still hits.
+      compiler.cachePartial("c", "c", false, false, new EofInst(), compat);
+      assertEquals(compiler.partialCacheSize(), 2);
+      boolean hit = compiler.getCachedPartial("a", "a", false, false, compat) != null
+          || compiler.getCachedPartial("b", "b", false, false, compat) != null;
+      assertTrue(hit);
+    } finally {
+      Compiler.MAX_PARTIAL_CACHE = saved;
+    }
+  }
+
+  @Test
   public void testCodeLimiter() throws CodeException {
     CodeLimiter limiter = new NoopCodeLimiter();
     Context ctx = COMPILER.newExecutor()

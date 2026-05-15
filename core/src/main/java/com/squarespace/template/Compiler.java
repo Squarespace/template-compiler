@@ -36,9 +36,9 @@ public class Compiler {
 
   /**
    * Max entries in the cross-context partial cache. Bounded to avoid unbounded
-   * memory growth; when full the whole cache is cleared (simple policy).
+   * memory growth; when full a single entry is evicted before inserting.
    */
-  static final int MAX_PARTIAL_CACHE = 1024;
+  static int MAX_PARTIAL_CACHE = 1024;
 
   /**
    * A compiled partial kept for reuse across contexts. Holds the source text
@@ -108,9 +108,21 @@ public class Compiler {
   public void cachePartial(String name, String source, boolean safeExecution, boolean preprocess, Instruction inst,
       CompatLevel compat) {
     if (partialCache.size() >= MAX_PARTIAL_CACHE) {
-      partialCache.clear();
+      // Evict one entry rather than clearing; a miss just recompiles, so
+      // concurrent evictions are harmless and the rest of the cache survives.
+      for (String existing : partialCache.keySet()) {
+        partialCache.remove(existing);
+        break;
+      }
     }
     partialCache.put(key(name, source, safeExecution, preprocess, compat), new PartialEntry(source, inst));
+  }
+
+  /**
+   * Number of entries currently held in the cross-context partial cache.
+   */
+  int partialCacheSize() {
+    return partialCache.size();
   }
 
   private static String key(String name, String source, boolean safeExecution, boolean preprocess, CompatLevel compat) {
