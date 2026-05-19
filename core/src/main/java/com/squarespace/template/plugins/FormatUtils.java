@@ -70,17 +70,10 @@ public class FormatUtils {
           case '7':
           case '8':
           case '9':
-            if (legacyState) {
-              // Legacy, digits count even while ignoring, which can
-              // re-arm a slot: {x 2} leaks slot 0.
-              // support > 9 arguments
-              if (index > 0) {
-                index *= 10;
-              }
-              index += (int)(ch - '0');
-            } else if (index >= 0) {
-              // Fixed, only count digits inside a real tag, never
-              // while ignoring.
+            if (legacyState || index >= 0) {
+              // Legacy counts digits even while ignoring a bad tag,
+              // which can re-arm a slot. Fixed counts digits only
+              // inside a real tag.
               // support > 9 arguments
               if (index > 0) {
                 index *= 10;
