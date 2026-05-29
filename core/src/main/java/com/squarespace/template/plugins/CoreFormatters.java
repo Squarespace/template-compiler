@@ -74,6 +74,8 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new EncodeSpaceFormatter());
     table.add(new EncodeUriFormatter());
     table.add(new EncodeUriComponentFormatter());
+    table.add(new FindFirstFormatter());
+    table.add(new FindLastFormatter());
     table.add(new FormatFormatter());
     table.add(new GetFormatter());
     table.add(new HtmlFormatter());
@@ -316,6 +318,110 @@ public class CoreFormatters implements FormatterRegistry {
       Variable var = variables.first();
       String value = var.node().asText();
       var.set(EncodeUtils.encodeURIComponent(value));
+    }
+
+  }
+
+  /**
+   * FIND-FIRST - Returns the first element of an array.
+   *
+   * Forms:
+   *   {array|find-first}              first element
+   *   {array|find-first path}         first element where element.path is truthy
+   *   {array|find-first lookup path}  array is treated as a list of keys; each key is
+   *                                   looked up in the `lookup` object (resolved against
+   *                                   the context) and the first key whose looked-up
+   *                                   value has a truthy value at `path` is returned.
+   *
+   * Returns a missing node when the input is not an array, the array is empty,
+   * or no element matches.
+   */
+  public static class FindFirstFormatter extends BaseFormatter {
+
+    public FindFirstFormatter() {
+      super("find-first", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.between(0, 2);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+      if (!node.isArray() || node.size() == 0) {
+        var.set(Constants.MISSING_NODE);
+        return;
+      }
+      if (args.count() == 0) {
+        var.set(node.get(0));
+        return;
+      }
+      boolean hasLookup = args.count() == 2;
+      JsonNode lookup = hasLookup ? ctx.resolve(splitVariable(args.first())) : null;
+      Object[] path = splitVariable(args.get(hasLookup ? 1 : 0));
+      for (JsonNode element : node) {
+        JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
+        if (isTruthy(getNodeAtPath(candidate, path))) {
+          var.set(element);
+          return;
+        }
+      }
+      var.set(Constants.MISSING_NODE);
+    }
+}
+
+  /**
+   * FIND-LAST - Returns the last element of an array.
+   *
+   * Forms:
+   *   {array|find-last}              last element
+   *   {array|find-last path}         last element where element.path is truthy
+   *   {array|find-last lookup path}  array is treated as a list of keys; each key is
+   *                                  looked up in the `lookup` object (resolved against
+   *                                  the context) and the last key whose looked-up
+   *                                  value has a truthy value at `path` is returned.
+   *
+   * Returns a missing node when the input is not an array, the array is empty,
+   * or no element matches.
+   */
+  public static class FindLastFormatter extends BaseFormatter {
+
+    public FindLastFormatter() {
+      super("find-last", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.between(0, 2);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      JsonNode node = var.node();
+      if (!node.isArray() || node.size() == 0) {
+        var.set(Constants.MISSING_NODE);
+        return;
+      }
+      if (args.count() == 0) {
+        var.set(node.get(node.size() - 1));
+        return;
+      }
+      boolean hasLookup = args.count() == 2;
+      JsonNode lookup = hasLookup ? ctx.resolve(splitVariable(args.first())) : null;
+      Object[] path = splitVariable(args.get(hasLookup ? 1 : 0));
+      for (int i = node.size() - 1; i >= 0; i--) {
+        JsonNode element = node.get(i);
+        JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
+        if (isTruthy(getNodeAtPath(candidate, path))) {
+          var.set(element);
+          return;
+        }
+      }
+      var.set(Constants.MISSING_NODE);
     }
 
   }

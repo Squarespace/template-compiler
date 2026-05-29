@@ -50,6 +50,8 @@ import com.squarespace.template.plugins.CoreFormatters.CycleFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeSpaceFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeUriComponentFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeUriFormatter;
+import com.squarespace.template.plugins.CoreFormatters.FindFirstFormatter;
+import com.squarespace.template.plugins.CoreFormatters.FindLastFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
@@ -81,6 +83,8 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter ENCODE_SPACE = new EncodeSpaceFormatter();
   private static final Formatter ENCODE_URI = new EncodeUriFormatter();
   private static final Formatter ENCODE_URI_COMPONENT = new EncodeUriComponentFormatter();
+  private static final Formatter FIND_FIRST = new FindFirstFormatter();
+  private static final Formatter FIND_LAST = new FindLastFormatter();
   private static final Formatter HTML = new HtmlFormatter();
   private static final Formatter HTMLATTR = new HtmlAttrFormatter();
   private static final Formatter HTMLTAG = new HtmlTagFormatter();
@@ -542,6 +546,82 @@ public class CoreFormattersTest extends UnitTestBase {
     );
 
     runner.exec("f-key-by-%N.html");
+  }
+
+  @Test
+  public void testFindFirst() throws CodeException {
+    CodeMaker mk = maker();
+
+    assertFormatter(FIND_FIRST, "[\"a\",\"b\",\"c\"]", "a");
+    assertFormatter(FIND_FIRST, "[]", "");
+    assertFormatter(FIND_FIRST, "\"not-an-array\"", "");
+    assertFormatterRaw(FIND_FIRST, "[{\"x\":1},{\"x\":2}]", JsonUtils.decode("{\"x\":1}"));
+
+    Arguments args = mk.args(" enabled");
+    assertFormatterRaw(
+        FIND_FIRST,
+        args,
+        "[{\"id\":\"a\",\"enabled\":false},{\"id\":\"b\",\"enabled\":true},{\"id\":\"c\",\"enabled\":true}]",
+        JsonUtils.decode("{\"id\":\"b\",\"enabled\":true}")
+    );
+    assertFormatter(
+        FIND_FIRST,
+        args,
+        "[{\"id\":\"a\",\"enabled\":false},{\"id\":\"b\"}]",
+        ""
+    );
+
+    Context ctx = compiler().newExecutor()
+    .json("{\"items\": [{\"id\":\"a\",\"enabled\":false},{\"id\":\"b\",\"enabled\":true},{\"id\":\"c\",\"enabled\":true}]}")
+    .template("{.var @firstEnabled items|find-first enabled}{@firstEnabled.id}")
+    .safeExecution(true)
+    .execute();
+    assertContext(ctx, "b");
+
+    ctx = compiler().newExecutor()
+    .json("{\"keys\": [\"a\", \"b\", \"c\"], \"map\": {\"a\": {\"enabled\": false}, \"b\": {\"enabled\": true}, \"c\": {\"enabled\": true}}}")
+    .template("{keys|find-first map enabled}")
+    .safeExecution(true)
+    .execute();
+    assertContext(ctx, "b");
+  }
+
+  @Test
+  public void testFindLast() throws CodeException {
+    CodeMaker mk = maker();
+
+    assertFormatter(FIND_LAST, "[\"a\",\"b\",\"c\"]", "c");
+    assertFormatter(FIND_LAST, "[]", "");
+    assertFormatter(FIND_LAST, "\"not-an-array\"", "");
+    assertFormatterRaw(FIND_LAST, "[{\"x\":1},{\"x\":2}]", JsonUtils.decode("{\"x\":2}"));
+
+    Arguments args = mk.args(" enabled");
+    assertFormatterRaw(
+        FIND_LAST,
+        args,
+        "[{\"id\":\"a\",\"enabled\":true},{\"id\":\"b\",\"enabled\":true},{\"id\":\"c\",\"enabled\":false}]",
+        JsonUtils.decode("{\"id\":\"b\",\"enabled\":true}")
+    );
+    assertFormatter(
+        FIND_LAST,
+        args,
+        "[{\"id\":\"a\",\"enabled\":false},{\"id\":\"b\"}]",
+        ""
+    );
+
+    Context ctx = compiler().newExecutor()
+    .json("{\"items\": [{\"id\":\"a\",\"enabled\":true},{\"id\":\"b\",\"enabled\":true},{\"id\":\"c\",\"enabled\":false}]}")
+    .template("{.var @lastEnabled items|find-last enabled}{@lastEnabled.id}")
+    .safeExecution(true)
+    .execute();
+    assertContext(ctx, "b");
+
+    ctx = compiler().newExecutor()
+    .json("{\"keys\": [\"a\", \"b\", \"c\"], \"map\": {\"a\": {\"enabled\": true}, \"b\": {\"enabled\": true}, \"c\": {\"enabled\": false}}}")
+    .template("{keys|find-last map enabled}")
+    .safeExecution(true)
+    .execute();
+    assertContext(ctx, "b");
   }
 
   @Test
