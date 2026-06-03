@@ -25,6 +25,8 @@ import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
 import static com.squarespace.template.GeneralUtils.splitVariable;
 import static com.squarespace.template.GeneralUtils.getNodeAtPath;
+import static com.squarespace.template.plugins.FindUtils.findNthValidEntry;
+import static com.squarespace.template.plugins.FindUtils.getLookupAndPath;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
@@ -350,28 +352,10 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
-      JsonNode node = var.node();
-      if (!node.isArray() || node.size() == 0) {
-        var.set(Constants.MISSING_NODE);
-        return;
-      }
-      if (args.count() == 0) {
-        var.set(node.get(0));
-        return;
-      }
-      boolean hasLookup = args.count() == 2;
-      JsonNode lookup = hasLookup ? ctx.resolve(splitVariable(args.first())) : null;
-      Object[] path = splitVariable(args.get(hasLookup ? 1 : 0));
-      for (JsonNode element : node) {
-        JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
-        if (isTruthy(getNodeAtPath(candidate, path))) {
-          var.set(element);
-          return;
-        }
-      }
-      var.set(Constants.MISSING_NODE);
+      FindUtils.LookupAndPath lp = getLookupAndPath(ctx, args.getArgs());
+      var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, 0));
     }
-}
+  }
 
   /**
    * FIND-LAST - Returns the last element of an array.
@@ -401,29 +385,53 @@ public class CoreFormatters implements FormatterRegistry {
     @Override
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
+      FindUtils.LookupAndPath lp = getLookupAndPath(ctx, args.getArgs());
+      var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, -1));
+    }
+  }
+
+  /**
+   * FIND-NTH - Returns the nth matching element of an array (0-based; negative counts from end).
+   *
+   * Forms:
+   *   {array|find-nth nth}              finds nth element
+   *   {array|find-nth nth path}         finds nth element where element.path is truthy
+   *   {array|find-nth nth lookup path}  array is treated as a list of keys; each key is
+   *                                     looked up in the `lookup` object (resolved against
+   *                                     the context) and the nth key whose looked-up
+   *                                     value has a truthy value at `path` is returned.
+   *
+   * Returns a missing node when the input is not an array, the array is empty,
+   * nth is not an integer, or no element matches.
+   */
+  public static class FindNthFormatter extends BaseFormatter {
+
+    public FindNthFormatter() {
+      super("find-nth", true);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.between(1, 3);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
       JsonNode node = var.node();
-      if (!node.isArray() || node.size() == 0) {
+
+      int nth;
+      try{
+        nth = Integer.parseInt(args.first());
+      }catch(NumberFormatException e) {
         var.set(Constants.MISSING_NODE);
         return;
       }
-      if (args.count() == 0) {
-        var.set(node.get(node.size() - 1));
-        return;
-      }
-      boolean hasLookup = args.count() == 2;
-      JsonNode lookup = hasLookup ? ctx.resolve(splitVariable(args.first())) : null;
-      Object[] path = splitVariable(args.get(hasLookup ? 1 : 0));
-      for (int i = node.size() - 1; i >= 0; i--) {
-        JsonNode element = node.get(i);
-        JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
-        if (isTruthy(getNodeAtPath(candidate, path))) {
-          var.set(element);
-          return;
-        }
-      }
-      var.set(Constants.MISSING_NODE);
-    }
+      List<String> argsWithoutNth = args.getArgs().subList(1, args.getArgs().size());
+      FindUtils.LookupAndPath lp = getLookupAndPath(ctx, argsWithoutNth);
 
+      var.set(findNthValidEntry(node, lp.path, lp.lookup, nth));
+    }
   }
 
   /**
