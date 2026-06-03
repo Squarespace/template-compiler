@@ -39,11 +39,15 @@ public class FindUtils {
         }
         ArrayNode validEntries = JsonUtils.createArrayNode();
         boolean hasLookup = lookup != null;
-        for (JsonNode element : items) {
-            JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
-            if (isTruthy(getNodeAtPath(candidate, path))) {
-                validEntries.add(candidate);
+        if(hasLookup || path != null){
+            for (JsonNode element : items) {
+                JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
+                if (isTruthy(getNodeAtPath(candidate, path))) {
+                    validEntries.add(element);
+                }
             }
+        } else {
+            validEntries = (ArrayNode)items;
         }
         int size = validEntries.size();
         if (size == 0) {

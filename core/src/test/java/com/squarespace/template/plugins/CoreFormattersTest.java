@@ -52,6 +52,7 @@ import com.squarespace.template.plugins.CoreFormatters.EncodeUriComponentFormatt
 import com.squarespace.template.plugins.CoreFormatters.EncodeUriFormatter;
 import com.squarespace.template.plugins.CoreFormatters.FindFirstFormatter;
 import com.squarespace.template.plugins.CoreFormatters.FindLastFormatter;
+import com.squarespace.template.plugins.CoreFormatters.FindNthFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
@@ -85,6 +86,7 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter ENCODE_URI_COMPONENT = new EncodeUriComponentFormatter();
   private static final Formatter FIND_FIRST = new FindFirstFormatter();
   private static final Formatter FIND_LAST = new FindLastFormatter();
+  private static final Formatter FIND_NTH = new FindNthFormatter();
   private static final Formatter HTML = new HtmlFormatter();
   private static final Formatter HTMLATTR = new HtmlAttrFormatter();
   private static final Formatter HTMLTAG = new HtmlTagFormatter();
@@ -621,6 +623,53 @@ public class CoreFormattersTest extends UnitTestBase {
     .template("{keys|find-last map enabled}")
     .safeExecution(true)
     .execute();
+    assertContext(ctx, "b");
+  }
+
+  @Test
+  public void testFindNth() throws CodeException {
+    CodeMaker mk = maker();
+
+    // index selection
+    assertFormatter(FIND_NTH, mk.args(" 0"), "[\"a\",\"b\",\"c\"]", "a");
+    assertFormatter(FIND_NTH, mk.args(" 1"), "[\"a\",\"b\",\"c\"]", "b");
+    assertFormatter(FIND_NTH, mk.args(" 2"), "[\"a\",\"b\",\"c\"]", "c");
+
+    // negative index (counts from end)
+    assertFormatter(FIND_NTH, mk.args(" -1"), "[\"a\",\"b\",\"c\"]", "c");
+    assertFormatter(FIND_NTH, mk.args(" -2"), "[\"a\",\"b\",\"c\"]", "b");
+
+    // out of bounds
+    assertFormatter(FIND_NTH, mk.args(" 5"), "[\"a\",\"b\",\"c\"]", "");
+    assertFormatter(FIND_NTH, mk.args(" -4"), "[\"a\",\"b\",\"c\"]", "");
+
+    // edge cases: empty array, non-array, non-integer nth
+    assertFormatter(FIND_NTH, mk.args(" 0"), "[]", "");
+    assertFormatter(FIND_NTH, mk.args(" 0"), "\"not-an-array\"", "");
+    assertFormatter(FIND_NTH, mk.args(" notAnInt"), "[\"a\",\"b\",\"c\"]", "");
+
+    // with path filter
+    assertFormatterRaw(
+        FIND_NTH, mk.args(" 1 enabled"),
+        "[{\"id\":\"a\",\"enabled\":true},{\"id\":\"b\",\"enabled\":true},{\"id\":\"c\",\"enabled\":false}]",
+        JsonUtils.decode("{\"id\":\"b\",\"enabled\":true}")
+    );
+    assertFormatter(FIND_NTH, mk.args(" 0 enabled"), "[{\"id\":\"a\",\"enabled\":false},{\"id\":\"b\"}]", "");
+
+    // with path filter via template
+    Context ctx = compiler().newExecutor()
+        .json("{\"items\": [{\"id\":\"a\",\"enabled\":true},{\"id\":\"b\",\"enabled\":true},{\"id\":\"c\",\"enabled\":false}]}")
+        .template("{.var @item items|find-nth 1 enabled}{@item.id}")
+        .safeExecution(true)
+        .execute();
+    assertContext(ctx, "b");
+
+    // with lookup + path filter via template
+    ctx = compiler().newExecutor()
+        .json("{\"keys\": [\"a\", \"b\", \"c\"], \"map\": {\"a\": {\"enabled\": true}, \"b\": {\"enabled\": true}, \"c\": {\"enabled\": false}}}")
+        .template("{keys|find-nth 1 map enabled}")
+        .safeExecution(true)
+        .execute();
     assertContext(ctx, "b");
   }
 

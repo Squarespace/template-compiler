@@ -78,6 +78,7 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new EncodeUriComponentFormatter());
     table.add(new FindFirstFormatter());
     table.add(new FindLastFormatter());
+    table.add(new FindNthFormatter());
     table.add(new FormatFormatter());
     table.add(new GetFormatter());
     table.add(new HtmlFormatter());
