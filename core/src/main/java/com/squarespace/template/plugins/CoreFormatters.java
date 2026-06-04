@@ -78,7 +78,6 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new EncodeUriComponentFormatter());
     table.add(new FindFirstFormatter());
     table.add(new FindLastFormatter());
-    table.add(new FindNthFormatter());
     table.add(new FormatFormatter());
     table.add(new GetFormatter());
     table.add(new HtmlFormatter());
@@ -354,7 +353,7 @@ public class CoreFormatters implements FormatterRegistry {
     public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
       Variable var = variables.first();
       FindUtils.LookupAndPath lp = getLookupAndPath(ctx, args.getArgs());
-      var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, 0));
+      var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, 1));
     }
   }
 
@@ -390,51 +389,6 @@ public class CoreFormatters implements FormatterRegistry {
       var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, -1));
     }
   }
-
-  /**
-   * FIND-NTH - Returns the nth matching element of an array (0-based; negative counts from end).
-   *
-   * Forms:
-   *   {array|find-nth nth}              finds nth element
-   *   {array|find-nth nth path}         finds nth element where element.path is truthy
-   *   {array|find-nth nth lookup path}  array is treated as a list of keys; each key is
-   *                                     looked up in the `lookup` object (resolved against
-   *                                     the context) and the nth key whose looked-up
-   *                                     value has a truthy value at `path` is returned.
-   *
-   * Returns a missing node when the input is not an array, the array is empty,
-   * nth is not an integer, or no element matches.
-   */
-  public static class FindNthFormatter extends BaseFormatter {
-
-    public FindNthFormatter() {
-      super("find-nth", true);
-    }
-
-    @Override
-    public void validateArgs(Arguments args) throws ArgumentsException {
-      args.between(1, 3);
-    }
-
-    @Override
-    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
-      Variable var = variables.first();
-      JsonNode node = var.node();
-
-      int nth;
-      try{
-        nth = Integer.parseInt(args.first());
-      }catch(NumberFormatException e) {
-        var.set(Constants.MISSING_NODE);
-        return;
-      }
-      List<String> argsWithoutNth = args.getArgs().subList(1, args.getArgs().size());
-      FindUtils.LookupAndPath lp = getLookupAndPath(ctx, argsWithoutNth);
-
-      var.set(findNthValidEntry(node, lp.path, lp.lookup, nth));
-    }
-  }
-
   /**
    * FORMAT - Substitutes positional arguments in a format string.
    */

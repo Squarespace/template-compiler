@@ -1,0 +1,15 @@
+:JSON
+{
+  "keys": ["a", "b", "c"],
+  "map": {
+    "a": { "enabled": true },
+    "b": { "enabled": true },
+    "c": { "enabled": false }
+  }
+}
+
+:TEMPLATE
+{keys|find-last map enabled}
+
+:OUTPUT
+b

@@ -1,0 +1,22 @@
+:JSON
+{
+  "strings": ["a", "b", "c"],
+  "empty": [],
+  "notArray": "not-an-array",
+  "objects": [{ "x": 1 }, { "x": 2 }],
+  "noMatch": [{ "id": "a", "enabled": false }, { "id": "b" }]
+}
+
+:TEMPLATE
+{.var @r strings|find-last}{@r}
+{.var @r empty|find-last}-{@r}
+{.var @r notArray|find-last}-{@r}
+{.var @r objects|find-last}{@r.x}
+{.var @r noMatch|find-last enabled}-{@r}
+
+:OUTPUT
+c
+-
+-
+2
+-

@@ -1,0 +1,14 @@
+:JSON
+{
+  "items": [
+    { "id": "a", "enabled": true },
+    { "id": "b", "enabled": true },
+    { "id": "c", "enabled": false }
+  ]
+}
+
+:TEMPLATE
+{.var @last items|find-last enabled}{@last.id}
+
+:OUTPUT
+b

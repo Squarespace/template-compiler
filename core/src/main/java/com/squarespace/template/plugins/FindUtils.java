@@ -1,10 +1,8 @@
 package com.squarespace.template.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.squarespace.template.Constants;
 import com.squarespace.template.Context;
-import com.squarespace.template.JsonUtils;
 
 import java.util.List;
 
@@ -37,26 +35,29 @@ public class FindUtils {
         if (!items.isArray()) {
             return Constants.MISSING_NODE;
         }
-        ArrayNode validEntries = JsonUtils.createArrayNode();
+
+        boolean forward = nth > 0;
+        int start = forward ? 0 : items.size() - 1;
+        int end = forward ? items.size() : -1;
+        int step = forward ? 1 : -1;
+
+        int count = 0;
         boolean hasLookup = lookup != null;
-        if(hasLookup || path != null){
-            for (JsonNode element : items) {
-                JsonNode candidate = hasLookup ? lookup.path(element.asText()) : element;
+        boolean hasPath = path != null;
+
+        for (int i = start; forward ? (i < end) : (i > end); i += step ) {
+            JsonNode node = items.get(i);
+            if (!hasPath){
+                count += step;
+                if (count == nth) { return node;}
+            } else {
+                JsonNode candidate = hasLookup ? lookup.path(node.asText()) : node;
                 if (isTruthy(getNodeAtPath(candidate, path))) {
-                    validEntries.add(element);
+                    count += step;
+                    if (count == nth) { return node;}
                 }
             }
-        } else {
-            validEntries = (ArrayNode)items;
         }
-        int size = validEntries.size();
-        if (size == 0) {
-            return Constants.MISSING_NODE;
-        }
-        int index = nth < 0 ? size + nth : nth;
-        if (index < 0 || index >= size) {
-            return Constants.MISSING_NODE;
-        }
-        return validEntries.get(index);
+        return Constants.MISSING_NODE;
     }
 }
