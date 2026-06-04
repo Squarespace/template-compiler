@@ -1,0 +1,15 @@
+:JSON
+{
+  "keys": ["a", "b", "c"],
+  "map": {
+    "a": { "enabled": false },
+    "b": { "enabled": true },
+    "c": { "enabled": true }
+  }
+}
+
+:TEMPLATE
+{keys|find-first map enabled}
+
+:OUTPUT
+b

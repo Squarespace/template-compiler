@@ -1,0 +1,22 @@
+:JSON
+{
+  "strings": ["a", "b", "c"],
+  "empty": [],
+  "notArray": "not-an-array",
+  "objects": [{ "x": 1 }, { "x": 2 }],
+  "noMatch": [{ "id": "a", "enabled": false }, { "id": "b" }]
+}
+
+:TEMPLATE
+{.var @r strings|find-first}{@r}
+{.var @r empty|find-first}-{@r}
+{.var @r notArray|find-first}-{@r}
+{.var @r objects|find-first}{@r.x}
+{.var @r noMatch|find-first enabled}-{@r}
+
+:OUTPUT
+a
+-
+-
+1
+-

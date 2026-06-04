@@ -50,6 +50,8 @@ import com.squarespace.template.plugins.CoreFormatters.CycleFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeSpaceFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeUriComponentFormatter;
 import com.squarespace.template.plugins.CoreFormatters.EncodeUriFormatter;
+import com.squarespace.template.plugins.CoreFormatters.FindFirstFormatter;
+import com.squarespace.template.plugins.CoreFormatters.FindLastFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlAttrFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlFormatter;
 import com.squarespace.template.plugins.CoreFormatters.HtmlTagFormatter;
@@ -81,6 +83,8 @@ public class CoreFormattersTest extends UnitTestBase {
   private static final Formatter ENCODE_SPACE = new EncodeSpaceFormatter();
   private static final Formatter ENCODE_URI = new EncodeUriFormatter();
   private static final Formatter ENCODE_URI_COMPONENT = new EncodeUriComponentFormatter();
+  private static final Formatter FIND_FIRST = new FindFirstFormatter();
+  private static final Formatter FIND_LAST = new FindLastFormatter();
   private static final Formatter HTML = new HtmlFormatter();
   private static final Formatter HTMLATTR = new HtmlAttrFormatter();
   private static final Formatter HTMLTAG = new HtmlTagFormatter();
@@ -542,6 +546,16 @@ public class CoreFormattersTest extends UnitTestBase {
     );
 
     runner.exec("f-key-by-%N.html");
+  }
+
+  @Test
+  public void testFindFirst() throws CodeException {
+    runner.exec("f-find-first-%N.html");
+  }
+
+  @Test
+  public void testFindLast() throws CodeException {
+    runner.exec("f-find-last-%N.html");
   }
 
   @Test

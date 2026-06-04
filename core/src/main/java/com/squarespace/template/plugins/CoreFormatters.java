@@ -25,6 +25,8 @@ import static com.squarespace.template.GeneralUtils.isTruthy;
 import static com.squarespace.template.GeneralUtils.jsonPretty;
 import static com.squarespace.template.GeneralUtils.splitVariable;
 import static com.squarespace.template.GeneralUtils.getNodeAtPath;
+import static com.squarespace.template.plugins.FindUtils.findNthValidEntry;
+import static com.squarespace.template.plugins.FindUtils.getLookupAndPath;
 import static com.squarespace.template.plugins.PluginDateUtils.formatDate;
 import static com.squarespace.template.plugins.PluginUtils.escapeScriptTags;
 
@@ -74,6 +76,8 @@ public class CoreFormatters implements FormatterRegistry {
     table.add(new EncodeSpaceFormatter());
     table.add(new EncodeUriFormatter());
     table.add(new EncodeUriComponentFormatter());
+    table.add(new FindFirstFormatter());
+    table.add(new FindLastFormatter());
     table.add(new FormatFormatter());
     table.add(new GetFormatter());
     table.add(new HtmlFormatter());
@@ -320,6 +324,71 @@ public class CoreFormatters implements FormatterRegistry {
 
   }
 
+  /**
+   * FIND-FIRST - Returns the first element of an array.
+   *
+   * Forms:
+   *   {array|find-first}              first element
+   *   {array|find-first path}         first element where element.path is truthy
+   *   {array|find-first lookup path}  array is treated as a list of keys; each key is
+   *                                   looked up in the `lookup` object (resolved against
+   *                                   the context) and the first key whose looked-up
+   *                                   value has a truthy value at `path` is returned.
+   *
+   * Returns a missing node when the input is not an array, the array is empty,
+   * or no element matches.
+   */
+  public static class FindFirstFormatter extends BaseFormatter {
+
+    public FindFirstFormatter() {
+      super("find-first", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.between(0, 2);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      FindUtils.LookupAndPath lp = getLookupAndPath(ctx, args.getArgs());
+      var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, 1));
+    }
+  }
+
+  /**
+   * FIND-LAST - Returns the last element of an array.
+   *
+   * Forms:
+   *   {array|find-last}              last element
+   *   {array|find-last path}         last element where element.path is truthy
+   *   {array|find-last lookup path}  array is treated as a list of keys; each key is
+   *                                  looked up in the `lookup` object (resolved against
+   *                                  the context) and the last key whose looked-up
+   *                                  value has a truthy value at `path` is returned.
+   *
+   * Returns a missing node when the input is not an array, the array is empty,
+   * or no element matches.
+   */
+  public static class FindLastFormatter extends BaseFormatter {
+
+    public FindLastFormatter() {
+      super("find-last", false);
+    }
+
+    @Override
+    public void validateArgs(Arguments args) throws ArgumentsException {
+      args.between(0, 2);
+    }
+
+    @Override
+    public void apply(Context ctx, Arguments args, Variables variables) throws CodeExecuteException {
+      Variable var = variables.first();
+      FindUtils.LookupAndPath lp = getLookupAndPath(ctx, args.getArgs());
+      var.set(findNthValidEntry(var.node(), lp.path, lp.lookup, -1));
+    }
+  }
   /**
    * FORMAT - Substitutes positional arguments in a format string.
    */
